@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Never.Deployment</id>
+    <title>Never.Deployment</title>
+    <authors>Never</authors>
+    <owners>Never</owners>
+    <version>1.0.0</version>
+    <tags>httprequest</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <repository type="git" url="https://github.com/shelldudu/never"></repository>
+    <language>zh-cn</language>
+    <description>never library</description>
+    <summary>never library</summary>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1" >
+        <dependency id="Never" version="1.0.0" />
+        <dependency id="Never.Web" version="1.0.0" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Never" version="1.0.0" />
+        <dependency id="Never.Web" version="1.0.0" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="..\Never.Deployment\bin\Never.Deployment.xml" target="lib/net461"/>
+    <file src="..\Never.Deployment\bin\Release\net461\Never.Deployment.dll" target="lib/net461"/>
+    <file src="..\Never.Deployment\bin\Release\net461\Never.Deployment.pdb" target="lib/net461"/>
+
+    <file src="..\Never.Deployment\bin\Never.Deployment.xml" target="lib/NETStandard2.0"/>
+    <file src="..\Never.Deployment\bin\Release\netstandard2.0\Never.Deployment.dll" target="lib/NETStandard2.0"/>
+    <file src="..\Never.Deployment\bin\Release\netstandard2.0\Never.Deployment.pdb" target="lib/NETStandard2.0"/>
+  </files>
+</package>

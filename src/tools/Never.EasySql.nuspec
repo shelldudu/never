@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Never.EasySql</id>
+    <title>Never.EasySql</title>
+    <authors>Never</authors>
+    <owners>Never</owners>
+    <version>1.0.0</version>
+    <tags>sqlclient</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <repository type="git" url="https://github.com/shelldudu/never"></repository>
+    <language>zh-cn</language>
+    <description>never library</description>
+    <summary>never library</summary>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1" >
+        <dependency id="Never" version="1.0.0" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Never" version="1.0.0" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="..\Never.EasySql\bin\Release\net461\xml\easysql.xsd" target="content/App_Config"/>
+    <file src="..\Never.EasySql\bin\Release\net461\xml\easysqldemo.xml" target="content/App_Config"/>
+    <file src="..\Never.EasySql\bin\Release\net461\xml\easysqldemo.txt" target="content/App_Config"/>
+
+    <file src="..\Never.EasySql\bin\Never.EasySql.xml" target="lib/net461"/>
+    <file src="..\Never.EasySql\bin\Release\net461\Never.EasySql.dll" target="lib/net461"/>
+    <file src="..\Never.EasySql\bin\Release\net461\Never.EasySql.pdb" target="lib/net461"/>
+
+    <file src="..\Never.EasySql\bin\Never.EasySql.xml" target="lib/NETStandard2.0"/>
+    <file src="..\Never.EasySql\bin\Release\netstandard2.0\Never.EasySql.dll" target="lib/NETStandard2.0"/>
+    <file src="..\Never.EasySql\bin\Release\netstandard2.0\Never.EasySql.pdb" target="lib/NETStandard2.0"/>
+  </files>
+</package>

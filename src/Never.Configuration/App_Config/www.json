@@ -1,0 +1,9 @@
+{
+  "application": "true",
+  "version": "1123",
+  "eat": "find://eat@abc",
+  "cat": "find://eat@abc",
+  "aum_conn": "link://eat@share@member_conn",
+  "risk_conn": "link://eat@share@member_conn",
+  "tianji_config": "find://eat@member_conn"
+}

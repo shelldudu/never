@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<namespace id="demo"
+           indented="true"
+           xmlns="never.easysql"
+           xsi:schemaLocation="never.easysql easysql.xsd"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <sql id="sqlUserAllField">
+    select a.Id,
+    a.UserId,
+    a.UserName
+    from myuser as a
+  </sql>
+
+  <sql id="qryUserContion">
+    <ifnotnull parameter="UserId" then="and">
+      UserId = $UserId$ and UserId = @UserId
+    </ifnotnull>
+    <ifnotnull parameter="Id" then="and ">Id = @Id</ifnotnull>
+    <ifempty parameter="UserName" then="and">
+      UserName = '111'
+    </ifempty>
+    <ifnotempty parameter="UserName" then="and">
+      UserName = '222'
+    </ifnotempty>
+  </sql>
+
+  <select id="qryUser">
+    <include refid="sqlUserAllField"></include>
+    <if then="where" end=";" split="">
+      <include refid="qryUserContion"></include>
+      <ifarray parameter="IdArray" then="and" split="," open="" close="">
+        Id in (@IdArray)
+      </ifarray>
+    </if>
+  </select>
+
+  <delete id="delUser">
+    delete from myuser
+    where UserId = @UserId;
+  </delete>
+
+  <update id="updUser">
+    update myuser
+    set UserName = @UserName
+    where UserId = @UserId;
+  </update>
+
+  <insert id="insUser">
+    insert into myuser(UserId,UserName)
+    values(
+    @UserId,
+    @UserName);
+    <return type="int">
+      select @@identity;
+    </return>
+  </insert>
+
+  <insert id="batchInsUser">
+    insert into myuser(UserId,UserName)
+    values
+    <ifarray open = "(" close= ")" parameter = "" then = "" split = ",">
+      @UserId,
+      @UserName
+    </ifarray>
+  </insert>
+</namespace>

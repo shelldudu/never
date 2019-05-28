@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Never.Web.WebApi</id>
+    <title>Never.Web.WebApi</title>
+    <authors>Never</authors>
+    <owners>Never</owners>
+    <version>1.0.0</version>
+    <tags>webapi</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <repository type="git" url="https://github.com/shelldudu/never"></repository>
+    <language>zh-cn</language>
+    <description>never library</description>
+    <summary>never library</summary>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1" >
+        <dependency id="Never" version="1.0.0" />
+        <dependency id="Never.Web" version="1.0.0" />
+        <dependency id="Microsoft.AspNet.WebApi.Core" version="5.2.7" />
+        <dependency id="Microsoft.AspNet.WebApi.WebHost" version="5.2.67" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Never" version="1.0.0" />
+        <dependency id="Never.Web" version="1.0.0" />
+        <dependency id="Microsoft.AspNetCore" version="2.2.0" />
+        <dependency id="Microsoft.AspNetCore.Mvc" version="2.2.0" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Net" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Net.Http" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Web" targetFramework=".NETFramework4.6.1" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="..\Never.Web.WebApi\bin\Never.Web.WebApi.xml" target="lib/net461"/>
+    <file src="..\Never.Web.WebApi\bin\Release\net461\Never.Web.WebApi.dll" target="lib/net461"/>
+    <file src="..\Never.Web.WebApi\bin\Release\net461\Never.Web.WebApi.pdb" target="lib/net461"/>
+
+    <file src="..\Never.Web.WebApi\bin\Never.Web.WebApi.xml" target="lib/NETStandard2.0"/>
+    <file src="..\Never.Web.WebApi\bin\Release\netstandard2.0\Never.Web.WebApi.dll" target="lib/NETStandard2.0"/>
+    <file src="..\Never.Web.WebApi\bin\Release\netstandard2.0\Never.Web.WebApi.pdb" target="lib/NETStandard2.0"/>
+  </files>
+</package>

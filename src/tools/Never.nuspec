@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Never</id>
+    <title>Never</title>
+    <authors>Never</authors>
+    <owners>Never</owners>
+    <version>1.0.0</version>
+    <tags>ioc,aop,sql,cqrs,mapper,socket,remoting,jsonser</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <repository type="git" url="https://github.com/shelldudu/never"></repository>
+    <language>zh-cn</language>
+    <description>never library</description>
+    <summary>never library</summary>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1" >
+        <dependency id="Microsoft.CSharp" version="4.5.0" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.CSharp" version="4.5.0" />
+        <dependency id="System.Reflection.Emit" version="4.3.0" />
+        <dependency id="System.Reflection.Emit.Lightweight" version="4.3.0" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Messaging" targetFramework=".NETFramework4.6.1" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="..\Never\bin\Never.xml" target="lib/net461"/>
+    <file src="..\Never\bin\Release\net461\Never.dll" target="lib/net461"/>
+    <file src="..\Never\bin\Release\net461\Never.pdb" target="lib/net461"/>
+
+    <file src="..\Never\bin\Never.xml" target="lib/NETStandard2.0"/>
+    <file src="..\Never\bin\Release\netstandard2.0\Never.dll" target="lib/NETStandard2.0"/>
+    <file src="..\Never\bin\Release\netstandard2.0\Never.pdb" target="lib/NETStandard2.0"/>
+  </files>
+</package>

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema targetNamespace="never.easysql"
+           elementFormDefault="qualified"
+           xmlns:mstns="http://tempuri.org/XMLSchema.xsd"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="never.easysql">
+
+  <xs:element name="namespace">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="sql" maxOccurs="unbounded" />
+        <xs:element ref="select" maxOccurs="unbounded" />
+        <xs:element ref="delete" maxOccurs="unbounded" />
+        <xs:element ref="update" maxOccurs="unbounded" />
+        <xs:element ref="insert" maxOccurs="unbounded" />
+        <xs:element ref="procedure" maxOccurs="unbounded" />
+      </xs:choice>
+      <xs:attribute name="id" type="xs:string" use="required" />
+      <xs:attribute name="indented" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="procedure">
+    <xs:complexType mixed="true">
+      <xs:attribute name="id" type="xs:string" use="required" />
+      <xs:attribute name="indented" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="include">
+    <xs:complexType mixed="true">
+      <xs:attribute name="refid" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sql">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="include" />
+        <xs:element ref="return" maxOccurs="0" />
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="id" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="select">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="include" />
+        <xs:element ref="if" />
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="id" type="xs:string" use="required" />
+      <xs:attribute name="indented" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="delete">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="include" />
+        <xs:element ref="if" />
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="id" use="required" />
+      <xs:attribute name="indented" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="insert">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="include" />
+        <xs:element ref="return" />
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="id" type="xs:string" use="required" />
+      <xs:attribute name="indented" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="return">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="type" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="byte" />
+                <xs:enumeration value="char" />
+                <xs:enumeration value="datetime" />
+                <xs:enumeration value="decimal" />
+                <xs:enumeration value="double" />
+                <xs:enumeration value="float" />
+                <xs:enumeration value="int" />
+                <xs:enumeration value="long" />
+                <xs:enumeration value="short" />
+                <xs:enumeration value="guid" />
+                <xs:enumeration value="string" />
+                <xs:enumeration value="other" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="update">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="include" />
+        <xs:element ref="return" />
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="id" type="xs:string" use="required" />
+      <xs:attribute name="indented" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="if">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="include" />
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="then" type="xs:string" use="required" />
+      <xs:attribute name="end" type="xs:string" use="required" />
+      <xs:attribute name="split" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ifnotnull">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="parameter" type="xs:string" use="required" />
+      <xs:attribute name="then" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ifnotempty">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="parameter" type="xs:string" use="required" />
+      <xs:attribute name="then" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ifnull">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="parameter" type="xs:string" use="required" />
+      <xs:attribute name="then" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ifempty">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="parameter" type="xs:string" use="required" />
+      <xs:attribute name="then" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ifcontain">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="parameter" type="xs:string" use="required" />
+      <xs:attribute name="then" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ifnotexists">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ifnotnull" />
+        <xs:element ref="ifnull" />
+        <xs:element ref="ifnotempty" />
+        <xs:element ref="ifempty" />
+        <xs:element ref="ifcontain" />
+        <xs:element ref="ifnotexists" />
+        <xs:element ref="ifarray" />
+      </xs:choice>
+      <xs:attribute name="parameter" type="xs:string" use="required" />
+      <xs:attribute name="then" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ifarray">
+    <xs:complexType mixed="true">
+      <xs:attribute name="open" type="xs:string" use="required" />
+      <xs:attribute name="close" type="xs:string" use="required" />
+      <xs:attribute name="split" type="xs:string" use="required" />
+      <xs:attribute name="parameter" type="xs:string" use="required" />
+      <xs:attribute name="then" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

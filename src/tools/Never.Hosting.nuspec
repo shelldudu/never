@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Never.Hosting</id>
+    <title>Never.Hosting</title>
+    <authors>Never</authors>
+    <owners>Never</owners>
+    <version>1.0.0</version>
+    <tags>hosting</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <repository type="git" url="https://github.com/shelldudu/never"></repository>
+    <language>zh-cn</language>
+    <description>never library</description>
+    <summary>never library</summary>
+    <dependencies>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="Never" version="1.0.0" />
+        <dependency id="Microsoft.Extensions.Configuration" version="2.2.0" />
+        <dependency id="Microsoft.Extensions.Configuration.Json" version="2.2.0" />  
+        <dependency id="Microsoft.Extensions.Hosting" version="2.2.0" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="..\Never.Hosting\bin\Release\netstandard2.0\Never.Hosting.dll" target="lib/NETStandard2.0"/>
+    <file src="..\Never.Hosting\bin\Release\netstandard2.0\Never.Hosting.pdb" target="lib/NETStandard2.0"/>
+  </files>
+</package>

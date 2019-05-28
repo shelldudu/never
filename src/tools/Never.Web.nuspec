@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Never.Web</id>
+    <title>Never.Web</title>
+    <authors>Never</authors>
+    <owners>Never</owners>
+    <version>1.0.0</version>
+    <tags>web</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <repository type="git" url="https://github.com/shelldudu/never"></repository>
+    <language>zh-cn</language>
+    <description>never library</description>
+    <summary>never library</summary>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1" >
+        <dependency id="Never" version="1.0.0" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Never" version="1.0.0" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Configuration" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Net" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Net.Http" targetFramework=".NETFramework4.6.1" />
+
+      <frameworkAssembly assemblyName="System.Runtime.Caching" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Runtime.Serialization.Formatters.Soap" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.ServiceModel" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.ServiceModel.Activation" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Web" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Web.Extensions" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Drawing" targetFramework=".NETFramework4.6.1" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="..\Never.Web\bin\Never.Web.xml" target="lib/net461"/>
+    <file src="..\Never.Web\bin\Release\net461\Never.Web.dll" target="lib/net461"/>
+    <file src="..\Never.Web\bin\Release\net461\Never.Web.pdb" target="lib/net461"/>
+
+    <file src="..\Never.Web\bin\Never.Web.xml" target="lib/NETStandard2.0"/>
+    <file src="..\Never.Web\bin\Release\netstandard2.0\Never.Web.dll" target="lib/NETStandard2.0"/>
+    <file src="..\Never.Web\bin\Release\netstandard2.0\Never.Web.pdb" target="lib/NETStandard2.0"/>
+  </files>
+</package>
