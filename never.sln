@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28917.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never", "src\Never\Never.csproj", "{8F12FB10-685A-4D01-BDBC-B6C90C4DE3B2}"
 EndProject
@@ -9,17 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Web", "src\Never.Web\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.EasySql", "src\Never.EasySql\Never.EasySql.csproj", "{DE092F24-2880-4C2C-8E78-893DF9360DE4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Web.Mvc", "src\Never.Web.Mvc\Never.Web.Mvc.csproj", "{A632FDB6-27B5-411C-89D2-42C5C6ABD3EB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Web.WebApi", "src\Never.Web.WebApi\Never.Web.WebApi.csproj", "{35FF6CE0-07FF-4849-BAF1-F27C745BF0CF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.WorkFlow", "src\Never.WorkFlow\Never.WorkFlow.csproj", "{F7A8BFCD-D1DF-4AFC-BB91-FB23AEF14599}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Configuration", "src\Never.Configuration\Never.Configuration.csproj", "{E6EF204E-323B-4BA6-945E-A67A3BF8BC3B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Deployment", "src\Never.Deployment\Never.Deployment.csproj", "{CCFD3486-1705-486A-BC6D-AAB310B6AE94}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Hosting", "src\Never.Hosting\Never.Hosting.csproj", "{9176F0FB-BBCB-4E98-8722-D5599C96134A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{523D1460-3987-43E5-848E-A3E7F988F48E}"
 EndProject
@@ -45,14 +39,6 @@ Global
 		{DE092F24-2880-4C2C-8E78-893DF9360DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE092F24-2880-4C2C-8E78-893DF9360DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE092F24-2880-4C2C-8E78-893DF9360DE4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A632FDB6-27B5-411C-89D2-42C5C6ABD3EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A632FDB6-27B5-411C-89D2-42C5C6ABD3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A632FDB6-27B5-411C-89D2-42C5C6ABD3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A632FDB6-27B5-411C-89D2-42C5C6ABD3EB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{35FF6CE0-07FF-4849-BAF1-F27C745BF0CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{35FF6CE0-07FF-4849-BAF1-F27C745BF0CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{35FF6CE0-07FF-4849-BAF1-F27C745BF0CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{35FF6CE0-07FF-4849-BAF1-F27C745BF0CF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F7A8BFCD-D1DF-4AFC-BB91-FB23AEF14599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F7A8BFCD-D1DF-4AFC-BB91-FB23AEF14599}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7A8BFCD-D1DF-4AFC-BB91-FB23AEF14599}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -65,10 +51,6 @@ Global
 		{CCFD3486-1705-486A-BC6D-AAB310B6AE94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCFD3486-1705-486A-BC6D-AAB310B6AE94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCFD3486-1705-486A-BC6D-AAB310B6AE94}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9176F0FB-BBCB-4E98-8722-D5599C96134A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9176F0FB-BBCB-4E98-8722-D5599C96134A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9176F0FB-BBCB-4E98-8722-D5599C96134A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9176F0FB-BBCB-4E98-8722-D5599C96134A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42A4EB21-2ABA-486B-9BD0-9BECA80EC24A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42A4EB21-2ABA-486B-9BD0-9BECA80EC24A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42A4EB21-2ABA-486B-9BD0-9BECA80EC24A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -86,7 +68,7 @@ Global
 		{1E5E2598-0EC0-4D15-A379-47B1162D3E08} = {523D1460-3987-43E5-848E-A3E7F988F48E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35
 		SolutionGuid = {98FF3BAD-84CC-482A-91DB-F008915B25CC}
+		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35
 	EndGlobalSection
 EndGlobal
