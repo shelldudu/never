@@ -1,4 +1,4 @@
-never是个开发框架，它的宗旨是让net开发简单。
+# never是个开发框架，它的宗旨是让net开发简单。
 
 所包含如下工具：
 
@@ -24,39 +24,14 @@ never是个开发框架，它的宗旨是让net开发简单。
 
 － worlflow 简单工作流
 
+# 核心组件
 
-组件初始流程：
+<a target="_blank" rel="never" href="https://raw.githubusercontent.com/shelldudu/never/master/doc/never.png"><img src="https://raw.githubusercontent.com/shelldudu/never/master/doc/never.png" alt="alt tag" style="max-width:100%;"></a>
 
-```
-private void Startup_OnStarting(object sender, Never.StartupEventArgs e)
-{
-    e.Startup.RegisterAssemblyFilter("Never".CreateAssemblyFilter())
-    .UseEasyIoC((x,y,z)=>{})
-    .UseCounterCache()
-    .UseConcurrentCache()
-    .UseDataContractJson()
-    .UseEasyJson(string.Empty)
-    .UseNLog(logfile)
-    .UseMvcActionCustomRoute(e.Collector as IServiceCollection)
-    .UseMvcModelStateValidation()
-    .UseForceCheckAggregateRootImplIHandle()
-    .UseForceCheckCommandAppDomainAttribute()
-    .UseForceCheckCommandEvenWithNoParamaterCtor()
-    .UseForceCheckCommandHandlerCtor()
-    .UseForceCheckEventAppDomainAttribute()
-    .UseForceCheckEventHandlerCtor()
-    .UseForceCheckMessageSubscriberCtor()
-    .UseAppConfig(configReader)
-    .UseMvcPermission()
-    .UseApiUriRouteDispatch(40, (x) => new IApiRouteProvider[]
-    {
-        new B2C.Message.Contract.Services.ApiRouteProvider(configReader),
-    }, () => e.Startup.ServiceLocator.ResolveOptional<ILoggerBuilder>())
-    .UseHttpProxyGenerateMessageApi()
-    .UseInjectingCommandHandlerEventHandler(Never.IoC.ComponentLifeStyle.Singleton)
-    .UseSqliteEventProviderCommandBus<CommandContextWrapper>(new SqliteFailRecoveryStorager(commandfile, eventfile))
-    .UseMvcDependency(e.Collector as IServiceCollection);
-}
-```
+
+
+<a target="_blank" rel="never" href="https://raw.githubusercontent.com/shelldudu/never/master/doc/never_emit.png"><img src="https://raw.githubusercontent.com/shelldudu/never/master/doc/never_emit.png" alt="alt tag" style="max-width:100%;"></a>
+    
+
 
 详情可看 https://github.com/shelldudu/never_application
