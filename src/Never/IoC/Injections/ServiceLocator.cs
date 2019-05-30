@@ -34,6 +34,11 @@ namespace Never.IoC.Injections
         #region IServiceLocator
 
         /// <summary>
+        /// 跟踪者
+        /// </summary>
+        public ILifetimeScopeTracker ScopeTracker { get; set; }
+
+        /// <summary>
         ///
         /// </summary>
         /// <returns></returns>
@@ -46,26 +51,23 @@ namespace Never.IoC.Injections
         ///
         /// </summary>
         /// <param name="scope"></param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        internal ILifetimeScope BeginLifetimeScope(ILifetimeScope scope, ILifetimeScopeTracker scopeTracker = null)
+        public ILifetimeScope BeginLifetimeScope(ILifetimeScope scope)
         {
-            var tracker = (scopeTracker ?? ContainerContext.Current?.ScopeTracker);
-            if (tracker == null)
+            if (this.ScopeTracker == null)
                 throw new ArgumentNullException("scopeTracker is null");
 
-            return tracker.StartScope(scope);
+            return this.ScopeTracker.StartScope(scope);
         }
 
         /// <summary>
         /// 返回所有T对象的实体
         /// </summary>
         /// <typeparam name="TService">服务类型</typeparam>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public TService[] ResolveAll<TService>(ILifetimeScopeTracker scopeTracker = null)
+        public TService[] ResolveAll<TService>()
         {
-            var all = this.BeginLifetimeScope(this.rootScope, scopeTracker).ResolveAll(typeof(TService));
+            var all = this.BeginLifetimeScope(this.rootScope).ResolveAll(typeof(TService));
             var result = all?.Select(t => (TService)t).ToArray();
             return result;
         }
@@ -74,22 +76,20 @@ namespace Never.IoC.Injections
         /// 返回所有T对象的实体
         /// </summary>
         /// <param name="serviceType">服务类型</param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public object[] ResolveAll(Type serviceType, ILifetimeScopeTracker scopeTracker = null)
+        public object[] ResolveAll(Type serviceType)
         {
-            return this.BeginLifetimeScope(this.rootScope, scopeTracker).ResolveAll(serviceType);
+            return this.BeginLifetimeScope(this.rootScope).ResolveAll(serviceType);
         }
 
         /// <summary>
         /// 返回T对象的实体
         /// </summary>
         /// <typeparam name="TService">服务类型</typeparam>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public TService Resolve<TService>(ILifetimeScopeTracker scopeTracker = null)
+        public TService Resolve<TService>()
         {
-            return (TService)this.BeginLifetimeScope(this.rootScope, scopeTracker).Resolve(typeof(TService), string.Empty);
+            return (TService)this.BeginLifetimeScope(this.rootScope).Resolve(typeof(TService), string.Empty);
         }
 
         /// <summary>
@@ -97,20 +97,18 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <typeparam name="TService">服务类型</typeparam>
         /// <param name="key">key</param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public TService Resolve<TService>(string key, ILifetimeScopeTracker scopeTracker = null)
+        public TService Resolve<TService>(string key)
         {
-            return (TService)this.BeginLifetimeScope(this.rootScope, scopeTracker).Resolve(typeof(TService), key);
+            return (TService)this.BeginLifetimeScope(this.rootScope).Resolve(typeof(TService), key);
         }
 
         /// <summary>
         /// 返回T对象的实体
         /// </summary>
         /// <typeparam name="TService">服务类型</typeparam>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public TService ResolveOptional<TService>(ILifetimeScopeTracker scopeTracker = null)
+        public TService ResolveOptional<TService>()
         {
             TService service = default(TService);
             this.ResolveOptional<TService>(string.Empty, out service);
@@ -121,9 +119,8 @@ namespace Never.IoC.Injections
         /// 返回某对象实体
         /// </summary>
         /// <param name="serviceType">服务类型</param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public object ResolveOptional(Type serviceType, ILifetimeScopeTracker scopeTracker = null)
+        public object ResolveOptional(Type serviceType)
         {
             object service = default(object);
             this.ResolveOptional(serviceType, string.Empty, out service);
@@ -134,13 +131,12 @@ namespace Never.IoC.Injections
         /// 返回T对象的实体
         /// </summary>
         /// <typeparam name="TService">服务类型</typeparam>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <param name="key"></param>
         /// <param name="service"></param>
         /// <returns></returns>
-        private bool ResolveOptional<TService>(string key, out TService service, ILifetimeScopeTracker scopeTracker = null)
+        private bool ResolveOptional<TService>(string key, out TService service)
         {
-            var scope = this.BeginLifetimeScope(this.rootScope, scopeTracker);
+            var scope = this.BeginLifetimeScope(this.rootScope);
             try
             {
                 service = (TService)scope.Resolve(typeof(TService), key);
@@ -169,11 +165,10 @@ namespace Never.IoC.Injections
         /// <param name="serviceType"></param>
         /// <param name="service"></param>
         /// <param name="key"></param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        private bool ResolveOptional(Type serviceType, string key, out object service, ILifetimeScopeTracker scopeTracker = null)
+        private bool ResolveOptional(Type serviceType, string key, out object service)
         {
-            var scope = this.BeginLifetimeScope(this.rootScope, scopeTracker);
+            var scope = this.BeginLifetimeScope(this.rootScope);
             try
             {
                 service = scope.Resolve(serviceType, key);
@@ -200,11 +195,10 @@ namespace Never.IoC.Injections
         /// 返回某对象实体
         /// </summary>
         /// <param name="serviceType">服务类型</param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public object Resolve(Type serviceType, ILifetimeScopeTracker scopeTracker = null)
+        public object Resolve(Type serviceType)
         {
-            return this.BeginLifetimeScope(this.rootScope, scopeTracker).Resolve(serviceType, string.Empty);
+            return this.BeginLifetimeScope(this.rootScope).Resolve(serviceType, string.Empty);
         }
 
         /// <summary>
@@ -212,11 +206,10 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <param name="serviceType">服务类型</param>
         /// <param name="key">key</param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public object Resolve(Type serviceType, string key, ILifetimeScopeTracker scopeTracker = null)
+        public object Resolve(Type serviceType, string key)
         {
-            return this.BeginLifetimeScope(this.rootScope, scopeTracker).Resolve(serviceType, key);
+            return this.BeginLifetimeScope(this.rootScope).Resolve(serviceType, key);
         }
 
         /// <summary>
@@ -224,9 +217,8 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <typeparam name="TService">服务类型</typeparam>
         /// <param name="instance">服务对象</param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public bool TryResolve<TService>(ref TService instance, ILifetimeScopeTracker scopeTracker = null)
+        public bool TryResolve<TService>(ref TService instance)
         {
             return this.TryResolve<TService>(ref instance, string.Empty);
         }
@@ -236,10 +228,9 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <typeparam name="TService">服务类型</typeparam>
         /// <param name="instance">服务对象</param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <param name="key">key</param>
         /// <returns></returns>
-        public bool TryResolve<TService>(ref TService instance, string key, ILifetimeScopeTracker scopeTracker = null)
+        public bool TryResolve<TService>(ref TService instance, string key)
         {
             try
             {
@@ -256,9 +247,8 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <param name="serviceType">服务类型</param>
         /// <param name="instance">服务对象</param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <returns></returns>
-        public bool TryResolve(Type serviceType, ref object instance, ILifetimeScopeTracker scopeTracker = null)
+        public bool TryResolve(Type serviceType, ref object instance)
         {
             return this.TryResolve(serviceType, ref instance, string.Empty);
         }
@@ -268,10 +258,9 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <param name="serviceType">服务类型</param>
         /// <param name="instance">服务对象</param>
-        /// <param name="scopeTracker">跟踪者</param>
         /// <param name="key">key</param>
         /// <returns></returns>
-        public bool TryResolve(Type serviceType, ref object instance, string key, ILifetimeScopeTracker scopeTracker = null)
+        public bool TryResolve(Type serviceType, ref object instance, string key)
         {
             try
             {

@@ -13,20 +13,19 @@ namespace Never.IoC
     /// </summary>
     public class ThreadLifetimeScopeTracker : DefaultLifetimeScopeTracker
     {
-        #region ctor
+        #region field and ctor
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
-        static ThreadLifetimeScopeTracker()
-        {
-        }
+        private readonly System.Threading.ThreadLocal<ILifetimeScope> threadLocal = null;
 
         /// <summary>
         ///
         /// </summary>
         public ThreadLifetimeScopeTracker()
         {
+            this.threadLocal = new System.Threading.ThreadLocal<ILifetimeScope>(false);
         }
 
         #endregion ctor
@@ -38,7 +37,10 @@ namespace Never.IoC
         /// <returns></returns>
         public override ILifetimeScope StartScope(ILifetimeScope parent)
         {
-            return new ThreadContextCache().Get("BeginLifetimeScope", () => base.StartScope(parent));
+            if (this.threadLocal.IsValueCreated)
+                return this.threadLocal.Value;
+
+            return this.threadLocal.Value = base.StartScope(parent);
         }
 
         /// <summary>
@@ -46,9 +48,11 @@ namespace Never.IoC
         /// </summary>
         public override void CleanScope()
         {
-            var scope = new ThreadContextCache().Get<ILifetimeScope>("BeginLifetimeScope");
-            if (scope != null)
-                scope.Dispose();
+            if (this.threadLocal.IsValueCreated && this.threadLocal.Value != null)
+            {
+                this.threadLocal.Value.Dispose();
+                this.threadLocal.Value = null;
+            }
 
             base.CleanScope();
         }

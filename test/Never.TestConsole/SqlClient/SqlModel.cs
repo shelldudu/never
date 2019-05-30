@@ -46,7 +46,7 @@ namespace Never.TestConsole.SqlClient
         {
             get
             {
-                return @"server=127.0.0.1;uid=sa;pwd=gg123456;database=b2c_message;";
+                return @"server=192.168.110.130;uid=sa;pwd=gg123456;database=p2p_admin;";
             }
         }
 

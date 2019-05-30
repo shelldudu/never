@@ -1,5 +1,4 @@
-﻿#if !NET461
-#else
+﻿#if NET461
 
 using Never.Caching;
 using System;

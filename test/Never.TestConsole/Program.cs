@@ -2,7 +2,9 @@
 using Never.EventStreams;
 using Never.IoC;
 using Never.IoC.Providers;
+using Never.TestConsole.Caching;
 using Never.TestConsole.Performance;
+using Never.TestConsole.SqlClient;
 
 namespace Never.TestConsole
 {
@@ -76,7 +78,7 @@ namespace Never.TestConsole
 
         public void Release()
         {
-            ContainerContext.Current?.ScopeTracker?.CleanScope();
+            ContainerContext.Current.ServiceLocator.ScopeTracker?.CleanScope();
         }
 
         #endregion ctor
@@ -84,7 +86,8 @@ namespace Never.TestConsole
 
         private static void Main(string[] args)
         {
-            new MapperTest().TestMapper();
+           // new InsertTest().TestSession();
+            new CachingTest().TestThreadContextCache();
         }
     }
 }

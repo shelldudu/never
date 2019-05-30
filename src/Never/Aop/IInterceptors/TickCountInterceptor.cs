@@ -12,20 +12,6 @@ namespace Never.Aop.IInterceptors
         /// </summary>
         public uint ElapsedMilliseconds { get; private set; }
 
-#if NET20 || NET30 || NET35
-#else
-
-        #region field
-
-        /// <summary>
-        ///
-        /// </summary>
-        private readonly static System.Threading.ThreadLocal<uint> tickResult = new System.Threading.ThreadLocal<uint>(() => Never.Utils.MethodTickCount.GetTickCount());
-
-        #endregion field
-
-#endif
-
         /// <summary>
         /// 在对方法进行调用前
         /// </summary>

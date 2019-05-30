@@ -1,5 +1,4 @@
-﻿#if !NET461
-#else
+﻿#if NET461
 
 using Never.Caching;
 using System;
@@ -16,45 +15,42 @@ namespace Never.Web.Caching
     /// </summary>
     public sealed class HttpRequestCache : ContextCache, ICaching, IDisposable
     {
-        #region
+        #region field and ctor
 
         /// <summary>
         /// 在httprequestItem中的缓存Key
         /// </summary>
-        private const string key = "Caching.HttpRequest";
+        private const string key = "Caching.HttpRequestCache";
 
-        #endregion
+        /// <summary>
+        /// 
+        /// </summary>
+        private static readonly Func<IDictionary> init = null;
 
-        #region
+        static HttpRequestCache()
+        {
+            init = new Func<IDictionary>(() =>
+            {
+                if (HttpContext.Current.Items.Contains(key))
+                    return System.Web.HttpContext.Current.Items[key] as Hashtable;
 
-        #region ctor
+                var result = new Hashtable();
+                HttpContext.Current.Items[key] = result;
+
+                return result;
+            });
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ThreadContextCache"/> class.
         /// </summary>
         public HttpRequestCache()
-            : base(GetCurrenDictionary())
+            : base(init())
         {
         }
 
         #endregion
 
-        /// <summary>
-        /// 获取对象缓存字典
-        /// </summary>
-        /// <returns></returns>
-        private static IDictionary GetCurrenDictionary()
-        {
-            if (HttpContext.Current.Items.Contains(key))
-                return System.Web.HttpContext.Current.Items[key] as Hashtable;
-
-            var result = new Hashtable();
-            HttpContext.Current.Items[key] = result;
-
-            return result;
-        }
-
-        #endregion
 
         #region IDisposable成员
 

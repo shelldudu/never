@@ -6,14 +6,14 @@ namespace Never.Caching
     /// <summary>
     /// 当前线程请求缓存
     /// </summary>
-    public class ThreadContextCache : ContextCache, ICaching, IDisposable
+    public sealed class ThreadContextCache : ContextCache, ICaching, IDisposable
     {
         #region field
 
         /// <summary>
         ///
         /// </summary>
-        protected readonly static System.Threading.ThreadLocal<Hashtable> CurrentThreadLocal = null;
+        private readonly System.Threading.ThreadLocal<Hashtable> threadLocal = null;
 
         #endregion field
 
@@ -22,28 +22,13 @@ namespace Never.Caching
         /// <summary>
         /// Initializes a new instance of the <see cref="ThreadContextCache"/> class.
         /// </summary>
-        static ThreadContextCache()
-        {
-            CurrentThreadLocal = new System.Threading.ThreadLocal<Hashtable>(() => new Hashtable());
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ThreadContextCache"/> class.
-        /// </summary>
-        public ThreadContextCache() : this(CurrentThreadLocal)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ThreadContextCache"/> class.
-        /// </summary>
-        /// <param name="dictionary"></param>
-        protected ThreadContextCache(IDictionary dictionary) : base(dictionary)
+        public ThreadContextCache() : this(new System.Threading.ThreadLocal<Hashtable>(() => new Hashtable()))
         {
         }
 
         private ThreadContextCache(System.Threading.ThreadLocal<Hashtable> threadLocal) : base(threadLocal.Value)
         {
+            this.threadLocal = threadLocal;
         }
 
         #endregion ctor
@@ -56,6 +41,9 @@ namespace Never.Caching
         /// <param name="isDispose">是否释放</param>
         protected override void Dispose(bool isDispose)
         {
+            this.threadLocal.Value.Clear();
+            this.threadLocal.Value = null;
+            this.threadLocal.Dispose();
             base.Dispose(isDispose);
         }
 

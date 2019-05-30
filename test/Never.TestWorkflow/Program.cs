@@ -96,7 +96,7 @@ namespace Never.WorkFlow.Test
 
         public void Release()
         {
-            ContainerContext.Current?.ScopeTracker?.CleanScope();
+            ContainerContext.Current.ServiceLocator.ScopeTracker?.CleanScope();
         }
 
         #endregion ctor

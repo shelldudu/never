@@ -52,5 +52,43 @@ namespace Never.TestConsole.SqlClient
                 throw;
             }
         }
+
+        [Xunit.Fact]
+        public void TestSession()
+        {
+            var builder = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build;
+            Task.Run(() => 
+            {
+                Console.WriteLine(builder.GetHashCode());
+                var dao = builder();
+                dao.BeginTransaction();
+                System.Threading.Thread.Sleep(TimeSpan.FromSeconds(2));
+                Console.WriteLine("1:" + dao.GetHashCode());
+                dao.RollBackTransaction();
+                dao.Dispose();
+            });
+
+            Task.Run(() =>
+            {
+                Console.WriteLine(builder.GetHashCode());
+                System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
+                var dao = builder();
+                dao.BeginTransaction();
+                Console.WriteLine("2:" + dao.GetHashCode());
+                dao.RollBackTransaction();
+                dao.Dispose();
+            });
+
+            Task.Run(() =>
+            {
+                System.Threading.Thread.Sleep(TimeSpan.FromSeconds(10));
+                var dao = builder();
+                dao.BeginTransaction();
+                Console.WriteLine("1:" + dao.GetHashCode());
+                dao.RollBackTransaction();
+            });
+
+            Console.ReadLine();
+        }
     }
 }

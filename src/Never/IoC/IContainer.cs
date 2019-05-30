@@ -26,10 +26,5 @@ namespace Never.IoC
         /// 类型发现者
         /// </summary>
         ITypeFinder TypeFinder { get; }
-
-        /// <summary>
-        /// 跟踪者
-        /// </summary>
-        ILifetimeScopeTracker ScopeTracker { get; set; }
     }
 }

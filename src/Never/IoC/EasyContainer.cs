@@ -212,9 +212,9 @@ namespace Never.IoC
             //注入生命周期管理
             var rule = default(RegisterRule);
             this.rootScope = this.ruleContainer.Build(out rule);
-            this.serviceLocator = new ServiceLocator(this.rootScope);
+            this.serviceLocator = new ServiceLocator(this.rootScope) { ScopeTracker = this.scopeTracker };
             this.serviceActivator = new ServiceActivator(this.rootScope, this.ruleContainer);
-            rule.Builder = rule.OptionalBuilder = (r, q, l, c) => { return ((ServiceLocator)this.serviceLocator).BeginLifetimeScope(this.rootScope, this.scopeTracker); };
+            rule.Builder = rule.OptionalBuilder = (r, q, l, c) => { return ((ServiceLocator)this.serviceLocator).BeginLifetimeScope(this.rootScope); };
             this.isStarted = true;
         }
 
