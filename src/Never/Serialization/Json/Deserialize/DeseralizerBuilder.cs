@@ -671,7 +671,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (nullableArrayGenericArgumentType != null && this.IsPrimitiveType(nullableArrayGenericArgumentType))
+                if (nullableArrayGenericArgumentType != null && this.IsPrimitiveOrInsideHandleType(nullableArrayGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -695,7 +695,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (this.IsPrimitiveType(enumerableGenericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(enumerableGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -796,7 +796,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (nullableListGenericArgumentType != null && this.IsPrimitiveType(nullableListGenericArgumentType))
+                if (nullableListGenericArgumentType != null && this.IsPrimitiveOrInsideHandleType(nullableListGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -824,7 +824,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (this.IsPrimitiveType(listGenericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(listGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -945,7 +945,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (nullableISetGenericArgumentType != null && this.IsPrimitiveType(nullableISetGenericArgumentType))
+                if (nullableISetGenericArgumentType != null && this.IsPrimitiveOrInsideHandleType(nullableISetGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -973,7 +973,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (this.IsPrimitiveType(iSetGenericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(iSetGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -1088,7 +1088,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (nullableICollectionGenericArgumentType != null && this.IsPrimitiveType(nullableICollectionGenericArgumentType))
+                if (nullableICollectionGenericArgumentType != null && this.IsPrimitiveOrInsideHandleType(nullableICollectionGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -1114,7 +1114,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (this.IsPrimitiveType(iCollectionGenericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(iCollectionGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -1223,7 +1223,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (nullableArrayGenericArgumentType != null && this.IsPrimitiveType(nullableArrayGenericArgumentType))
+                if (nullableArrayGenericArgumentType != null && this.IsPrimitiveOrInsideHandleType(nullableArrayGenericArgumentType))
                 {
                     if (sourceType.IsValueType)
                         emit.LoadLocalAddress(instanceLocal);
@@ -1263,7 +1263,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (this.IsPrimitiveType(enumerableGenericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(enumerableGenericArgumentType))
                 {
                     if (sourceType.IsValueType)
                         emit.LoadLocalAddress(instanceLocal);
@@ -1399,7 +1399,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (nullableListGenericArgumentType != null && this.IsPrimitiveType(nullableListGenericArgumentType))
+                if (nullableListGenericArgumentType != null && this.IsPrimitiveOrInsideHandleType(nullableListGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -1442,7 +1442,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (this.IsPrimitiveType(listGenericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(listGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -1604,7 +1604,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (nullableISetGenericArgumentType != null && this.IsPrimitiveType(nullableISetGenericArgumentType))
+                if (nullableISetGenericArgumentType != null && this.IsPrimitiveOrInsideHandleType(nullableISetGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -1650,7 +1650,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (this.IsPrimitiveType(iSetGenericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(iSetGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -1810,7 +1810,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (nullableICollectionGenericArgumentType != null && this.IsPrimitiveType(nullableICollectionGenericArgumentType))
+                if (nullableICollectionGenericArgumentType != null && this.IsPrimitiveOrInsideHandleType(nullableICollectionGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -1853,7 +1853,7 @@ namespace Never.Serialization.Json.Deserialize
                     return true;
                 }
 
-                if (this.IsPrimitiveType(iCollectionGenericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(iCollectionGenericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -2146,7 +2146,7 @@ namespace Never.Serialization.Json.Deserialize
         /// <returns></returns>
         protected virtual bool BuildForPrimitiveModule(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, Type memberType)
         {
-            if (this.IsPrimitiveType(memberType))
+            if (this.IsPrimitiveOrInsideHandleType(memberType))
             {
                 emit.LoadArgument(0);
                 emit.LoadArgument(1);
@@ -2156,7 +2156,7 @@ namespace Never.Serialization.Json.Deserialize
                 return true;
             }
 
-            if (this.IsNullablePrimitiveType(memberType))
+            if (this.IsNullablePrimitiveOrInsideHandleType(memberType))
             {
                 emit.LoadArgument(0);
                 emit.LoadArgument(1);
@@ -2181,7 +2181,7 @@ namespace Never.Serialization.Json.Deserialize
         /// <returns></returns>
         protected virtual bool BuildForPrimitiveModule(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, ILocal instanceLocal, Type sourceType, MemberInfo member, Type memberType, Attribute[] memberAttributes)
         {
-            if (this.IsPrimitiveType(memberType))
+            if (this.IsPrimitiveOrInsideHandleType(memberType))
             {
                 if (sourceType.IsValueType)
                     emit.LoadLocalAddress(instanceLocal);
@@ -2200,7 +2200,7 @@ namespace Never.Serialization.Json.Deserialize
                 return true;
             }
 
-            if (this.IsNullablePrimitiveType(memberType))
+            if (this.IsNullablePrimitiveOrInsideHandleType(memberType))
             {
                 if (sourceType.IsValueType)
                     emit.LoadLocalAddress(instanceLocal);

@@ -807,7 +807,7 @@ namespace Never.Aop.DynamicProxy.Builders
             }
 
             /*非可空的*/
-            if (this.IsPrimitiveType(elementType))
+            if (this.IsPrimitiveOrInsideHandleType(elementType))
             {
                 il.LoadLocal(argumentLocal);
                 il.LoadConstant(index + 1);
@@ -820,7 +820,7 @@ namespace Never.Aop.DynamicProxy.Builders
             }
 
             /*可空的*/
-            if (this.IsNullablePrimitiveType(elementType))
+            if (this.IsNullablePrimitiveOrInsideHandleType(elementType))
             {
                 il.LoadLocal(argumentLocal);
                 il.LoadConstant(index + 1);
@@ -908,7 +908,7 @@ namespace Never.Aop.DynamicProxy.Builders
             }
 
             /*非可空的*/
-            if (this.IsPrimitiveType(elementType))
+            if (this.IsPrimitiveOrInsideHandleType(elementType))
             {
                 il.LoadLocal(argumentLocal);
                 il.LoadConstant(index + 1);
@@ -921,7 +921,7 @@ namespace Never.Aop.DynamicProxy.Builders
             }
 
             /*可空的*/
-            if (this.IsNullablePrimitiveType(elementType))
+            if (this.IsNullablePrimitiveOrInsideHandleType(elementType))
             {
                 il.LoadLocal(argumentLocal);
                 il.LoadConstant(index + 1);
@@ -991,7 +991,7 @@ namespace Never.Aop.DynamicProxy.Builders
             }
 
             /*非可空的*/
-            if (this.IsPrimitiveType(parameters[index].ParameterType))
+            if (this.IsPrimitiveOrInsideHandleType(parameters[index].ParameterType))
             {
                 il.LoadLocal(argumentLocal);
                 il.LoadConstant(index + 1);
@@ -1003,7 +1003,7 @@ namespace Never.Aop.DynamicProxy.Builders
             }
 
             /*可空的*/
-            if (this.IsNullablePrimitiveType(parameters[index].ParameterType))
+            if (this.IsNullablePrimitiveOrInsideHandleType(parameters[index].ParameterType))
             {
                 il.LoadLocal(argumentLocal);
                 il.LoadConstant(index + 1);
@@ -1093,13 +1093,13 @@ namespace Never.Aop.DynamicProxy.Builders
             if (source.IsVisible)
                 return source;
 
-            if (IsPrimitiveType(source))
+            if (IsPrimitiveOrInsideHandleType(source))
                 return null;
 
             if (source.IsEnum)
                 return null;
 
-            if (this.IsNullablePrimitiveType(source))
+            if (this.IsNullablePrimitiveOrInsideHandleType(source))
                 return null;
 
             if (this.IsNullableEnumType(source))

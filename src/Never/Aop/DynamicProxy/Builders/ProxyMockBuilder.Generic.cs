@@ -81,12 +81,12 @@ namespace Never.Aop.DynamicProxy.Builders
         protected virtual Func<Target, IInterceptor[], Target> BuildNotCepaType(Target @object)
         {
             var type = typeof(Target);
-            if (this.IsPrimitiveType(type) || this.IsEnumType(type))
+            if (this.IsPrimitiveOrInsideHandleType(type) || this.IsEnumType(type))
             {
                 return new Func<Target, IInterceptor[], Target>((x, y) => { return default(Target); });
             }
 
-            if (this.IsNullablePrimitiveType(type) || this.IsNullableEnumType(type))
+            if (this.IsNullablePrimitiveOrInsideHandleType(type) || this.IsNullableEnumType(type))
             {
                 return new Func<Target, IInterceptor[], Target>((x, y) => { return default(Target); });
             }

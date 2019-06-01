@@ -102,7 +102,7 @@ namespace Never.Deployment
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public override bool IsPrimitiveType(Type type)
+        public override bool IsPrimitiveOrInsideHandleType(Type type)
         {
             if (TypeHelper.IsPrimitiveType(type))
                 return true;
@@ -118,7 +118,7 @@ namespace Never.Deployment
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public override bool IsNullablePrimitiveType(Type type)
+        public override bool IsNullablePrimitiveOrInsideHandleType(Type type)
         {
             var nullableType = Nullable.GetUnderlyingType(type);
             if (nullableType == null)
@@ -451,7 +451,7 @@ namespace Never.Deployment
                                 continue;
                             }
 
-                            if (this.IsPrimitiveType(parameters[i].ParameterType))
+                            if (this.IsPrimitiveOrInsideHandleType(parameters[i].ParameterType))
                             {
                                 il.LoadLocal(dictionlocal);
                                 il.LoadConstant(parameters[i].Name);
@@ -477,7 +477,7 @@ namespace Never.Deployment
                                 continue;
                             }
 
-                            if (this.IsNullablePrimitiveType(parameters[i].ParameterType))
+                            if (this.IsNullablePrimitiveOrInsideHandleType(parameters[i].ParameterType))
                             {
                                 il.LoadLocal(dictionlocal);
                                 il.LoadConstant(parameters[i].Name);
@@ -611,7 +611,7 @@ namespace Never.Deployment
                                 }
                             }
 
-                            else if (this.IsPrimitiveType(parameters[0].ParameterType))
+                            else if (this.IsPrimitiveOrInsideHandleType(parameters[0].ParameterType))
                             {
                                 var dictionlocal = il.DeclareLocal(typeof(Dictionary<string, string>));
                                 il.LoadConstant(parameters.Length);
@@ -663,7 +663,7 @@ namespace Never.Deployment
                                 return;
                             }
 
-                            else if (this.IsNullablePrimitiveType(parameters[0].ParameterType))
+                            else if (this.IsNullablePrimitiveOrInsideHandleType(parameters[0].ParameterType))
                             {
                                 var dictionlocal = il.DeclareLocal(typeof(Dictionary<string, string>));
                                 il.LoadConstant(parameters.Length);
@@ -795,7 +795,7 @@ namespace Never.Deployment
                                     continue;
                                 }
 
-                                if (this.IsPrimitiveType(parameters[i].ParameterType))
+                                if (this.IsPrimitiveOrInsideHandleType(parameters[i].ParameterType))
                                 {
                                     il.LoadLocal(dictionlocal);
                                     il.LoadConstant(parameters[i].Name);
@@ -812,7 +812,7 @@ namespace Never.Deployment
                                     continue;
                                 }
 
-                                if (this.IsNullablePrimitiveType(parameters[i].ParameterType))
+                                if (this.IsNullablePrimitiveOrInsideHandleType(parameters[i].ParameterType))
                                 {
                                     il.LoadLocal(dictionlocal);
                                     il.LoadConstant(parameters[i].Name);

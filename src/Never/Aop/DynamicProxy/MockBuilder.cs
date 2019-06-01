@@ -124,7 +124,7 @@ namespace Never.Aop.DynamicProxy
             foreach (var m in members)
             {
                 var mType = m.MemberType == MemberTypes.Property ? ((PropertyInfo)m).PropertyType : ((FieldInfo)m).FieldType;
-                if (this.IsPrimitiveType(mType) || this.IsEnumType(mType) || this.IsNullablePrimitiveType(mType) || this.IsNullableEnumType(mType))
+                if (this.IsPrimitiveOrInsideHandleType(mType) || this.IsEnumType(mType) || this.IsNullablePrimitiveOrInsideHandleType(mType) || this.IsNullableEnumType(mType))
                     primitive.Add(m);
                 else
                     notPrimitive.Add(m);
@@ -230,10 +230,10 @@ namespace Never.Aop.DynamicProxy
             if (this.IsNullableEnumType(type))
                 return false;
 
-            if (this.IsPrimitiveType(type))
+            if (this.IsPrimitiveOrInsideHandleType(type))
                 return false;
 
-            if (this.IsNullablePrimitiveType(type))
+            if (this.IsNullablePrimitiveOrInsideHandleType(type))
                 return false;
 
             if (TypeHelper.IsEnumerableType(type))
@@ -252,6 +252,36 @@ namespace Never.Aop.DynamicProxy
             if (TypeHelper.IsPrimitiveType(type))
                 return true;
 
+            return false;
+        }
+
+        /// <summary>
+        /// 是否为基元类型
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public virtual bool IsNullablePrimitiveType(Type type)
+        {
+            var nullableType = Nullable.GetUnderlyingType(type);
+            if (nullableType == null)
+                return false;
+
+            if (TypeHelper.IsPrimitiveType(nullableType))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// 是否为基元类型
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public virtual bool IsPrimitiveOrInsideHandleType(Type type)
+        {
+            if (TypeHelper.IsPrimitiveType(type))
+                return true;
+
             if (type == typeof(string) || type == typeof(DateTime) || type == typeof(DateTimeOffset) || type == typeof(Guid) || type == typeof(TimeSpan) || type == typeof(decimal))
                 return true;
 
@@ -263,7 +293,7 @@ namespace Never.Aop.DynamicProxy
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public virtual bool IsNullablePrimitiveType(Type type)
+        public virtual bool IsNullablePrimitiveOrInsideHandleType(Type type)
         {
             var nullableType = Nullable.GetUnderlyingType(type);
             if (nullableType == null)

@@ -460,7 +460,7 @@ namespace Never.Serialization.Json.Serialize
                 }
 
                 /*primitive*/
-                if (this.IsPrimitiveType(genericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(genericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -502,7 +502,7 @@ namespace Never.Serialization.Json.Serialize
                     }
 
                     /*primitive*/
-                    if (this.IsPrimitiveType(nullableGenericArgumentType))
+                    if (this.IsPrimitiveOrInsideHandleType(nullableGenericArgumentType))
                     {
                         emit.LoadArgument(0);
                         emit.LoadArgument(1);
@@ -799,7 +799,7 @@ namespace Never.Serialization.Json.Serialize
                 }
 
                 /*primitive*/
-                if (this.IsPrimitiveType(genericArgumentType))
+                if (this.IsPrimitiveOrInsideHandleType(genericArgumentType))
                 {
                     emit.LoadArgument(0);
                     emit.LoadArgument(1);
@@ -880,7 +880,7 @@ namespace Never.Serialization.Json.Serialize
                     }
 
                     /*primitive*/
-                    if (this.IsPrimitiveType(nullableGenericArgumentType))
+                    if (this.IsPrimitiveOrInsideHandleType(nullableGenericArgumentType))
                     {
                         emit.LoadArgument(0);
                         emit.LoadArgument(1);
@@ -1766,7 +1766,7 @@ namespace Never.Serialization.Json.Serialize
         protected virtual bool BuildForPrimitiveModule(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, Type memberType)
         {
             /*不可空的基元类型*/
-            if (this.IsPrimitiveType(memberType))
+            if (this.IsPrimitiveOrInsideHandleType(memberType))
             {
                 /*string*/
                 if (memberType == typeof(string))
@@ -1810,7 +1810,7 @@ namespace Never.Serialization.Json.Serialize
                 return true;
             }
 
-            if (this.IsNullablePrimitiveType(memberType))
+            if (this.IsNullablePrimitiveOrInsideHandleType(memberType))
             {
                 emit.LoadArgument(0);                                      // writer
                 emit.LoadArgument(1);
@@ -1839,7 +1839,7 @@ namespace Never.Serialization.Json.Serialize
         protected virtual bool BuildForPrimitiveModule(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, ILocal instanceLocal, Type sourceType, MemberInfo member, Type memberType, Attribute[] attributes)
         {
             /*可空的基元类型*/
-            if (this.IsNullablePrimitiveType(memberType))
+            if (this.IsNullablePrimitiveOrInsideHandleType(memberType))
             {
                 this.WriteMemberName(emit, setting, member, attributes);
                 this.WriteColon(emit, setting);
@@ -1874,7 +1874,7 @@ namespace Never.Serialization.Json.Serialize
             }
 
             /*不可空的基元类型*/
-            if (this.IsPrimitiveType(memberType))
+            if (this.IsPrimitiveOrInsideHandleType(memberType))
             {
                 /*string*/
                 if (memberType == typeof(string))
