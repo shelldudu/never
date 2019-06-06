@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.TestConsole", "test\N
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.TestWorkFlow", "test\Never.TestWorkflow\Never.TestWorkFlow.csproj", "{1E5E2598-0EC0-4D15-A379-47B1162D3E08}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Memcached", "src\Never.MemCached\Never.Memcached.csproj", "{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{1E5E2598-0EC0-4D15-A379-47B1162D3E08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E5E2598-0EC0-4D15-A379-47B1162D3E08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E5E2598-0EC0-4D15-A379-47B1162D3E08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,7 +74,7 @@ Global
 		{1E5E2598-0EC0-4D15-A379-47B1162D3E08} = {523D1460-3987-43E5-848E-A3E7F988F48E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {98FF3BAD-84CC-482A-91DB-F008915B25CC}
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35
+		SolutionGuid = {98FF3BAD-84CC-482A-91DB-F008915B25CC}
 	EndGlobalSection
 EndGlobal
