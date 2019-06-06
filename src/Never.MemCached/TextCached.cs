@@ -34,7 +34,7 @@ namespace Never.Memcached
             {
                 var connectionPool = new ConnectionPool(setting, () =>
                 {
-                    var server = servers[0];
+                    var server = servers[i];
                     var client = new Sockets.ClientSocket(setting, server);
                     client.Start();
                     return client.Connection;
@@ -171,6 +171,11 @@ namespace Never.Memcached
                         case "STORED":
                             {
                                 return true;
+                            }
+                        case "EXISTS":
+                            {
+                                //主要是这里引出不同
+                                return command == Command.add ? false : true;
                             }
                         case "NOT_STORED":
                             {

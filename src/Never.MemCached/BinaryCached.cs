@@ -37,7 +37,7 @@ namespace Never.Memcached
             {
                 var connectionPool = new ConnectionPool(setting, () =>
                 {
-                    var server = servers[0];
+                    var server = servers[i];
                     var client = new Sockets.ClientSocket(setting, server);
                     client.Start();
                     return client.Connection;
