@@ -25,12 +25,12 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="..\Never.WorkFlow\bin\Never.WorkFlow.xml" target="lib/net461"/>
-    <file src="..\Never.WorkFlow\bin\Release\net461\Never.WorkFlow.dll" target="lib/net461"/>
-    <file src="..\Never.WorkFlow\bin\Release\net461\Never.WorkFlow.pdb" target="lib/net461"/>
+    <file src="..\src\Never.WorkFlow\bin\Never.WorkFlow.xml" target="lib/net461"/>
+    <file src="..\src\Never.WorkFlow\bin\Release\net461\Never.WorkFlow.dll" target="lib/net461"/>
+    <file src="..\src\Never.WorkFlow\bin\Release\net461\Never.WorkFlow.pdb" target="lib/net461"/>
 
-    <file src="..\Never.WorkFlow\bin\Never.WorkFlow.xml" target="lib/NETStandard2.0"/>
-    <file src="..\Never.WorkFlow\bin\Release\netstandard2.0\Never.WorkFlow.dll" target="lib/NETStandard2.0"/>
-    <file src="..\Never.WorkFlow\bin\Release\netstandard2.0\Never.WorkFlow.pdb" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.WorkFlow\bin\Never.WorkFlow.xml" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.WorkFlow\bin\Release\netstandard2.0\Never.WorkFlow.dll" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.WorkFlow\bin\Release\netstandard2.0\Never.WorkFlow.pdb" target="lib/NETStandard2.0"/>
   </files>
 </package>

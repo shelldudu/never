@@ -25,16 +25,16 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="..\Never.EasySql\bin\Release\net461\xml\easysql.xsd" target="content/App_Config"/>
-    <file src="..\Never.EasySql\bin\Release\net461\xml\easysqldemo.xml" target="content/App_Config"/>
-    <file src="..\Never.EasySql\bin\Release\net461\xml\easysqldemo.txt" target="content/App_Config"/>
+    <file src="..\src\Never.EasySql\bin\Release\net461\xml\easysql.xsd" target="content/App_Config"/>
+    <file src="..\src\Never.EasySql\bin\Release\net461\xml\easysqldemo.xml" target="content/App_Config"/>
+    <file src="..\src\Never.EasySql\bin\Release\net461\xml\easysqldemo.txt" target="content/App_Config"/>
 
-    <file src="..\Never.EasySql\bin\Never.EasySql.xml" target="lib/net461"/>
-    <file src="..\Never.EasySql\bin\Release\net461\Never.EasySql.dll" target="lib/net461"/>
-    <file src="..\Never.EasySql\bin\Release\net461\Never.EasySql.pdb" target="lib/net461"/>
+    <file src="..\src\Never.EasySql\bin\Never.EasySql.xml" target="lib/net461"/>
+    <file src="..\src\Never.EasySql\bin\Release\net461\Never.EasySql.dll" target="lib/net461"/>
+    <file src="..\src\Never.EasySql\bin\Release\net461\Never.EasySql.pdb" target="lib/net461"/>
 
-    <file src="..\Never.EasySql\bin\Never.EasySql.xml" target="lib/NETStandard2.0"/>
-    <file src="..\Never.EasySql\bin\Release\netstandard2.0\Never.EasySql.dll" target="lib/NETStandard2.0"/>
-    <file src="..\Never.EasySql\bin\Release\netstandard2.0\Never.EasySql.pdb" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.EasySql\bin\Never.EasySql.xml" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.EasySql\bin\Release\netstandard2.0\Never.EasySql.dll" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.EasySql\bin\Release\netstandard2.0\Never.EasySql.pdb" target="lib/NETStandard2.0"/>
   </files>
 </package>

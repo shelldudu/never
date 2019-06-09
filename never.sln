@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28917.181
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never", "src\Never\Never.csproj", "{8F12FB10-685A-4D01-BDBC-B6C90C4DE3B2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Web", "src\Never.Web\Never.Web.csproj", "{1AD4F5D2-7A31-476A-AE78-BDB9D3E73348}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.EasySql", "src\Never.EasySql\Never.EasySql.csproj", "{DE092F24-2880-4C2C-8E78-893DF9360DE4}"
 EndProject
@@ -33,10 +31,6 @@ Global
 		{8F12FB10-685A-4D01-BDBC-B6C90C4DE3B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F12FB10-685A-4D01-BDBC-B6C90C4DE3B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F12FB10-685A-4D01-BDBC-B6C90C4DE3B2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1AD4F5D2-7A31-476A-AE78-BDB9D3E73348}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1AD4F5D2-7A31-476A-AE78-BDB9D3E73348}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1AD4F5D2-7A31-476A-AE78-BDB9D3E73348}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1AD4F5D2-7A31-476A-AE78-BDB9D3E73348}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE092F24-2880-4C2C-8E78-893DF9360DE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE092F24-2880-4C2C-8E78-893DF9360DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE092F24-2880-4C2C-8E78-893DF9360DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -74,7 +68,7 @@ Global
 		{1E5E2598-0EC0-4D15-A379-47B1162D3E08} = {523D1460-3987-43E5-848E-A3E7F988F48E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35
 		SolutionGuid = {98FF3BAD-84CC-482A-91DB-F008915B25CC}
+		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35
 	EndGlobalSection
 EndGlobal

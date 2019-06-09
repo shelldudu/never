@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Never.Web
@@ -9,6 +11,11 @@ namespace Never.Web
     /// </summary>
     public interface IHttpAsyncDownloader
     {
+        /// <summary>
+        /// 数据编码
+        /// </summary>
+        Encoding Encoding { get; }
+
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
@@ -122,6 +129,17 @@ namespace Never.Web
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        Task<byte[]> Post(string url, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout);
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
         /// <param name="uri">Url请求地址</param>
         /// <param name="postParams">请求参数</param>
         /// <returns></returns>
@@ -160,56 +178,13 @@ namespace Never.Web
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
-        /// <param name="url">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <returns></returns>
-        Task<byte[]> Post(string url, string jsonData);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="url">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
         /// <param name="headerParams">标头的值</param>
-        /// <returns></returns>
-        Task<byte[]> Post(string url, string jsonData, IDictionary<string, string> headerParams);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="url">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        Task<byte[]> Post(string url, string jsonData, IDictionary<string, string> headerParams, int timeout);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="uri">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <returns></returns>
-        Task<byte[]> Post(Uri uri, string jsonData);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="uri">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <param name="headerParams">标头的值</param>
-        /// <returns></returns>
-        Task<byte[]> Post(Uri uri, string jsonData, IDictionary<string, string> headerParams);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="uri">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <param name="headerParams">标头的值</param>
-        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
-        /// <returns></returns>
-        Task<byte[]> Post(Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout);
+        Task<byte[]> Post(Uri uri, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout);
 
         /// <summary>
         /// 从Url地址中下载数据
@@ -324,6 +299,17 @@ namespace Never.Web
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        Task<string> PostString(string url, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout);
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
         /// <param name="uri">Url请求地址</param>
         /// <param name="postParams">请求参数</param>
         /// <returns></returns>
@@ -362,55 +348,12 @@ namespace Never.Web
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
-        /// <param name="url">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <returns></returns>
-        Task<string> PostString(string url, string jsonData);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="url">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
         /// <param name="headerParams">标头的值</param>
-        /// <returns></returns>
-        Task<string> PostString(string url, string jsonData, IDictionary<string, string> headerParams);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="url">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        Task<string> PostString(string url, string jsonData, IDictionary<string, string> headerParams, int timeout);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="uri">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <returns></returns>
-        Task<string> PostString(Uri uri, string jsonData);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="uri">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <param name="headerParams">标头的值</param>
-        /// <returns></returns>
-        Task<string> PostString(Uri uri, string jsonData, IDictionary<string, string> headerParams);
-
-        /// <summary>
-        /// 从Url地址中下载数据
-        /// </summary>
-        /// <param name="uri">Url请求地址</param>
-        /// <param name="jsonData">请求json参数</param>
-        /// <param name="headerParams">标头的值</param>
-        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
-        /// <returns></returns>
-        Task<string> PostString(Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout);
+        Task<string> PostString(Uri uri, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout);
     }
 }

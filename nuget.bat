@@ -32,8 +32,8 @@ goto start
 
 :pack
 set path=%CD%
-set exe=%path%\src\tools\nuget.exe
-set outPath=%path%\src\tools\
+set exe=%path%\tools\nuget.exe
+set outPath=%path%\tools\
 set x86="c:\Program Files\dotnet\dotnet.exe"
 set x64="c:\Program Files (x86)\dotnet\dotnet.exe"
 set file=""
@@ -50,7 +50,7 @@ goto start
 
 :delete
 set path=%CD%
-set outPath=%path%\src\tools\
+set outPath=%path%\tools\
 del %outPath%\*.nupkg
 echo ....
 :ipdhcp

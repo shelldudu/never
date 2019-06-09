@@ -5,7 +5,7 @@
     <title>Never</title>
     <authors>Never</authors>
     <owners>Never</owners>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <tags>ioc,aop,sql,cqrs,mapper,socket,remoting,jsonser</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
@@ -28,12 +28,12 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="..\Never\bin\Never.xml" target="lib/net461"/>
-    <file src="..\Never\bin\Release\net461\Never.dll" target="lib/net461"/>
-    <file src="..\Never\bin\Release\net461\Never.pdb" target="lib/net461"/>
+    <file src="..\src\Never\bin\Never.xml" target="lib/net461"/>
+    <file src="..\src\Never\bin\Release\net461\Never.dll" target="lib/net461"/>
+    <file src="..\src\Never\bin\Release\net461\Never.pdb" target="lib/net461"/>
 
-    <file src="..\Never\bin\Never.xml" target="lib/NETStandard2.0"/>
-    <file src="..\Never\bin\Release\netstandard2.0\Never.dll" target="lib/NETStandard2.0"/>
-    <file src="..\Never\bin\Release\netstandard2.0\Never.pdb" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never\bin\Never.xml" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never\bin\Release\netstandard2.0\Never.dll" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never\bin\Release\netstandard2.0\Never.pdb" target="lib/NETStandard2.0"/>
   </files>
 </package>

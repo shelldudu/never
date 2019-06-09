@@ -28,12 +28,12 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="..\Never.Configuration\bin\Never.Configuration.xml" target="lib/net461"/>
-    <file src="..\Never.Configuration\bin\Release\net461\Never.Configuration.dll" target="lib/net461"/>
-    <file src="..\Never.Configuration\bin\Release\net461\Never.Configuration.pdb" target="lib/net461"/>
+    <file src="..\src\Never.Configuration\bin\Never.Configuration.xml" target="lib/net461"/>
+    <file src="..\src\Never.Configuration\bin\Release\net461\Never.Configuration.dll" target="lib/net461"/>
+    <file src="..\src\Never.Configuration\bin\Release\net461\Never.Configuration.pdb" target="lib/net461"/>
 
-    <file src="..\Never.Configuration\bin\Never.Configuration.xml" target="lib/NETStandard2.0"/>
-    <file src="..\Never.Configuration\bin\Release\netstandard2.0\Never.Configuration.dll" target="lib/NETStandard2.0"/>
-    <file src="..\Never.Configuration\bin\Release\netstandard2.0\Never.Configuration.pdb" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.Configuration\bin\Never.Configuration.xml" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.Configuration\bin\Release\netstandard2.0\Never.Configuration.dll" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.Configuration\bin\Release\netstandard2.0\Never.Configuration.pdb" target="lib/NETStandard2.0"/>
   </files>
 </package>

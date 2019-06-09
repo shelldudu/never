@@ -40,7 +40,6 @@
     <ProjectReference Include="..\..\src\Never.Configuration\Never.Configuration.csproj" />
     <ProjectReference Include="..\..\src\Never.Deployment\Never.Deployment.csproj" />
     <ProjectReference Include="..\..\src\Never.EasySql\Never.EasySql.csproj" />
-    <ProjectReference Include="..\..\src\Never.Web\Never.Web.csproj" />
     <ProjectReference Include="..\..\src\Never.WorkFlow\Never.WorkFlow.csproj" />
     <ProjectReference Include="..\..\src\Never\Never.csproj" />
   </ItemGroup>

@@ -208,14 +208,8 @@ namespace Never
             if (string.IsNullOrEmpty(text))
                 throw new ArgumentException("要加密的内容不能为空");
 
-            if (IsChineseWord(key))
-                throw new ArgumentOutOfRangeException("key不能为汉字");
-
             if (key.Length != 8)
                 throw new ArgumentOutOfRangeException("key的长度要为8个字符");
-
-            if (IsChineseWord(iv))
-                throw new ArgumentOutOfRangeException("iv不能为汉字");
 
             if (iv.Length != 8)
                 throw new ArgumentOutOfRangeException("key的长度要为8个字符");
@@ -252,14 +246,8 @@ namespace Never
             if (string.IsNullOrEmpty(text))
                 throw new ArgumentException("要解密的内容不能为空");
 
-            if (IsChineseWord(key))
-                throw new ArgumentOutOfRangeException("key不能为汉字");
-
             if (key.Length != 8)
                 throw new ArgumentOutOfRangeException("key的长度要为8个字符");
-
-            if (IsChineseWord(iv))
-                throw new ArgumentOutOfRangeException("iv不能为汉字");
 
             if (iv.Length != 8)
                 throw new ArgumentOutOfRangeException("key的长度要为8个字符");
@@ -313,9 +301,6 @@ namespace Never
             if (string.IsNullOrEmpty(text))
                 return string.Empty;
 
-            if (IsChineseWord(key))
-                throw new ArgumentOutOfRangeException("key不能为汉字");
-
             if (key.Length != 24)
                 throw new ArgumentOutOfRangeException("key的长度要为24个字符");
 
@@ -335,9 +320,6 @@ namespace Never
         /// <returns></returns>
         public static byte[] To3DES(this byte[] data, string key)
         {
-            if (IsChineseWord(key))
-                throw new ArgumentOutOfRangeException("key不能为汉字");
-
             if (key.Length != 24)
                 throw new ArgumentOutOfRangeException("key的长度要为24个字符");
 
@@ -381,9 +363,6 @@ namespace Never
             if (string.IsNullOrEmpty(text))
                 return string.Empty;
 
-            if (IsChineseWord(key))
-                throw new ArgumentOutOfRangeException("key不能为汉字");
-
             if (key.Length != 24)
                 throw new ArgumentOutOfRangeException("key的长度要为24个字符");
 
@@ -403,9 +382,6 @@ namespace Never
         /// <returns></returns>
         public static byte[] From3DES(this byte[] data, string key)
         {
-            if (IsChineseWord(key))
-                throw new ArgumentOutOfRangeException("key不能为汉字");
-
             if (key.Length != 24)
                 throw new ArgumentOutOfRangeException("key的长度要为24个字符");
 
@@ -442,9 +418,6 @@ namespace Never
             if (string.IsNullOrEmpty(text))
                 return string.Empty;
 
-            if (IsChineseWord(key))
-                throw new ArgumentOutOfRangeException("key不能为汉字");
-
             if (!IsBetween(key.Length, 5, 16))
                 throw new ArgumentOutOfRangeException("key的长度要介于4和16为字符串");
 
@@ -478,8 +451,6 @@ namespace Never
             if (string.IsNullOrEmpty(text))
                 return string.Empty;
 
-            if (IsChineseWord(key))
-                throw new ArgumentOutOfRangeException("key不能为汉字");
             if (!IsBetween(key.Length, 5, 16))
                 throw new ArgumentOutOfRangeException("key的长度要介于4和16为字符串");
 

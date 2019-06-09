@@ -29,6 +29,7 @@
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Messaging" />
   </ItemGroup>
 
@@ -44,7 +45,6 @@
     <None Remove="Serialization\Binary\**" />
     <None Remove="Serialization\Xml\**" />
   </ItemGroup>
-  
-  
+ 
 
 </Project>

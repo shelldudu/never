@@ -9,7 +9,7 @@ using System.Runtime.Caching;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Never.Web.Caching
+namespace Never.Caching
 {
     /// <summary>
     /// .net 4.0 使用内存

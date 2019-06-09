@@ -98,6 +98,33 @@ namespace Never
             return startup;
         }
 
+        /// <summary>
+        /// 启动MemoryCache支持
+        /// </summary>
+        /// <param name="startup">程序宿主环境配置服务</param>
+        /// <returns></returns>
+        public static ApplicationStartup UseMemoryCache(this ApplicationStartup startup)
+        {
+            return UseMemoryCache(startup, string.Empty);
+        }
+
+        /// <summary>
+        /// 启动MemoryCache支持
+        /// </summary>
+        /// <param name="startup">程序宿主环境配置服务</param>
+        /// <param name="key">IoC容器中的key</param>
+        /// <returns></returns>
+        public static ApplicationStartup UseMemoryCache(this ApplicationStartup startup, string key)
+        {
+            if (startup.ServiceRegister == null)
+                return startup;
+
+            if (startup.Items.ContainsKey("UseMemoryCache" + key))
+                return startup;
+            startup.ServiceRegister.RegisterType(typeof(Never.Caching.MemoryCache), typeof(ICaching), key, ComponentLifeStyle.Singleton);
+            startup.Items["UseMemoryCache" + key] = "t";
+            return startup;
+        }
 #endif
 
         /// <summary>

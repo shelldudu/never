@@ -26,10 +26,10 @@
   </metadata>
   <files>
 
-    <file src="..\Never.Memcached\bin\Release\net461\Never.Memcached.dll" target="lib/net461"/>
-    <file src="..\Never.Memcached\bin\Release\net461\Never.Memcached.pdb" target="lib/net461"/>
+    <file src="..\src\Never.Memcached\bin\Release\net461\Never.Memcached.dll" target="lib/net461"/>
+    <file src="..\src\Never.Memcached\bin\Release\net461\Never.Memcached.pdb" target="lib/net461"/>
 
-    <file src="..\Never.Memcached\bin\Release\netstandard2.0\Never.Memcached.dll" target="lib/NETStandard2.0"/>
-    <file src="..\Never.Memcached\bin\Release\netstandard2.0\Never.Memcached.pdb" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.Memcached\bin\Release\netstandard2.0\Never.Memcached.dll" target="lib/NETStandard2.0"/>
+    <file src="..\src\Never.Memcached\bin\Release\netstandard2.0\Never.Memcached.pdb" target="lib/NETStandard2.0"/>
   </files>
 </package>

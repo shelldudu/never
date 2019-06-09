@@ -1,7 +1,6 @@
 ﻿using Never.IoC;
 using Never.Logging;
 using Never.Web;
-using Never.Net;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -58,7 +57,7 @@ namespace Never.Deployment
                     }
                     else
                     {
-                        txt = new WebRequestDownloader().GetString(item.A10Url, null, null, ContentType.Default, 0);
+                        txt = new WebRequestDownloader().GetString(item.A10Url);
                         item.ReportText = txt;
                         item.ReportTime = DateTime.Now;
                     }

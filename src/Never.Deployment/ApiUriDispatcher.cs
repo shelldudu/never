@@ -1,13 +1,12 @@
-﻿using Never.Logging;
-using Never.Net;
-using Never.Serialization;
-using Never.Utils;
-using Never.Web;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Never.Logging;
+using Never.Web;
+using Never.Serialization;
+using Never.Utils;
 
 namespace Never.Deployment
 {
@@ -285,7 +284,7 @@ namespace Never.Deployment
         /// <returns></returns>
         public virtual T Post<T>(IJsonSerializer jsonSerializer, UrlConcat url, string jsonDate, IDictionary<string, string> headerParams, int timeout = 30000)
         {
-            var txt = new WebRequestDownloader().PostString(url.ToString(), jsonDate, headerParams, timeout);
+            var txt = new WebRequestDownloader().JPostString(url.ToString(), jsonDate, headerParams, timeout);
             if (txt.IsNullOrEmpty())
                 return default(T);
 
@@ -303,7 +302,7 @@ namespace Never.Deployment
         /// <returns></returns>
         public virtual void Post(IJsonSerializer jsonSerializer, UrlConcat url, string jsonDate, IDictionary<string, string> headerParams, int timeout = 30000)
         {
-            new WebRequestDownloader().PostString(url.ToString(), jsonDate, headerParams, timeout);
+            new WebRequestDownloader().JPostString(url.ToString(), jsonDate, headerParams, timeout);
         }
 
         /// <summary>
@@ -349,7 +348,7 @@ namespace Never.Deployment
         /// <returns></returns>
         public virtual T Get<T>(IJsonSerializer jsonSerializer, UrlConcat url, IDictionary<string, string> requestPara, IDictionary<string, string> headerParams, int timeout = 30000)
         {
-            var txt = new WebRequestDownloader().GetString(url.ToString(), requestPara, headerParams, ContentType.Json, timeout);
+            var txt = new WebRequestDownloader().GetString(url.ToString(), requestPara, headerParams, "application/json", timeout);
             if (txt.IsNullOrEmpty())
                 return default(T);
 
@@ -367,7 +366,7 @@ namespace Never.Deployment
         /// <returns></returns>
         public virtual void Get(IJsonSerializer jsonSerializer, UrlConcat url, IDictionary<string, string> requestPara, IDictionary<string, string> headerParams, int timeout = 30000)
         {
-            new WebRequestDownloader().GetString(url.ToString(), requestPara, headerParams, ContentType.Json, timeout);
+            new WebRequestDownloader().GetString(url.ToString(), requestPara, headerParams, "application/json", timeout);
         }
 
         #endregion utils
