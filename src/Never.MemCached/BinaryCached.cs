@@ -35,13 +35,12 @@ namespace Never.Memcached
             this.connectionPools = new ConnectionPool[servers.Length];
             for (var i = 0; i < servers.Length; i++)
             {
-                var connectionPool = new ConnectionPool(setting, () =>
-                {
-                    var server = servers[i];
-                    var client = new Sockets.ClientSocket(setting, server);
-                    client.Start();
-                    return client.Connection;
-                });
+                var connectionPool = new ConnectionPool(setting, servers[i], (set, end) =>
+                 {
+                     var client = new Sockets.ClientSocket(set, end);
+                     client.Start();
+                     return client.Connection;
+                 });
 
                 this.connectionPools[i] = connectionPool;
             }

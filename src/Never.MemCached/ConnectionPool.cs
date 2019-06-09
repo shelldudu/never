@@ -1,7 +1,8 @@
-﻿using Never.Memcached.Sockets;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
+using Never.Memcached.Sockets;
 
 namespace Never.Memcached
 {
@@ -29,14 +30,16 @@ namespace Never.Memcached
         private SocketSetting setting;
         private List<ConnectionItem[]> pools;
         private ConcurrentQueue<RangeTuple<int, int>> groups;
-        private Func<Connection> connectionInit;
+        private EndPoint endPoint;
+        private Func<SocketSetting, EndPoint, Connection> connectionInit;
 
         /// <summary>
         /// 
         /// </summary>
-        public ConnectionPool(SocketSetting setting, Func<Connection> connectionInit)
+        public ConnectionPool(SocketSetting setting, EndPoint endPoint, Func<SocketSetting, EndPoint, Connection> connectionInit)
         {
             this.setting = setting;
+            this.endPoint = endPoint;
             this.pools = new List<ConnectionItem[]>();
             this.groups = new ConcurrentQueue<RangeTuple<int, int>>();
             this.connectionInit = connectionInit;
@@ -75,7 +78,7 @@ namespace Never.Memcached
                 var buffer = new ConnectionItem()
                 {
                     Group = new RangeTuple<int, int>(count, i),
-                    Connection = this.connectionInit(),
+                    Connection = this.connectionInit(this.setting, this.endPoint),
                 };
                 buffers[i] = buffer;
                 offset += this.setting.ReceiveBufferSize;

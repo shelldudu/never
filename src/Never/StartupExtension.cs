@@ -129,7 +129,7 @@ namespace Never
         /// <param name="startup">程序宿主环境配置服务</param>
         /// <param name="key">key</param>
         /// <returns></returns>
-        public static ApplicationStartup UseDataContractJson(this ApplicationStartup startup, string key = GlobalConstantSetting.SerializerKey.DataContract)
+        public static ApplicationStartup UseDataContractJson(this ApplicationStartup startup, string key = "ioc.ser.datacontract")
         {
             if (startup.ServiceRegister == null)
                 return startup;
@@ -151,7 +151,7 @@ namespace Never
         /// <param name="startup">程序宿主环境配置服务</param>
         /// <param name="key">key</param>
         /// <returns></returns>
-        public static ApplicationStartup UseEasyJson(this ApplicationStartup startup, string key = GlobalConstantSetting.SerializerKey.EasyJson)
+        public static ApplicationStartup UseEasyJson(this ApplicationStartup startup, string key = "ioc.ser.easyjson")
         {
             if (startup.ServiceRegister == null)
                 return startup;

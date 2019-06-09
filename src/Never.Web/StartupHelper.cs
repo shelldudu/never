@@ -1,6 +1,12 @@
 ﻿#if !NET461
 #else
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 using Never.Caching;
 using Never.Commands;
 using Never.CommandStreams;
@@ -14,12 +20,6 @@ using Never.Startups;
 using Never.Startups.Impls;
 using Never.Threading;
 using Never.Web.Caching;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Never.Web
 {
@@ -34,8 +34,9 @@ namespace Never.Web
         /// 启动Serializer支持
         /// </summary>
         /// <param name="startup">程序宿主环境配置服务</param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public static ApplicationStartup UseJavaScriptSerializer(ApplicationStartup startup)
+        public static ApplicationStartup UseJavaScriptSerializer(ApplicationStartup startup,string key = "ioc.ser.javascript")
         {
             if (startup.ServiceRegister == null)
                 return startup;
@@ -46,7 +47,7 @@ namespace Never.Web
             if (startup.Items.ContainsKey("UseJavaScriptSerializer"))
                 return startup;
 
-            startup.ServiceRegister.RegisterType(typeof(Never.Web.Serialization.JavaScriptSerializer), typeof(IJsonSerializer), GlobalConstantSetting.SerializerKey.JavaScript, ComponentLifeStyle.Singleton);
+            startup.ServiceRegister.RegisterType(typeof(Never.Web.Serialization.JavaScriptSerializer), typeof(IJsonSerializer),key, ComponentLifeStyle.Singleton);
 
             startup.Items["UseJavaScriptSerializer"] = "t";
             return startup;

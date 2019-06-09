@@ -97,6 +97,10 @@ namespace Never.Reflection
             }
         }
 
+        /// <summary>
+        /// 优先使用使用dynamic类型，比如来替换一些hashtable的行为
+        /// </summary>
+        public static bool PreferredDynamic { get; set; }
         #endregion prop
 
         #region IEmit

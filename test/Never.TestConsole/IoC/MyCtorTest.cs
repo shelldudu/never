@@ -209,7 +209,7 @@ namespace Never.TestConsole.IoC
             Console.WriteLine(f1 == f2);
         }
 
-        [SingletonAutoInjectingAttribute("test", typeof(Never.Serialization.IJsonSerializer), GlobalConstantSetting.SerializerKey.EasyJson)]
+        [SingletonAutoInjectingAttribute("test", typeof(Never.Serialization.IJsonSerializer), "ioc.ser.easyjson")]
         [ScopedAutoInjecting("test", typeof(Never.Serialization.IJsonSerializer))]
         public class MyJsonSer : Never.Serialization.IJsonSerializer
         {

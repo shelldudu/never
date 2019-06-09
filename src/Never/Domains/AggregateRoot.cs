@@ -199,7 +199,7 @@ namespace Never.Domains
         {
             foreach (var e in history)
             {
-                if (GlobalCompileSetting.DynamicReplaceHashtable)
+                if (EmitBuilder.PreferredDynamic)
                 {
                     this.ApplyReplyEvent((dynamic)e);
                 }
@@ -214,6 +214,7 @@ namespace Never.Domains
 
                         /*装一下逼*/
                         var emit = EasyEmitBuilder<Action<IAggregateRoot, IEvent>>.NewDynamicMethod();
+                        //load(this)
                         emit.LoadArgument(0);
                         emit.LoadArgument(1);
                         emit.Call(typeof(AggregateRoot).GetMethod("ApplyReplyEvent", BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(type));

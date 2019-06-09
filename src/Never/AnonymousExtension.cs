@@ -1,4 +1,10 @@
-﻿using Never.Commands;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using Never.Commands;
 using Never.DataAnnotations;
 using Never.Events;
 using Never.Exceptions;
@@ -6,12 +12,6 @@ using Never.IoC;
 using Never.Messages;
 using Never.Reflection;
 using Never.Serialization;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Never
 {
@@ -72,7 +72,7 @@ namespace Never
                 throw new ParameterNullException("command", "聚合根命令不能为空");
             }
 
-            if (GlobalCompileSetting.DynamicReplaceHashtable)
+            if (EmitBuilder.PreferredDynamic)
             {
                 return commandBus.Send((dynamic)command, communication);
             }
@@ -116,7 +116,7 @@ namespace Never
                 throw new ParameterNullException("command", "聚合根命令不能为空");
             }
 
-            if (GlobalCompileSetting.DynamicReplaceHashtable)
+            if (EmitBuilder.PreferredDynamic)
             {
                 return commandBus.SendAsync((dynamic)@command, communication);
             }
@@ -231,7 +231,7 @@ namespace Never
                 throw new ParameterNullException("e", "聚合根事件不能为空");
             }
 
-            if (GlobalCompileSetting.DynamicReplaceHashtable)
+            if (EmitBuilder.PreferredDynamic)
             {
                 eventBus.Publish(context, (dynamic)e);
                 return;
@@ -277,7 +277,7 @@ namespace Never
                 throw new ParameterNullException("e", "聚合根事件不能为空");
             }
 
-            if (GlobalCompileSetting.DynamicReplaceHashtable)
+            if (EmitBuilder.PreferredDynamic)
             {
                 return Task.FromResult(eventBus.Publish(context, (dynamic)e));
             }
@@ -397,7 +397,7 @@ namespace Never
                 throw new ParameterNullException("message", "消息内容不能为空");
             }
 
-            if (GlobalCompileSetting.DynamicReplaceHashtable)
+            if (EmitBuilder.PreferredDynamic)
             {
                 publisher.Publish(context, (dynamic)message);
                 return;
@@ -455,7 +455,7 @@ namespace Never
                 throw new ParameterNullException("message", "消息内容不能为空");
             }
 
-            if (GlobalCompileSetting.DynamicReplaceHashtable)
+            if (EmitBuilder.PreferredDynamic)
             {
                 return Task.FromResult(publisher.Publish(context, (dynamic)message));
             }
