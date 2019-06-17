@@ -11,17 +11,26 @@ namespace Never.EasySql.SqlClient
     /// <summary>
     /// odbcserver数据库
     /// </summary>
-    [Never.Attributes.Summary(Descn = "请先引用初始化Never.SqlClient.SqlExecuterFactory.OdbcServerExecuter.DbProviderFactory")]
     public sealed class OdbcServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
+        #region feild
+
+        /// <summary>
+        /// 工厂实例
+        /// </summary>
+        public static DbProviderFactory DbProviderFactoryInstance { get; set; }
+
+        #endregion feild
+
         #region ctor
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlServerExecuter"/> class.
         /// </summary>
         /// <param name="connectionString">连接字符串.</param>
+        [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlClient.OdbcServerExecuter.DbProviderFactory")]
         public OdbcServerExecuter(string connectionString)
-            : base("@", Never.SqlClient.SqlExecuterFactory.OdbcServerExecuter.GetInstance(), connectionString)
+            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.OdbcServerExecuter.InitInstance()), connectionString)
         {
         }
 
@@ -33,6 +42,9 @@ namespace Never.EasySql.SqlClient
         public OdbcServerExecuter(DbProviderFactory provider, string connectionString)
             : base("@", provider, connectionString)
         {
+            //cache the provider
+            if (DbProviderFactoryInstance == null)
+                DbProviderFactoryInstance = provider;
         }
 
         #endregion ctor

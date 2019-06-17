@@ -105,7 +105,7 @@ namespace Never.SqlClient
         /// <param name="value">参数值</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public virtual DbParameter CreateParameter(string parameterName, object value)
+        public DbParameter CreateParameter(string parameterName, object value)
         {
             var pa = this.factory.CreateParameter();
             pa.ParameterName = parameterName;
@@ -363,7 +363,7 @@ namespace Never.SqlClient
         /// <param name="command">创建数据库操作命令对象</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected virtual DataSet CreateDataSet(IDbCommand command)
+        protected DataSet CreateDataSet(IDbCommand command)
         {
             return this.CreateDataSet(command, true);
         }
@@ -443,7 +443,7 @@ namespace Never.SqlClient
         /// <param name="command">创建数据库操作命令对象</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected virtual DataTable CreateTable(IDbCommand command)
+        protected DataTable CreateTable(IDbCommand command)
         {
             return this.CreateTable(command, true);
         }
@@ -534,9 +534,21 @@ namespace Never.SqlClient
         /// <param name="command">创建数据库操作命令对象</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected virtual DataView CreateDataView(IDbCommand command)
+        protected DataView CreateDataView(IDbCommand command)
         {
-            var table = this.CreateTable(command);
+            return this.CreateDataView(command, true);
+        }
+
+        /// <summary>
+        /// 获取DataView,性能较低
+        /// </summary>
+        /// <param name="command">创建数据库操作命令对象</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        protected virtual DataView CreateDataView(IDbCommand command, bool closeConnection)
+        {
+            var table = this.CreateTable(command, closeConnection);
             if (table != null)
                 return table.DefaultView;
 
@@ -583,7 +595,19 @@ namespace Never.SqlClient
         /// <param name="command">创建数据库操作命令对象</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected virtual IDictionary CreateSingleRow(IDbCommand command)
+        protected IDictionary CreateSingleRow(IDbCommand command)
+        {
+            return this.CreateSingleRow(command, true);
+        }
+
+        /// <summary>
+        /// 返回DataRow一行
+        /// </summary>
+        /// <param name="command">创建数据库操作命令对象</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        protected virtual IDictionary CreateSingleRow(IDbCommand command, bool closeConnection)
         {
             if (command == null || (command != null && command.Connection == null))
                 throw new ArgumentNullException("构造Connection对象为空");
@@ -611,7 +635,7 @@ namespace Never.SqlClient
             }
             finally
             {
-                if (this.Transaction == null && command.Connection.State != ConnectionState.Closed)
+                if (this.Transaction == null && closeConnection && command.Connection.State != ConnectionState.Closed)
                     command.Connection.Close();
             }
         }
@@ -656,7 +680,7 @@ namespace Never.SqlClient
         /// <param name="command">创建数据库操作命令对象</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected virtual int ExecuteNonQuery(IDbCommand command)
+        protected int ExecuteNonQuery(IDbCommand command)
         {
             return this.ExecuteNonQuery(command, true);
         }
@@ -668,7 +692,7 @@ namespace Never.SqlClient
         /// <param name="closeConnection">关闭数据库连接</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected int ExecuteNonQuery(IDbCommand command, bool closeConnection)
+        protected virtual int ExecuteNonQuery(IDbCommand command, bool closeConnection)
         {
             if (command == null || (command != null && command.Connection == null))
                 throw new ArgumentNullException("构造Connection对象为空");
@@ -731,7 +755,7 @@ namespace Never.SqlClient
         /// <param name="command">创建数据库操作命令对象</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected virtual object ExecuteScalar(IDbCommand command)
+        protected object ExecuteScalar(IDbCommand command)
         {
             return this.ExecuteScalar(command, true);
         }
@@ -743,7 +767,7 @@ namespace Never.SqlClient
         /// <param name="closeConnection">关闭数据库连接</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected object ExecuteScalar(IDbCommand command, bool closeConnection)
+        protected virtual object ExecuteScalar(IDbCommand command, bool closeConnection)
         {
             if (command == null || (command != null && command.Connection == null))
                 throw new ArgumentNullException("构造Connection对象为空");
@@ -808,7 +832,7 @@ namespace Never.SqlClient
         /// <param name="parameter">查询参数</param>
         /// <param name="checkParameterMatched">是否检查参数的匹配性，如果为true,则要sql中所需要的参数都要在参数提供者中找到</param>
         /// <returns></returns>
-        protected virtual IDataReader CreateReader(string sql, CommandType commandType, KeyValuePair<string, object>[] @parameter, bool checkParameterMatched)
+        protected IDataReader CreateReader(string sql, CommandType commandType, KeyValuePair<string, object>[] @parameter, bool checkParameterMatched)
         {
             if (checkParameterMatched)
             {
@@ -837,7 +861,7 @@ namespace Never.SqlClient
         /// <param name="command">创建数据库操作命令对象</param>
         /// <returns></returns>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected virtual IDataReader CreateReader(IDbCommand command)
+        protected IDataReader CreateReader(IDbCommand command)
         {
             return this.CreateReader(command, true);
         }
@@ -898,7 +922,19 @@ namespace Never.SqlClient
         /// <typeparam name="T">返回对象类型</typeparam>
         /// <param name="command">查询命令</param>
         /// <returns></returns>
-        protected virtual IEnumerable<T> QueryForEnumerable<T>(IDbCommand command)
+        protected IEnumerable<T> QueryForEnumerable<T>(IDbCommand command)
+        {
+            return this.QueryForEnumerable<T>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual IEnumerable<T> QueryForEnumerable<T>(IDbCommand command, bool closeConnection)
         {
             var @delegate = DataRecordBuilder<T>.Func;
             var result = new List<T>();
@@ -922,7 +958,7 @@ namespace Never.SqlClient
             }
             finally
             {
-                if (this.Transaction == null && reader != null && !reader.IsClosed)
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
                     reader.Close();
             }
         }
@@ -965,7 +1001,19 @@ namespace Never.SqlClient
         /// <typeparam name="T">返回对象类型</typeparam>
         /// <param name="command">查询命令</param>
         /// <returns></returns>
-        protected virtual T QueryForObject<T>(IDbCommand command)
+        protected T QueryForObject<T>(IDbCommand command)
+        {
+            return this.QueryForObject<T>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual T QueryForObject<T>(IDbCommand command, bool closeConnection)
         {
             var @delegate = DataRecordBuilder<T>.Func;
             IDataReader reader = null;
@@ -986,7 +1034,7 @@ namespace Never.SqlClient
             }
             finally
             {
-                if (this.Transaction == null && reader != null && !reader.IsClosed)
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
                     reader.Close();
             }
 
@@ -1003,7 +1051,7 @@ namespace Never.SqlClient
         /// <param name="sql">查询字符串</param>
         /// <param name="parameter">查询参数</param>
         /// <returns></returns>
-        public virtual object Insert(string sql, object @parameter)
+        public object Insert(string sql, object @parameter)
         {
             return this.Insert(sql, CommandType.Text, @parameter);
         }
@@ -1015,7 +1063,7 @@ namespace Never.SqlClient
         /// <param name="commandType">查询命令的解释模式</param>
         /// <param name="parameter">查询参数</param>
         /// <returns></returns>
-        public virtual object Insert(string sql, CommandType commandType, object @parameter)
+        public object Insert(string sql, CommandType commandType, object @parameter)
         {
             /*要检查是否以insert into 开头的*/
             if (commandType == CommandType.Text)
@@ -1037,7 +1085,7 @@ namespace Never.SqlClient
         /// <param name="sql">查询字符串</param>
         /// <param name="parameter">查询参数</param>
         /// <returns></returns>
-        public virtual int Update(string sql, object @parameter)
+        public int Update(string sql, object @parameter)
         {
             return this.Update(sql, CommandType.Text, @parameter);
         }
@@ -1049,7 +1097,7 @@ namespace Never.SqlClient
         /// <param name="commandType">查询命令的解释模式</param>
         /// <param name="parameter">查询参数</param>
         /// <returns></returns>
-        public virtual int Update(string sql, CommandType commandType, object @parameter)
+        public int Update(string sql, CommandType commandType, object @parameter)
         {
             if (commandType == CommandType.Text)
             {
@@ -1070,7 +1118,7 @@ namespace Never.SqlClient
         /// <param name="sql">查询字符串</param>
         /// <param name="parameter">查询参数</param>
         /// <returns></returns>
-        public virtual int Delete(string sql, object @parameter)
+        public int Delete(string sql, object @parameter)
         {
             return this.Delete(sql, CommandType.Text, @parameter);
         }
@@ -1082,7 +1130,7 @@ namespace Never.SqlClient
         /// <param name="commandType">查询命令的解释模式</param>
         /// <param name="parameter">查询参数</param>
         /// <returns></returns>
-        public virtual int Delete(string sql, CommandType commandType, object @parameter)
+        public int Delete(string sql, CommandType commandType, object @parameter)
         {
             if (commandType == CommandType.Text)
             {

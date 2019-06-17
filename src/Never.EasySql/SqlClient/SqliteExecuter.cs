@@ -11,17 +11,26 @@ namespace Never.EasySql.SqlClient
     /// <summary>
     /// sqlite数据库
     /// </summary>
-    [Never.Attributes.Summary(Descn = "请先引用初始化Never.SqlClient.SqlExecuterFactory.SqliteExecuter.DbProviderFactory")]
     public sealed class SqliteExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
+        #region feild
+
+        /// <summary>
+        /// 工厂实例
+        /// </summary>
+        public static DbProviderFactory DbProviderFactoryInstance { get; set; }
+
+        #endregion feild
+
         #region ctor
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqliteExecuter"/> class.
         /// </summary>
         /// <param name="connectionString">连接字符串.</param>
+        [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlClient.SqliteExecuter.DbProviderFactory")]
         public SqliteExecuter(string connectionString)
-            : base("@", Never.SqlClient.SqlExecuterFactory.SqliteExecuter.GetInstance(), connectionString)
+            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.SqliteExecuter.InitInstance()), connectionString)
         {
         }
 
@@ -33,6 +42,9 @@ namespace Never.EasySql.SqlClient
         public SqliteExecuter(DbProviderFactory provider, string connectionString)
             : base("@", provider, connectionString)
         {
+            //cache the provider
+            if (DbProviderFactoryInstance == null)
+                DbProviderFactoryInstance = provider;
         }
 
         #endregion ctor

@@ -5,18 +5,27 @@ namespace Never.EasySql.SqlClient
 {
     /// <summary>
     /// PostgreSql 数据库
-    /// </summary>
-    [Never.Attributes.Summary(Descn = "请先引用初始化Never.SqlClient.SqlExecuterFactory.PostgreSqlExecuter.DbProviderFactory")]
+    /// </summary> 
     public sealed class PostgreSqlExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
+        #region feild
+
+        /// <summary>
+        /// 工厂实例
+        /// </summary>
+        public static DbProviderFactory DbProviderFactoryInstance { get; set; }
+
+        #endregion feild
+
         #region ctor
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostgreSqlExecuter"/> class.
         /// </summary>
         /// <param name="connectionString">连接字符串.</param>
+        [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlClient.PostgreSqlExecuter.DbProviderFactory")]
         public PostgreSqlExecuter(string connectionString)
-            : base(":", Never.SqlClient.SqlExecuterFactory.PostgreSqlExecuter.GetInstance(), connectionString)
+            : base(":", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.PostgreSqlExecuter.InitInstance()), connectionString)
         {
         }
 
@@ -28,6 +37,9 @@ namespace Never.EasySql.SqlClient
         public PostgreSqlExecuter(DbProviderFactory provider, string connectionString)
             : base(":", provider, connectionString)
         {
+            //cache the provider
+            if (DbProviderFactoryInstance == null)
+                DbProviderFactoryInstance = provider;
         }
 
         #endregion ctor
