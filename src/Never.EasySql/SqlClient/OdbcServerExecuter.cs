@@ -11,7 +11,7 @@ namespace Never.EasySql.SqlClient
     /// <summary>
     /// odbcserver数据库
     /// </summary>
-    [Never.Attributes.Summary(Descn = "请先引用初始化Never.SqlClient.OdbcServerExecuter.DbProviderFactory")]
+    [Never.Attributes.Summary(Descn = "请先引用初始化Never.SqlClient.SqlExecuterFactory.OdbcServerExecuter.DbProviderFactory")]
     public sealed class OdbcServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region ctor
@@ -21,7 +21,7 @@ namespace Never.EasySql.SqlClient
         /// </summary>
         /// <param name="connectionString">连接字符串.</param>
         public OdbcServerExecuter(string connectionString)
-            : base("@", Never.SqlClient.OdbcServerExecuter.GetInstance(), connectionString)
+            : base("@", Never.SqlClient.SqlExecuterFactory.OdbcServerExecuter.GetInstance(), connectionString)
         {
         }
 

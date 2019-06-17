@@ -11,7 +11,7 @@ namespace Never.EasySql.SqlClient
     /// <summary>
     /// mySql数据库
     /// </summary>
-    [Never.Attributes.Summary(Descn = "请先引用初始化Never.SqlClient.MySqlExecuter.DbProviderFactory")]
+    [Never.Attributes.Summary(Descn = "请先引用初始化Never.SqlClient.SqlExecuterFactory.MySqlExecuter.DbProviderFactory")]
     public sealed class MySqlExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region ctor
@@ -21,7 +21,7 @@ namespace Never.EasySql.SqlClient
         /// </summary>
         /// <param name="connectionString">连接字符串.</param>
         public MySqlExecuter(string connectionString)
-            : base("?", Never.SqlClient.MySqlExecuter.GetInstance(), connectionString)
+            : base("?", Never.SqlClient.SqlExecuterFactory.MySqlExecuter.GetInstance(), connectionString)
         {
         }
 

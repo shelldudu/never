@@ -6,28 +6,9 @@ namespace Never.SqlClient
     /// <summary>
     /// PostgreSQL数据库
     /// </summary>
-    [Never.Attributes.Summary(Descn = "请先引用Npgsql组件或者初始化DbProviderFactoryInstance属性对象")]
-    public class PostgreSqlExecuter : SqlExecuter, ISqlExecuter, ITransactionExecuter
-    {
-        #region feild
-
-        /// <summary>
-        /// 工厂实例
-        /// </summary>
-        public static DbProviderFactory DbProviderFactoryInstance { get; set; }
-
-        #endregion feild
-
+    public abstract class PostgreSqlExecuter : SqlExecuter, ISqlExecuter, ITransactionExecuter
+    { 
         #region ctor
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PostgreSqlExecuter"/> class.
-        /// </summary>
-        /// <param name="connectionString">连接字符串.</param>
-        public PostgreSqlExecuter(string connectionString)
-            : base(GetInstance(), connectionString)
-        {
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostgreSqlExecuter"/> class.
@@ -40,53 +21,6 @@ namespace Never.SqlClient
         }
 
         #endregion ctor
-
-        #region build
-
-        /// <summary>
-        /// 获取实例
-        /// </summary>
-        /// <returns></returns>
-        public static DbProviderFactory GetInstance()
-        {
-            if (DbProviderFactoryInstance != null)
-                return DbProviderFactoryInstance;
-
-            lock (typeof(PostgreSqlExecuter))
-            {
-                if (DbProviderFactoryInstance != null)
-                    return DbProviderFactoryInstance;
-
-                DbProviderFactoryInstance = InitInstance();
-                if (DbProviderFactoryInstance != null)
-                    return DbProviderFactoryInstance;
-            }
-
-            throw new TypeLoadException("请先引用Npgsql组件或者初始化Instance属性对象");
-        }
-
-        /// <summary>
-        /// 查询实例
-        /// </summary>
-        /// <returns></returns>
-        public static DbProviderFactory InitInstance()
-        {
-            var type = Type.GetType("Npgsql.NpgsqlFactory,Npgsql");
-            if (type == null)
-            {
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    if (assembly.GetName().Name == "Npgsql")
-                    {
-                        type = assembly.GetType("Npgsql.NpgsqlFactory");
-                        break;
-                    }
-                }
-            }
-
-            return type == null ? null : CreateDbProviderFactory(type);
-        }
-        #endregion build
 
         #region prefix
 
