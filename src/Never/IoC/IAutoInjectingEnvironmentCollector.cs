@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+
+namespace Never.IoC
+{
+    /// <summary>
+    /// 主动注入环境规则收集者
+    /// </summary>
+    public interface IAutoInjectingEnvironmentCollector
+    {
+        /// <summary>
+        /// 收集类型
+        /// </summary>
+        /// <param name="groups"></param>
+        /// <param name="object"></param>
+        /// <param name="typeFinder"></param>
+        /// <param name="assemblies"></param>
+        void Register(AutoInjectingGroupInfo[] groups, object @object, ITypeFinder typeFinder, IEnumerable<Assembly> assemblies);
+    }
+}

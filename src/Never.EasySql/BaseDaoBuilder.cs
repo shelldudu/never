@@ -10,7 +10,7 @@ namespace Never.EasySql
     /// <summary>
     /// 基本的读取
     /// </summary>
-    public abstract class BaseDaoBuilder : IDaoBuilder
+    public abstract class BaseDaoBuilder : IDaoBuilder, IDisposable
     {
         private class MyDao : BaseDao
         {
@@ -164,6 +164,23 @@ namespace Never.EasySql
             {
                 i.Dispose();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            this.currentSessionThreadLocal.Dispose();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Never.IoC
     /// 短暂自动注入属性
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true, Inherited = true)]
-    public class TransientAutoInjectingAttribute : LifeStyleAutoInjectingAttribute
+    public class TransientAutoInjectingAttribute : AutoInjectingAttribute
     {
         /// <summary>
         /// 声明生命周期

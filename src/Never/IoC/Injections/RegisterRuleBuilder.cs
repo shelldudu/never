@@ -9,7 +9,7 @@ using System.Reflection;
 namespace Never.IoC.Injections
 {
     /// <summary>
-    /// 容器构建者
+    /// 规则构建者
     /// </summary>
     public class RegisterRuleBuilder
     {
@@ -146,7 +146,7 @@ namespace Never.IoC.Injections
             //                    current.LifeStyle == ComponentLifeStyle.Scoped ? "线程" : "短暂"));
             //        }
             //        break;
-            //    /*嵌套只能注入到嵌套，其构造不能接受短暂，可接受有嵌套和单例*/
+            //    /*作用域只能注入到嵌套，其构造不能接受短暂，可接受有嵌套和单例*/
             //    case ComponentLifeStyle.Scoped:
             //        {
             //            if (preRule.LifeStyle == ComponentLifeStyle.Singleton)
@@ -189,11 +189,11 @@ namespace Never.IoC.Injections
             //                    current.ServiceType.FullName));
             //        }
             //        break;
-            //    /*嵌套只能注入到嵌套，其构造不能接受短暂，可接受有嵌套和单例*/
+            //    /*作用域只能注入到嵌套，其构造不能接受短暂，可接受有嵌套和单例*/
             //    case ComponentLifeStyle.Scoped:
             //        {
             //            if (current.LifeStyle == ComponentLifeStyle.Singleton)
-            //                throw new ArgumentException(string.Format("当前参数{0}为嵌套，期望对象{1}为单例，不能相容",
+            //                throw new ArgumentException(string.Format("当前参数{0}为作用域，期望对象{1}为单例，不能相容",
             //                    nextRule.ServiceType.FullName,
             //                    current.ServiceType.FullName));
             //        }

@@ -1,10 +1,17 @@
-﻿namespace Never.IoC
+﻿using System;
+
+namespace Never.IoC
 {
     /// <summary>
     /// 生命周期的自动注入属性
     /// </summary>
-    public abstract class LifeStyleAutoInjectingAttribute : BaseAutoInjectingAttribute
+    public abstract class AutoInjectingAttribute : Attribute
     {
+        /// <summary>
+        /// 注入类型
+        /// </summary>
+        public virtual Type ServiceType { get; }
+
         /// <summary>
         /// 注入的Key
         /// </summary>

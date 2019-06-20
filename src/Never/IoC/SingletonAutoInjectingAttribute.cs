@@ -6,7 +6,7 @@ namespace Never.IoC
     /// 单例自动注入属性
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true, Inherited = true)]
-    public class SingletonAutoInjectingAttribute : LifeStyleAutoInjectingAttribute
+    public class SingletonAutoInjectingAttribute : AutoInjectingAttribute
     {
         /// <summary>
         /// 声明生命周期

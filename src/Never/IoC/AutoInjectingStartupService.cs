@@ -48,18 +48,18 @@ namespace Never.IoC
             if (repeat == null)
                 return;
 
-            var dict = new List<AutoInjectingTurpeGroup>(50);
+            var dict = new List<AutoInjectingGroupInfo>(50);
             foreach (var assembly in context.FilteringAssemblyProvider.GetAssemblies())
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    var attributes = type.GetCustomAttributes(typeof(BaseAutoInjectingAttribute), true);
+                    var attributes = type.GetCustomAttributes(typeof(AutoInjectingAttribute), true);
                     if (attributes == null || attributes.Length <= 0)
                         continue;
 
                     foreach (var attribute in attributes)
                     {
-                        dict.Add(new AutoInjectingTurpeGroup() { Attribute = attribute as BaseAutoInjectingAttribute, ImplementationType = type });
+                        dict.Add(new AutoInjectingGroupInfo() { Attribute = attribute as AutoInjectingAttribute, ImplementationType = type });
                     }
                 }
             }

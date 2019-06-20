@@ -3,10 +3,10 @@
 namespace Never.IoC
 {
     /// <summary>
-    /// 嵌套自动注入属性
+    /// 作用域自动注入属性
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true, Inherited = true)]
-    public class ScopedAutoInjectingAttribute : LifeStyleAutoInjectingAttribute
+    public class ScopedAutoInjectingAttribute : AutoInjectingAttribute
     {
         /// <summary>
         /// 声明生命周期

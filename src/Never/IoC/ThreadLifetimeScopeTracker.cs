@@ -11,7 +11,7 @@ namespace Never.IoC
     /// <summary>
     ///
     /// </summary>
-    public class ThreadLifetimeScopeTracker : DefaultLifetimeScopeTracker
+    public class ThreadLifetimeScopeTracker : DefaultLifetimeScopeTracker, IDisposable
     {
         #region field and ctor
 
@@ -44,7 +44,7 @@ namespace Never.IoC
         }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         public override void CleanScope()
         {
@@ -55,6 +55,14 @@ namespace Never.IoC
             }
 
             base.CleanScope();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            this.threadLocal.Dispose();
         }
     }
 }

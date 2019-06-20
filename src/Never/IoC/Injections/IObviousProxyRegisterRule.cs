@@ -1,7 +1,7 @@
 ﻿namespace Never.IoC.Injections
 {
     /// <summary>
-    /// 代理注册规则
+    /// 参数注册规则
     /// </summary>
     public interface IObviousProxyRegisterRule
     {

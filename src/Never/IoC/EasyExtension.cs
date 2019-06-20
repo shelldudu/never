@@ -29,7 +29,7 @@ namespace Never.IoC
                     {
                         return target == ComponentLifeStyle.Transient;
                     }
-                /*嵌套只能注入到嵌套，其构造不能接受短暂，可接受有嵌套和单例*/
+                /*作用域其构造不能接受短暂，可接受有作用域和单例*/
                 case ComponentLifeStyle.Scoped:
                     {
                         return target != ComponentLifeStyle.Singleton;
@@ -61,11 +61,11 @@ namespace Never.IoC
                             return string.Format("构建当前对象{0}为单例，期望对象{1}为{2}，不能相容",
                                 target.ServiceType.FullName,
                                 current.ServiceType.FullName,
-                                current.LifeStyle == ComponentLifeStyle.Scoped ? "线程" : "短暂");
+                                current.LifeStyle == ComponentLifeStyle.Scoped ? "作用域" : "短暂");
 
                         return string.Empty;
                     }
-                /*嵌套只能注入到嵌套，其构造不能接受短暂，可接受有嵌套和单例*/
+                /*作用域其构造不能接受短暂，可接受有作用域和单例*/
                 case ComponentLifeStyle.Scoped:
                     {
                         if (target.LifeStyle == ComponentLifeStyle.Singleton)

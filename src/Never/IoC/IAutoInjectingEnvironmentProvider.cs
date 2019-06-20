@@ -20,6 +20,6 @@ namespace Never.IoC
         /// </summary>
         /// <param name="groups"></param>
         /// <param name="eventArgs"></param>
-        void Call(AutoInjectingTurpeGroup[] groups, IContainerStartupEventArgs eventArgs);
+        void Call(AutoInjectingGroupInfo[] groups, IContainerStartupEventArgs eventArgs);
     }
 }
