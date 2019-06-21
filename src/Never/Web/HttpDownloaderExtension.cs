@@ -11,7 +11,7 @@ namespace Never.Web
     /// <summary>
     /// 下载扩展
     /// </summary>
-    public static class IHttpDownloaderExtension
+    public static class HttpDownloaderExtension
     {
         #region IHttpDownloader
 
@@ -22,7 +22,7 @@ namespace Never.Web
         /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, string url, string jsonData)
+        public static byte[] JPost(this HttpRequestDownloader downloader, string url, string jsonData)
         {
             return JPost(downloader, url, jsonData, null);
         }
@@ -35,7 +35,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams)
+        public static byte[] JPost(this HttpRequestDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams)
         {
             return JPost(downloader, url, jsonData, headerParams, -1);
         }
@@ -49,7 +49,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static byte[] JPost(this HttpRequestDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPost(downloader, new Uri(url), jsonData, headerParams, timeout);
         }
@@ -61,7 +61,7 @@ namespace Never.Web
         /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, string url, Stream jsonData)
+        public static byte[] JPost(this HttpRequestDownloader downloader, string url, Stream jsonData)
         {
             return JPost(downloader, url, jsonData, null);
         }
@@ -74,7 +74,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams)
+        public static byte[] JPost(this HttpRequestDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams)
         {
             return JPost(downloader, url, jsonData, headerParams, -1);
         }
@@ -88,7 +88,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static byte[] JPost(this HttpRequestDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPost(downloader, new Uri(url), jsonData, headerParams, timeout);
         }
@@ -100,7 +100,7 @@ namespace Never.Web
         /// <param name="uri">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, Uri uri, string jsonData)
+        public static byte[] JPost(this HttpRequestDownloader downloader, Uri uri, string jsonData)
         {
             return JPost(downloader, uri, jsonData, null);
         }
@@ -113,7 +113,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams)
+        public static byte[] JPost(this HttpRequestDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams)
         {
             return JPost(downloader, uri, jsonData, headerParams, -1);
         }
@@ -127,7 +127,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static byte[] JPost(this HttpRequestDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPost(downloader, uri, jsonData, headerParams, string.Empty, timeout);
         }
@@ -142,7 +142,7 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static byte[] JPost(this HttpRequestDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
             return JPost(downloader, uri, new MemoryStream(downloader.Encoding.GetBytes(jsonData ?? "{}")), headerParams, contentType, timeout);
         }
@@ -154,7 +154,7 @@ namespace Never.Web
         /// <param name="uri">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, Uri uri, Stream jsonData)
+        public static byte[] JPost(this HttpRequestDownloader downloader, Uri uri, Stream jsonData)
         {
             return JPost(downloader, uri, jsonData, null);
         }
@@ -167,7 +167,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams)
+        public static byte[] JPost(this HttpRequestDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams)
         {
             return JPost(downloader, uri, jsonData, headerParams, -1);
         }
@@ -180,7 +180,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static byte[] JPost(this HttpRequestDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPost(downloader, uri, jsonData, headerParams, string.Empty, timeout);
         }
@@ -195,7 +195,7 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static byte[] JPost(this IHttpDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static byte[] JPost(this HttpRequestDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
             return downloader.Post(uri, jsonData == null ? new MemoryStream(downloader.Encoding.GetBytes("{}")) : jsonData, headerParams, string.IsNullOrWhiteSpace(contentType) ? "application/json" : contentType, timeout);
         }
@@ -207,7 +207,7 @@ namespace Never.Web
         /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, string url, string jsonData)
+        public static string JPostString(this HttpRequestDownloader downloader, string url, string jsonData)
         {
             return JPostString(downloader, url, jsonData, null);
         }
@@ -220,7 +220,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams)
+        public static string JPostString(this HttpRequestDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams)
         {
             return JPostString(downloader, url, jsonData, headerParams, -1);
         }
@@ -234,7 +234,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static string JPostString(this HttpRequestDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPostString(downloader, new Uri(url), jsonData, headerParams, timeout);
         }
@@ -246,7 +246,7 @@ namespace Never.Web
         /// <param name="uri">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, Uri uri, string jsonData)
+        public static string JPostString(this HttpRequestDownloader downloader, Uri uri, string jsonData)
         {
             return JPostString(downloader, uri, jsonData, null);
         }
@@ -259,7 +259,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams)
+        public static string JPostString(this HttpRequestDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams)
         {
             return JPostString(downloader, uri, jsonData, headerParams, -1);
         }
@@ -272,7 +272,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static string JPostString(this HttpRequestDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPostString(downloader, uri, jsonData, headerParams, string.Empty, timeout);
         }
@@ -287,7 +287,7 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static string JPostString(this HttpRequestDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
             return JPostString(downloader, uri, new MemoryStream(downloader.Encoding.GetBytes(jsonData ?? "{}")), headerParams, contentType, timeout);
         }
@@ -299,7 +299,7 @@ namespace Never.Web
         /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, string url, Stream jsonData)
+        public static string JPostString(this HttpRequestDownloader downloader, string url, Stream jsonData)
         {
             return JPostString(downloader, url, jsonData, null);
         }
@@ -312,7 +312,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams)
+        public static string JPostString(this HttpRequestDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams)
         {
             return JPostString(downloader, url, jsonData, headerParams, -1);
         }
@@ -326,7 +326,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static string JPostString(this HttpRequestDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPostString(downloader, url, jsonData, headerParams, string.Empty, timeout);
         }
@@ -341,7 +341,7 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static string JPostString(this HttpRequestDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
             return JPostString(downloader, new Uri(url), jsonData, headerParams, contentType, timeout);
         }
@@ -353,7 +353,7 @@ namespace Never.Web
         /// <param name="uri">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, Uri uri, Stream jsonData)
+        public static string JPostString(this HttpRequestDownloader downloader, Uri uri, Stream jsonData)
         {
             return JPostString(downloader, uri, jsonData, null);
         }
@@ -366,7 +366,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams)
+        public static string JPostString(this HttpRequestDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams)
         {
             return JPostString(downloader, uri, jsonData, headerParams, -1);
         }
@@ -380,7 +380,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static string JPostString(this HttpRequestDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPostString(downloader, uri, jsonData, headerParams, string.Empty, timeout);
         }
@@ -395,7 +395,7 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static string JPostString(this IHttpDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static string JPostString(this HttpRequestDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
             return downloader.PostString(uri, jsonData == null ? new MemoryStream(downloader.Encoding.GetBytes("{}")) : jsonData, headerParams, string.IsNullOrWhiteSpace(contentType) ? "application/json" : contentType, timeout);
         }
@@ -411,7 +411,7 @@ namespace Never.Web
         /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, string url, string jsonData)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, string url, string jsonData)
         {
             return JPost(downloader, url, jsonData, null);
         }
@@ -424,7 +424,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams)
         {
             return JPost(downloader, url, jsonData, headerParams, -1);
         }
@@ -438,7 +438,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPost(downloader, new Uri(url), jsonData, headerParams, string.Empty, timeout);
         }
@@ -450,7 +450,7 @@ namespace Never.Web
         /// <param name="uri">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, Uri uri, string jsonData)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, Uri uri, string jsonData)
         {
             return JPost(downloader, uri, jsonData, null);
         }
@@ -463,7 +463,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams)
         {
             return JPost(downloader, uri, jsonData, headerParams, -1);
         }
@@ -476,7 +476,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPost(downloader, uri, jsonData, headerParams, string.Empty, timeout);
         }
@@ -491,7 +491,7 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
             return JPost(downloader, uri, new MemoryStream(downloader.Encoding.GetBytes(jsonData ?? "{}")), headerParams, contentType, timeout);
         }
@@ -503,7 +503,7 @@ namespace Never.Web
         /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, string url, Stream jsonData)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, string url, Stream jsonData)
         {
             return JPost(downloader, url, jsonData, null);
         }
@@ -516,7 +516,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams)
         {
             return JPost(downloader, url, jsonData, headerParams, -1);
         }
@@ -530,7 +530,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPost(downloader, new Uri(url), jsonData, headerParams, timeout);
         }
@@ -542,7 +542,7 @@ namespace Never.Web
         /// <param name="uri">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, Uri uri, Stream jsonData)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, Uri uri, Stream jsonData)
         {
             return JPost(downloader, uri, jsonData, null);
         }
@@ -555,7 +555,7 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams)
         {
             return JPost(downloader, uri, jsonData, headerParams, -1);
         }
@@ -568,7 +568,7 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
         {
             return JPost(downloader, uri, jsonData, headerParams, string.Empty, timeout);
         }
@@ -583,9 +583,9 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<byte[]> JPost(this IHttpAsyncDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static Task<byte[]> JPost(this HttpClientDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
-            return downloader.Post(uri, jsonData == null ? new MemoryStream(downloader.Encoding.GetBytes("{}")) : jsonData, headerParams, string.IsNullOrWhiteSpace(contentType) ? "application/json" : contentType, timeout);
+            return downloader.PostAsync(uri, jsonData == null ? new MemoryStream(downloader.Encoding.GetBytes("{}")) : jsonData, headerParams, string.IsNullOrWhiteSpace(contentType) ? "application/json" : contentType, timeout);
         }
 
         /// <summary>
@@ -595,9 +595,9 @@ namespace Never.Web
         /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, string url, string jsonData)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, string url, string jsonData)
         {
-            return JPostString(downloader, url, jsonData, null);
+            return await JPostStringAsync(downloader, url, jsonData, null);
         }
 
         /// <summary>
@@ -608,9 +608,9 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams)
         {
-            return JPostString(downloader, url, jsonData, headerParams, -1);
+            return await JPostStringAsync(downloader, url, jsonData, headerParams, -1);
         }
 
         /// <summary>
@@ -622,9 +622,9 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, string url, string jsonData, IDictionary<string, string> headerParams, int timeout)
         {
-            return JPostString(downloader, new Uri(url), jsonData, headerParams, string.Empty, timeout);
+            return await JPostStringAsync(downloader, new Uri(url), jsonData, headerParams, string.Empty, timeout);
         }
 
         /// <summary>
@@ -634,9 +634,9 @@ namespace Never.Web
         /// <param name="uri">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, Uri uri, string jsonData)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, Uri uri, string jsonData)
         {
-            return JPostString(downloader, uri, jsonData, null);
+            return await JPostStringAsync(downloader, uri, jsonData, null);
         }
 
         /// <summary>
@@ -647,9 +647,9 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams)
         {
-            return JPostString(downloader, uri, jsonData, headerParams, -1);
+            return await JPostStringAsync(downloader, uri, jsonData, headerParams, -1);
         }
         /// <summary>
         /// 从Url地址中下载数据
@@ -660,9 +660,9 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, int timeout)
         {
-            return JPostString(downloader, uri, jsonData, headerParams, string.Empty, timeout);
+            return await JPostStringAsync(downloader, uri, jsonData, headerParams, string.Empty, timeout);
         }
 
         /// <summary>
@@ -675,9 +675,9 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, Uri uri, string jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
-            return JPostString(downloader, uri, new MemoryStream(downloader.Encoding.GetBytes(jsonData ?? "{}")), headerParams, contentType, timeout);
+            return await JPostStringAsync(downloader, uri, new MemoryStream(downloader.Encoding.GetBytes(jsonData ?? "{}")), headerParams, contentType, timeout);
         }
 
         /// <summary>
@@ -687,9 +687,9 @@ namespace Never.Web
         /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, string url, Stream jsonData)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, string url, Stream jsonData)
         {
-            return JPostString(downloader, url, jsonData, null);
+            return await JPostStringAsync(downloader, url, jsonData, null);
         }
 
         /// <summary>
@@ -700,9 +700,9 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams)
         {
-            return JPostString(downloader, url, jsonData, headerParams, -1);
+            return await JPostStringAsync(downloader, url, jsonData, headerParams, -1);
         }
 
         /// <summary>
@@ -714,9 +714,9 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
         {
-            return JPostString(downloader, url, jsonData, headerParams, string.Empty, timeout);
+            return await JPostStringAsync(downloader, url, jsonData, headerParams, string.Empty, timeout);
         }
 
         /// <summary>
@@ -729,9 +729,9 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, string url, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
-            return JPostString(downloader, new Uri(url), jsonData, headerParams, contentType, timeout);
+            return await JPostStringAsync(downloader, new Uri(url), jsonData, headerParams, contentType, timeout);
         }
 
         /// <summary>
@@ -741,9 +741,9 @@ namespace Never.Web
         /// <param name="uri">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, Uri uri, Stream jsonData)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, Uri uri, Stream jsonData)
         {
-            return JPostString(downloader, uri, jsonData, null);
+            return await JPostStringAsync(downloader, uri, jsonData, null);
         }
 
         /// <summary>
@@ -754,9 +754,9 @@ namespace Never.Web
         /// <param name="jsonData">请求json参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams)
         {
-            return JPostString(downloader, uri, jsonData, headerParams, -1);
+            return await JPostStringAsync(downloader, uri, jsonData, headerParams, -1);
         }
 
         /// <summary>
@@ -768,9 +768,9 @@ namespace Never.Web
         /// <param name="headerParams">标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, int timeout)
         {
-            return JPostString(downloader, uri, jsonData, headerParams, string.Empty, timeout);
+            return await JPostStringAsync(downloader, uri, jsonData, headerParams, string.Empty, timeout);
         }
 
         /// <summary>
@@ -783,9 +783,9 @@ namespace Never.Web
         /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
-        public static Task<string> JPostString(this IHttpAsyncDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        public static async Task<string> JPostStringAsync(this HttpClientDownloader downloader, Uri uri, Stream jsonData, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
         {
-            return downloader.PostString(uri, jsonData == null ? new MemoryStream(downloader.Encoding.GetBytes("{}")) : jsonData, headerParams, string.IsNullOrWhiteSpace(contentType) ? "application/json" : contentType, timeout);
+            return await downloader.PostStringAsync(uri, jsonData == null ? new MemoryStream(downloader.Encoding.GetBytes("{}")) : jsonData, headerParams, string.IsNullOrWhiteSpace(contentType) ? "application/json" : contentType, timeout);
         }
 
         #endregion IHttpAsyncDownloader

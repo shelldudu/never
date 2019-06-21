@@ -284,7 +284,7 @@ namespace Never.Deployment
         /// <returns></returns>
         public virtual T Post<T>(IJsonSerializer jsonSerializer, UrlConcat url, string jsonDate, IDictionary<string, string> headerParams, int timeout = 30000)
         {
-            var txt = new WebRequestDownloader().JPostString(url.ToString(), jsonDate, headerParams, timeout);
+            var txt = new HttpRequestDownloader().JPostString(url.ToString(), jsonDate, headerParams, timeout);
             if (txt.IsNullOrEmpty())
                 return default(T);
 
@@ -302,7 +302,7 @@ namespace Never.Deployment
         /// <returns></returns>
         public virtual void Post(IJsonSerializer jsonSerializer, UrlConcat url, string jsonDate, IDictionary<string, string> headerParams, int timeout = 30000)
         {
-            new WebRequestDownloader().JPostString(url.ToString(), jsonDate, headerParams, timeout);
+            new HttpRequestDownloader().JPostString(url.ToString(), jsonDate, headerParams, timeout);
         }
 
         /// <summary>
@@ -348,7 +348,7 @@ namespace Never.Deployment
         /// <returns></returns>
         public virtual T Get<T>(IJsonSerializer jsonSerializer, UrlConcat url, IDictionary<string, string> requestPara, IDictionary<string, string> headerParams, int timeout = 30000)
         {
-            var txt = new WebRequestDownloader().GetString(url.ToString(), requestPara, headerParams, "application/json", timeout);
+            var txt = new HttpRequestDownloader().GetString(url.ToString(), requestPara, headerParams, "application/json", timeout);
             if (txt.IsNullOrEmpty())
                 return default(T);
 
@@ -366,7 +366,7 @@ namespace Never.Deployment
         /// <returns></returns>
         public virtual void Get(IJsonSerializer jsonSerializer, UrlConcat url, IDictionary<string, string> requestPara, IDictionary<string, string> headerParams, int timeout = 30000)
         {
-            new WebRequestDownloader().GetString(url.ToString(), requestPara, headerParams, "application/json", timeout);
+            new HttpRequestDownloader().GetString(url.ToString(), requestPara, headerParams, "application/json", timeout);
         }
 
         #endregion utils

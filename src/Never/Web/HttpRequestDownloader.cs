@@ -1,25 +1,26 @@
-﻿using Never;
-using Never.Web;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
+using Never;
+using Never.Web;
 
 namespace Never.Web
 {
     /// <summary>
     /// 网络资源的简单下载
     /// </summary>
-    public struct WebRequestDownloader : IHttpDownloader
+    public struct HttpRequestDownloader
     {
         #region ctor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WebRequestDownloader"/> class.
+        /// Initializes a new instance of the <see cref="HttpRequestDownloader"/> class.
         /// </summary>
         /// <param name="encoding">The encoding.</param>
-        public WebRequestDownloader(Encoding encoding)
+        public HttpRequestDownloader(Encoding encoding)
         {
             this.encoding = encoding ?? Encoding.UTF8;
         }
@@ -673,6 +674,498 @@ namespace Never.Web
         public string PostString(Uri uri, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
         {
             return this.Encoding.GetString(this.Post(uri, postParams, headerParams, contentType, timeout));
+        }
+
+        #endregion string
+
+        #region byte[]
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(string url)
+        {
+            return await this.GetAsync(url, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(string url, IDictionary<string, string> getParams)
+        {
+            return await this.GetAsync(url, getParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams)
+        {
+            return await this.GetAsync(url, getParams, headerParams, "application/x-www-form-urlencoded");
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType)
+        {
+            return await this.GetAsync(url, getParams, headerParams, contentType, -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            var that = this;
+            return await Task.Run(() =>
+            {
+                return that.Get(url, getParams, headerParams, contentType, timeout);
+            });
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(Uri uri)
+        {
+            return await this.GetAsync(uri, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(Uri uri, IDictionary<string, string> headerParams)
+        {
+            return await this.GetAsync(uri, headerParams, "application/x-www-form-urlencoded");
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(Uri uri, IDictionary<string, string> headerParams, string contentType)
+        {
+            return await this.GetAsync(uri, headerParams, contentType, -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(Uri uri, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            var that = this;
+            return await Task.Run(() =>
+            {
+                return that.Get(uri, headerParams, contentType, timeout);
+            });
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(string url, IDictionary<string, string> postParams)
+        {
+            return await this.PostAsync(url, postParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(string url, IDictionary<string, string> postParams, IDictionary<string, string> headerParams)
+        {
+            return await this.PostAsync(url, postParams, headerParams, "application/x-www-form-urlencoded");
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(string url, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType)
+        {
+            return await this.PostAsync(url, postParams, headerParams, contentType, -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(string url, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return await this.PostAsync(new Uri(url), postParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(string url, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return await this.PostAsync(new Uri(url), postParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(Uri uri, IDictionary<string, string> postParams)
+        {
+            return await this.PostAsync(uri, postParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(Uri uri, IDictionary<string, string> postParams, IDictionary<string, string> headerParams)
+        {
+            return await this.PostAsync(uri, postParams, headerParams, "application/x-www-form-urlencoded");
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(Uri uri, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType)
+        {
+            return await this.PostAsync(uri, postParams, headerParams, contentType, -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(Uri uri, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            var that = this;
+            return await Task.Run(() =>
+            {
+                return that.Post(uri, postParams, headerParams, contentType, timeout);
+            });
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(Uri uri, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            var that = this;
+            return await Task.Run(() =>
+            {
+                return that.Post(uri, postParams, headerParams, contentType, timeout);
+            });
+        }
+
+        #endregion byte[]
+
+        #region string
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <returns></returns>
+        public async Task<string> GetStringAsync(string url)
+        {
+            return await this.GetStringAsync(url, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <returns></returns>
+        public async Task<string> GetStringAsync(string url, IDictionary<string, string> getParams)
+        {
+            return await this.GetStringAsync(url, getParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public async Task<string> GetStringAsync(string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams)
+        {
+            return await this.GetStringAsync(url, getParams, headerParams, "application/x-www-form-urlencoded");
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <returns></returns>
+        public async Task<string> GetStringAsync(string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType)
+        {
+            return await this.GetStringAsync(url, getParams, headerParams, contentType, -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<string> GetStringAsync(string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return this.Encoding.GetString(await this.GetAsync(url, getParams, headerParams, contentType, timeout));
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <returns></returns>
+        public async Task<string> GetStringAsync(Uri uri)
+        {
+            return await this.GetStringAsync(uri, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public async Task<string> GetStringAsync(Uri uri, IDictionary<string, string> headerParams)
+        {
+            return await this.GetStringAsync(uri, headerParams, "application/x-www-form-urlencoded");
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <returns></returns>
+        public async Task<string> GetStringAsync(Uri uri, IDictionary<string, string> headerParams, string contentType)
+        {
+            return await this.GetStringAsync(uri, headerParams, contentType, -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<string> GetStringAsync(Uri uri, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return this.Encoding.GetString(await this.GetAsync(uri, headerParams, contentType, timeout));
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(string url, IDictionary<string, string> postParams)
+        {
+            return await this.PostStringAsync(url, postParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(string url, IDictionary<string, string> postParams, IDictionary<string, string> headerParams)
+        {
+            return await this.PostStringAsync(url, postParams, headerParams, "application/x-www-form-urlencoded");
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(string url, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType)
+        {
+            return await this.PostStringAsync(url, postParams, headerParams, contentType, -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(string url, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return await this.PostStringAsync(new Uri(url), postParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(string url, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return await this.PostStringAsync(new Uri(url), postParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(Uri uri, IDictionary<string, string> postParams)
+        {
+            return await this.PostStringAsync(uri, postParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(Uri uri, IDictionary<string, string> postParams, IDictionary<string, string> headerParams)
+        {
+            return await this.PostStringAsync(uri, postParams, headerParams, "application/x-www-form-urlencoded");
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(Uri uri, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType)
+        {
+            return await this.PostStringAsync(uri, postParams, headerParams, contentType, -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(Uri uri, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return this.Encoding.GetString(await this.PostAsync(uri, postParams, headerParams, contentType, timeout));
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(Uri uri, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return this.Encoding.GetString(await this.PostAsync(uri, postParams, headerParams, contentType, timeout));
         }
 
         #endregion string

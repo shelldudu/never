@@ -5,7 +5,7 @@
     <title>Never.Memcached</title>
     <authors>Never</authors>
     <owners>Never</owners>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <tags>memcached</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
@@ -15,10 +15,10 @@
     <summary>never library</summary>
     <dependencies>
       <group targetFramework=".NETFramework4.6.1" >
-        <dependency id="Never" version="1.0.0" />
+        <dependency id="Never" version="1.0.4" />
       </group>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="Never" version="1.0.0" />
+        <dependency id="Never" version="1.0.4" />
       </group>
     </dependencies>
     <frameworkAssemblies>

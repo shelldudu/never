@@ -31,6 +31,8 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Messaging" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">

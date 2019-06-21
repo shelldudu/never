@@ -57,7 +57,7 @@ namespace Never.Deployment
                     }
                     else
                     {
-                        txt = new WebRequestDownloader().GetString(item.A10Url);
+                        txt = new HttpRequestDownloader().GetString(item.A10Url);
                         item.ReportText = txt;
                         item.ReportTime = DateTime.Now;
                     }
