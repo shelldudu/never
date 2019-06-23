@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Never.SqlClient;
 
 namespace Never.EasySql.Xml
 {
@@ -27,7 +29,10 @@ namespace Never.EasySql.Xml
         /// <returns></returns>
         public string ToParameter(object value)
         {
-            return Never.Serialization.EasyJsonSerializer.Default.SerializeObject(value);
+            if (value == null)
+                return string.Empty;
+
+            return new string((char[])value);
         }
 
         /// <summary>
@@ -54,7 +59,7 @@ namespace Never.EasySql.Xml
         {
             get
             {
-                return GetXmlContentFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), (xml, file) =>
+                return this.GetXmlContentFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), (xml, file) =>
                 {
                     if (xml["namespace"].GetAttribute("id").IsNotEquals("demo", StringComparison.CurrentCultureIgnoreCase))
                         throw new ArgumentException(string.Format("the file {0} namespaces id attribute is error!", file));
@@ -72,9 +77,9 @@ namespace Never.EasySql.Xml
             }
         }
 
-        protected override IEasySqlExecuter CreateSqlExecuter(string connectionString)
+        protected override IEasySqlExecuter CreateSqlExecuter()
         {
-            return new EasySql.SqlClient.SqlServerExecuter(connectionString);
+            return new EasySql.SqlClient.SqlServerExecuter(this.ConnectionString);
         }
     }
 
@@ -84,7 +89,7 @@ namespace Never.EasySql.Xml
         {
             get
             {
-                return GetXmlContentFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), (xml, file) =>
+                return this.GetXmlContentFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), (xml, file) =>
                 {
                     if (xml["namespace"].GetAttribute("id").IsNotEquals("demo", StringComparison.CurrentCultureIgnoreCase))
                         throw new ArgumentException(string.Format("the file {0} namespaces id attribute is error!", file));
@@ -102,9 +107,9 @@ namespace Never.EasySql.Xml
             }
         }
 
-        protected override IEasySqlExecuter CreateSqlExecuter(string connectionString)
+        protected override IEasySqlExecuter CreateSqlExecuter()
         {
-            return new EasySql.SqlClient.MySqlExecuter(connectionString);
+            return new EasySql.SqlClient.MySqlExecuter(this.ConnectionString);
         }
     }
 
@@ -114,7 +119,7 @@ namespace Never.EasySql.Xml
         {
             get
             {
-                return GetXmlContentFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), (xml, file) =>
+                return this.GetXmlContentFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), (xml, file) =>
                 {
                     if (xml["namespace"].GetAttribute("id").IsNotEquals("demo", StringComparison.CurrentCultureIgnoreCase))
                         throw new ArgumentException(string.Format("the file {0} namespaces id attribute is error!", file));
@@ -132,15 +137,66 @@ namespace Never.EasySql.Xml
             }
         }
 
-        protected override IEasySqlExecuter CreateSqlExecuter(string connectionString)
+        protected override IEasySqlExecuter CreateSqlExecuter()
         {
-            return new EasySql.SqlClient.PostgreSqlExecuter(connectionString);
+            return new EasySql.SqlClient.PostgreSqlExecuter(this.ConnectionString);
         }
     }
 
     #endregion builder
 
     #region query
+
+    /// <summary>
+    /// register on application startup
+    /// </summary>
+    public static class Extension
+    {
+        public static ApplicationStartup Register(this ApplicationStartup startup)
+        {
+            startup.ServiceRegister.RegisterInstance(new SqlServerBuilder());
+            return startup;
+        }
+    }
+
+    public class Query
+    {
+        #region field
+
+        private readonly Func<IDao> builder = null;
+
+        #endregion field
+
+        #region ctor
+
+        public Query(SqlServerBuilder builder)
+        {
+            this.builder = builder.Build;
+        }
+
+        #endregion ctor
+
+        #region crud
+
+        public User GetUser()
+        {
+            return this.builder().ToEasyTextDao(new { Id = 1 }).QueryForObject<User>("select a.* from myuser as a where Id = @Id;");
+        }
+
+        public IEnumerable<User> GetAllUser()
+        {
+            return this.builder().ToEasyTextDao(new
+            {
+                Id = 1,
+                //userName parameter means no effect
+                UserName = "".ToNullableParameter(),
+                UserId = DBNull.Value,
+                IdArray = new[] { 1, 2, 3, 4 }.ToNullableParameter()
+            }).QueryForEnumerable<User>("select * from myuser where Id = $Id$ and Id in (@IdArray);");
+        }
+
+        #endregion crud
+    }
 
     public class Repository
     {
@@ -154,7 +210,7 @@ namespace Never.EasySql.Xml
 
         public Repository()
         {
-            this.builder = StaticDaoBuilder<SqlServerBuilder>.Value.Builder;
+            this.builder = Never.EasySql.ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build;
         }
 
         #endregion ctor
@@ -180,20 +236,22 @@ namespace Never.EasySql.Xml
         {
             return this.builder().ToEasyTextDao(new
             {
-                Id = 1,
+                Id = new int?(1).ToNullableParameter(),
+                //userName parameter means no effect
+                UserName = "".ToNullableParameter(),
                 UserId = DBNull.Value,
-                IdArray = new[] { 1, 2, 3, 4 }
+                IdArray = new[] { 1, 2, 3, 4 }.ToNullableParameter()
             }).QueryForEnumerable<User>("select * from myuser where Id = $Id$ and Id in (@IdArray);");
         }
 
         public int Insert()
         {
-            return (int)this.builder().ToEasyDao(new { UserId = 1, UserName = "1" }).Insert("insUser");
+            return (int)this.builder().ToEasyXmlDao(new { UserId = 1, UserName = "1" }).Insert("insUser");
         }
 
         public void BatchInsert()
         {
-            this.builder().ToEasyDao(new[] { new { UserId = 1, UserName = "1" }, new { UserId = 2, UserName = "2" } }).Insert("batchInsUser");
+            this.builder().ToEasyXmlDao(new[] { new { UserId = 1, UserName = "1" }, new { UserId = 2, UserName = "2" } }).Insert("batchInsUser");
         }
 
         #endregion crud
