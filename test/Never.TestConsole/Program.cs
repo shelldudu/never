@@ -86,7 +86,8 @@ namespace Never.TestConsole
 
         private static void Main(string[] args)
         {
-           // new InsertTest().TestSession();
+            // new InsertTest().TestSession();
+            new MemcachedTest().TestAddValueOnTextMode();
             new CachingTest().TestThreadContextCache();
         }
     }
