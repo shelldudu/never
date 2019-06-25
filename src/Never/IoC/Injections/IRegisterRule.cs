@@ -21,27 +21,27 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <param name="proxyType">代理服务，该类型要自己实现被代理的信息，比如承认对象，实现相同接口等</param>
         /// <returns></returns>
-        IObviousProxyRegisterRule AsProxy(Type proxyType);
+        IParameterRegisterRule AsProxy(Type proxyType);
 
         /// <summary>
         /// 注册为代理服务
         /// </summary>
         /// <typeparam name="TProxyType">代理服务，该类型要自己实现被代理的信息，比如承认对象，实现相同接口等</typeparam>
         /// <returns></returns>
-        IObviousProxyRegisterRule AsProxy<TProxyType>();
+        IParameterRegisterRule AsProxy<TProxyType>();
 
         /// <summary>
         /// 注册为代理服务，该方法会自动生成一个类，实现了接口或承继了被代理
         /// </summary>
         /// <returns></returns>
-        IShadowProxyRegisterRule AsProxy();
+        IProxyRegisterRule AsProxy();
 
         /// <summary>
         /// 注册为代理服务，该方法会自动生成一个类，实现了接口或承继了被代理
         /// </summary>
         /// <param name="setting">配置</param>
         /// <returns></returns>
-        IShadowProxyRegisterRule AsProxy(InterceptCompileSetting setting);
+        IProxyRegisterRule AsProxy(InterceptCompileSetting setting);
 
         /// <summary>
         /// 返回当前注册的增量缓存字符串key

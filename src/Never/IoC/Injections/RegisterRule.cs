@@ -7,7 +7,7 @@ namespace Never.IoC.Injections
     /// <summary>
     /// 注册规则
     /// </summary>
-    public class RegisterRule : IEquatable<RegisterRule>, ICloneable, IDisposable, IRegisterRule, IObviousProxyRegisterRule, IShadowProxyRegisterRule, IRegisterRuleDescriptor
+    public class RegisterRule : IEquatable<RegisterRule>, ICloneable, IDisposable, IRegisterRule, IParameterRegisterRule, IProxyRegisterRule, IRegisterRuleDescriptor
     {
         #region 增量
 
@@ -367,7 +367,7 @@ namespace Never.IoC.Injections
         /// 注册为代理服务
         /// </summary>
         /// <returns></returns>
-        public IShadowProxyRegisterRule AsProxy()
+        public IProxyRegisterRule AsProxy()
         {
             this.CheckProxyType(this.serviceType);
 
@@ -391,7 +391,7 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <param name="setting">配置</param>
         /// <returns></returns>
-        public IShadowProxyRegisterRule AsProxy(InterceptCompileSetting setting)
+        public IProxyRegisterRule AsProxy(InterceptCompileSetting setting)
         {
             var rule = this.AsProxy();
             this.setting = setting;
@@ -401,7 +401,7 @@ namespace Never.IoC.Injections
         /// <summary>
         /// 新加拦截器类型到构造函数参数中,key参数不能为空
         /// </summary>
-        public IShadowProxyRegisterRule WithInterceptor(string key)
+        public IProxyRegisterRule WithInterceptor(string key)
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(string.Format("using registe the {0} rule as proxy rule, but key is null", this.serviceType.FullName));
@@ -419,7 +419,7 @@ namespace Never.IoC.Injections
         /// <typeparam name="TInterceptor">拦截器类型</typeparam>
         /// <param name="key">注册key</param>
         /// <returns></returns>
-        public IShadowProxyRegisterRule WithInterceptor<TInterceptor>(string key) where TInterceptor : Never.Aop.IInterceptor
+        public IProxyRegisterRule WithInterceptor<TInterceptor>(string key) where TInterceptor : Never.Aop.IInterceptor
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(string.Format("using registe the {0} rule as proxy rule, but key is null", this.serviceType.FullName));
@@ -445,7 +445,7 @@ namespace Never.IoC.Injections
         /// <typeparam name="TService">服务类型</typeparam>
         /// <param name="key">注册key</param>
         /// <returns></returns>
-        IObviousProxyRegisterRule IObviousProxyRegisterRule.WithParameter<TService>(string key)
+        IParameterRegisterRule IParameterRegisterRule.WithParameter<TService>(string key)
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(string.Format("using registe the {0} rule as proxy rule, but key is null", this.serviceType.FullName));
@@ -459,7 +459,7 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <param name="proxyType">代理服务</param>
         /// <returns></returns>
-        public IObviousProxyRegisterRule AsProxy(Type proxyType)
+        public IParameterRegisterRule AsProxy(Type proxyType)
         {
             this.CheckProxyType(proxyType);
 
@@ -483,7 +483,7 @@ namespace Never.IoC.Injections
         /// </summary>
         /// <typeparam name="TProxyType">代理服务</typeparam>
         /// <returns></returns>
-        public IObviousProxyRegisterRule AsProxy<TProxyType>()
+        public IParameterRegisterRule AsProxy<TProxyType>()
         {
             return this.AsProxy(typeof(TProxyType));
         }

@@ -13,9 +13,9 @@ namespace Never.IoC
         /// 收集类型
         /// </summary>
         /// <param name="groups"></param>
-        /// <param name="object"></param>
+        /// <param name="collector"></param>
         /// <param name="typeFinder"></param>
         /// <param name="assemblies"></param>
-        void Register(AutoInjectingGroupInfo[] groups, object @object, ITypeFinder typeFinder, IEnumerable<Assembly> assemblies);
+        void Register(AutoInjectingGroupInfo[] groups, object collector, ITypeFinder typeFinder, IEnumerable<Assembly> assemblies);
     }
 }

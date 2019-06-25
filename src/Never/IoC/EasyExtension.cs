@@ -58,10 +58,10 @@ namespace Never.IoC
                 case ComponentLifeStyle.Transient:
                     {
                         if (target.LifeStyle != ComponentLifeStyle.Transient)
-                            return string.Format("构建当前对象{0}为单例，期望对象{1}为{2}，不能相容",
+                            return string.Format("构建当前对象{0}为{1}，期望对象{2}为短暂，不能相容",
                                 target.ServiceType.FullName,
-                                current.ServiceType.FullName,
-                                current.LifeStyle == ComponentLifeStyle.Scoped ? "作用域" : "短暂");
+                                target.LifeStyle == ComponentLifeStyle.Scoped ? "作用域" : "单例",
+                                current.ServiceType.FullName);
 
                         return string.Empty;
                     }
@@ -69,7 +69,7 @@ namespace Never.IoC
                 case ComponentLifeStyle.Scoped:
                     {
                         if (target.LifeStyle == ComponentLifeStyle.Singleton)
-                            return string.Format("构建当前对象{0}为线程，期望对象{1}为短暂，不能相容",
+                            return string.Format("构建当前对象{0}为单例，期望对象{1}为作用域，不能相容",
                                 target.ServiceType.FullName,
                                 current.ServiceType.FullName);
 
@@ -114,6 +114,7 @@ namespace Never.IoC
                             return first;
                     }
                     break;
+
                 case ComponentLifeStyle.Scoped:
                     {
                         var first = collection.FirstOrDefault(o => o.Key.IsNullOrEmpty() && o.LifeStyle == ComponentLifeStyle.Singleton && o.Builded);
@@ -133,6 +134,7 @@ namespace Never.IoC
                             return first;
                     }
                     break;
+
                 case ComponentLifeStyle.Transient:
                     {
                         var first = collection.FirstOrDefault(o => o.Key.IsNullOrEmpty() && o.Builded);
