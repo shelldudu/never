@@ -41,7 +41,7 @@ namespace Never.Utils
         /// <typeparam name="T">排序类型对象</typeparam>
         /// <param name="source">要排序的数组</param>
         /// <param name="compartion">排序委托对象</param>
-        public static IEnumerable<T> Sort<T>(IEnumerable<T> source, Func<T, T, bool> compartion)
+        public static IEnumerable<T> BubbleSort<T>(IEnumerable<T> source, Func<T, T, bool> compartion)
         {
             if (compartion == null || source == null)
                 return source;

@@ -5,6 +5,7 @@ using Never.IoC.Providers;
 using Never.TestConsole.Caching;
 using Never.TestConsole.Performance;
 using Never.TestConsole.SqlClient;
+using Never.Utils;
 
 namespace Never.TestConsole
 {
@@ -83,12 +84,13 @@ namespace Never.TestConsole
 
         #endregion ctor
 
-
         private static void Main(string[] args)
         {
-            // new InsertTest().TestSession();
-            new MemcachedTest().TestAddValueOnTextMode();
-            new CachingTest().TestThreadContextCache();
+            var id = Channel.GetFtypeId(66, 10);
+            var nid = Channel.GetOriginalFtypeId(id, 10);
+            //new InsertTest().TestSession();
+            //new MemcachedTest().TestAddValueOnTextMode();
+            //new CachingTest().TestThreadContextCache();
         }
     }
 }

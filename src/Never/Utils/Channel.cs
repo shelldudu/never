@@ -6,76 +6,38 @@
     public static class Channel
     {
         /// <summary>
-        /// 返回频道大类
+        /// Get holder16
         /// </summary>
         /// <param name="ftype">ftypeId</param>
-        /// <param name="channel">频道Id</param>
+        /// <param name="channelId">channelId</param>
         /// <returns></returns>
-        public static int GetFtype(int ftype, int channel)
+        public static int GetFtypeId(int ftype, int channelId)
         {
-            return AddPlaceHolder16(ftype, channel);
+            const int left = 16;
+            const int max = 1 << left;
+            channelId = channelId == 0 ? 1024 : channelId;
+            return ftype < max ? (channelId << left) | ftype : ftype;
         }
 
         /// <summary>
-        /// 返回频道小类
-        /// </summary>
-        /// <param name="stype">stypeId</param>
-        /// <param name="channel">频道Id</param>
-        /// <returns></returns>
-        public static int GetStype(int stype, int channel)
-        {
-            return AddPlaceHolder16(stype, channel);
-        }
-
-        /// <summary>
-        /// 返回频道专题
-        /// </summary>
-        /// <param name="special">专题Id</param>
-        /// <param name="channel">频道Id</param>
-        /// <returns></returns>
-        public static int GetSpecial(int special, int channel)
-        {
-            return AddPlaceHolder16(special, channel);
-        }
-
-        /// <summary>
-        /// 返回频道原始大类
+        /// return holder16
         /// </summary>
         /// <param name="ftype">ftypeId</param>
-        /// <param name="channelId">频道Id</param>
+        /// <param name="channelId">channelId</param>
         /// <returns></returns>
-        public static int GetOriginalFtype(int ftype, int channelId)
+        public static int GetOriginalFtypeId(int ftype, int channelId)
         {
-            return SubPlaceHolder16(ftype, channelId);
+            const int left = 16;
+            const int max = 1 << left;
+            channelId = channelId == 0 ? 1024 : channelId;
+            return ftype < max ? ftype : ftype - (channelId << left);
         }
 
         /// <summary>
-        /// 返回频道原始小类
+        /// get newsId
         /// </summary>
-        /// <param name="stype">stypeId</param>
-        /// <param name="channelId">频道Id</param>
-        /// <returns></returns>
-        public static int GetOriginalStype(int stype, int channelId)
-        {
-            return SubPlaceHolder16(stype, channelId);
-        }
-
-        /// <summary>
-        /// 返回频道原始专题
-        /// </summary>
-        /// <param name="special">specialId</param>
-        /// <param name="channelId">频道Id</param>
-        /// <returns></returns>
-        public static int GetOriginalSpecial(int special, int channelId)
-        {
-            return SubPlaceHolder16(special, channelId);
-        }
-
-        /// <summary>
-        /// 返回频道新闻
-        /// </summary>
-        /// <param name="newsId">新闻Id</param>
-        /// <param name="channelId">频道Id</param>
+        /// <param name="newsId">newsId</param>
+        /// <param name="channelId">channelId</param>
         /// <returns></returns>
         public static long GetNewsId(int newsId, int channelId)
         {
@@ -84,57 +46,15 @@
         }
 
         /// <summary>
-        /// 返回频道原始新闻
+        /// get newsId
         /// </summary>
-        /// <param name="newsId">新闻Id</param>
-        /// <returns></returns>
-        public static int GetOriginalNewsId(long newsId)
-        {
-            return (int)newsId;
-        }
-
-        /// <summary>
-        /// 返回频道原始新闻
-        /// </summary>
-        /// <param name="newsId">新闻Id</param>
-        /// <param name="channelId">频道Id</param>
+        /// <param name="newsId">newsId</param>
+        /// <param name="channelId">channelId</param>
         /// <returns></returns>
         public static int GetOriginalNewsId(long newsId, int channelId)
         {
             const int left = 32;
             return (int)(((long)channelId << left) ^ newsId);
-        }
-
-        /// <summary>
-        /// Adds the place holder16.
-        /// </summary>
-        /// <param name="number">The number.</param>
-        /// <param name="channel">The channel.</param>
-        /// <returns></returns>
-        private static int AddPlaceHolder16(int number, int channel)
-        {
-            const int left = 16;
-            const int max = 1 << left;
-
-            channel = channel == 0 ? 1024 : channel;
-
-            return number < max ? (channel << left) | number : number;
-        }
-
-        /// <summary>
-        /// Subs the place holder16.
-        /// </summary>
-        /// <param name="number">The number.</param>
-        /// <param name="channel">The channel.</param>
-        /// <returns></returns>
-        private static int SubPlaceHolder16(int number, int channel)
-        {
-            const int left = 16;
-            const int max = 1 << left;
-
-            channel = channel == 0 ? 1024 : channel;
-
-            return number < max ? number : number - (channel << left);
         }
     }
 }

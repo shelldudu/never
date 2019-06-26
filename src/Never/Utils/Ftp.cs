@@ -45,6 +45,7 @@ namespace Never.Utils
                 catch
                 {
                 }
+
                 return false;
             });
         }
