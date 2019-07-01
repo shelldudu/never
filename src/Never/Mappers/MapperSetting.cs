@@ -23,6 +23,7 @@ namespace Never.Mappers
         /// <summary>
         /// 是复合对象，如果是浅复制，则该值所描述的对象都使用相同副本
         /// </summary>
+        [System.Obsolete]
         public string[] ComplexMembers { get; set; }
 
         /// <summary>

@@ -91,7 +91,7 @@ namespace Never.Mappers
             if (TypeHelper.IsEnumType(nullableType))
                 return false;
 
-            if (nullableType == typeof(string) || nullableType == typeof(DateTime) || nullableType == typeof(DateTimeOffset) || nullableType == typeof(Guid) || nullableType == typeof(TimeSpan) || nullableType == typeof(decimal))
+            if (nullableType == typeof(DateTime) || nullableType == typeof(DateTimeOffset) || nullableType == typeof(Guid) || nullableType == typeof(TimeSpan) || nullableType == typeof(decimal))
                 return false;
 
             return true;

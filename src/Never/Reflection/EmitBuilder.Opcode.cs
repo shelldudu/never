@@ -61,6 +61,20 @@ namespace Never.Reflection
         /// <returns></returns>
         public virtual void NewObject(Type type, IList<Type> parameterTypes)
         {
+            if (this.TryNewObject(type, parameterTypes))
+                return;
+
+            throw new ArgumentNullException(string.Format("在当前类型{0}找不到构造函数", type.FullName));
+        }
+
+        /// <summary>
+        /// 创建新对象
+        /// </summary>
+        /// <param name="parameterTypes"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public virtual bool TryNewObject(Type type, IList<Type> parameterTypes)
+        {
             if (parameterTypes == null)
                 parameterTypes = new Type[0];
 
@@ -83,13 +97,12 @@ namespace Never.Reflection
                 if (allMatch)
                 {
                     this.il.Emit(OpCodes.Newobj, ctor);
-                    return;
+                    return true;
                 }
             };
 
-            throw new ArgumentNullException(string.Format("在当前类型{0}找不到构造函数", type.FullName));
+            return false;
         }
-
         /// <summary>
         /// 创建新对象
         /// </summary>
