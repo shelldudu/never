@@ -61,7 +61,6 @@ namespace Never
             return list.ToArray();
         }
 
-
         /// <summary>
         /// Gets the attributes.
         /// </summary>
@@ -101,7 +100,6 @@ namespace Never
             var attrs = memberInfo.GetCustomAttributes(typeof(T), inherit) as IEnumerable<Attribute>;
             return GetAttributes<T>(attrs);
         }
-
 
         #endregion attributes
 
@@ -251,7 +249,7 @@ namespace Never
         #region findType
 
         /// <summary>
-        /// 是否可以从serviceType分配implementationType类型
+        /// 确定implementationType类型的实例是否可以分配给serviceType类型的实例
         /// </summary>
         /// <param name="serviceType">接口类型</param>
         /// <param name="implementationType">实例类型</param>
@@ -285,17 +283,17 @@ namespace Never
         }
 
         /// <summary>
-        /// 是否可以从serviceType分分配implementationType类型
+        /// 确定serviceType类型的实例是否可以分配给baseType类型的实例
         /// </summary>
         /// <param name="baseType">基类型</param>
-        /// <param name="serviceType">实例类型</param>
+        /// <param name="type">实例类型</param>
         /// <returns></returns>
-        public static bool IsAssignableFromType(this Type serviceType, Type baseType)
+        public static bool IsAssignableFromType(this Type type, Type baseType)
         {
-            if (serviceType == null || baseType == null)
+            if (type == null || baseType == null)
                 return false;
 
-            return IsAssignableToType(baseType, serviceType);
+            return IsAssignableToType(baseType, type);
         }
 
         /// <summary>

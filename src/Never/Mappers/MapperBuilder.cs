@@ -78,8 +78,8 @@ namespace Never.Mappers
             if (type == typeof(string) || type == typeof(DateTime) || type == typeof(DateTimeOffset) || type == typeof(Guid) || type == typeof(TimeSpan) || type == typeof(decimal))
                 return false;
 
-            if (TypeHelper.IsEnumerableType(type))
-                return false;
+            //if (TypeHelper.IsEnumerableType(type))
+            //    return false;
 
             var nullableType = Nullable.GetUnderlyingType(type);
             if (nullableType == null)

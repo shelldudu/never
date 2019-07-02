@@ -45,7 +45,7 @@ namespace Never.Web
             }
         }
 
-        #endregion
+        #endregion encoding
 
         #region byte[]
 
@@ -106,6 +106,21 @@ namespace Never.Web
         /// <returns></returns>
         public byte[] Get(string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType, int timeout)
         {
+            return this.Get(url, getParams, headerParams, contentType, timeout, out var httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public byte[] Get(string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
             string paramString = string.Empty;
             if (getParams != null && getParams.Count > 0)
             {
@@ -117,7 +132,7 @@ namespace Never.Web
                 paramString = paramString.Trim('&');
             }
 
-            return this.Get(new Uri(string.Concat(url, url.IndexOf("?") >= 0 ? "&" : "?", paramString)), headerParams, contentType, timeout);
+            return this.Get(new Uri(string.Concat(url, url.IndexOf("?") >= 0 ? "&" : "?", paramString)), headerParams, contentType, timeout, out httpStatus);
         }
 
         /// <summary>
@@ -163,6 +178,20 @@ namespace Never.Web
         /// <returns></returns>
         public byte[] Get(Uri uri, IDictionary<string, string> headerParams, string contentType, int timeout)
         {
+            return this.Get(uri, headerParams, contentType, timeout, out var httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public byte[] Get(Uri uri, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
             var request = WebRequest.Create(uri) as HttpWebRequest;
             request.Method = "GET";
             request.ContentType = contentType;
@@ -192,6 +221,7 @@ namespace Never.Web
 
                 response.GetResponseStream().CopyTo(st);
                 st.Position = 0;
+                httpStatus = (int)response.StatusCode;
                 return st.ToArray();
             }
         }
@@ -253,11 +283,41 @@ namespace Never.Web
         /// <param name="postParams">请求参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <param name="contentType"> 标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public byte[] Post(string url, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
+            return this.Post(new Uri(url), postParams, headerParams, contentType, timeout, out httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
         public byte[] Post(string url, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
         {
             return this.Post(new Uri(url), postParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public byte[] Post(string url, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
+            return this.Post(new Uri(url), postParams, headerParams, contentType, timeout, out httpStatus);
         }
 
         /// <summary>
@@ -306,6 +366,21 @@ namespace Never.Web
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
         public byte[] Post(Uri uri, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return this.Post(uri, postParams, headerParams, contentType, timeout, out var httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public byte[] Post(Uri uri, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
         {
             string paramString = string.Empty;
             if (postParams != null && postParams.Count > 0)
@@ -356,6 +431,7 @@ namespace Never.Web
 
                 response.GetResponseStream().CopyTo(st);
                 st.Position = 0;
+                httpStatus = (int)response.StatusCode;
                 return st.ToArray();
             }
         }
@@ -370,6 +446,21 @@ namespace Never.Web
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
         public byte[] Post(Uri uri, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
+        {
+            return this.Post(uri, postParams, headerParams, contentType, timeout, out var httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public byte[] Post(Uri uri, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
         {
             string paramString = string.Empty;
             var request = WebRequest.Create(uri) as HttpWebRequest;
@@ -434,6 +525,7 @@ namespace Never.Web
 
                 response.GetResponseStream().CopyTo(st);
                 st.Position = 0;
+                httpStatus = (int)response.StatusCode;
                 return st.ToArray();
             }
         }
@@ -505,6 +597,21 @@ namespace Never.Web
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public string GetString(string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
+            return this.Encoding.GetString(this.Get(url, getParams, headerParams, contentType, timeout, out httpStatus));
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
         /// <param name="uri">Url请求地址</param>
         /// <returns></returns>
         public string GetString(Uri uri)
@@ -546,6 +653,20 @@ namespace Never.Web
         public string GetString(Uri uri, IDictionary<string, string> headerParams, string contentType, int timeout)
         {
             return this.Encoding.GetString(this.Get(uri, headerParams, contentType, timeout));
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public string GetString(Uri uri, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
+            return this.Encoding.GetString(this.Get(uri, headerParams, contentType, timeout, out httpStatus));
         }
 
         /// <summary>
@@ -605,11 +726,41 @@ namespace Never.Web
         /// <param name="postParams">请求参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <param name="contentType"> 标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public string PostString(string url, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
+            return this.PostString(new Uri(url), postParams, headerParams, contentType, timeout, out httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
         public string PostString(string url, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
         {
             return this.PostString(new Uri(url), postParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public string PostString(string url, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
+            return this.PostString(new Uri(url), postParams, headerParams, contentType, timeout, out httpStatus);
         }
 
         /// <summary>
@@ -669,11 +820,41 @@ namespace Never.Web
         /// <param name="postParams">请求参数</param>
         /// <param name="headerParams">标头的值</param>
         /// <param name="contentType"> 标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public string PostString(Uri uri, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
+            return this.Encoding.GetString(this.Post(uri, postParams, headerParams, contentType, timeout, out httpStatus));
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
         /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
         /// <returns></returns>
         public string PostString(Uri uri, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
         {
             return this.Encoding.GetString(this.Post(uri, postParams, headerParams, contentType, timeout));
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="postParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType"> 标头的值</param>
+        /// <param name="httpStatus">http status</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public string PostString(Uri uri, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout, out int httpStatus)
+        {
+            return this.Encoding.GetString(this.Post(uri, postParams, headerParams, contentType, timeout, out httpStatus));
         }
 
         #endregion string

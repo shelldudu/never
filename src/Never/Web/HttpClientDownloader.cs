@@ -45,9 +45,19 @@ namespace Never.Web
             }
         }
 
-        #endregion
+        #endregion encoding
 
         #region byte[]
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetAsync(string url)
+        {
+            return await this.GetAsync(url, null, null);
+        }
 
         /// <summary>
         /// 从Url地址中下载数据
@@ -182,6 +192,16 @@ namespace Never.Web
         /// 从Url地址中下载数据
         /// </summary>
         /// <param name="url">Url请求地址</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(string url)
+        {
+            return await this.PostAsync(url, null, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
         /// <param name="postParams">请求参数</param>
         /// <returns></returns>
         public async Task<byte[]> PostAsync(string url, IDictionary<string, string> postParams)
@@ -240,6 +260,16 @@ namespace Never.Web
         public async Task<byte[]> PostAsync(string url, Stream postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
         {
             return await this.PostAsync(new Uri(url), postParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <returns></returns>
+        public async Task<byte[]> PostAsync(Uri uri)
+        {
+            return await this.PostAsync(uri, null, null);
         }
 
         /// <summary>
@@ -478,6 +508,16 @@ namespace Never.Web
         /// 从Url地址中下载数据
         /// </summary>
         /// <param name="url">Url请求地址</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(string url)
+        {
+            return await this.PostStringAsync(url, null, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="url">Url请求地址</param>
         /// <param name="postParams">请求参数</param>
         /// <returns></returns>
         public async Task<string> PostStringAsync(string url, IDictionary<string, string> postParams)
@@ -522,6 +562,16 @@ namespace Never.Web
         public async Task<string> PostStringAsync(string url, IDictionary<string, string> postParams, IDictionary<string, string> headerParams, string contentType, int timeout)
         {
             return await this.PostStringAsync(new Uri(url), postParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="uri">Url请求地址</param>
+        /// <returns></returns>
+        public async Task<string> PostStringAsync(Uri uri)
+        {
+            return await this.PostStringAsync(uri, null, null);
         }
 
         /// <summary>

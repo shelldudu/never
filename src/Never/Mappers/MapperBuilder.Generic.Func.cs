@@ -3,12 +3,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 
 namespace Never.Mappers
 {
     /// <summary>
-    /// 自动映射创建
+    /// 自动映射创建，会创建To对象
     /// </summary>
     public partial class MapperBuilder<From, To> : MapperBuilder
     {
@@ -50,6 +51,47 @@ namespace Never.Mappers
         /// <returns></returns>
         private DelegateType FuncBuild<DelegateType>(EasyEmitBuilder<DelegateType> emit, Type fromType, Type toType, MapperSetting setting)
         {
+            if (MapperBuilderHelper.TryGetConvertMethod(toType, fromType, out var primitiveTypeMethod))
+            {
+                emit.LoadArgument(0);
+                emit.Call(primitiveTypeMethod);
+                emit.Return();
+                return emit.CreateDelegate();
+            }
+            if (Nullable.GetUnderlyingType(toType) != null)
+            {
+                if (Nullable.GetUnderlyingType(fromType) != null)
+                {
+                    emit.LoadArgument(0);
+                    emit.Call(typeof(MapperBuilderHelper).GetMethod("ConvertToNullableValueFromNullableValue").MakeGenericMethod(new[] { Nullable.GetUnderlyingType(toType), Nullable.GetUnderlyingType(fromType) }));
+                    emit.Return();
+                    return emit.CreateDelegate();
+                }
+                else if (fromType.IsValueType)
+                {
+                    emit.LoadArgument(0);
+                    emit.Call(typeof(MapperBuilderHelper).GetMethod("ConvertToNullableValueFromValue").MakeGenericMethod(new[] { Nullable.GetUnderlyingType(toType), fromType }));
+                    emit.Return();
+                    return emit.CreateDelegate();
+                }
+
+                emit.InitializeObject(toType);
+                emit.Return();
+                return emit.CreateDelegate();
+            }
+            if (Nullable.GetUnderlyingType(fromType) != null)
+            {
+                if (toType.IsValueType)
+                {
+                    emit.LoadArgument(0);
+                    emit.Call(typeof(MapperBuilderHelper).GetMethod("ConvertToValueFromNullableValue").MakeGenericMethod(new[] { toType, Nullable.GetUnderlyingType(fromType) }));
+                    emit.Return();
+                    return emit.CreateDelegate();
+                }
+
+                goto _nomember;
+            }
+
             var toMembers = GetMembers(toType);
             var fromMembers = GetMembers(fromType);
             var removes = new List<MemberInfo>(toMembers.Count);
@@ -59,7 +101,19 @@ namespace Never.Mappers
                 if (toMember.MemberType == MemberTypes.Property)
                 {
                     var p = (PropertyInfo)toMember;
-                    if (!p.CanRead)
+                    if (!p.CanWrite)
+                        removes.Add(toMember);
+
+                    if (p.GetSetMethod(true).GetParameters().Length != 1)
+                    {
+                        removes.Add(toMember);
+                        continue;
+                    }
+                }
+                else if (toMember.MemberType == MemberTypes.Field)
+                {
+                    var f = (FieldInfo)toMember;
+                    if (f.IsInitOnly)
                         removes.Add(toMember);
                 }
             }
@@ -76,13 +130,7 @@ namespace Never.Mappers
                 if (fromMember.MemberType == MemberTypes.Property)
                 {
                     var p = (PropertyInfo)fromMember;
-                    if (!p.CanWrite)
-                        removes.Add(fromMember);
-                }
-                else if (fromMember.MemberType == MemberTypes.Field)
-                {
-                    var f = (FieldInfo)fromMember;
-                    if (f.IsInitOnly)
+                    if (!p.CanRead)
                         removes.Add(fromMember);
                 }
             }
@@ -111,47 +159,7 @@ namespace Never.Mappers
             /*两都其中一处没有属性，直接返回，算优化*/
             if (toMembers.Count == 0 || fromMembers.Count == 0)
             {
-                if (toType.IsValueType)
-                {
-                    var structlocal = emit.DeclareLocal(toType);
-                    emit.LoadLocalAddress(structlocal);
-                    emit.InitializeObject(toType);
-                    emit.LoadLocal(structlocal);
-                    emit.Return();
-                    return emit.CreateDelegate();
-                }
-
-                /*总是构造新对象*/
-                if (setting.AlwaysNewTraget)
-                {
-                    emit.NewObject(toType.GetConstructor(Type.EmptyTypes));
-                    emit.Return();
-                    return emit.CreateDelegate();
-                }
-
-                if (!fromType.IsValueType)
-                {
-                    emit.LoadArgument(0);
-                    emit.LoadNull();
-                    emit.CompareGreaterThan();
-                    /*null*/
-                    emit.BranchIfFalse(nullLabel);
-                    emit.NewObject(toType.GetConstructor(Type.EmptyTypes));
-                    emit.StoreLocal(toInstanceLocal);
-                    emit.Branch(returnLabel);
-                    emit.MarkLabel(nullLabel);
-                    emit.LoadNull();
-                    emit.StoreLocal(toInstanceLocal);
-                    emit.Branch(returnLabel);
-                    emit.MarkLabel(returnLabel);
-                    emit.LoadLocal(toInstanceLocal);
-                    emit.Return();
-                    return emit.CreateDelegate();
-                }
-
-                emit.NewObject(toType.GetConstructor(Type.EmptyTypes));
-                emit.Return();
-                return emit.CreateDelegate();
+                goto _nomember;
             }
 
             /*总是构造新对象*/
@@ -254,6 +262,56 @@ namespace Never.Mappers
             emit.LoadLocal(toInstanceLocal);
             emit.Return();
             return emit.CreateDelegate();
+
+        _nomember:
+            {
+                if (toType.IsValueType)
+                {
+                    var structlocal = emit.DeclareLocal(toType);
+                    emit.LoadLocalAddress(structlocal);
+                    emit.InitializeObject(toType);
+                    emit.LoadLocal(structlocal);
+                    emit.Return();
+                    return emit.CreateDelegate();
+                }
+
+                /*总是构造新对象*/
+                if (setting.AlwaysNewTraget)
+                {
+                    emit.NewObject(toType.GetConstructor(Type.EmptyTypes));
+                    emit.Return();
+                    return emit.CreateDelegate();
+                }
+
+                if (!fromType.IsValueType)
+                {
+                    ILabel nullLabel2 = emit.DefineLabel();
+                    ILabel returnLabel2 = emit.DefineLabel();
+                    var toInstanceLocal2 = emit.DeclareLocal(toType);
+                    var fromInstanceLocal2 = emit.DeclareLocal(fromType);
+
+                    emit.LoadArgument(0);
+                    emit.LoadNull();
+                    emit.CompareGreaterThan();
+                    /*null*/
+                    emit.BranchIfFalse(nullLabel2);
+                    emit.NewObject(toType.GetConstructor(Type.EmptyTypes));
+                    emit.StoreLocal(toInstanceLocal2);
+                    emit.Branch(returnLabel2);
+                    emit.MarkLabel(nullLabel2);
+                    emit.LoadNull();
+                    emit.StoreLocal(toInstanceLocal2);
+                    emit.Branch(returnLabel2);
+                    emit.MarkLabel(returnLabel2);
+                    emit.LoadLocal(toInstanceLocal2);
+                    emit.Return();
+                    return emit.CreateDelegate();
+                }
+
+                emit.NewObject(toType.GetConstructor(Type.EmptyTypes));
+                emit.Return();
+                return emit.CreateDelegate();
+            }
         }
 
         #endregion build
@@ -285,23 +343,17 @@ namespace Never.Mappers
                 emit.BranchIfFalse(breakLbl);
             }
 
-            for (var i = 0; i < toMembers.Count; i++)
+            var members = toMembers.ToArray();
+            for (var i = 0; i < members.Length; i++)
             {
-                var toMember = toMembers[i];
-                if (toMember.MemberType == MemberTypes.Property)
-                {
-                    var prop = (PropertyInfo)toMember;
-                    if (!prop.CanWrite)
-                        continue;
-
-                    if (prop.GetSetMethod(true).GetParameters().Length != 1)
-                        continue;
-                }
-
+                var toMember = members[i];
                 /*在源对象中找不到该目标对象*/
                 var fromMember = fromMembers.Find(o => toMember.Name.Equals(o.Name, StringComparison.OrdinalIgnoreCase));
                 if (fromMember == null)
+                {
+                    toMembers.Remove(toMember);
                     continue;
+                }
 
                 if (fromMember.MemberType == MemberTypes.Property && !((PropertyInfo)fromMember).CanRead)
                     continue;
@@ -352,11 +404,13 @@ namespace Never.Mappers
                     if (nullableFromMemberType == null)
                     {
                         FuncBuildTargetNullableSourceNotNullable(setting, toLocal, fromLocal, emit, toType, toMember, nullableToMemberType, fromType, fromMember);
+                        toMembers.Remove(toMember);
                         continue;
                     }
 
                     /*2的情况*/
                     FuncBuildTargetNullableSourceNullable(setting, toLocal, fromLocal, emit, toType, toMember, nullableToMemberType, fromType, fromMember, nullableFromMemberType);
+                    toMembers.Remove(toMember);
                     continue;
                 }
 
@@ -364,11 +418,13 @@ namespace Never.Mappers
                 if (nullableFromMemberType == null)
                 {
                     FuncBuildTargetNotNullableSourceNotNullable(setting, toLocal, fromLocal, emit, toType, toMember, fromType, fromMember);
+                    toMembers.Remove(toMember);
                     continue;
                 }
 
                 /*4的情况*/
                 FuncBuildTargetNotNullableSourceNullable(setting, toLocal, fromLocal, emit, toType, toMember, fromType, fromMember, nullableFromMemberType);
+                toMembers.Remove(toMember);
                 continue;
             }
 
@@ -405,67 +461,338 @@ namespace Never.Mappers
                 emit.BranchIfFalse(breakLbl);
             }
 
-            for (var i = 0; i < toMembers.Count; i++)
+            var members = toMembers.ToArray();
+            for (var i = 0; i < members.Length; i++)
             {
-                var toMember = toMembers[i];
-                if (toMember.MemberType == MemberTypes.Property)
-                {
-                    var prop = (PropertyInfo)toMember;
-                    if (!prop.CanWrite)
-                        continue;
-
-                    if (prop.GetSetMethod(true).GetParameters().Length != 1)
-                        continue;
-                }
-
+                var toMember = members[i];
                 /*在源对象中找不到该目标对象*/
                 var fromMember = fromMembers.Find(o => toMember.Name.Equals(o.Name, StringComparison.OrdinalIgnoreCase));
                 if (fromMember == null)
-                    continue;
-
-                if (fromMember.MemberType == MemberTypes.Property && !((PropertyInfo)fromMember).CanRead)
-                    continue;
-
-                bool isComplexType = false;
-                /*目标类型不是复合对象*/
-                var toMemberType = toMember.MemberType == MemberTypes.Property ? ((PropertyInfo)toMember).PropertyType : ((FieldInfo)toMember).FieldType;
-                if (setting.ComplexMembers != null)
                 {
-                    foreach (var st in setting.ComplexMembers)
-                    {
-                        if (st.Equals(toMember.Name))
-                        {
-                            isComplexType = true;
-                            break;
-                        }
-                    }
+                    toMembers.Remove(toMember);
+                    continue;
                 }
 
-                if (!isComplexType && IsComplexType(toMemberType))
-                    isComplexType = true;
-
-                if (!isComplexType)
+                /*目标类型不是复合对象*/
+                var toMemberType = toMember.MemberType == MemberTypes.Property ? ((PropertyInfo)toMember).PropertyType : ((FieldInfo)toMember).FieldType;
+                if (!IsComplexType(toMemberType))
                     continue;
 
                 /*源类型不是复合对象*/
                 var fromMemberType = fromMember.MemberType == MemberTypes.Property ? ((PropertyInfo)fromMember).PropertyType : ((FieldInfo)fromMember).FieldType;
-                if (setting.ComplexMembers != null)
+                if (!IsComplexType(fromMemberType))
+                    continue;
+
+                toMembers.Remove(toMember);
+                var subToLocal = emit.DeclareLocal(toMemberType);
+                var subFromLocal = emit.DeclareLocal(fromMemberType);
+
+                //处理数组
+                if (toMemberType.IsAssignableFromType(typeof(IEnumerable<>)))
                 {
-                    foreach (var st in setting.ComplexMembers)
+                    //没有匹配
+                    var notMatchs = new List<bool>(5);
+                    //来源一定要是IEnumerable
+                    if (fromMemberType.IsAssignableFromType(typeof(IEnumerable<>)) == true)
                     {
-                        if (st.Equals(fromMemberType.Name))
+                        //目标是字典
+                        if (toMemberType.IsAssignableFromType(typeof(IDictionary<,>)))
                         {
-                            isComplexType = true;
-                            break;
+                            var keyvaluePairTypeType = this.FindKeyValuePairTypeInIEnumerable(fromMemberType);
+                            if (keyvaluePairTypeType == null)
+                            {
+                                notMatchs.Add(true);
+                                continue;
+                            }
+
+                            var dictionaryTypes = new Type[4];
+                            Array.Copy(TypeHelper.GetInterface(toMemberType, typeof(IDictionary<,>)).GetGenericArguments(), 0, dictionaryTypes, 0, 2);
+                            Array.Copy(keyvaluePairTypeType.GetGenericArguments()[0].GetGenericArguments(), 0, dictionaryTypes, 2, 4);
+                            if (toMemberType.IsClass)
+                            {
+                                if (emit.TryNewObject(toMemberType, Type.EmptyTypes) == false)
+                                {
+                                    notMatchs.Add(true);
+                                    continue;
+                                }
+
+                                /*局部变量*/
+                                if (fromType.IsValueType)
+                                    emit.LoadLocalAddress(fromLocal); // from
+                                else
+                                    emit.LoadLocal(fromLocal);
+
+                                if (fromMember.MemberType == MemberTypes.Property)
+                                    emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                                else
+                                    emit.LoadField((FieldInfo)fromMember);
+
+                                if (toMemberType.IsAssignableFromType(typeof(ICollection<>)))
+                                {
+                                    emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoCollection").MakeGenericMethod(dictionaryTypes));
+                                }
+                                else
+                                {
+                                    emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoDictionary").MakeGenericMethod(dictionaryTypes));
+                                }
+                            }
+                            else if (toMemberType.IsValueType)
+                            {
+                                emit.InitializeObject(toMemberType);
+                                /*局部变量*/
+                                if (fromType.IsValueType)
+                                    emit.LoadLocalAddress(fromLocal); // from
+                                else
+                                    emit.LoadLocal(fromLocal);
+
+                                if (fromMember.MemberType == MemberTypes.Property)
+                                    emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                                else
+                                    emit.LoadField((FieldInfo)fromMember);
+
+                                if (toMemberType.IsAssignableFromType(typeof(ICollection<>)))
+                                {
+                                    emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoCollection").MakeGenericMethod(dictionaryTypes));
+                                }
+                                else
+                                {
+                                    emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoDictionary").MakeGenericMethod(dictionaryTypes));
+                                }
+                            }
+                            else if (toMemberType.IsAssignableFromType(typeof(IDictionary<,>)))
+                            {
+                                /*局部变量*/
+                                if (fromType.IsValueType)
+                                    emit.LoadLocalAddress(fromLocal); // from
+                                else
+                                    emit.LoadLocal(fromLocal);
+
+                                if (fromMember.MemberType == MemberTypes.Property)
+                                    emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                                else
+                                    emit.LoadField((FieldInfo)fromMember);
+
+                                emit.Call(typeof(MapperBuilderHelper).GetMethod("ConvertToDictionary").MakeGenericMethod(dictionaryTypes));
+                            }
+                            else if (toMemberType.IsAssignableFromType(typeof(ICollection<>).MakeGenericType(keyvaluePairTypeType.GetGenericArguments()[0])))
+                            {
+                                /*局部变量*/
+                                if (fromType.IsValueType)
+                                    emit.LoadLocalAddress(fromLocal); // from
+                                else
+                                    emit.LoadLocal(fromLocal);
+
+                                if (fromMember.MemberType == MemberTypes.Property)
+                                    emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                                else
+                                    emit.LoadField((FieldInfo)fromMember);
+
+                                emit.Call(typeof(MapperBuilderHelper).GetMethod("ConvertToCollection").MakeGenericMethod(dictionaryTypes));
+                            }
+                            else
+                            {
+                                notMatchs.Add(true);
+                                continue;
+                            }
+                        }
+
+                        //目标是数组
+                        var enumerableTypes = new Type[2];
+                        Array.Copy(TypeHelper.GetInterface(toMemberType, typeof(IEnumerable<>)).GetGenericArguments(), 0, enumerableTypes, 0, 1);
+                        Array.Copy(TypeHelper.GetInterface(fromMemberType, typeof(IEnumerable<>)).GetGenericArguments(), 0, enumerableTypes, 1, 1);
+
+                        if (toMemberType.IsArray)
+                        {
+                            /*局部变量*/
+                            if (fromType.IsValueType)
+                                emit.LoadLocalAddress(fromLocal); // from
+                            else
+                                emit.LoadLocal(fromLocal);
+
+                            if (fromMember.MemberType == MemberTypes.Property)
+                                emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                            else
+                                emit.LoadField((FieldInfo)fromMember);
+
+                            emit.Call(typeof(MapperBuilderHelper).GetMethod("ConvertToEnumerable").MakeGenericMethod(enumerableTypes));
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("ToArray").MakeGenericMethod(enumerableTypes[0]));
+                        }
+                        else if (toMemberType.IsClass)
+                        {
+                            if (emit.TryNewObject(toMemberType, Type.EmptyTypes) == false)
+                            {
+                                notMatchs.Add(true);
+                                continue;
+                            }
+
+                            /*局部变量*/
+                            if (fromType.IsValueType)
+                                emit.LoadLocalAddress(fromLocal); // from
+                            else
+                                emit.LoadLocal(fromLocal);
+
+                            if (fromMember.MemberType == MemberTypes.Property)
+                                emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                            else
+                                emit.LoadField((FieldInfo)fromMember);
+
+                            if (toMemberType.IsAssignableFromType(typeof(IList<>)))
+                            {
+                                emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoList").MakeGenericMethod(enumerableTypes));
+                            }
+                            else if (toMemberType.IsAssignableFromType(typeof(ICollection<>)))
+                            {
+                                emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoCollection").MakeGenericMethod(enumerableTypes));
+                            }
+                            else
+                            {
+                                notMatchs.Add(true);
+                                continue;
+                            }
+                        }
+                        else if (toMemberType.IsValueType)
+                        {
+                            emit.InitializeObject(toMemberType);
+
+                            /*局部变量*/
+                            if (fromType.IsValueType)
+                                emit.LoadLocalAddress(fromLocal); // from
+                            else
+                                emit.LoadLocal(fromLocal);
+
+                            if (fromMember.MemberType == MemberTypes.Property)
+                                emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                            else
+                                emit.LoadField((FieldInfo)fromMember);
+
+                            if (toMemberType.IsAssignableFromType(typeof(IList<>)))
+                            {
+                                emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoList").MakeGenericMethod(enumerableTypes));
+                            }
+                            else if (toMemberType.IsAssignableFromType(typeof(ICollection<>)))
+                            {
+                                emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoCollection").MakeGenericMethod(enumerableTypes));
+                            }
+                            else
+                            {
+                                notMatchs.Add(true);
+                                continue;
+                            }
+                        }
+                        else if (toMemberType.IsAssignableFromType(typeof(IList<>)))
+                        {
+                            /*局部变量*/
+                            if (fromType.IsValueType)
+                                emit.LoadLocalAddress(fromLocal); // from
+                            else
+                                emit.LoadLocal(fromLocal);
+
+                            if (fromMember.MemberType == MemberTypes.Property)
+                                emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                            else
+                                emit.LoadField((FieldInfo)fromMember);
+
+                            emit.Call(typeof(MapperBuilderHelper).GetMethod("ConvertToEnumerable").MakeGenericMethod(enumerableTypes));
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("ToList").MakeGenericMethod(enumerableTypes[0]));
+                        }
+                        else if (toMemberType.IsAssignableFromType(typeof(ICollection<>)))
+                        {
+                            /*局部变量*/
+                            if (fromType.IsValueType)
+                                emit.LoadLocalAddress(fromLocal); // from
+                            else
+                                emit.LoadLocal(fromLocal);
+
+                            if (fromMember.MemberType == MemberTypes.Property)
+                                emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                            else
+                                emit.LoadField((FieldInfo)fromMember);
+
+                            emit.Call(typeof(MapperBuilderHelper).GetMethod("ConvertToEnumerable").MakeGenericMethod(enumerableTypes));
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("ToList").MakeGenericMethod(enumerableTypes[0]));
+                        }
+                        else
+                        {
+                            /*局部变量*/
+                            if (fromType.IsValueType)
+                                emit.LoadLocalAddress(fromLocal); // from
+                            else
+                                emit.LoadLocal(fromLocal);
+
+                            if (fromMember.MemberType == MemberTypes.Property)
+                                emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                            else
+                                emit.LoadField((FieldInfo)fromMember);
+
+                            emit.Call(typeof(MapperBuilderHelper).GetMethod("ConvertToEnumerable").MakeGenericMethod(enumerableTypes));
                         }
                     }
-                }
+                    else
+                    {
+                        notMatchs.Insert(0, true);
+                    }
 
-                if (!isComplexType && IsComplexType(fromMemberType))
-                    isComplexType = true;
+                    //没有匹配
+                    if (notMatchs.Any(tt => tt))
+                    {
+                        if (toMemberType.IsArray)
+                        {
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("Empty").MakeGenericMethod(toMemberType.GetGenericArguments()[0]));
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("ToArray").MakeGenericMethod(toMemberType.GetGenericArguments()[0]));
+                        }
+                        else if (toMemberType.IsClass)
+                        {
+                            if (emit.TryNewObject(toMemberType, Type.EmptyTypes) == false)
+                                continue;
+                        }
+                        else if (toMemberType.IsValueType)
+                        {
+                            emit.InitializeObject(toMemberType);
+                        }
+                        else if (toMemberType == typeof(IDictionary<,>))
+                        {
+                            emit.NewObject(typeof(Dictionary<,>), Type.EmptyTypes);
+                        }
+                        else if (toMemberType == typeof(ICollection<>).MakeGenericType(TypeHelper.GetInterface(toMemberType, typeof(IEnumerable<>)).GetGenericArguments()))
+                        {
+                            emit.NewObject(typeof(Dictionary<,>), Type.EmptyTypes);
+                        }
+                        else if (toMemberType == typeof(IList<>))
+                        {
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("Empty").MakeGenericMethod(toMemberType.GetGenericArguments()[0]));
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("ToList").MakeGenericMethod(toMemberType.GetGenericArguments()[0]));
+                        }
+                        else if (toMemberType == typeof(ICollection<>).MakeGenericType(TypeHelper.GetInterface(toMemberType, typeof(IEnumerable<>)).GetGenericArguments()))
+                        {
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("Empty").MakeGenericMethod(toMemberType.GetGenericArguments()[0]));
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("ToList").MakeGenericMethod(toMemberType.GetGenericArguments()[0]));
+                        }
+                        else if (toMemberType == typeof(IEnumerable<>))
+                        {
+                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("Empty").MakeGenericMethod(toMemberType.GetGenericArguments()[0]));
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
 
-                if (!isComplexType)
+                    emit.StoreLocal(subToLocal);
+
+                    /*局部变量*/
+                    if (toType.IsValueType)
+                        emit.LoadLocalAddress(toLocal); // from
+                    else
+                        emit.LoadLocal(toLocal);
+
+                    emit.LoadLocal(subToLocal);
+                    if (toMember.MemberType == MemberTypes.Property)
+                        emit.Call(((PropertyInfo)toMember).GetSetMethod(true)); // from get method
+                    else
+                        emit.StoreField((FieldInfo)toMember);
+
                     continue;
+                }
 
                 if (fromMemberType != toMemberType)
                 {
@@ -502,9 +829,6 @@ namespace Never.Mappers
 
                 if (!toMemberType.IsValueType && toMemberType.GetConstructor(Type.EmptyTypes) == null)
                     continue;
-
-                var subToLocal = emit.DeclareLocal(toMemberType);
-                var subFromLocal = emit.DeclareLocal(fromMemberType);
 
                 /*局部变量*/
                 var subToMembers = GetMembers(toMemberType);

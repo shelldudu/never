@@ -1,4 +1,5 @@
-﻿using Never.Commands;
+﻿using System;
+using Never.Commands;
 using Never.EventStreams;
 using Never.IoC;
 using Never.IoC.Providers;
@@ -86,11 +87,19 @@ namespace Never.TestConsole
 
         private static void Main(string[] args)
         {
-            var id = Channel.GetFtypeId(66, 10);
-            var nid = Channel.GetOriginalFtypeId(id, 10);
-            //new InsertTest().TestSession();
-            //new MemcachedTest().TestAddValueOnTextMode();
-            //new CachingTest().TestThreadContextCache();
+            var baidu = new Never.Web.HttpRequestDownloader().GetString("http://baidu.com", null, null, null, 0, out var status);
+            baidu = new Never.Web.HttpRequestDownloader().GetStringAsync("http://baidu.com").GetAwaiter().GetResult();
+            var bingo = new Never.Web.HttpClientDownloader().GetAsync("http://bing.com").GetAwaiter().GetResult();
+        }
+
+        public struct ABC
+        {
+            public int Id { get; set; }
+
+            public void ChangeId()
+            {
+                this.Id = 666;
+            }
         }
     }
 }

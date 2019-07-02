@@ -3,11 +3,11 @@ using Never.Reflection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 
 namespace Never.TestConsole.Mappers
 {
-
     /// <summary>
     /// 扩展基本实体
     /// </summary>
@@ -99,7 +99,6 @@ namespace Never.TestConsole.Mappers
         /// </summary>
         Buying = 1,
     }
-
 
     /// <summary>
     /// 自动映射配置
@@ -213,12 +212,47 @@ namespace Never.TestConsole.Mappers
             return new ClassMapper();
         }
 
-
         [Xunit.FactAttribute]
         public void TestEnumParse()
         {
             var from = new TestFromMappeEnum() { Value = MapperEnum.A | MapperEnum.B };
             var to = EasyMapper.Map(from, new TestToMappeEnum());
+        }
+
+        [Xunit.Fact]
+        public void TestMapArray()
+        {
+            var a = "e";
+            SetString(a);
+
+            var @base = new FromMapArray
+            {
+                A = 236m,
+                Array = new[] { 1, 2, 3 },
+            };
+
+            var mapper = (IMapper)new EasyMapper(new MapperSetting() { ForceConvertWhenTypeNotSame = true });
+            var to = mapper.Map<FromMapArray, MapArrayTarget>(@base);
+            //var aaa = to.Array.ToArray();
+        }
+
+        public void SetString(string a)
+        {
+            a = "eee";
+        }
+
+        private class FromMapArray
+        {
+            public decimal A { get; set; }
+
+            public int[] Array { get; set; }
+        }
+
+        private struct MapArrayTarget
+        {
+            public string A { get; set; }
+
+            public ICollection<ToNullProp> Array { get; set; }
         }
     }
 
@@ -324,10 +358,9 @@ namespace Never.TestConsole.Mappers
 
     public class AInfoAmount : BaseAmount
     {
-
     }
+
     public class BInfoAmount : BaseAmount
     {
-
     }
 }

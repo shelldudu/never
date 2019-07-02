@@ -164,7 +164,6 @@ namespace Never.Mappers
                 }
             }
 
-
             definedMethodDict[typeof(string)].Add(typeof(Guid), typeof(MapperBuilderHelper).GetMethod("GuidToString"));
         }
 
@@ -182,7 +181,6 @@ namespace Never.Mappers
             return definedTypeDict.Contains(targetType);
         }
 
-
         #endregion containType
 
         #region getmethod
@@ -192,15 +190,23 @@ namespace Never.Mappers
             return guid.ToString();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="toType"></param>
-        /// <param name="fromType"></param>
-        /// <returns></returns>
         public static MethodInfo GetConvertMethod(Type toType, Type fromType)
         {
             return definedMethodDict[toType][fromType];
+        }
+
+        public static bool TryGetConvertMethod(Type toType, Type fromType, out MethodInfo method)
+        {
+            method = null;
+            if (definedMethodDict.ContainsKey(toType) == false)
+                return false;
+
+            var current = definedMethodDict[toType];
+            if (current.ContainsKey(fromType) == false)
+                return false;
+
+            method = current[fromType];
+            return true;
         }
 
         #endregion getmethod
@@ -244,6 +250,7 @@ namespace Never.Mappers
 
             return list;
         }
+
         public static ICollection<T> LoadIntoCollection<T, F>(ICollection<T> target, IEnumerable<F> source)
         {
             if (source.IsNullOrEmpty())
@@ -257,6 +264,7 @@ namespace Never.Mappers
 
             return list;
         }
+
         public static IDictionary<TKey, TValue> ConvertToDictionary<TKey, TValue, FKey, FValue>(IEnumerable<KeyValuePair<FKey, FValue>> source)
         {
             if (source.IsNullOrEmpty())
@@ -272,6 +280,7 @@ namespace Never.Mappers
 
             return dictionary;
         }
+
         public static IDictionary<TKey, TValue> LoadIntoDictionary<TKey, TValue, FKey, FValue>(IDictionary<TKey, TValue> target, IEnumerable<KeyValuePair<FKey, FValue>> source)
         {
             if (source.IsNullOrEmpty())
@@ -303,6 +312,7 @@ namespace Never.Mappers
 
             return dictionary;
         }
+
         public static ICollection<KeyValuePair<TKey, TValue>> LoadIntoCollection<TKey, TValue, FKey, FValue>(ICollection<KeyValuePair<TKey, TValue>> target, IEnumerable<KeyValuePair<FKey, FValue>> source)
         {
             if (source.IsNullOrEmpty())
@@ -318,6 +328,32 @@ namespace Never.Mappers
 
             return target = dictionary;
         }
-        #endregion
+
+        #endregion enumerable
+
+        #region nullable
+
+        public static T ConvertToValueFromNullableValue<T, F>(F? value) where T : struct, IConvertible where F : struct, IConvertible
+        {
+            if (value.HasValue == false)
+                return default(T);
+
+            return EasyMapper.Map<F, T>(value.Value);
+        }
+
+        public static T? ConvertToNullableValueFromNullableValue<T, F>(F? value) where T : struct, IConvertible where F : struct, IConvertible
+        {
+            if (value.HasValue == false)
+                return default(T);
+
+            return EasyMapper.Map<F, T>(value.Value);
+        }
+
+        public static T? ConvertToNullableValueFromValue<T, F>(F value) where T : struct, IConvertible where F : struct, IConvertible
+        {
+            return new T?(EasyMapper.Map<F, T>(value));
+        }
+
+        #endregion nullable
     }
 }

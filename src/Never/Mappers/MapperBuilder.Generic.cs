@@ -25,5 +25,37 @@ namespace Never.Mappers
         }
 
         #endregion field and ctor
+
+        #region find
+
+        private Type FindKeyValuePairTypeInIEnumerable(Type sourceType)
+        {
+            if (sourceType.IsAssignableFromType(typeof(IEnumerable<>)) == false)
+                return null;
+
+            if (sourceType.IsGenericTypeDefinition)
+            {
+                var parameters = sourceType.GetGenericArguments();
+                foreach (var parameter in parameters)
+                {
+                    if (parameter.IsAssignableFromType(typeof(KeyValuePair<,>)))
+                    {
+                        return typeof(IEnumerable<>).MakeGenericType(parameter);
+                    }
+                }
+            }
+
+            var @interfaces = sourceType.GetInterfaces();
+            foreach (var @interface in interfaces)
+            {
+                var type = this.FindKeyValuePairTypeInIEnumerable(@interface);
+                if (type != null)
+                    return type;
+            }
+
+            return null;
+        }
+
+        #endregion find
     }
 }
