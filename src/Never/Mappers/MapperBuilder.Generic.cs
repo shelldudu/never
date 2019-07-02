@@ -28,12 +28,17 @@ namespace Never.Mappers
 
         #region find
 
-        private Type FindKeyValuePairTypeInIEnumerable(Type sourceType)
+        /// <summary>
+        /// 查询IEnumerable KeyValuePair Type
+        /// </summary>
+        /// <param name="sourceType"></param>
+        /// <returns></returns>
+        private Type FindIEnumerableKeyValuePairGenericType(Type sourceType)
         {
             if (sourceType.IsAssignableFromType(typeof(IEnumerable<>)) == false)
                 return null;
 
-            if (sourceType.IsGenericTypeDefinition)
+            if (sourceType.IsGenericType && sourceType.IsGenericTypeDefinition == false)
             {
                 var parameters = sourceType.GetGenericArguments();
                 foreach (var parameter in parameters)
@@ -48,9 +53,36 @@ namespace Never.Mappers
             var @interfaces = sourceType.GetInterfaces();
             foreach (var @interface in interfaces)
             {
-                var type = this.FindKeyValuePairTypeInIEnumerable(@interface);
+                var type = this.FindIEnumerableKeyValuePairGenericType(@interface);
                 if (type != null)
                     return type;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 查询指定某个接口，可能返回泛型接口
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
+        private Type FindInterfaceOrGenericInterface(Type type, Type targetType)
+        {
+            if (type == targetType)
+                return type;
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == targetType)
+                return type;
+
+            var @interfaces = type.GetInterfaces();
+            foreach (var @interface in @interfaces)
+            {
+                if (@interface == targetType)
+                    return @interface;
+
+                if (@interface.IsGenericType && @interface.GetGenericTypeDefinition() == targetType)
+                    return @interface;
             }
 
             return null;

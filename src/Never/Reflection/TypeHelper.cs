@@ -27,38 +27,6 @@ namespace Never.Reflection
         }
 
         /// <summary>
-        /// 查询指定某个接口
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="targetType"></param>
-        /// <returns></returns>
-        public static Type GetInterface(Type type, Type targetType)
-        {
-            if (type == targetType)
-                return type;
-
-            var @interfaces = type.FindInterfaces((objType, objCriteria) => true, null);
-            foreach (var @interface in @interfaces)
-            {
-                if (@interface == targetType)
-                    return @interface;
-
-                if (@interface.IsGenericType && @interface.GetGenericTypeDefinition() == targetType)
-                    return @interface;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// 查询指定某个接口
-        /// </summary>
-        public static Type GetInterface<TargetType>(Type type)
-        {
-            return GetInterface(type, typeof(TargetType));
-        }
-
-        /// <summary>
         /// 当前是否值对象
         /// </summary>
         /// <param name="type">目标对象</param>

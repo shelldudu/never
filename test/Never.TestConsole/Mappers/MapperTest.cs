@@ -222,37 +222,35 @@ namespace Never.TestConsole.Mappers
         [Xunit.Fact]
         public void TestMapArray()
         {
-            var a = "e";
-            SetString(a);
-
             var @base = new FromMapArray
             {
                 A = 236m,
                 Array = new[] { 1, 2, 3 },
+                Collection = new Dictionary<int, int>() { { 1, 1 }, { 2, 2 } }
             };
 
             var mapper = (IMapper)new EasyMapper(new MapperSetting() { ForceConvertWhenTypeNotSame = true });
             var to = mapper.Map<FromMapArray, MapArrayTarget>(@base);
+            //var to = mapper.Map(@base, new MapArrayTarget());
             //var aaa = to.Array.ToArray();
-        }
-
-        public void SetString(string a)
-        {
-            a = "eee";
         }
 
         private class FromMapArray
         {
             public decimal A { get; set; }
 
-            public int[] Array { get; set; }
+            public IEnumerable<int> Array { get; set; }
+
+            public Dictionary<int, int> Collection { get; set; }
         }
 
         private struct MapArrayTarget
         {
             public string A { get; set; }
 
-            public ICollection<ToNullProp> Array { get; set; }
+            public ToNullProp[] Array { get; set; }
+
+            public ICollection<KeyValuePair<int, int>> Collection { get; set; }
         }
     }
 

@@ -342,7 +342,7 @@ namespace Never.IoC.Providers
         /// <returns></returns>
         protected virtual bool IsTargetTypeImplementSourceGenericType(Type targetType, Type sourceGenericType)
         {
-            if (targetType == null || sourceGenericType == null)
+            if (targetType == null || sourceGenericType == null || sourceGenericType.IsGenericType == false)
                 return false;
 
             var genericTypeDefinition = sourceGenericType.GetGenericTypeDefinition();

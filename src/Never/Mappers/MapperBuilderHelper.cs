@@ -228,6 +228,17 @@ namespace Never.Mappers
 
         #region enumerable
 
+        /// <summary>
+        /// 确定条数
+        /// </summary>
+        /// <typeparam name="F"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static int MakeSureEnumerableCount<F>(IEnumerable<F> source)
+        {
+            return source == null ? 0 : source.Count();
+        }
+
         public static IEnumerable<T> ConvertToEnumerable<T, F>(IEnumerable<F> source)
         {
             if (source.IsNullOrEmpty())
@@ -237,10 +248,44 @@ namespace Never.Mappers
                 yield return EasyMapper.Map<F, T>(s);
         }
 
-        public static IList<T> LoadIntoList<T, F>(IList<T> target, IEnumerable<F> source)
+        public static void LoadIntoArray<T, F>(T[] target, IEnumerable<F> source)
+        {
+            if (source.IsNullOrEmpty() || target.IsNullOrEmpty())
+                return;
+
+            for (int i = 0; i < source.Count(); i++)
+            {
+                if (i < target.Length)
+                    target[i] = EasyMapper.Map<F, T>(source.ElementAt(i));
+            }
+        }
+
+        public static void LoadIntoEnumerable<T, F>(IEnumerable<T> target, IEnumerable<F> source)
         {
             if (source.IsNullOrEmpty())
-                return target;
+                return;
+
+            foreach (var s in source)
+                target = target.Union(new[] { EasyMapper.Map<F, T>(s) });
+        }
+
+        public static void LoadIntoList<T, F>(IList<T> target, IEnumerable<F> source)
+        {
+            if (source.IsNullOrEmpty())
+                return;
+
+            foreach (var s in source)
+            {
+                target.Add(EasyMapper.Map<F, T>(s));
+            }
+
+            return;
+        }
+
+        public static void LoadIntoCollection<T, F>(ICollection<T> target, IEnumerable<F> source)
+        {
+            if (source.IsNullOrEmpty())
+                return;
 
             var list = new List<T>(source.Count());
             foreach (var s in source)
@@ -248,85 +293,37 @@ namespace Never.Mappers
                 list.Add(EasyMapper.Map<F, T>(s));
             }
 
-            return list;
+            return;
         }
 
-        public static ICollection<T> LoadIntoCollection<T, F>(ICollection<T> target, IEnumerable<F> source)
+        public static void KeyValuePairLoadIntoDictionary<TKey, TValue, FKey, FValue>(IDictionary<TKey, TValue> target, IEnumerable<KeyValuePair<FKey, FValue>> source)
         {
             if (source.IsNullOrEmpty())
-                return target;
+                return;
 
-            var list = new List<T>(source.Count());
-            foreach (var s in source)
-            {
-                list.Add(EasyMapper.Map<F, T>(s));
-            }
-
-            return list;
-        }
-
-        public static IDictionary<TKey, TValue> ConvertToDictionary<TKey, TValue, FKey, FValue>(IEnumerable<KeyValuePair<FKey, FValue>> source)
-        {
-            if (source.IsNullOrEmpty())
-                return new Dictionary<TKey, TValue>();
-
-            var dictionary = new Dictionary<TKey, TValue>(source.Count());
             foreach (var s in source)
             {
                 var key = EasyMapper.Map<FKey, TKey>(s.Key);
                 var value = EasyMapper.Map<FValue, TValue>(s.Value);
-                dictionary[key] = value;
+                target[key] = value;
             }
 
-            return dictionary;
+            return;
         }
 
-        public static IDictionary<TKey, TValue> LoadIntoDictionary<TKey, TValue, FKey, FValue>(IDictionary<TKey, TValue> target, IEnumerable<KeyValuePair<FKey, FValue>> source)
+        public static void KeyValuePairLoadIntoCollection<TKey, TValue, FKey, FValue>(ICollection<KeyValuePair<TKey, TValue>> target, IEnumerable<KeyValuePair<FKey, FValue>> source)
         {
             if (source.IsNullOrEmpty())
-                return target;
+                return;
 
-            var dictionary = new Dictionary<TKey, TValue>(source.Count());
             foreach (var s in source)
             {
                 var key = EasyMapper.Map<FKey, TKey>(s.Key);
                 var value = EasyMapper.Map<FValue, TValue>(s.Value);
-                dictionary[key] = value;
+                target.Add(new KeyValuePair<TKey, TValue>(key, value));
             }
 
-            return target = dictionary;
-        }
-
-        public static ICollection<KeyValuePair<TKey, TValue>> ConvertToCollection<TKey, TValue, FKey, FValue>(IEnumerable<KeyValuePair<FKey, FValue>> source)
-        {
-            if (source.IsNullOrEmpty())
-                return new Dictionary<TKey, TValue>();
-
-            var dictionary = new Dictionary<TKey, TValue>(source.Count());
-            foreach (var s in source)
-            {
-                var key = EasyMapper.Map<FKey, TKey>(s.Key);
-                var value = EasyMapper.Map<FValue, TValue>(s.Value);
-                dictionary[key] = value;
-            }
-
-            return dictionary;
-        }
-
-        public static ICollection<KeyValuePair<TKey, TValue>> LoadIntoCollection<TKey, TValue, FKey, FValue>(ICollection<KeyValuePair<TKey, TValue>> target, IEnumerable<KeyValuePair<FKey, FValue>> source)
-        {
-            if (source.IsNullOrEmpty())
-                return target;
-
-            var dictionary = new Dictionary<TKey, TValue>(source.Count());
-            foreach (var s in source)
-            {
-                var key = EasyMapper.Map<FKey, TKey>(s.Key);
-                var value = EasyMapper.Map<FValue, TValue>(s.Value);
-                dictionary[key] = value;
-            }
-
-            return target = dictionary;
+            return;
         }
 
         #endregion enumerable
