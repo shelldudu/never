@@ -14,14 +14,14 @@ namespace Never.Mappers
     {
         #region field and ctor
 
-        private static ConcurrentDictionary<MapperSetting, Func<From, To>> funcCaching = null;
+        private static ConcurrentDictionary<MapperSetting, Func<From, MapperContext, To>> funcCaching = null;
 
-        private static ConcurrentDictionary<MapperSetting, Action<From, To>> actionCaching = null;
+        private static ConcurrentDictionary<MapperSetting, Action<From, MapperContext, To>> actionCaching = null;
 
         static MapperBuilder()
         {
-            funcCaching = new ConcurrentDictionary<MapperSetting, Func<From, To>>(new MapperSetting());
-            actionCaching = new ConcurrentDictionary<MapperSetting, Action<From, To>>(new MapperSetting());
+            funcCaching = new ConcurrentDictionary<MapperSetting, Func<From, MapperContext, To>>(new MapperSetting());
+            actionCaching = new ConcurrentDictionary<MapperSetting, Action<From, MapperContext, To>>(new MapperSetting());
         }
 
         #endregion field and ctor
@@ -54,6 +54,34 @@ namespace Never.Mappers
             foreach (var @interface in interfaces)
             {
                 var type = this.FindIEnumerableKeyValuePairGenericType(@interface);
+                if (type != null)
+                    return type;
+            }
+
+            return null;
+        }
+
+        private Type FindICollectionKeyValuePairGenericType(Type sourceType)
+        {
+            if (sourceType.IsAssignableFromType(typeof(ICollection<>)) == false)
+                return null;
+
+            if (sourceType.IsGenericType && sourceType.IsGenericTypeDefinition == false)
+            {
+                var parameters = sourceType.GetGenericArguments();
+                foreach (var parameter in parameters)
+                {
+                    if (parameter.IsAssignableFromType(typeof(KeyValuePair<,>)))
+                    {
+                        return typeof(ICollection<>).MakeGenericType(parameter);
+                    }
+                }
+            }
+
+            var @interfaces = sourceType.GetInterfaces();
+            foreach (var @interface in interfaces)
+            {
+                var type = this.FindICollectionKeyValuePairGenericType(@interface);
                 if (type != null)
                     return type;
             }

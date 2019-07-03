@@ -216,10 +216,7 @@ namespace Never.Mappers
         /// <summary>
         /// 枚举ToString，反射用到的，不能删
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="object"></param>
-        /// <returns></returns>
-        private static string _GenericToString<T>(T @object) where T : IConvertible
+        private static string _GenericToString<T>(T @object, MapperContext context) where T : IConvertible
         {
             return @object.ToString();
         }
@@ -229,26 +226,17 @@ namespace Never.Mappers
         #region enumerable
 
         /// <summary>
-        /// 确定条数
+        /// 确定条数，反射用到的，不能删
         /// </summary>
-        /// <typeparam name="F"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static int MakeSureEnumerableCount<F>(IEnumerable<F> source)
+        public static int MakeSureEnumerableCount<F>(IEnumerable<F> source, MapperContext context)
         {
             return source == null ? 0 : source.Count();
         }
 
-        public static IEnumerable<T> ConvertToEnumerable<T, F>(IEnumerable<F> source)
-        {
-            if (source.IsNullOrEmpty())
-                yield return default(T);
-
-            foreach (var s in source)
-                yield return EasyMapper.Map<F, T>(s);
-        }
-
-        public static void LoadIntoArray<T, F>(T[] target, IEnumerable<F> source)
+        /// <summary>
+        /// 反射用到的，不能删
+        /// </summary>
+        public static void LoadIntoArray<T, F>(T[] target, IEnumerable<F> source, MapperContext context)
         {
             if (source.IsNullOrEmpty() || target.IsNullOrEmpty())
                 return;
@@ -256,81 +244,100 @@ namespace Never.Mappers
             for (int i = 0; i < source.Count(); i++)
             {
                 if (i < target.Length)
-                    target[i] = EasyMapper.Map<F, T>(source.ElementAt(i));
+                    target[i] = EasyMapper.Map<F, T>(source.ElementAt(i), null, context);
             }
         }
-
-        public static void LoadIntoEnumerable<T, F>(IEnumerable<T> target, IEnumerable<F> source)
+        /// <summary>
+        /// 反射用到的，不能删
+        /// </summary>
+        public static void LoadIntoEnumerable<T, F>(IEnumerable<T> target, IEnumerable<F> source, MapperContext context)
         {
             if (source.IsNullOrEmpty())
                 return;
 
             foreach (var s in source)
-                target = target.Union(new[] { EasyMapper.Map<F, T>(s) });
+                target = target.Union(new[] { EasyMapper.Map<F, T>(s, null, context) });
         }
-
-        public static void LoadIntoList<T, F>(IList<T> target, IEnumerable<F> source)
+        /// <summary>
+        /// 反射用到的，不能删
+        /// </summary>
+        public static void LoadIntoList<T, F>(IList<T> target, IEnumerable<F> source, MapperContext context)
         {
             if (source.IsNullOrEmpty())
                 return;
 
             foreach (var s in source)
             {
-                target.Add(EasyMapper.Map<F, T>(s));
-            }
-
-            return;
-        }
-
-        public static void LoadIntoCollection<T, F>(ICollection<T> target, IEnumerable<F> source)
-        {
-            if (source.IsNullOrEmpty())
-                return;
-
-            var list = new List<T>(source.Count());
-            foreach (var s in source)
-            {
-                list.Add(EasyMapper.Map<F, T>(s));
+                target.Add(EasyMapper.Map<F, T>(s, null, context));
             }
 
             return;
         }
-
-        public static void KeyValuePairLoadIntoDictionary<TKey, TValue, FKey, FValue>(IDictionary<TKey, TValue> target, IEnumerable<KeyValuePair<FKey, FValue>> source)
+        /// <summary>
+        /// 反射用到的，不能删
+        /// </summary>
+        public static void LoadIntoCollection<T, F>(ICollection<T> target, IEnumerable<F> source, MapperContext context)
         {
             if (source.IsNullOrEmpty())
                 return;
 
             foreach (var s in source)
             {
-                var key = EasyMapper.Map<FKey, TKey>(s.Key);
-                var value = EasyMapper.Map<FValue, TValue>(s.Value);
+                target.Add(EasyMapper.Map<F, T>(s, null, context));
+            }
+
+            return;
+        }
+        /// <summary>
+        /// 反射用到的，不能删
+        /// </summary>
+        public static void KeyValuePairLoadIntoDictionary<TKey, TValue, FKey, FValue>(IDictionary<TKey, TValue> target, IEnumerable<KeyValuePair<FKey, FValue>> source, MapperContext context)
+        {
+            if (source.IsNullOrEmpty())
+                return;
+
+            foreach (var s in source)
+            {
+                var key = EasyMapper.Map<FKey, TKey>(s.Key, null, context);
+                var value = EasyMapper.Map<FValue, TValue>(s.Value, null, context);
                 target[key] = value;
             }
 
             return;
         }
-
-        public static void KeyValuePairLoadIntoCollection<TKey, TValue, FKey, FValue>(ICollection<KeyValuePair<TKey, TValue>> target, IEnumerable<KeyValuePair<FKey, FValue>> source)
+        /// <summary>
+        /// 反射用到的，不能删
+        /// </summary>
+        public static void KeyValuePairLoadIntoCollection<TKey, TValue, FKey, FValue>(ICollection<KeyValuePair<TKey, TValue>> target, IEnumerable<KeyValuePair<FKey, FValue>> source, MapperContext context)
         {
             if (source.IsNullOrEmpty())
                 return;
 
             foreach (var s in source)
             {
-                var key = EasyMapper.Map<FKey, TKey>(s.Key);
-                var value = EasyMapper.Map<FValue, TValue>(s.Value);
+                var key = EasyMapper.Map<FKey, TKey>(s.Key, null, context);
+                var value = EasyMapper.Map<FValue, TValue>(s.Value, null, context);
                 target.Add(new KeyValuePair<TKey, TValue>(key, value));
             }
 
             return;
         }
 
-        #endregion enumerable
+        /// <summary>
+        /// 反射用到的，不能删
+        /// </summary>
+        public static T ConvertToValueFromNullableValue<T, F>(F? value, MapperContext context) where T : struct, IConvertible where F : struct, IConvertible
+        {
+            if (value.HasValue == false)
+                return default(T);
 
-        #region nullable
+            return EasyMapper.Map<F, T>(value.Value, null, context);
+        }
 
-        public static T ConvertToValueFromNullableValue<T, F>(F? value) where T : struct, IConvertible where F : struct, IConvertible
+        /// <summary>
+        /// 反射用到的，不能删
+        /// </summary>
+        public static T? ConvertToNullableValueFromNullableValue<T, F>(F? value, MapperContext context) where T : struct, IConvertible where F : struct, IConvertible
         {
             if (value.HasValue == false)
                 return default(T);
@@ -338,17 +345,12 @@ namespace Never.Mappers
             return EasyMapper.Map<F, T>(value.Value);
         }
 
-        public static T? ConvertToNullableValueFromNullableValue<T, F>(F? value) where T : struct, IConvertible where F : struct, IConvertible
+        /// <summary>
+        /// 反射用到的，不能删
+        /// </summary>
+        public static T? ConvertToNullableValueFromValue<T, F>(F value, MapperContext context) where T : struct, IConvertible where F : struct, IConvertible
         {
-            if (value.HasValue == false)
-                return default(T);
-
-            return EasyMapper.Map<F, T>(value.Value);
-        }
-
-        public static T? ConvertToNullableValueFromValue<T, F>(F value) where T : struct, IConvertible where F : struct, IConvertible
-        {
-            return new T?(EasyMapper.Map<F, T>(value));
+            return new T?(EasyMapper.Map<F, T>(value, null, context));
         }
 
         #endregion nullable

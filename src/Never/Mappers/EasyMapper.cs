@@ -40,7 +40,7 @@ namespace Never.Mappers
         /// <returns></returns>
         To IMapper.Map<From, To>(From from)
         {
-            return EasyMapper.Map<From, To>(from, null, this.setting);
+            return Map<From, To>(from, null, this.setting);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Never.Mappers
         /// <returns></returns>
         To IMapper.Map<From, To>(From from, Action<From, To> callBack)
         {
-            return EasyMapper.Map<From, To>(from, callBack, this.setting);
+            return Map(from, callBack, this.setting);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Never.Mappers
         /// <returns></returns>
         To IMapper.Map<From, To>(From from, To target)
         {
-            return EasyMapper.Map<From, To>(from, target, null, this.setting);
+            return Map(from, target, null, this.setting);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Never.Mappers
         /// <returns></returns>
         To IMapper.Map<From, To>(From from, To target, Action<From, To> callBack)
         {
-            return EasyMapper.Map<From, To>(from, target, callBack, this.setting);
+            return Map(from, target, callBack, this.setting);
         }
 
         #endregion imapper
@@ -121,10 +121,27 @@ namespace Never.Mappers
         /// <param name="callBack">当完成映射后的回调</param>
         /// <param name="setting">配置项目</param>
         /// <returns></returns>
-        private static To Map<From, To>(From from, Action<From, To> callBack, MapperSetting setting)
+        internal static To Map<From, To>(From from, Action<From, To> callBack, MapperSetting setting)
         {
             var func = MapperBuilder<From, To>.FuncBuild(setting);
-            var to = func(from);
+            var to = func(from, new MapperContext() { Setting = setting });
+            callBack?.Invoke(from, to);
+            return to;
+        }
+
+        /// <summary>
+        /// 自动映射
+        /// </summary>
+        /// <typeparam name="To">目标对象</typeparam>
+        /// <typeparam name="From">来源对象</typeparam>
+        /// <param name="from">来源对象</param>
+        /// <param name="callBack">当完成映射后的回调</param>
+        /// <param name="context">上下文</param>
+        /// <returns></returns>
+        internal static To Map<From, To>(From from, Action<From, To> callBack, MapperContext context)
+        {
+            var func = MapperBuilder<From, To>.FuncBuild(context.Setting);
+            var to = func(from, context);
             callBack?.Invoke(from, to);
             return to;
         }
@@ -166,10 +183,28 @@ namespace Never.Mappers
         /// <param name="callBack">当完成映射后的回调</param>
         /// <param name="setting">配置项目</param>
         /// <returns></returns>
-        private static To Map<From, To>(From from, To target, Action<From, To> callBack, MapperSetting setting)
+        internal static To Map<From, To>(From from, To target, Action<From, To> callBack, MapperSetting setting)
         {
             var action = MapperBuilder<From, To>.ActionBuild(setting);
-            action(from, target);
+            action(from, new MapperContext() { Setting = setting }, target);
+            callBack?.Invoke(from, target);
+            return target;
+        }
+
+        /// <summary>
+        /// 自动映射
+        /// </summary>
+        /// <typeparam name="To">目标对象</typeparam>
+        /// <typeparam name="From">来源对象</typeparam>
+        /// <param name="from">来源对象</param>
+        /// <param name="target">目标对象，请实例化该对象</param>
+        /// <param name="callBack">当完成映射后的回调</param>
+        /// <param name="context">上下文</param>
+        /// <returns></returns>
+        internal static To Map<From, To>(From from, To target, Action<From, To> callBack, MapperContext context)
+        {
+            var action = MapperBuilder<From, To>.ActionBuild(context.Setting);
+            action(from, context, target);
             callBack?.Invoke(from, target);
             return target;
         }

@@ -225,7 +225,7 @@ namespace Never.TestConsole.Mappers
             var @base = new FromMapArray
             {
                 A = 236m,
-                Array = new[] { 1, 2, 3 },
+                Array = new[] { new ToNullProp { Id = 1 }, new ToNullProp { Id = 2 }, new ToNullProp { Id = 3 } },
                 Collection = new Dictionary<int, int>() { { 1, 1 }, { 2, 2 } }
             };
 
@@ -239,7 +239,7 @@ namespace Never.TestConsole.Mappers
         {
             public decimal A { get; set; }
 
-            public IEnumerable<int> Array { get; set; }
+            public IEnumerable<ToNullProp> Array { get; set; }
 
             public Dictionary<int, int> Collection { get; set; }
         }
