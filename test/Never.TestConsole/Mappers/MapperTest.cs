@@ -1,6 +1,7 @@
 ﻿using Never.Mappers;
 using Never.Reflection;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -225,23 +226,35 @@ namespace Never.TestConsole.Mappers
             var @base = new FromMapArray
             {
                 A = 236m,
-                Array = new[] { new ToNullProp { Id = 1 }, new ToNullProp { Id = 2 }, new ToNullProp { Id = 3 } },
+                //Array = new[] { new ToNullProp { Id = 1 }, new ToNullProp { Id = 2 }, new ToNullProp { Id = 3 } },
                 //Collection = new Dictionary<int, int>() { { 1, 1 }, { 2, 2 } }
             };
 
-            var mapper = (IMapper)new EasyMapper(new MapperSetting() { ForceConvertWhenTypeNotSame = true });
+            var mapper = (IMapper)new EasyMapper(new MapperSetting() { ForceConvertWhenTypeNotSame = true, AlwaysNewTraget = true });
             var to = mapper.Map<FromMapArray, TargetMapArray>(@base);
-            to = mapper.Map<FromMapArray, TargetMapArray>(@base, new TargetMapArray());
-            to = mapper.Map<FromMapArray, TargetMapArray>(@base, new TargetMapArray() { Array = new ToNullProp[1] });
+            //to = mapper.Map<FromMapArray, TargetMapArray>(@base, new TargetMapArray());
+            var to2 = mapper.Map<FromMapArray, TargetMapArray>(@base, new TargetMapArray()
+            {
+                //Array = new ToNullProp[1]
+            });
             //var to = mapper.Map(@base, new MapArrayTarget());
             //var aaa = to.Array.ToArray();
+
+            var mylist = new MyList<ToNullProp>();
+            TestMapArrayAdd(mylist);
+            //var target = new TargetMapArray() { Array = mylist };
+        }
+
+        private void TestMapArrayAdd(IList<ToNullProp> mylist)
+        {
+            mylist.Add(new ToNullProp());
         }
 
         private class FromMapArray
         {
             public decimal A { get; set; }
 
-            public IEnumerable<ToNullProp> Array { get; set; }
+            public TestToMappeEnum Array { get; set; }
 
             //public Dictionary<int, int> Collection { get; set; }
         }
@@ -250,9 +263,93 @@ namespace Never.TestConsole.Mappers
         {
             public string A { get; set; }
 
-            public IEnumerable<ToNullProp> Array { get; set; }
+            public ToNullProp[] Array { get; set; }
 
             //public ICollection<KeyValuePair<int, int>> Collection { get; set; }
+        }
+
+        private struct MyList<T> : IList<T>
+        {
+            private List<T> collection;
+
+            public MyList(int capacity) : this()
+            {
+                this.collection = new List<T>(capacity);
+            }
+
+            public T this[int index] { get { this.Init(); return this.collection[index]; } set { this.Init(); this.collection[index] = value; } }
+
+            public int Count
+            {
+                get { this.Init(); return this.collection.Count; }
+            }
+
+            public bool IsReadOnly => false;
+
+            public void Add(T item)
+            {
+                this.Init();
+                this.collection.Add(item);
+            }
+
+            public void Clear()
+            {
+                this.Init();
+                this.collection.Clear();
+            }
+
+            public bool Contains(T item)
+            {
+                this.Init();
+                return this.collection.Contains(item);
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                this.Init();
+                this.collection.CopyTo(array, arrayIndex);
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                this.Init();
+                return this.collection.GetEnumerator();
+            }
+
+            public int IndexOf(T item)
+            {
+                return this.collection.IndexOf(item);
+            }
+
+            public void Insert(int index, T item)
+            {
+                this.Init();
+                this.collection.Insert(index, item);
+            }
+
+            public bool Remove(T item)
+            {
+                this.Init();
+                return this.collection.Remove(item);
+            }
+
+            public void RemoveAt(int index)
+            {
+                this.Init();
+                this.collection.RemoveAt(index);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                this.Init();
+                return this.collection.GetEnumerator();
+            }
+
+            private void Init()
+            {
+                if (this.collection == null)
+                    this.collection = new List<T>();
+            }
         }
     }
 
