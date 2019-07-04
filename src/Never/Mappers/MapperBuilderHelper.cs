@@ -247,6 +247,7 @@ namespace Never.Mappers
                     target[i] = EasyMapper.Map<F, T>(source.ElementAt(i), null, context);
             }
         }
+
         /// <summary>
         /// 反射用到的，不能删
         /// </summary>
@@ -258,6 +259,7 @@ namespace Never.Mappers
             foreach (var s in source)
                 target = target.Union(new[] { EasyMapper.Map<F, T>(s, null, context) });
         }
+
         /// <summary>
         /// 反射用到的，不能删
         /// </summary>
@@ -273,6 +275,7 @@ namespace Never.Mappers
 
             return;
         }
+
         /// <summary>
         /// 反射用到的，不能删
         /// </summary>
@@ -288,6 +291,7 @@ namespace Never.Mappers
 
             return;
         }
+
         /// <summary>
         /// 反射用到的，不能删
         /// </summary>
@@ -305,6 +309,7 @@ namespace Never.Mappers
 
             return;
         }
+
         /// <summary>
         /// 反射用到的，不能删
         /// </summary>
@@ -353,6 +358,6 @@ namespace Never.Mappers
             return new T?(EasyMapper.Map<F, T>(value, null, context));
         }
 
-        #endregion nullable
+        #endregion enumerable
     }
 }

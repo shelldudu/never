@@ -226,11 +226,13 @@ namespace Never.TestConsole.Mappers
             {
                 A = 236m,
                 Array = new[] { new ToNullProp { Id = 1 }, new ToNullProp { Id = 2 }, new ToNullProp { Id = 3 } },
-                Collection = new Dictionary<int, int>() { { 1, 1 }, { 2, 2 } }
+                //Collection = new Dictionary<int, int>() { { 1, 1 }, { 2, 2 } }
             };
 
             var mapper = (IMapper)new EasyMapper(new MapperSetting() { ForceConvertWhenTypeNotSame = true });
-            var to = mapper.Map<FromMapArray, MapArrayTarget>(@base);
+            var to = mapper.Map<FromMapArray, TargetMapArray>(@base);
+            to = mapper.Map<FromMapArray, TargetMapArray>(@base, new TargetMapArray());
+            to = mapper.Map<FromMapArray, TargetMapArray>(@base, new TargetMapArray() { Array = new ToNullProp[1] });
             //var to = mapper.Map(@base, new MapArrayTarget());
             //var aaa = to.Array.ToArray();
         }
@@ -241,16 +243,16 @@ namespace Never.TestConsole.Mappers
 
             public IEnumerable<ToNullProp> Array { get; set; }
 
-            public Dictionary<int, int> Collection { get; set; }
+            //public Dictionary<int, int> Collection { get; set; }
         }
 
-        private struct MapArrayTarget
+        private class TargetMapArray
         {
             public string A { get; set; }
 
-            public ToNullProp[] Array { get; set; }
+            public IEnumerable<ToNullProp> Array { get; set; }
 
-            public ICollection<KeyValuePair<int, int>> Collection { get; set; }
+            //public ICollection<KeyValuePair<int, int>> Collection { get; set; }
         }
     }
 

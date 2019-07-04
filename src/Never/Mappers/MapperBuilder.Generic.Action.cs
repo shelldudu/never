@@ -629,6 +629,7 @@ namespace Never.Mappers
                                 continue;
                             }
                         }
+
                         //目标是ICollection
                         if (toMemberType.IsAssignableFromType(typeof(ICollection<>)) && fromMemberType.IsAssignableFromType(typeof(ICollection<>)))
                         {
@@ -1239,7 +1240,20 @@ namespace Never.Mappers
                             emit.StoreLocal(subToLocal);
                             emit.Branch(dictionaryDoneLabel);
                             emit.MarkLabel(dictionaryNullLabel);
-                            emit.Call(typeof(System.Linq.Enumerable).GetMethod("Empty").MakeGenericMethod(enumerableTypes[0]));
+                            /*局部变量*/
+                            if (fromType.IsValueType)
+                                emit.LoadLocalAddress(fromLocal); // from
+                            else
+                                emit.LoadLocal(fromLocal);
+
+                            if (fromMember.MemberType == MemberTypes.Property)
+                                emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                            else
+                                emit.LoadField((FieldInfo)fromMember);
+
+                            emit.LoadArgument(1);
+                            emit.Call(typeof(MapperBuilderHelper).GetMethod("MakeSureEnumerableCount").MakeGenericMethod(enumerableTypes[1]));
+                            emit.NewArray(enumerableTypes[0]);
                             emit.StoreLocal(subToLocal);
                             emit.Branch(dictionaryDoneLabel);
                             emit.MarkLabel(dictionaryContinueLabel);
@@ -1258,7 +1272,7 @@ namespace Never.Mappers
                                 emit.LoadField((FieldInfo)fromMember);
 
                             emit.LoadArgument(1);
-                            emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoEnumerable").MakeGenericMethod(enumerableTypes));
+                            emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoArray").MakeGenericMethod(enumerableTypes));
 
                             /*局部变量*/
                             if (toType.IsValueType)
@@ -1274,6 +1288,70 @@ namespace Never.Mappers
 
                             emit.Nop();
                             continue;
+
+                            //if (toType.IsValueType)
+                            //    emit.LoadLocalAddress(toLocal); //to
+                            //else
+                            //    emit.LoadLocal(toLocal);
+
+                            //if (toMember.MemberType == MemberTypes.Property)
+                            //    emit.Call(((PropertyInfo)toMember).GetGetMethod()); // from get method
+                            //else
+                            //    emit.LoadField((FieldInfo)toMember);
+
+                            //var dictionaryNullLabel = emit.DefineLabel();
+                            //var dictionaryDoneLabel = emit.DefineLabel();
+                            //var dictionaryContinueLabel = emit.DefineLabel();
+                            //emit.LoadNull();
+                            //emit.CompareGreaterThan();
+                            //emit.BranchIfFalse(dictionaryNullLabel);
+                            //if (toType.IsValueType)
+                            //    emit.LoadLocalAddress(toLocal); //to
+                            //else
+                            //    emit.LoadLocal(toLocal);
+
+                            //if (toMember.MemberType == MemberTypes.Property)
+                            //    emit.Call(((PropertyInfo)toMember).GetGetMethod()); // from get method
+                            //else
+                            //    emit.LoadField((FieldInfo)toMember);
+                            //emit.StoreLocal(subToLocal);
+                            //emit.Branch(dictionaryDoneLabel);
+                            //emit.MarkLabel(dictionaryNullLabel);
+                            //emit.Call(typeof(System.Linq.Enumerable).GetMethod("Empty").MakeGenericMethod(enumerableTypes[0]));
+                            //emit.StoreLocal(subToLocal);
+                            //emit.Branch(dictionaryDoneLabel);
+                            //emit.MarkLabel(dictionaryContinueLabel);
+                            //emit.Nop();
+                            //emit.MarkLabel(dictionaryDoneLabel);
+                            //emit.LoadLocal(subToLocal);
+                            ///*局部变量*/
+                            //if (fromType.IsValueType)
+                            //    emit.LoadLocalAddress(fromLocal); // from
+                            //else
+                            //    emit.LoadLocal(fromLocal);
+
+                            //if (fromMember.MemberType == MemberTypes.Property)
+                            //    emit.Call(((PropertyInfo)fromMember).GetGetMethod()); // from get method
+                            //else
+                            //    emit.LoadField((FieldInfo)fromMember);
+
+                            //emit.LoadArgument(1);
+                            //emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoEnumerable").MakeGenericMethod(enumerableTypes));
+
+                            ///*局部变量*/
+                            //if (toType.IsValueType)
+                            //    emit.LoadLocalAddress(toLocal); // from
+                            //else
+                            //    emit.LoadLocal(toLocal);
+
+                            //emit.LoadLocal(subToLocal);
+                            //if (toMember.MemberType == MemberTypes.Property)
+                            //    emit.Call(((PropertyInfo)toMember).GetSetMethod(true)); // from get method
+                            //else
+                            //    emit.StoreField((FieldInfo)toMember);
+
+                            //emit.Nop();
+                            //continue;
                         }
                     }
                     else
@@ -1837,6 +1915,6 @@ namespace Never.Mappers
             return;
         }
 
-        #endregion members
+        #endregion memberInfo
     }
 }

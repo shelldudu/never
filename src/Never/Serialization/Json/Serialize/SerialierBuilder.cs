@@ -1778,12 +1778,8 @@ namespace Never.Serialization.Json.Serialize
                     return true;
                 }
 
-                bool writeQuote = setting.WriteQuoteWhenObjectIsNumber;
-                if (!writeQuote && this.IsNoQuotationMarkType(memberType))
-                    writeQuote = false;
-                else
-                    writeQuote = true;
-
+                //当为数字的时候写引号，否则不写引号。但是默认都是写引号的
+                var writeQuote = true;
                 /*bool 类型在javascript中用引号的话不会正确转换，必需不能带引号的*/
                 if (memberType == typeof(bool))
                 {
@@ -1791,6 +1787,14 @@ namespace Never.Serialization.Json.Serialize
                         writeQuote = true;
                     else
                         writeQuote = false;
+                }
+                else
+                {
+                    if (this.IsNoQuotationMarkType(memberType))
+                        writeQuote = false;
+
+                    if (writeQuote == false && setting.WriteQuoteWhenObjectIsNumber)
+                        writeQuote = true;
                 }
 
                 if (writeQuote)
@@ -1909,12 +1913,8 @@ namespace Never.Serialization.Json.Serialize
                 this.WriteMemberName(emit, setting, member, attributes);
                 this.WriteColon(emit, setting);
 
-                bool writeQuote = setting.WriteQuoteWhenObjectIsNumber;
-                if (!writeQuote && this.IsNoQuotationMarkType(memberType))
-                    writeQuote = false;
-                else
-                    writeQuote = true;
-
+                //当为数字的时候写引号，否则不写引号。但是默认都是写引号的
+                var writeQuote = true;
                 /*bool 类型在javascript中用引号的话不会正确转换，必需不能带引号的*/
                 if (memberType == typeof(bool))
                 {
@@ -1922,6 +1922,14 @@ namespace Never.Serialization.Json.Serialize
                         writeQuote = true;
                     else
                         writeQuote = false;
+                }
+                else
+                {
+                    if (this.IsNoQuotationMarkType(memberType))
+                        writeQuote = false;
+
+                    if (writeQuote == false && setting.WriteQuoteWhenObjectIsNumber)
+                        writeQuote = true;
                 }
 
                 if (writeQuote)
