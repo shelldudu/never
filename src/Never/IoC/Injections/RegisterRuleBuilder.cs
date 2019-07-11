@@ -409,6 +409,11 @@ namespace Never.IoC.Injections
             var ctors = Analyse(rule).OrderByDescending(o => o.Parameters.Length);
             if (ctors.Count() == 0)
             {
+                if (rule.ImplementationType.IsValueType)
+                {
+                    return BuildValueTypeNoCtorParameterDelegate(rule);
+                }
+
                 throw new ArgumentNullException(string.Format("{0} type can not find the public ctors", rule.ImplementationType.FullName));
             }
 
@@ -683,7 +688,7 @@ namespace Never.IoC.Injections
 
                     return emit.CreateDelegate();
                 }
-                catch
+                catch (Exception ex)
                 {
                     continue;
                 }
@@ -727,6 +732,11 @@ namespace Never.IoC.Injections
             var ctors = Analyse(rule).OrderByDescending(o => o.Parameters.Length);
             if (ctors.Count() == 0)
             {
+                if (rule.ImplementationType.IsValueType)
+                {
+                    return BuildValueTypeNoCtorParameterDelegate(rule);
+                }
+
                 return new Func<RegisterRule, IRegisterRuleQuery, ILifetimeScope, IResolveContext, object>((x, y, s, z) => { return null; });
             }
 

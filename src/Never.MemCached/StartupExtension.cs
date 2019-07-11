@@ -42,5 +42,23 @@ namespace Never.Memcached
             startup.Items["UseMemcached" + key] = "t";
             return startup;
         }
+
+        /// <summary>
+        /// 启动memcached支持
+        /// </summary>
+        /// <param name="startup"></param>
+        /// <param name="servers">服务列表</param>
+        /// <param name="key">IoC容器中的key</param>
+        /// <param name="compressProtocol"></param>
+        /// <returns></returns>
+        public static ApplicationStartup UseMemcached(this ApplicationStartup startup, MemcachedClient memcachedClient, string key = null)
+        {
+            if (startup.Items.ContainsKey("UseMemcached" + key))
+                return startup;
+
+            startup.ServiceRegister.RegisterInstance(memcachedClient, typeof(ICaching), key);
+            startup.Items["UseMemcached" + key] = "t";
+            return startup;
+        }
     }
 }

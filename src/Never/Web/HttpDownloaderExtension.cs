@@ -20,6 +20,182 @@ namespace Never.Web
         /// </summary>
         /// <param name="downloader">下載器</param>
         /// <param name="url">Url请求地址</param>
+        /// <returns></returns>
+        public static byte[] JGet(this HttpRequestDownloader downloader, string url)
+        {
+            return JGet(downloader, url, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <returns></returns>
+        public static byte[] JGet(this HttpRequestDownloader downloader, string url, IDictionary<string, string> getParams)
+        {
+            return JGet(downloader, url, getParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public static byte[] JGet(this HttpRequestDownloader downloader, string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams)
+        {
+            return JGet(downloader, url, getParams, headerParams, "application/json", -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public static byte[] JGet(this HttpRequestDownloader downloader, string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        {
+            return downloader.Get(url, getParams, headerParams, contentType, timeout, out var httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <returns></returns>
+        public static byte[] JGet(this HttpRequestDownloader downloader, Uri uri)
+        {
+            return JGet(downloader, uri, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public static byte[] JGet(this HttpRequestDownloader downloader, Uri uri, IDictionary<string, string> headerParams)
+        {
+            return JGet(downloader, uri, headerParams, "application/json", -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public static byte[] JGet(this HttpRequestDownloader downloader, Uri uri, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        {
+            return downloader.Get(uri, headerParams, contentType, timeout, out var httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <returns></returns>
+        public static string JGetString(this HttpRequestDownloader downloader, string url)
+        {
+            return JGetString(downloader, url, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <returns></returns>
+        public static string JGetString(this HttpRequestDownloader downloader, string url, IDictionary<string, string> getParams)
+        {
+            return JGetString(downloader, url, getParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public static string JGetString(this HttpRequestDownloader downloader, string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams)
+        {
+            return JGetString(downloader, url, getParams, headerParams, "application/json", -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public static string JGetString(this HttpRequestDownloader downloader, string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        {
+            return downloader.GetString(url, getParams, headerParams, contentType, timeout, out var httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <returns></returns>
+        public static string JGetString(this HttpRequestDownloader downloader, Uri uri)
+        {
+            return JGetString(downloader, uri, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public static string JGetString(this HttpRequestDownloader downloader, Uri uri, IDictionary<string, string> headerParams)
+        {
+            return JGetString(downloader, uri, headerParams, "application/json", -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public static string JGetString(this HttpRequestDownloader downloader, Uri uri, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        {
+            return downloader.GetString(uri, headerParams, contentType, timeout, out var httpStatus);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
         public static byte[] JPost(this HttpRequestDownloader downloader, string url, string jsonData)
@@ -171,6 +347,7 @@ namespace Never.Web
         {
             return JPost(downloader, uri, jsonData, headerParams, -1);
         }
+
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
@@ -263,6 +440,7 @@ namespace Never.Web
         {
             return JPostString(downloader, uri, jsonData, headerParams, -1);
         }
+
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
@@ -409,6 +587,182 @@ namespace Never.Web
         /// </summary>
         /// <param name="downloader">下載器</param>
         /// <param name="url">Url请求地址</param>
+        /// <returns></returns>
+        public static async Task<byte[]> JGetAsync(this HttpClientDownloader downloader, string url)
+        {
+            return await JGetAsync(downloader, url, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <returns></returns>
+        public static async Task<byte[]> JGetAsync(this HttpClientDownloader downloader, string url, IDictionary<string, string> getParams)
+        {
+            return await JGetAsync(downloader, url, getParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public static async Task<byte[]> JGetAsync(this HttpClientDownloader downloader, string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams)
+        {
+            return await JGetAsync(downloader, url, getParams, headerParams, "application/json", -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public static async Task<byte[]> JGetAsync(this HttpClientDownloader downloader, string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        {
+            return await downloader.GetAsync(url, getParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <returns></returns>
+        public static async Task<byte[]> JGetAsync(this HttpClientDownloader downloader, Uri uri)
+        {
+            return await JGetAsync(downloader, uri, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public static async Task<byte[]> JGetAsync(this HttpClientDownloader downloader, Uri uri, IDictionary<string, string> headerParams)
+        {
+            return await JGetAsync(downloader, uri, headerParams, "application/json", -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public static async Task<byte[]> JGetAsync(this HttpClientDownloader downloader, Uri uri, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        {
+            return await downloader.JGetAsync(uri, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <returns></returns>
+        public static async Task<string> JGetStringAsync(this HttpClientDownloader downloader, string url)
+        {
+            return await JGetStringAsync(downloader, url, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <returns></returns>
+        public static async Task<string> JGetStringAsync(this HttpClientDownloader downloader, string url, IDictionary<string, string> getParams)
+        {
+            return await JGetStringAsync(downloader, url, getParams, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public static async Task<string> JGetStringAsync(this HttpClientDownloader downloader, string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams)
+        {
+            return await JGetStringAsync(downloader, url, getParams, headerParams, "application/json", -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
+        /// <param name="getParams">请求参数</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">内容类型</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public static async Task<string> JGetStringAsync(this HttpClientDownloader downloader, string url, IDictionary<string, string> getParams, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        {
+            return await downloader.JGetStringAsync(url, getParams, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <returns></returns>
+        public static async Task<string> JGetStringAsync(this HttpClientDownloader downloader, Uri uri)
+        {
+            return await JGetStringAsync(downloader, uri, null);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <returns></returns>
+        public static async Task<string> JGetStringAsync(this HttpClientDownloader downloader, Uri uri, IDictionary<string, string> headerParams)
+        {
+            return await JGetStringAsync(downloader, uri, headerParams, "application/json", -1);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="uri">Url请求地址</param>
+        /// <param name="headerParams">标头的值</param>
+        /// <param name="contentType">标头的值</param>
+        /// <param name="timeout">请求时间，以毫秒为单位，为0的则表示使用默认,默认值是 100,000 毫秒（100 秒）</param>
+        /// <returns></returns>
+        public static async Task<string> JGetStringAsync(this HttpClientDownloader downloader, Uri uri, IDictionary<string, string> headerParams, string contentType = "application/json", int timeout = -1)
+        {
+            return await downloader.JGetStringAsync(uri, headerParams, contentType, timeout);
+        }
+
+        /// <summary>
+        /// 从Url地址中下载数据
+        /// </summary>
+        /// <param name="downloader">下載器</param>
+        /// <param name="url">Url请求地址</param>
         /// <param name="jsonData">请求json参数</param>
         /// <returns></returns>
         public static Task<byte[]> JPost(this HttpClientDownloader downloader, string url, string jsonData)
@@ -467,6 +821,7 @@ namespace Never.Web
         {
             return JPost(downloader, uri, jsonData, headerParams, -1);
         }
+
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
@@ -559,6 +914,7 @@ namespace Never.Web
         {
             return JPost(downloader, uri, jsonData, headerParams, -1);
         }
+
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>
@@ -651,6 +1007,7 @@ namespace Never.Web
         {
             return await JPostStringAsync(downloader, uri, jsonData, headerParams, -1);
         }
+
         /// <summary>
         /// 从Url地址中下载数据
         /// </summary>

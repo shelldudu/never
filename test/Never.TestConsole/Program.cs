@@ -88,15 +88,7 @@ namespace Never.TestConsole
 
         private static void Main(string[] args)
         {
-            //var baidu = new Never.Web.HttpRequestDownloader().GetString("http://baidu.com", null, null, null, 0, out var status);
-            // baidu = new Never.Web.HttpRequestDownloader().GetStringAsync("http://baidu.com").GetAwaiter().GetResult();
-            // var bingo = new Never.Web.HttpClientDownloader().GetAsync("http://bing.com").GetAwaiter().GetResult();
-
-            var a = new ABC();
-            a.Collection = new List<int>();
-            a.Collection.Add(2);
-
-            ChangeABC(a);
+            new MemcachedTest().TestAddValueOnTextMode();
         }
 
         private static void ChangeABC(ABC a)

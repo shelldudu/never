@@ -11,9 +11,15 @@ namespace Never.Memcached
     public abstract class MemcachedClient : ICaching
     {
         #region field and ctor
+
         private readonly ICompressProtocol compress = null;
-        protected MemcachedClient(ICompressProtocol compress) { this.compress = compress; }
-        #endregion
+
+        protected MemcachedClient(ICompressProtocol compress)
+        {
+            this.compress = compress;
+        }
+
+        #endregion field and ctor
 
         #region opear
 
@@ -306,7 +312,6 @@ namespace Never.Memcached
         /// <returns></returns>
         public abstract bool TryDelete(string key);
 
-
         /// <summary>
         /// 对值-1
         /// </summary>
@@ -350,6 +355,7 @@ namespace Never.Memcached
         {
             return this.TryInterlocked(Command.increment, key, increment, expireTime);
         }
+
         /// <summary>
         /// 对值+-1
         /// </summary>
@@ -357,7 +363,8 @@ namespace Never.Memcached
         /// <param name="inter"></param>
         /// <returns></returns>
         protected abstract bool TryInterlocked(Command command, string key, long inter, TimeSpan expireTime);
-        #endregion
+
+        #endregion opear
 
         #region help
 
@@ -446,40 +453,49 @@ namespace Never.Memcached
             if (length == 1)
                 return new int[] { 0 };
 
-            var array = new int[length];
-            var temp = new int[length];
             for (var i = 0; i < length; i++)
-                temp[i] = i;
-
-            var hit = hv % length;
-            temp[hit] = -1;
-            array[0] = hit;
-            var start = 0;
-            var offset = 0;
-            do
             {
-                length--;
-                start = 0;
-                offset = 0;
-                hit = ++hv % length;
-                for (start = 0; start < temp.Length; start++)
-                {
-                    if (temp[start] == -1)
-                    {
-                        offset++;
-                        continue;
-                    }
+                var min = i * (int.MaxValue / length);
+                var max = (i + 1) * (int.MaxValue / length);
+                if (hv.IsBetween(min, max))
+                    return new[] { i };
+            }
 
-                    if (start != hit + offset)
-                        continue;
+            return new[] { hv % length };
+            //var array = new int[length];
+            //var temp = new int[length];
+            //for (var i = 0; i < length; i++)
+            //    temp[i] = i;
 
-                    array[length] = temp[start];
-                    temp[start] = -1;
-                    break;
-                }
-            } while (length > 1);
+            //var hit = hv % length;
+            //temp[hit] = -1;
+            //array[0] = hit;
+            //var start = 0;
+            //var offset = 0;
+            //do
+            //{
+            //    length--;
+            //    start = 0;
+            //    offset = 0;
+            //    hit = ++hv % length;
+            //    for (start = 0; start < temp.Length; start++)
+            //    {
+            //        if (temp[start] == -1)
+            //        {
+            //            offset++;
+            //            continue;
+            //        }
 
-            return array;
+            //        if (start != hit + offset)
+            //            continue;
+
+            //        array[length] = temp[start];
+            //        temp[start] = -1;
+            //        break;
+            //    }
+            //} while (length > 1);
+
+            //return array;
         }
 
         /// <summary>
@@ -497,7 +513,7 @@ namespace Never.Memcached
             return second <= 0 ? 1 : second;
         }
 
-        #endregion
+        #endregion help
 
         #region create
 
@@ -584,7 +600,7 @@ namespace Never.Memcached
             return new BinaryCached(servers.Select(ta => Parse(ta)).ToArray(), encoding, compress, setting ?? new SocketSetting());
         }
 
-        #endregion
+        #endregion create
 
         #region icaching
 
@@ -601,6 +617,7 @@ namespace Never.Memcached
 
             return default(T);
         }
+
         /// <summary>
         /// 从缓存中获取某一项，如果没有命中，即调用CachingMissItemCallBack中获得值并将其加入缓存中，默认为10分钟过期
         /// </summary>
@@ -684,6 +701,7 @@ namespace Never.Memcached
         {
             this.compress.Dispose();
         }
-        #endregion
+
+        #endregion icaching
     }
 }

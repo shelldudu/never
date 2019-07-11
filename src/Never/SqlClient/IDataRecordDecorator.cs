@@ -29,18 +29,22 @@ namespace Never.SqlClient
         ///
         /// </summary>
         /// <param name="reader"></param>
-        public IDataRecordDecorator(IDataReader reader)
+        public IDataRecordDecorator(IDataReader reader) : this(reader, null)
+        {
+        }
+
+        public IDataRecordDecorator(IDataReader reader, IEqualityComparer<string> comparer)
         {
             this.dataRecord = null;
             if (reader != null && reader.FieldCount >= 0)
             {
-                this.field = new Dictionary<string, int>(reader.FieldCount);
+                this.field = comparer == null ? new Dictionary<string, int>(reader.FieldCount) : new Dictionary<string, int>(reader.FieldCount, comparer);
                 for (var i = 0; i < reader.FieldCount; i++)
                     field[reader.GetName(i)] = i;
             }
             else
             {
-                this.field = new Dictionary<string, int>(0);
+                this.field = comparer == null ? new Dictionary<string, int>(0) : new Dictionary<string, int>(0, comparer);
             }
         }
 

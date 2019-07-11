@@ -57,9 +57,9 @@ namespace Never.IoC
                     if (attributes == null || attributes.Length <= 0)
                         continue;
 
-                    foreach (var attribute in attributes)
+                    foreach (AutoInjectingAttribute attribute in attributes)
                     {
-                        dict.Add(new AutoInjectingGroupInfo() { Attribute = attribute as AutoInjectingAttribute, ImplementationType = type });
+                        dict.Add(new AutoInjectingGroupInfo() { Attribute = attribute, ImplementationType = type, Key = attribute.Key, LifeStyle = attribute.Declare });
                     }
                 }
             }
