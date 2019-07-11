@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.645
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29025.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never", "src\Never\Never.csproj", "{8F12FB10-685A-4D01-BDBC-B6C90C4DE3B2}"
 EndProject
@@ -15,11 +15,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Deployment", "src\Nev
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{523D1460-3987-43E5-848E-A3E7F988F48E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.TestConsole", "test\Never.TestConsole\Never.TestConsole.csproj", "{42A4EB21-2ABA-486B-9BD0-9BECA80EC24A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Test", "test\Never.Test\Never.Test.csproj", "{42A4EB21-2ABA-486B-9BD0-9BECA80EC24A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.TestWorkFlow", "test\Never.TestWorkflow\Never.TestWorkFlow.csproj", "{1E5E2598-0EC0-4D15-A379-47B1162D3E08}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Memcached", "src\Never.MemCached\Never.Memcached.csproj", "{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Hosting", "src\Never.Hosting\Never.Hosting.csproj", "{B3AEBA72-71B7-4632-B62C-DA93818659EB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Web", "src\Never.Web\Never.Web.csproj", "{E33F80A6-24F1-4B98-8CFD-3940B1D507B5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Web.Mvc", "src\Never.Web.Mvc\Never.Web.Mvc.csproj", "{EBCE3BC1-AD46-46F9-8AC1-0FF8C29BB9FB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Web.WebApi", "src\Never.Web.WebApi\Never.Web.WebApi.csproj", "{DD70FFC3-025E-4014-9C7C-7A3F38312986}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Never.TestMvc", "test\Never.TestMvc\Never.TestMvc.csproj", "{60177A6A-35BB-4528-8098-6838C9BDBA41}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.TestWebApi", "test\Never.TestWebApi\Never.TestWebApi.csproj", "{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +71,30 @@ Global
 		{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3AEBA72-71B7-4632-B62C-DA93818659EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3AEBA72-71B7-4632-B62C-DA93818659EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3AEBA72-71B7-4632-B62C-DA93818659EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3AEBA72-71B7-4632-B62C-DA93818659EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E33F80A6-24F1-4B98-8CFD-3940B1D507B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E33F80A6-24F1-4B98-8CFD-3940B1D507B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E33F80A6-24F1-4B98-8CFD-3940B1D507B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E33F80A6-24F1-4B98-8CFD-3940B1D507B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBCE3BC1-AD46-46F9-8AC1-0FF8C29BB9FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBCE3BC1-AD46-46F9-8AC1-0FF8C29BB9FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBCE3BC1-AD46-46F9-8AC1-0FF8C29BB9FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBCE3BC1-AD46-46F9-8AC1-0FF8C29BB9FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD70FFC3-025E-4014-9C7C-7A3F38312986}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD70FFC3-025E-4014-9C7C-7A3F38312986}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD70FFC3-025E-4014-9C7C-7A3F38312986}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD70FFC3-025E-4014-9C7C-7A3F38312986}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60177A6A-35BB-4528-8098-6838C9BDBA41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60177A6A-35BB-4528-8098-6838C9BDBA41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60177A6A-35BB-4528-8098-6838C9BDBA41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60177A6A-35BB-4528-8098-6838C9BDBA41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,9 +102,11 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{42A4EB21-2ABA-486B-9BD0-9BECA80EC24A} = {523D1460-3987-43E5-848E-A3E7F988F48E}
 		{1E5E2598-0EC0-4D15-A379-47B1162D3E08} = {523D1460-3987-43E5-848E-A3E7F988F48E}
+		{60177A6A-35BB-4528-8098-6838C9BDBA41} = {523D1460-3987-43E5-848E-A3E7F988F48E}
+		{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49} = {523D1460-3987-43E5-848E-A3E7F988F48E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {98FF3BAD-84CC-482A-91DB-F008915B25CC}
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35
+		SolutionGuid = {98FF3BAD-84CC-482A-91DB-F008915B25CC}
 	EndGlobalSection
 EndGlobal

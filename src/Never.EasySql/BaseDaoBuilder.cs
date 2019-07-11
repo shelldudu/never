@@ -81,7 +81,7 @@ namespace Never.EasySql
             {
                 return session.Dao;
             }
-
+            //System.Threading.Thread.CurrentThread.
             return new MyDao(this.CreateSqlExecuter(), this.currentSessionThreadLocal)
             {
                 SqlTagProvider = this.sqlTagProvider,
@@ -93,13 +93,14 @@ namespace Never.EasySql
         #region ctor
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         protected BaseDaoBuilder()
         {
             this.sqlTagProvider = new SqlTagProvider();
         }
-        #endregion
+
+        #endregion ctor
 
         /// <summary>
         /// 开始工作
@@ -145,7 +146,7 @@ namespace Never.EasySql
         {
             if (this.currentSessionThreadLocal == null)
             {
-                this.currentSessionThreadLocal = new System.Threading.ThreadLocal<ISession>(false);
+                this.currentSessionThreadLocal = new System.Threading.ThreadLocal<ISession>(true);
             }
         }
 
@@ -167,7 +168,7 @@ namespace Never.EasySql
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public void Dispose()
         {
@@ -175,7 +176,7 @@ namespace Never.EasySql
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)

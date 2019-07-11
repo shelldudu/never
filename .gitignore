@@ -63,3 +63,4 @@ GhostDoc*.xml
 /.idea
 /Visual Studio 2017
 *.nupkg
+/packages
