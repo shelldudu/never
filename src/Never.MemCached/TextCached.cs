@@ -12,10 +12,12 @@ namespace Never.Memcached
     public class TextCached : MemcachedClient
     {
         #region field and ctor
+
         private readonly ConnectionPool[] connectionPools = null;
         private readonly EndPoint[] servers = null;
         private readonly Encoding responseEncoding = null;
         private readonly ICompressProtocol compress = null;
+
         public TextCached(EndPoint[] servers, ICompressProtocol compress) : this(servers, Encoding.UTF8, compress)
         {
         }
@@ -43,7 +45,7 @@ namespace Never.Memcached
             }
         }
 
-        #endregion
+        #endregion field and ctor
 
         #region prop
 
@@ -52,7 +54,7 @@ namespace Never.Memcached
         /// </summary>
         public Func<ILoggerBuilder> LoggerBuilder { get; set; }
 
-        #endregion
+        #endregion prop
 
         #region set add replace delete interlocked
 
@@ -249,7 +251,7 @@ namespace Never.Memcached
                                 return false;
                             }
 
-                            return true;
+                            return false;
                         }
 
                         if (line.Length < 5 || line[0] != 'V' || line[1] != 'A' || line[2] != 'L' || line[3] != 'U' || line[4] != 'E')
@@ -320,7 +322,7 @@ namespace Never.Memcached
                                 return false;
                             }
 
-                            return true;
+                            return false;
                         }
 
                         if (line.Length < 5 || line[0] != 'V' || line[1] != 'A' || line[2] != 'L' || line[3] != 'U' || line[4] != 'E')
@@ -469,12 +471,12 @@ namespace Never.Memcached
             }
         }
 
-        #endregion
+        #endregion set add replace delete interlocked
 
         #region dispose
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="dispose"></param>
         protected override void Dispose(bool dispose)
@@ -486,6 +488,7 @@ namespace Never.Memcached
 
             base.Dispose(dispose);
         }
-        #endregion
+
+        #endregion dispose
     }
 }

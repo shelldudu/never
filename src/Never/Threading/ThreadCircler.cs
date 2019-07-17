@@ -13,6 +13,7 @@ namespace Never.Threading
     public class ThreadCircler : IDisposable
     {
         #region field and ctor
+
         /// <summary>
         /// 当前线程
         /// </summary>
@@ -39,12 +40,12 @@ namespace Never.Threading
         public bool IsWaited { get { return this.flag == -1; } }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private int flag = 0;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="working">返回休息时间，由于一直while，所以尽可能不要返回Timespan.Zero</param>
         /// <param name="threadName"></param>
@@ -54,7 +55,8 @@ namespace Never.Threading
             this.syncFlag = new object();
             this.thread = new Thread(Working) { IsBackground = true, Name = threadName.IsNullOrEmpty() ? typeof(ThreadCircler).Name : threadName };
         }
-        #endregion
+
+        #endregion field and ctor
 
         #region doing
 
@@ -116,17 +118,25 @@ namespace Never.Threading
         /// <param name="message">异常消息</param>
         protected virtual void HandleException(Exception ex, string message)
         {
-
         }
 
-        #endregion
+        #endregion doing
 
         #region state
 
         /// <summary>
         /// 停止，但不会释放thread
         /// </summary>
+        [Obsolete("it means thread wait")]
         public void Stop()
+        {
+            this.Wait();
+        }
+
+        /// <summary>
+        /// 停止，但不会释放thread
+        /// </summary>
+        public void Wait()
         {
             if (!this.IsWorking)
                 return;
@@ -227,12 +237,12 @@ namespace Never.Threading
         {
         }
 
-        #endregion
+        #endregion state
 
         #region dispose
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public void Dispose()
         {
@@ -240,7 +250,7 @@ namespace Never.Threading
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
@@ -251,6 +261,6 @@ namespace Never.Threading
             this.Close(false);
         }
 
-        #endregion
+        #endregion dispose
     }
 }

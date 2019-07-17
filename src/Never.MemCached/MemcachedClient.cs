@@ -648,7 +648,7 @@ namespace Never.Memcached
 
             value = itemMissCallBack();
             this.TrySetResult(key, value, expireTime);
-            return default(T);
+            return value;
         }
 
         /// <summary>
