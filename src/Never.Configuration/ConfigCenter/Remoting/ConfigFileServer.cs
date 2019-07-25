@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-
 namespace Never.Configuration.ConfigCenter.Remoting
 {
     /// <summary>
@@ -20,7 +19,7 @@ namespace Never.Configuration.ConfigCenter.Remoting
         private readonly Dictionary<ulong, KeyValuePair<string, Encoding>> sessions = null;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="serverEndPoint"></param>
         /// <param name="configurationWatcher"></param>
@@ -96,15 +95,26 @@ namespace Never.Configuration.ConfigCenter.Remoting
                 {
                     foreach (var a in all)
                     {
-                        this.requestHandler.Send(new ResponseResult()
+                        var response = new ResponseResult()
                         {
                             Query = new System.Collections.Specialized.NameValueCollection() { { "file", a.Value.Key } },
-                        }, new Request(a.Value.Value, ConfigFileCommand.Pull) { }, a.Key);
+                        };
+
+                        var request = new Request(a.Value.Value, ConfigFileCommand.Pull)
+                        {
+                        };
+
+                        var currentRequest = new CurrentRequest()
+                        {
+                            Id = 0,//Id=0表示服务端主动发送，不用客户端来请求，客户端来请求的话会在协议接口种被编码了
+                            Request = request,
+                        };
+
+                        this.requestHandler.Send(response, currentRequest, a.Key);
                     }
                 }
             }
         }
-
 
         /// <summary>
         /// 启动
@@ -142,7 +152,7 @@ namespace Never.Configuration.ConfigCenter.Remoting
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="context"></param>
         /// <param name="request"></param>

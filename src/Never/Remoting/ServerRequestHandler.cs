@@ -45,7 +45,7 @@ namespace Never.Remoting
         public event EventHandler<SocketEventArgs> OnConnectionAccepted;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="listeningEndPoint"></param>
         /// <param name="responseHandler"></param>
@@ -55,7 +55,7 @@ namespace Never.Remoting
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="listeningEndPoint"></param>
         /// <param name="setting"></param>
@@ -74,9 +74,7 @@ namespace Never.Remoting
             this.ResponseHandler = responseHandler;
         }
 
-
-
-        #endregion
+        #endregion field and ctor
 
         #region handle
 
@@ -122,7 +120,6 @@ namespace Never.Remoting
                 }
                 finally
                 {
-
                 }
 
                 return null;
@@ -137,7 +134,6 @@ namespace Never.Remoting
                 }
                 finally
                 {
-
                 }
 
                 return null;
@@ -149,7 +145,6 @@ namespace Never.Remoting
             }
             finally
             {
-
             }
 
             try
@@ -179,18 +174,19 @@ namespace Never.Remoting
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="response"></param>
         /// <param name="request"></param>
         /// <param name="sessiongId"></param>
+        [Obsolete("因为Id=0这个条件有歧义，因此该方法会被删除，实际上服务器主动发送，没有请求Id的")]
         public void Send(IResponseHandlerResult response, IRemoteRequest request, ulong sessiongId = 0)
         {
             this.Send(response, new CurrentRequest() { Id = 0, Request = request }, sessiongId);
         }
 
         /// <summary>
-        /// 
+        /// 服务器主动发送消息给特定的sessionid客户端
         /// </summary>
         /// <param name="response"></param>
         /// <param name="request"></param>
@@ -201,6 +197,6 @@ namespace Never.Remoting
             this.service.Push(sessiongId, bytes);
         }
 
-        #endregion
+        #endregion handle
     }
 }
