@@ -209,6 +209,19 @@ namespace Never.Memcached.Sockets
             return @byte;
         }
 
+        /// <summary>
+        /// 尝试清空
+        /// </summary>
+        public void ClearStream()
+        {
+            this.stream.Flush();
+            var ava = this.socket.Available;
+            if (ava > 0)
+            {
+                this.Read(ava);
+            }
+        }
+
         #endregion read
 
         #region start

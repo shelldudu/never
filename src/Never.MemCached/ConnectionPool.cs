@@ -125,10 +125,16 @@ namespace Never.Memcached
         /// <param name="item"></param>
         public void Recycle(ConnectionItem item)
         {
+            try
+            {
+                item.Connection.ClearStream();
+            }
+            catch
+            {
+            }
+
             this.groups.Enqueue(item.Group);
         }
-
-
         #endregion
 
         #region dispose
