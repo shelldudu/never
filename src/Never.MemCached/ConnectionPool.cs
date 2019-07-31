@@ -135,6 +135,31 @@ namespace Never.Memcached
 
             this.groups.Enqueue(item.Group);
         }
+
+        /// <summary>
+        /// 催毁
+        /// </summary>
+        /// <param name="item"></param>
+        public void Detory(ConnectionItem item)
+        {
+            try
+            {
+                item.Connection.ClearStream();
+            }
+            catch
+            {
+            }
+            try
+            {
+                item.Connection.Dispose();
+            }
+            catch
+            {
+
+            }
+
+            item.Connection = null;
+        }
         #endregion
 
         #region dispose

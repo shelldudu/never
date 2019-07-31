@@ -110,14 +110,7 @@ namespace Never.EasySql
             if (this.CurrentSession != null)
             {
                 ((IEasySqlTransactionExecuter)this.SqlExecuter).RollBackTransaction(closeConnection);
-                try
-                {
-                    this.CurrentSessionThreadLocal.Values.Remove(this.CurrentSession);
-                }
-                finally
-                {
-                    this.CurrentSessionThreadLocal.Value = null;
-                }
+                this.CurrentSessionThreadLocal.Value = null;
             }
 
             this.CurrentSession.Dispose();
@@ -149,14 +142,7 @@ namespace Never.EasySql
             if (this.CurrentSession != null)
             {
                 ((IEasySqlTransactionExecuter)this.SqlExecuter).CommitTransaction(closeConnection);
-                try
-                {
-                    this.CurrentSessionThreadLocal.Values.Remove(this.CurrentSession);
-                }
-                finally
-                {
-                    this.CurrentSessionThreadLocal.Value = null;
-                }
+                this.CurrentSessionThreadLocal.Value = null;
             }
 
             this.CurrentSession.Dispose();

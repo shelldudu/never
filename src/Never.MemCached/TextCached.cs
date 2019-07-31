@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -37,7 +38,7 @@ namespace Never.Memcached
                 var connectionPool = new ConnectionPool(setting, servers[i], (set, end) =>
                 {
                     var client = new Sockets.ClientSocket(set, end);
-                    client.Start();
+                    client.Start().KeepAlive(set.KeepAlivePeriod);
                     return client.Connection;
                 });
 

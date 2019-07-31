@@ -38,7 +38,7 @@ namespace Never.Memcached
                 var connectionPool = new ConnectionPool(setting, servers[i], (set, end) =>
                  {
                      var client = new Sockets.ClientSocket(set, end);
-                     client.Start();
+                     client.Start().KeepAlive(set.KeepAlivePeriod);
                      return client.Connection;
                  });
 
@@ -225,21 +225,26 @@ namespace Never.Memcached
                 val = null;
                 var request = BinaryConvert.GetRequest(key);
                 var item = pool.Alloc();
+                var detory = false;
                 try
                 {
                     item.Connection.Write(request);
                     item.Connection.Flush();
                     var @byte = item.Connection.Read(24);
                     var status = BinaryConvert.ParseStatus(@byte);
-                    if (status != 0x0000)
-                        return false;
-
                     var nflag = byte.MinValue;
                     var totallength = BinaryConvert.ParseTotalLength(@byte);
                     var extralength = BinaryConvert.ParseExtraLength(@byte);
                     var keylength = BinaryConvert.ParseKeyLength(@byte);
-                    var alldata = item.Connection.Read(totallength);
+                    if (status != 0x0000)
+                    {
+                        if (totallength > 0)
+                            item.Connection.Read(totallength);
 
+                        return false;
+                    }
+
+                    var alldata = item.Connection.Read(totallength);
                     var offset = 0;
                     if (extralength > 0)
                     {
@@ -269,11 +274,15 @@ namespace Never.Memcached
                 }
                 catch (Exception)
                 {
+                    detory = true;
                     return false;
                 }
                 finally
                 {
-                    pool.Recycle(item);
+                    if (detory)
+                        pool.Detory(item);
+                    else
+                        pool.Recycle(item);
                 }
             }
         }
@@ -302,21 +311,27 @@ namespace Never.Memcached
                 val = default(T);
                 var request = BinaryConvert.GetRequest(key);
                 var item = pool.Alloc();
+                var detory = false;
                 try
                 {
                     item.Connection.Write(request);
                     item.Connection.Flush();
                     var @byte = item.Connection.Read(24);
                     var status = BinaryConvert.ParseStatus(@byte);
-                    if (status != 0x0000)
-                        return false;
-
                     var nflag = byte.MinValue;
                     var totallength = BinaryConvert.ParseTotalLength(@byte);
                     var extralength = BinaryConvert.ParseExtraLength(@byte);
                     var keylength = BinaryConvert.ParseKeyLength(@byte);
-                    var alldata = item.Connection.Read(totallength);
+                    if (status != 0x0000)
+                    {
+                        if (totallength > 0)
+                        {
+                            item.Connection.Read(totallength);
+                        }
+                        return false;
+                    }
 
+                    var alldata = item.Connection.Read(totallength);
                     var offset = 0;
                     if (extralength > 0)
                     {
@@ -346,11 +361,15 @@ namespace Never.Memcached
                 }
                 catch (Exception)
                 {
+                    detory = true;
                     return false;
                 }
                 finally
                 {
-                    pool.Recycle(item);
+                    if (detory)
+                        pool.Detory(item);
+                    else
+                        pool.Recycle(item);
                 }
             }
         }

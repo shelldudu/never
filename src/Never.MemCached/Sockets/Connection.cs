@@ -17,8 +17,6 @@ namespace Never.Memcached.Sockets
     {
         #region field and ctor
 
-        private Socket socket = null;
-        private Stream stream = null;
         private readonly InterLocker sendLocker = null;
         private readonly InterLocker receiveLocker = null;
 
@@ -27,18 +25,41 @@ namespace Never.Memcached.Sockets
         /// </summary>
         /// <param name="socket"></param>
         /// <param name="stream"></param>
-        public Connection(Socket socket, Func<Socket, Stream> stream)
+        public Connection(Socket socket, Func<Socket, Stream> stream) : this(socket, new BufferedStream(stream(socket)))
         {
-            this.socket = socket;
-            this.LocalEndPoint = this.socket.LocalEndPoint;
-            this.RemoteEndPoint = this.socket.RemoteEndPoint;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="stream"></param>
+        public Connection(Socket socket, Stream stream)
+        {
+            this.Socket = socket;
+            this.Stream = stream;
+            this.LocalEndPoint = this.Socket.LocalEndPoint;
+            this.RemoteEndPoint = this.Socket.RemoteEndPoint;
             this.ConnectTime = DateTime.Now;
-            this.ProtocolType = this.socket.ProtocolType;
-            this.stream = new BufferedStream(stream(this.socket));
+            this.ProtocolType = this.Socket.ProtocolType;
             this.sendLocker = new InterLocker();
             this.receiveLocker = new InterLocker();
             this.Id = NextId.Next();
         }
+
+        #endregion
+
+        #region prop
+
+        /// <summary>
+        /// socket
+        /// </summary>
+        public Socket Socket { get; private set; }
+
+        /// <summary>
+        /// stream
+        /// </summary>
+        public Stream Stream { get; private set; }
 
         #endregion
 
@@ -48,36 +69,38 @@ namespace Never.Memcached.Sockets
         /// 写入数据
         /// </summary>
         /// <param name="bytes"></param>
-        public void Write(byte[] bytes)
+        public virtual void Write(byte[] bytes)
         {
-            this.stream.Write(bytes, 0, bytes.Length);
+            this.Stream.Write(bytes, 0, bytes.Length);
         }
+
         /// <summary>
         /// 写入数据
         /// </summary>
         /// <param name="bytes"></param>
-        public void Write(IEnumerable<byte[]> bytes)
+        public virtual void Write(IEnumerable<byte[]> bytes)
         {
             foreach (var @byte in bytes)
-                this.stream.Write(@byte, 0, @byte.Length);
+                this.Stream.Write(@byte, 0, @byte.Length);
         }
+
         /// <summary>
         /// 写入数据
         /// </summary>
         /// <param name="bytes"></param>
         /// <param name="offset"></param>
         /// <param name="count"></param>
-        public void Write(byte[] bytes, int offset, int count)
+        public virtual void Write(byte[] bytes, int offset, int count)
         {
-            this.stream.Write(bytes, offset, count);
+            this.Stream.Write(bytes, offset, count);
         }
 
         /// <summary>
         /// 每写一次都要重新写入流中
         /// </summary>
-        public void Flush()
+        public virtual void Flush()
         {
-            this.stream.Flush();
+            this.Stream.Flush();
         }
 
         #endregion write
@@ -88,13 +111,13 @@ namespace Never.Memcached.Sockets
         /// 读取一行，但是返回的结果是包含了换行或者回车
         /// </summary>
         /// <returns></returns>
-        public byte[] ReadLine()
+        public virtual byte[] ReadLine()
         {
             var @byte = new byte[1];
             var end = false;
             using (var st = new MemoryStream())
             {
-                while (this.stream.Read(@byte, 0, 1) != -1)
+                while (this.Stream.Read(@byte, 0, 1) != -1)
                 {
                     if (@byte[0] == 13)
                     {
@@ -127,13 +150,13 @@ namespace Never.Memcached.Sockets
         /// </summary>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public string ReadLine(Encoding encoding)
+        public virtual string ReadLine(Encoding encoding)
         {
             var @byte = new byte[1];
             var end = false;
             using (var st = new MemoryStream())
             {
-                while (this.stream.Read(@byte, 0, 1) != -1)
+                while (this.Stream.Read(@byte, 0, 1) != -1)
                 {
                     if (@byte[0] == 13)
                     {
@@ -164,11 +187,11 @@ namespace Never.Memcached.Sockets
         /// <summary>
         /// 清空结束换行
         /// </summary>
-        public void ClearLine()
+        public virtual void ClearLine()
         {
             var @byte = new byte[1];
             var end = false;
-            while (this.stream.Read(@byte, 0, 1) != -1)
+            while (this.Stream.Read(@byte, 0, 1) != -1)
             {
                 //13是回车 \r
                 if (@byte[0] == 13)
@@ -193,13 +216,13 @@ namespace Never.Memcached.Sockets
         /// </summary>
         /// <param name="length"></param>
         /// <returns></returns>
-        public byte[] Read(int length)
+        public virtual byte[] Read(int length)
         {
             var @byte = new byte[length];
             var count = 0;
             while (count < length)
             {
-                var cnt = this.stream.Read(@byte, count, length - count);
+                var cnt = this.Stream.Read(@byte, count, length - count);
                 if (cnt <= 0)
                     return @byte;
 
@@ -212,10 +235,10 @@ namespace Never.Memcached.Sockets
         /// <summary>
         /// 尝试清空
         /// </summary>
-        public void ClearStream()
+        public virtual void ClearStream()
         {
-            this.stream.Flush();
-            var ava = this.socket.Available;
+            this.Stream.Flush();
+            var ava = this.Socket.Available;
             if (ava > 0)
             {
                 this.Read(ava);
@@ -265,7 +288,7 @@ namespace Never.Memcached.Sockets
         /// <summary>
         /// 是否连接了
         /// </summary>
-        public bool IsConnected { get { return this.socket != null && this.socket.Connected; } }
+        public bool IsConnected { get { return this.Socket != null && this.Socket.Connected; } }
 
         /// <summary>
         /// 是否为安全连接的
@@ -324,7 +347,8 @@ namespace Never.Memcached.Sockets
         {
             try
             {
-                this.stream = null;
+                this.Stream.Flush();
+                this.Stream = null;
             }
             finally
             {
@@ -332,12 +356,12 @@ namespace Never.Memcached.Sockets
             }
             try
             {
-                this.socket.Shutdown(SocketShutdown.Both);
-                this.socket.Close();
+                this.Socket.Shutdown(SocketShutdown.Both);
+                this.Socket.Close();
             }
             finally
             {
-                this.socket = null;
+                this.Socket = null;
             }
         }
 
@@ -357,7 +381,7 @@ namespace Never.Memcached.Sockets
                 return false;
             }
 
-            if (this.socket == null)
+            if (this.Socket == null)
             {
                 return false;
             }
@@ -371,17 +395,17 @@ namespace Never.Memcached.Sockets
             BitConverter.GetBytes(period).CopyTo(inOptionValue, 8);
             try
             {
-                this.socket.IOControl(IOControlCode.KeepAliveValues, inOptionValue, outOptionValue);
+                this.Socket.IOControl(IOControlCode.KeepAliveValues, inOptionValue, outOptionValue);
                 return true;
             }
             catch (NotSupportedException)
             {
-                this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, inOptionValue);
+                this.Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, inOptionValue);
                 return true;
             }
             catch (NotImplementedException)
             {
-                this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, inOptionValue);
+                this.Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, inOptionValue);
                 return true;
             }
             catch (Exception)

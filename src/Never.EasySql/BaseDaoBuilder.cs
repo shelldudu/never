@@ -146,7 +146,7 @@ namespace Never.EasySql
         {
             if (this.currentSessionThreadLocal == null)
             {
-                this.currentSessionThreadLocal = new System.Threading.ThreadLocal<ISession>(true);
+                this.currentSessionThreadLocal = new System.Threading.ThreadLocal<ISession>(false) ;
             }
         }
 

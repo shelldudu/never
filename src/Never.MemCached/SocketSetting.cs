@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,5 +25,10 @@ namespace Never.Memcached
         /// 连接池中最大个socket活动
         /// </summary>
         public int MaxPoolBufferSize { get; set; } = 10;
+
+        /// <summary>
+        /// 心跳时间
+        /// </summary>
+        public TimeSpan KeepAlivePeriod { get; set; } = TimeSpan.FromMinutes(10);
     }
 }
