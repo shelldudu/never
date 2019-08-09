@@ -1,6 +1,7 @@
 ﻿using Never.IO;
 using Never.Threading;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,6 +45,11 @@ namespace Never.Configuration.ConfigCenter
             /// </summary>
             public bool PathChanged { get; set; }
 
+            /// <summary>
+            /// 文件编码
+            /// </summary>
+            public Encoding Encoding { get; set; }
+
             public bool Equals(ChangeQueue other)
             {
                 if (this.FullName == null)
@@ -78,12 +84,13 @@ namespace Never.Configuration.ConfigCenter
 
         private readonly List<ShareConfigurationBuilder> shareConfiguration = null;
         private readonly List<IShareFileReference> appConfiguration = null;
+        private readonly ConcurrentQueue<ChangeQueue> changeQueue = null;
         private readonly ICustomKeyValueFinder keyValueFinder = null;
         private readonly Dictionary<string, FileSystemWatcher> fileWather = null;
         private readonly Dictionary<string, DateTime> moreTimeLimit = null;
+        private readonly Dictionary<string, Encoding> encodings = null;
+        private readonly List<string> appUniqueName = null;
         private readonly TimeSpan sleepTimeSpan = TimeSpan.Zero;
-        private readonly System.Collections.Concurrent.ConcurrentQueue<ChangeQueue> changeQueue = null;
-
         /// <summary>
         /// 共享文件重命名时
         /// </summary>
@@ -120,6 +127,11 @@ namespace Never.Configuration.ConfigCenter
         public Func<Logging.ILoggerBuilder> LoggerBuilder { get; set; }
 
         /// <summary>
+        /// 使用文件命名作为应用级统一的名字
+        /// </summary>
+        public bool UseFileAllNameAsAppUniqueId { get; set; }
+
+        /// <summary>
         /// 构建者
         /// </summary>
         internal EventHandler<ShareFileEventArgs> ShareFileEventHandler { get; set; }
@@ -141,6 +153,8 @@ namespace Never.Configuration.ConfigCenter
             this.appConfiguration = appConfiguration == null ? new List<IShareFileReference>() : appConfiguration.ToList();
             this.keyValueFinder = keyValueFinder;
             this.sleepTimeSpan = sleepTimeSpan;
+            this.appUniqueName = new List<string>();
+            this.encodings = new Dictionary<string, Encoding>();
             this.moreTimeLimit = new Dictionary<string, DateTime>();
             this.changeQueue = new System.Collections.Concurrent.ConcurrentQueue<ChangeQueue>();
             this.fileWather = new Dictionary<string, FileSystemWatcher>(StringComparer.OrdinalIgnoreCase);
@@ -149,13 +163,17 @@ namespace Never.Configuration.ConfigCenter
             {
                 foreach (var share in shareConfiguration)
                 {
-                    var watcher = new Never.IO.FileWatcher(share.File) { EnableRaisingEvents = true };
-                    this.fileWather.Add(share.File.FullName, watcher);
-                    this.moreTimeLimit.Add(share.File.FullName, DateTime.Now);
-                    watcher.Created += ShareWatcher_Created;
-                    watcher.Changed += ShareWatcher_Changed;
-                    watcher.Deleted += ShareWatcher_Deleted;
-                    watcher.Renamed += ShareWatcher_Renamed;
+                    if (this.fileWather.ContainsKey(share.File.FullName) == false)
+                    {
+                        this.encodings[share.File.FullName] = share.Encoding;
+                        var watcher = new Never.IO.FileWatcher(share.File) { EnableRaisingEvents = true };
+                        this.fileWather.Add(share.File.FullName, watcher);
+                        this.moreTimeLimit.Add(share.File.FullName, DateTime.Now);
+                        watcher.Created += ShareWatcher_Created;
+                        watcher.Changed += ShareWatcher_Changed;
+                        watcher.Deleted += ShareWatcher_Deleted;
+                        watcher.Renamed += ShareWatcher_Renamed;
+                    }
                 }
             }
 
@@ -163,13 +181,17 @@ namespace Never.Configuration.ConfigCenter
             {
                 foreach (var config in appConfiguration)
                 {
-                    var watcher = new Never.IO.FileWatcher(config.Builder.File.File) { EnableRaisingEvents = true };
-                    this.fileWather.Add(config.Builder.File.File.FullName, watcher);
-                    this.moreTimeLimit.Add(config.Builder.File.File.FullName, DateTime.Now);
-                    watcher.Created += AppWatcher_Created;
-                    watcher.Changed += AppWatcher_Changed;
-                    watcher.Deleted += AppWatcher_Deleted;
-                    watcher.Renamed += AppWatcher_Renamed;
+                    if (this.fileWather.ContainsKey(config.Builder.File.File.FullName) == false)
+                    {
+                        this.encodings[config.Builder.File.File.FullName] = config.Builder.File.Encoding;
+                        var watcher = new Never.IO.FileWatcher(config.Builder.File.File) { EnableRaisingEvents = true };
+                        this.fileWather.Add(config.Builder.File.File.FullName, watcher);
+                        this.moreTimeLimit.Add(config.Builder.File.File.FullName, DateTime.Now);
+                        watcher.Created += AppWatcher_Created;
+                        watcher.Changed += AppWatcher_Changed;
+                        watcher.Deleted += AppWatcher_Deleted;
+                        watcher.Renamed += AppWatcher_Renamed;
+                    }
                 }
             }
 
@@ -179,6 +201,7 @@ namespace Never.Configuration.ConfigCenter
         #endregion field and ctor
 
         #region change
+
         private void ShareWatcher_Deleted(object sender, FileSystemEventArgs e)
         {
             this.changeQueue.Enqueue(new ChangeQueue()
@@ -188,6 +211,7 @@ namespace Never.Configuration.ConfigCenter
                 Action = 3,
                 //FullName = e.FullPath,
                 OldFullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath],
             });
         }
 
@@ -200,7 +224,11 @@ namespace Never.Configuration.ConfigCenter
                 Action = 2,
                 FullName = e.FullPath,
                 OldFullName = e.OldFullPath,
+                Encoding = this.encodings[e.OldFullPath]
             });
+
+            this.encodings[e.FullPath] = this.encodings[e.OldFullPath];
+            this.encodings.Remove(e.OldFullPath);
         }
 
         private void ShareWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -211,6 +239,7 @@ namespace Never.Configuration.ConfigCenter
                 Shared = true,
                 Action = 1,
                 FullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -222,6 +251,7 @@ namespace Never.Configuration.ConfigCenter
                 Shared = true,
                 Action = 0,
                 FullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -234,6 +264,7 @@ namespace Never.Configuration.ConfigCenter
                 Action = 3,
                 //FullName = e.FullPath,
                 OldFullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -246,7 +277,11 @@ namespace Never.Configuration.ConfigCenter
                 Action = 2,
                 FullName = e.FullPath,
                 OldFullName = e.OldFullPath,
+                Encoding = this.encodings[e.OldFullPath]
             });
+
+            this.encodings[e.FullPath] = this.encodings[e.OldFullPath];
+            this.encodings.Remove(e.OldFullPath);
         }
 
         private void SharePathWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -257,6 +292,7 @@ namespace Never.Configuration.ConfigCenter
                 Shared = true,
                 Action = 1,
                 FullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -268,6 +304,7 @@ namespace Never.Configuration.ConfigCenter
                 Shared = true,
                 Action = 0,
                 FullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -280,6 +317,7 @@ namespace Never.Configuration.ConfigCenter
                 Action = 3,
                 //FullName = e.FullPath,
                 OldFullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -293,7 +331,11 @@ namespace Never.Configuration.ConfigCenter
                 Action = 2,
                 FullName = e.FullPath,
                 OldFullName = e.OldFullPath,
+                Encoding = this.encodings[e.OldFullPath]
             });
+
+            this.encodings[e.FullPath] = this.encodings[e.OldFullPath];
+            this.encodings.Remove(e.OldFullPath);
         }
 
         private void AppWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -304,6 +346,7 @@ namespace Never.Configuration.ConfigCenter
                 Shared = false,
                 Action = 1,
                 FullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -315,6 +358,7 @@ namespace Never.Configuration.ConfigCenter
                 Shared = false,
                 Action = 0,
                 FullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -327,6 +371,7 @@ namespace Never.Configuration.ConfigCenter
                 Action = 3,
                 //FullName = e.FullPath,
                 OldFullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -339,7 +384,11 @@ namespace Never.Configuration.ConfigCenter
                 Action = 2,
                 FullName = e.FullPath,
                 OldFullName = e.OldFullPath,
+                Encoding = this.encodings[e.OldFullPath]
             });
+
+            this.encodings[e.FullPath] = this.encodings[e.OldFullPath];
+            this.encodings.Remove(e.OldFullPath);
         }
 
         private void AppPathWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -350,6 +399,7 @@ namespace Never.Configuration.ConfigCenter
                 Shared = false,
                 Action = 1,
                 FullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
 
@@ -361,39 +411,61 @@ namespace Never.Configuration.ConfigCenter
                 Shared = false,
                 Action = 0,
                 FullName = e.FullPath,
+                Encoding = this.encodings[e.FullPath]
             });
         }
+        #endregion
+
+        #region add file
 
         /// <summary>
-        /// 新加共享文件，读取文件夹下面的所有的文件（只支持.json与.config）2种，并且建立监听文件
+        /// 新加共享文件，读取文件夹下面的所有的文件（只支持.json与.xml）2种，并且建立监听文件
         /// </summary>
         /// <param name="path"></param>
         /// <param name="searchPattern"></param>
-        /// <param name="searchOption"></param>
         /// <param name="encoding"></param>
         /// <param name="onBuilding"></param>
         /// <returns></returns>
-        public ConfigurationWatcher AddShareFile(string path, string searchPattern, SearchOption searchOption, Encoding encoding, EventHandler<ShareFileEventArgs> onBuilding = null)
+        public ConfigurationWatcher AddShareFile(string path, string searchPattern, Encoding encoding, EventHandler<ShareFileEventArgs> onBuilding = null)
         {
-            if (this.fileWather.ContainsKey(path))
-                return this;
+            return this.AddShareFile(path, new[] { searchPattern }, encoding, onBuilding);
+        }
 
-            var watcher = new FileSystemWatcher(path, searchPattern) { EnableRaisingEvents = true };
-            this.fileWather.Add(path, watcher);
-            watcher.Created += SharePathWatcher_Created;
-            watcher.Changed += SharePathWatcher_Changed;
-            watcher.Deleted += SharePathWatcher_Deleted;
-            watcher.Renamed += SharePathWatcher_Renamed;
-            foreach (var file in System.IO.Directory.GetFiles(path, searchPattern, searchOption).Select(ta => new FileInfo(ta)))
+        /// <summary>
+        /// 新加共享文件，读取文件夹下面的所有的文件（只支持.json与.xml）2种，并且建立监听文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="searchPattern"></param>
+        /// <param name="encoding"></param>
+        /// <param name="onBuilding"></param>
+        /// <returns></returns>
+        public ConfigurationWatcher AddShareFile(string path, string[] searchPattern, Encoding encoding, EventHandler<ShareFileEventArgs> onBuilding = null)
+        {
+            if (onBuilding != null)
             {
-                this.HandleShareFile(new ChangeQueue()
+                this.ShareFileEventHandler += onBuilding;
+            }
+
+            foreach (var pattern in searchPattern)
+            {
+                var watcher = new FileSystemWatcher(path, pattern) { EnableRaisingEvents = true };
+                watcher.Created += SharePathWatcher_Created;
+                watcher.Changed += SharePathWatcher_Changed;
+                watcher.Deleted += SharePathWatcher_Deleted;
+                watcher.Renamed += SharePathWatcher_Renamed;
+                foreach (var file in System.IO.Directory.GetFiles(path, pattern).Select(ta => new FileInfo(ta)))
                 {
-                    PathChanged = true,
-                    Action = 0,
-                    FullName = file.FullName,
-                    Shared = true,
-                    OldFullName = null,
-                }, encoding);
+                    this.encodings[file.FullName] = encoding;
+                    this.HandleShareFile(new ChangeQueue()
+                    {
+                        PathChanged = true,
+                        Action = 0,
+                        FullName = file.FullName,
+                        Shared = true,
+                        OldFullName = null,
+                        Encoding = encoding,
+                    }, true);
+                }
             }
 
             return this;
@@ -414,11 +486,12 @@ namespace Never.Configuration.ConfigCenter
             if (this.fileWather.ContainsKey(file.FullName))
                 return this;
 
-            if (this.ShareFileEventHandler != null)
+            if (onBuilding != null)
             {
                 this.ShareFileEventHandler += onBuilding;
             }
 
+            this.encodings[file.FullName] = encoding;
             this.HandleShareFile(new ChangeQueue()
             {
                 PathChanged = false,
@@ -426,41 +499,54 @@ namespace Never.Configuration.ConfigCenter
                 FullName = file.FullName,
                 Shared = true,
                 OldFullName = null,
-            }, encoding);
+                Encoding = encoding,
+            }, true);
 
             return this;
         }
 
         /// <summary>
-        /// 新加应用文件，读取文件夹下面的所有的文件（只支持.json与.config）2种，并且建立监听文件
+        /// 新加应用文件，读取文件夹下面的所有的文件（只支持.json与.xml）2种，并且建立监听文件
         /// </summary>
         /// <param name="path"></param>
         /// <param name="searchPattern"></param>
-        /// <param name="searchOption"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public ConfigurationWatcher AddAppFile(string path, string searchPattern, SearchOption searchOption, Encoding encoding)
+        public ConfigurationWatcher AddAppFile(string path, string searchPattern, Encoding encoding)
         {
-            if (this.fileWather.ContainsKey(path))
-                return this;
+            return this.AddAppFile(path, new[] { searchPattern }, encoding);
+        }
 
-            var watcher = new FileSystemWatcher(path, searchPattern) { EnableRaisingEvents = true };
-            this.fileWather.Add(path, watcher);
-            watcher.Created += AppPathWatcher_Created;
-            watcher.Changed += AppPathWatcher_Changed;
-            watcher.Deleted += AppPathWatcher_Deleted;
-            watcher.Renamed += AppPathWatcher_Renamed;
-
-            foreach (var file in System.IO.Directory.GetFiles(path, searchPattern, searchOption).Select(ta => new FileInfo(ta)))
+        /// <summary>
+        /// 新加应用文件，读取文件夹下面的所有的文件（只支持.json与.xml）2种，并且建立监听文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="searchPattern"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public ConfigurationWatcher AddAppFile(string path, string[] searchPattern, Encoding encoding)
+        {
+            foreach (var pattern in searchPattern)
             {
-                this.HandleAppFile(new ChangeQueue()
+                var watcher = new FileSystemWatcher(path, pattern) { EnableRaisingEvents = true };
+                watcher.Created += AppPathWatcher_Created;
+                watcher.Changed += AppPathWatcher_Changed;
+                watcher.Deleted += AppPathWatcher_Deleted;
+                watcher.Renamed += AppPathWatcher_Renamed;
+
+                foreach (var file in System.IO.Directory.GetFiles(path, pattern).Select(ta => new FileInfo(ta)))
                 {
-                    PathChanged = true,
-                    Action = 0,
-                    FullName = file.FullName,
-                    Shared = false,
-                    OldFullName = null,
-                }, encoding);
+                    this.encodings[file.FullName] = encoding;
+                    this.HandleAppFile(new ChangeQueue()
+                    {
+                        PathChanged = true,
+                        Action = 0,
+                        FullName = file.FullName,
+                        Shared = false,
+                        OldFullName = null,
+                        Encoding = encoding,
+                    }, true);
+                }
             }
 
             return this;
@@ -480,6 +566,7 @@ namespace Never.Configuration.ConfigCenter
             if (this.fileWather.ContainsKey(file.FullName))
                 return this;
 
+            this.encodings[file.FullName] = encoding;
             this.HandleAppFile(new ChangeQueue()
             {
                 PathChanged = false,
@@ -487,7 +574,8 @@ namespace Never.Configuration.ConfigCenter
                 FullName = file.FullName,
                 Shared = false,
                 OldFullName = null,
-            }, encoding);
+                Encoding = encoding,
+            }, true);
 
             return this;
         }
@@ -510,13 +598,13 @@ namespace Never.Configuration.ConfigCenter
                                 //应用级文件
                                 case false:
                                     {
-                                        this.HandleAppFile(change);
+                                        this.HandleAppFile(change, false);
                                     }
                                     break;
                                 //共享及文件
                                 case true:
                                     {
-                                        this.HandleShareFile(change);
+                                        this.HandleShareFile(change, false);
                                     }
                                     break;
                             }
@@ -530,13 +618,13 @@ namespace Never.Configuration.ConfigCenter
                                 //应用级文件
                                 case false:
                                     {
-                                        this.HandleAppFile(change);
+                                        this.HandleAppFile(change, false);
                                     }
                                     break;
                                 //共享及文件
                                 case true:
                                     {
-                                        this.HandleShareFile(change);
+                                        this.HandleShareFile(change, false);
                                     }
                                     break;
                             }
@@ -581,8 +669,8 @@ namespace Never.Configuration.ConfigCenter
         /// 处理share级
         /// </summary>
         /// <param name="change"></param>
-        /// <param name="outsideEncoding"></param>
-        private void HandleShareFile(ChangeQueue change, Encoding outsideEncoding = null)
+        /// <param name="adding">是否新加</param>
+        private void HandleShareFile(ChangeQueue change, bool adding)
         {
             var oldFile = change.OldFullName == null ? null : new FileInfo(change.OldFullName);
             var newFile = change.FullName == null ? null : new FileInfo(change.FullName);
@@ -594,7 +682,7 @@ namespace Never.Configuration.ConfigCenter
                 //新加
                 case 0:
                     {
-                        var shareBuilder = new ShareConfigurationBuilder(new ConfigFileInfo() { File = newFile, Encoding = outsideEncoding ?? Encoding.UTF8 });
+                        var shareBuilder = new ShareConfigurationBuilder(new ConfigFileInfo() { File = newFile, Encoding = change.Encoding ?? Encoding.UTF8 });
                         if (this.ShareFileEventHandler != null)
                         {
                             shareBuilder.OnBuilding += this.ShareFileEventHandler;
@@ -605,8 +693,14 @@ namespace Never.Configuration.ConfigCenter
                         {
                             case ConfigFileType.Json:
                                 {
-                                    if (this.shareConfiguration.Any(ta => ta.JsonShareFile.Name == shareBuilder.JsonShareFile.Name))
+                                    if (this.shareConfiguration.Any(ta => ta.JsonShareFile != null && ta.JsonShareFile.Name == shareBuilder.JsonShareFile.Name))
                                     {
+                                        if (adding)
+                                        {
+                                            shareBuilder.Dispose();
+                                            throw new Exception(string.Format("存在相同的共享文件{0}", shareBuilder.JsonShareFile.Name));
+                                        }
+
                                     }
                                     else
                                     {
@@ -616,8 +710,13 @@ namespace Never.Configuration.ConfigCenter
                                 break;
                             case ConfigFileType.Xml:
                                 {
-                                    if (this.shareConfiguration.Any(ta => ta.XmlShareFile.Name == shareBuilder.XmlShareFile.Name))
+                                    if (this.shareConfiguration.Any(ta => ta.XmlShareFile != null && ta.XmlShareFile.Name == shareBuilder.XmlShareFile.Name))
                                     {
+                                        if (adding)
+                                        {
+                                            shareBuilder.Dispose();
+                                            throw new Exception(string.Format("存在相同的共享文件{0}", shareBuilder.XmlShareFile.Name));
+                                        }
                                     }
                                     else
                                     {
@@ -644,7 +743,7 @@ namespace Never.Configuration.ConfigCenter
                 //修改
                 case 1:
                     {
-                        var oldBuilder = this.shareConfiguration.FirstOrDefault(ta => ta.File.FullName == newFile.FullName).Rebuild();
+                        var oldBuilder = this.shareConfiguration.FirstOrDefault(ta => ta.File != null && ta.File.FullName == newFile.FullName).Rebuild();
                         //引起引用文件的修改，先找出相应的引用，找到后等新的builder替换成功后再更新引用文件里面的引用
                         var refences = new List<IShareFileReference>();
                         foreach (var b in new[] { oldBuilder.JsonShareFile, oldBuilder.XmlShareFile })
@@ -677,7 +776,7 @@ namespace Never.Configuration.ConfigCenter
                 //重命名
                 case 2:
                     {
-                        var oldBuilder = this.shareConfiguration.FirstOrDefault(ta => ta.File.FullName == oldFile.FullName);
+                        var oldBuilder = this.shareConfiguration.FirstOrDefault(ta => ta.File != null && ta.File.FullName == oldFile.FullName);
                         var newBuilder = new ShareConfigurationBuilder(new ConfigFileInfo() { File = newFile, Encoding = oldBuilder.Encoding });
 
                         //引起引用文件的修改，先找出相应的引用，找到后等新的builder替换成功后再更新引用文件里面的引用
@@ -698,7 +797,17 @@ namespace Never.Configuration.ConfigCenter
                         }
 
                         this.shareConfiguration.Remove(oldBuilder);
-                        this.shareConfiguration.Add(newBuilder.Build(oldBuilder));
+                        var be = newBuilder.Build(oldBuilder);
+                        if (be.FileType == ConfigFileType.Json)
+                        {
+                            this.shareConfiguration.RemoveAll(ta => ta.JsonShareFile != null && ta.JsonShareFile.Name.IsEquals(be.JsonShareFile.Name));
+                        }
+                        else if (be.FileType == ConfigFileType.Xml)
+                        {
+                            this.shareConfiguration.RemoveAll(ta => ta.XmlShareFile != null && ta.XmlShareFile.Name.IsEquals(be.XmlShareFile.Name));
+                        }
+
+                        this.shareConfiguration.Add(be);
                         oldBuilder = null;
                         if (!change.PathChanged)
                         {
@@ -725,7 +834,7 @@ namespace Never.Configuration.ConfigCenter
                 //删除
                 case 3:
                     {
-                        var oldBuilder = this.shareConfiguration.FirstOrDefault(ta => ta.File.FullName == oldFile.FullName);
+                        var oldBuilder = this.shareConfiguration.FirstOrDefault(ta => ta.File != null && ta.File.FullName == oldFile.FullName);
                         //引起引用文件的修改，先找出相应的引用，找到后等新的builder替换成功后再更新引用文件里面的引用
                         var refences = new List<IShareFileReference>();
                         foreach (var b in new[] { oldBuilder.JsonShareFile, oldBuilder.XmlShareFile })
@@ -774,13 +883,26 @@ namespace Never.Configuration.ConfigCenter
         /// 处理app级
         /// </summary>
         /// <param name="change"></param>
-        /// <param name="outsideEncoding"></param>
-        private void HandleAppFile(ChangeQueue change, Encoding outsideEncoding = null)
+        /// <param name="adding">是否新加</param>
+        private void HandleAppFile(ChangeQueue change, bool adding)
         {
             var oldFile = change.OldFullName == null ? null : new FileInfo(change.OldFullName);
             var newFile = change.FullName == null ? null : new FileInfo(change.FullName);
-            if (newFile != null && !this.CanRefresh(newFile))
-                return;
+            if (newFile != null)
+            {
+                if (this.CanRefresh(newFile) == false)
+                    return;
+
+                //要检查去掉后续名字是否相同
+                if (UseFileAllNameAsAppUniqueId == false && (adding || change.Action == 0 || change.Action == 2))
+                {
+                    var name = System.IO.Path.GetFileNameWithoutExtension(newFile.FullName);
+                    if (this.appUniqueName.Contains(name))
+                        throw new Exception(string.Format("存在相同的应用文件{0}", name));
+
+                    this.appUniqueName.Add(name);
+                }
+            }
 
             switch (change.Action)
             {
@@ -792,11 +914,14 @@ namespace Never.Configuration.ConfigCenter
                         {
                             case ".json":
                                 {
-                                    var fileInfo = new ConfigFileInfo() { File = newFile, Encoding = outsideEncoding ?? Encoding.UTF8 };
+                                    var fileInfo = new ConfigFileInfo() { File = newFile, Encoding = change.Encoding ?? Encoding.UTF8 };
                                     var builder = new JsonConfigurationBuilder(this.shareConfiguration, fileInfo, this.keyValueFinder) { }.Build();
-                                    if (this.appConfiguration.Any(ta => ta.Builder.Name == builder.Name))
+                                    if (this.appConfiguration.Any(ta => ta.Builder.Match(this.UseFileAllNameAsAppUniqueId, builder.Name)))
                                     {
-
+                                        if (adding)
+                                        {
+                                            throw new Exception(string.Format("存在相同的应用文件{0}", builder.Name));
+                                        }
                                     }
                                     else
                                     {
@@ -806,13 +931,16 @@ namespace Never.Configuration.ConfigCenter
                                     newBuilder = builder;
                                 }
                                 break;
-                            case ".conf":
+                            case ".xml":
                                 {
-                                    var fileInfo = new ConfigFileInfo() { File = newFile, Encoding = outsideEncoding };
+                                    var fileInfo = new ConfigFileInfo() { File = newFile, Encoding = change.Encoding };
                                     var builder = new XmlConfigurationBuilder(this.shareConfiguration, fileInfo, this.keyValueFinder) { }.Build();
-                                    if (this.appConfiguration.Any(ta => ta.Builder.Name == builder.Name))
+                                    if (this.appConfiguration.Any(ta => ta.Builder.Match(this.UseFileAllNameAsAppUniqueId, builder.Name)))
                                     {
-
+                                        if (adding)
+                                        {
+                                            throw new Exception(string.Format("存在相同的应用文件{0}", builder.Name));
+                                        }
                                     }
                                     else
                                     {
@@ -957,7 +1085,7 @@ namespace Never.Configuration.ConfigCenter
                     sb.AppendLine();
                     sb.AppendFormat("the flowing files [");
                     var sname = string.Empty;
-                    foreach(var r in references)
+                    foreach (var r in references)
                     {
                         if (r == null || r.Builder == null)
                             continue;
@@ -994,7 +1122,7 @@ namespace Never.Configuration.ConfigCenter
 
                         sb.AppendLine();
                         sb.AppendFormat("{0}", r.Name);
-                        
+
                     }
                     sb.AppendLine();
                     sb.AppendFormat("] are using the app {0} file;", builder.Builder.Name);
@@ -1036,7 +1164,7 @@ namespace Never.Configuration.ConfigCenter
         {
             get
             {
-                var first = this.appConfiguration.FirstOrDefault(ta => ta.Builder.Name == name);
+                var first = this.appConfiguration.FirstOrDefault(ta => ta.Builder.Match(this.UseFileAllNameAsAppUniqueId, name));
                 return first == null || first.Builder == null ? null : first.Builder;
             }
         }

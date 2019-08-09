@@ -16,6 +16,11 @@ namespace Never.Configuration.ConfigCenter
         /// 名字
         /// </summary>
         string Name { get; }
+        
+        /// <summary>
+        /// 是否相等
+        /// </summary>
+        bool Match(bool useFileAllNameAsAppUniqueId, string name);
 
         /// <summary>
         /// 文件

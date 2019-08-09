@@ -5,7 +5,7 @@
     <title>Never.Configuration</title>
     <authors>Never</authors>
     <owners>Never</owners>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <tags>configuration,easyconfig</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>

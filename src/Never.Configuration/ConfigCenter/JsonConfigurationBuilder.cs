@@ -32,6 +32,7 @@ namespace Never.Configuration.ConfigCenter
             this.share = share;
             this.File = fileInfo;
             this.Name = this.File.File.Name.Replace(this.File.File.Extension, "").Trim(new[] { ' ', '.' });
+            this.AllName = this.File.File.Name;
             this.usingShareInfo = new List<ShareFileInfo>();
             this.keyValueFinder = keyValueFinder;
         }
@@ -44,6 +45,11 @@ namespace Never.Configuration.ConfigCenter
         /// 名字
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// 全名称
+        /// </summary>
+        public string AllName { get; }
 
         /// <summary>
         /// 文件内容
@@ -79,6 +85,14 @@ namespace Never.Configuration.ConfigCenter
 
                 return this.usingShareInfo;
             }
+        }
+
+        /// <summary>
+        /// 是否相等
+        /// </summary>
+        public bool Match(bool useFileAllNameAsAppUniqueId, string name)
+        {
+            return useFileAllNameAsAppUniqueId ? this.AllName.IsEquals(name) : this.Name.IsEquals(name);
         }
 
         #endregion
@@ -174,6 +188,7 @@ namespace Never.Configuration.ConfigCenter
                 var value = this.Link(split[1], keys);
                 return value.IsNotNullOrEmpty() ? string.Concat(m.Value[0], value, m.Value[m.Value.Length - 1]) : m.Value;
             });
+
             return content;
         }
 
@@ -199,23 +214,43 @@ namespace Never.Configuration.ConfigCenter
         /// <returns></returns>
         protected string Link(string share, List<string> keys)
         {
-            var shareItem = this.share.FirstOrDefault(ta => ta.JsonShareFile.Name == share);
-            if (shareItem == null)
-                throw new Exception(string.Format("can not find the share {0} file while load the {1} files", share, this.File.File.Name));
+            var jsonShareItem = this.share.FirstOrDefault(ta => ta.JsonShareFile != null && ta.JsonShareFile.Name == share);
+            if (jsonShareItem != null)
+            {
+                var sharelist = jsonShareItem.JsonShareFile;
+                if (sharelist.Node.IsNullOrEmpty())
+                    throw new Exception(string.Format("the share {0} file has no node;", share, this.File.File.Name));
 
-            var sharelist = shareItem.JsonShareFile;
-            if (sharelist.Node.IsNullOrEmpty())
-                throw new Exception(string.Format("the share {0} file has no node;", share, this.File.File.Name));
+                var key = string.Join(":", keys);
+                var first = sharelist.Node.FirstOrDefault(ta => ta.Key == key);
+                if (first == null)
+                    throw new Exception(string.Format("can not find the key {1} in the share {0} file", share, key));
 
-            var key = string.Join(":", keys);
-            var first = sharelist.Node.FirstOrDefault(ta => ta.Key == key);
-            if (first == null)
-                throw new Exception(string.Format("can not find the key {1} in the share {0} file", share, key));
+                if (!this.usingShareInfo.Contains(sharelist))
+                    this.usingShareInfo.Add(sharelist);
 
-            if (!this.usingShareInfo.Contains(sharelist))
-                this.usingShareInfo.Add(sharelist);
+                return first.Value;
+            }
 
-            return first.Value;
+            var xmlShareItem = this.share.FirstOrDefault(ta => ta.XmlShareFile != null && ta.XmlShareFile.Name == share);
+            if (xmlShareItem != null)
+            {
+                var sharelist = xmlShareItem.XmlShareFile;
+                if (sharelist.Node.IsNullOrEmpty())
+                    throw new Exception(string.Format("the share {0} file has no node;", share, this.File.File.Name));
+
+                var key = string.Join(":", keys);
+                var first = sharelist.Node.FirstOrDefault(ta => ta.Key == key);
+                if (first == null)
+                    throw new Exception(string.Format("can not find the key {1} in the share {0} file", share, key));
+
+                if (!this.usingShareInfo.Contains(sharelist))
+                    this.usingShareInfo.Add(sharelist);
+
+                return first.Value;
+            }
+
+            throw new Exception(string.Format("can not find the share {0} file while load the {1} files", share, this.File.File.Name));
         }
 
         #endregion

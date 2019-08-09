@@ -107,14 +107,36 @@ namespace Never.Configuration.ConfigCenter.Remoting
             {
                 var response = ta.Result as Response;
                 var fileName = response.Query["file"];
-                if (fileName.IsNotNullOrEmpty() && response.Body != null)
+                if (fileName.IsNotNullOrEmpty())
                 {
-                    var content = response.Encoding.GetString((response.Body as MemoryStream).ToArray());
-                    this.saveFile(new ConfigFileClientCallbakRequest() { FileName = fileName, Encoding = response.Query["encoding"] }, content);
+                    if (response.Body != null)
+                    {
+                        var content = response.Encoding.GetString((response.Body as MemoryStream).ToArray());
+                        this.saveFile(new ConfigFileClientCallbakRequest() { FileName = fileName, Encoding = response.Query["encoding"] }, content);
+                    }
+                    else
+                    {
+                        this.saveFile(new ConfigFileClientCallbakRequest() { FileName = fileName, Encoding = response.Query["encoding"] }, null);
+                    }
                 }
 
                 return ta.Result;
             });
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Task<IRemoteResponse> Test(string name)
+        {
+            var task = this.requestHandler.Excute(new Request(Encoding.UTF8, ConfigFileCommand.Test)
+            {
+            });
+
+            return task.Task;
+        }
+
     }
 }

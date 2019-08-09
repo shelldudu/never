@@ -1,4 +1,4 @@
-/*共享文件只支持key-value，并且只支持一层key查询,find://eat表示不会保留双引号，find://cat表示保留，link://表示不保留双引号，直接使用引用的value绑定到这里*/
+/*共享文件只支持key-value，并且只支持一层key查询,find://eat表示不会保留双引号，find://cat表示保留，link://表示不保留双引号，直接使用引用的value绑定到这里，不支持find语法*/
 {
   "template": "true",
   "sharename": "share",

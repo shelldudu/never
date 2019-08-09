@@ -125,7 +125,7 @@ namespace Never.Configuration.ConfigCenter
                         this.FileType = ConfigFileType.Json;
                     }
                     break;
-                case ".config":
+                case ".xml":
                     {
                         var content = System.IO.File.ReadAllText(this.File.FullName, this.Encoding);
                         if (content.IsNullOrWhiteSpace())

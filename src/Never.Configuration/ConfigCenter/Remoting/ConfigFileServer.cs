@@ -45,15 +45,22 @@ namespace Never.Configuration.ConfigCenter.Remoting
 
         private void RequestHandler_OnMessageReceived(object sender, IRemoteRequest request, OnReceivedSocketEventArgs e2)
         {
-            if (this.sessions.ContainsKey(e2.Connection.Id))
-                return;
-
             var reqs = request as Request;
-            var fileName = reqs.Query == null ? null : reqs.Query["file"];
-            if (fileName == null)
+            if (reqs == null)
                 return;
 
-            this.sessions[e2.Connection.Id] = new KeyValuePair<string, Encoding>(fileName, reqs.Encoding);
+            if (request.CommandType.IsEquals(ConfigFileCommand.Push))
+            {
+                if (this.sessions.ContainsKey(e2.Connection.Id))
+                    return;
+
+                var fileName = reqs.Query == null ? null : reqs.Query["file"];
+                if (fileName == null)
+                    return;
+
+                this.sessions[e2.Connection.Id] = new KeyValuePair<string, Encoding>(fileName, reqs.Encoding);
+                return;
+            }
         }
 
         private void ConfigurationWatcher_OnShareFileRenamed(object sender, ConfigurationWatcherEventArgs e)
@@ -90,7 +97,7 @@ namespace Never.Configuration.ConfigCenter.Remoting
         {
             foreach (var i in e.Builders)
             {
-                var all = this.sessions.Where(ta => ta.Value.Key.IsEquals(i.Name));
+                var all = this.sessions.Where(ta => i.Match(configurationWatcher.UseFileAllNameAsAppUniqueId, ta.Value.Key));
                 if (all.IsNotNullOrEmpty())
                 {
                     foreach (var a in all)
@@ -166,6 +173,11 @@ namespace Never.Configuration.ConfigCenter.Remoting
                 Headers = reqs.Headers,
                 Form = reqs.Form,
             };
+
+            if (request.CommandType.IsEquals(ConfigFileCommand.Test))
+            {
+                return resp;
+            }
 
             var fileName = reqs.Query == null ? null : reqs.Query["file"];
             if (fileName == null)

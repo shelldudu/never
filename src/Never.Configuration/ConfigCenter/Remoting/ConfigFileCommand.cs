@@ -20,5 +20,10 @@ namespace Never.Configuration.ConfigCenter.Remoting
         /// 服务器推送过来的命令
         /// </summary>
         public static string Pull = "pull";
+
+        /// <summary>
+        /// 客户端去测试服务器的命令
+        /// </summary>
+        public static string Test = "test";
     }
 }
