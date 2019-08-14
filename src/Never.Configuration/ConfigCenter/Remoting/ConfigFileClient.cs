@@ -15,17 +15,23 @@ namespace Never.Configuration.ConfigCenter.Remoting
     /// </summary>
     public class ConfigFileClient : IWorkService
     {
-        private readonly ClientRequestHadler requestHandler = null;
+        private ClientRequestHadler requestHandler = null;
         private Action<ConfigFileClientCallbakRequest, string> saveFile = null;
         private IEnumerable<ConfigFileClientRequest> allFiles = null;
+        private System.Threading.Timer timer = null;
+        private EndPoint serverEndPoint = null;
+        private Never.Threading.IRigidLocker locker = new Never.Threading.MonitorLocker();
+        private TimeSpan keepAlive = TimeSpan.Zero;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="serverEndPoint"></param>
         public ConfigFileClient(EndPoint serverEndPoint)
         {
-            this.requestHandler = new ClientRequestHadler(serverEndPoint, new Protocol());
+            this.serverEndPoint = serverEndPoint;
+            this.requestHandler = new ClientRequestHadler(this.serverEndPoint, new Protocol());
             this.requestHandler.OnMessageReceived += this.RequestHandler_OnMessageReceived;
+            this.timer = new System.Threading.Timer(Reconnect, this, TimeSpan.FromMilliseconds(-1), TimeSpan.FromMilliseconds(-1));
         }
 
         private void RequestHandler_OnMessageReceived(object sender, IRemoteResponse response, OnReceivedSocketEventArgs args)
@@ -34,6 +40,16 @@ namespace Never.Configuration.ConfigCenter.Remoting
                 return;
 
             if (response.CommandType.IsEquals(ConfigFileCommand.Pull))
+            {
+                System.Threading.ThreadPool.QueueUserWorkItem(x =>
+                {
+                    foreach (var file in this.allFiles)
+                    {
+                        this.Push(file.FileName);
+                    }
+                });
+            }
+            else if (response.CommandType.IsEquals(ConfigFileCommand.Test))
             {
                 System.Threading.ThreadPool.QueueUserWorkItem(x =>
                 {
@@ -53,11 +69,78 @@ namespace Never.Configuration.ConfigCenter.Remoting
         /// <param name="saveFile"></param>
         public ConfigFileClient Startup(TimeSpan keepAlive, IEnumerable<ConfigFileClientRequest> allFiles, Action<ConfigFileClientCallbakRequest, string> saveFile)
         {
+            return this.Startup(keepAlive, TimeSpan.Zero, allFiles, saveFile);
+        }
+
+        /// <summary>
+        /// 启动
+        /// </summary>
+        /// <param name="keepAlive">心跳</param>
+        /// <param name="reconnect">重连接</param>
+        /// <param name="allFiles"></param>
+        /// <param name="saveFile"></param>
+        /// <returns></returns>
+        public ConfigFileClient Startup(TimeSpan keepAlive, TimeSpan reconnect, IEnumerable<ConfigFileClientRequest> allFiles, Action<ConfigFileClientCallbakRequest, string> saveFile)
+        {
             this.allFiles = allFiles;
             this.saveFile = saveFile;
-            this.requestHandler.KeepAlive(keepAlive);
+            this.keepAlive = keepAlive;
+            this.requestHandler.KeepAlive(this.keepAlive);
             this.requestHandler.Startup();
+            if (reconnect > TimeSpan.Zero)
+            {
+                this.timer.Change(reconnect, reconnect);
+            }
+
             return this;
+        }
+
+        /// <summary>
+        /// 重连接
+        /// </summary>
+        /// <param name="state"></param>
+        private void Reconnect(object state)
+        {
+            this.locker.EnterLock(true, () =>
+            {
+                try
+                {
+                    if (this.requestHandler.Socket == null || this.requestHandler.Socket.Connection == null || this.requestHandler.Socket.Connection.IsConnected == false)
+                    {
+                        this.requestHandler.Dispose();
+                        this.requestHandler.OnMessageReceived -= this.RequestHandler_OnMessageReceived;
+                        this.requestHandler = new ClientRequestHadler(this.serverEndPoint, this.requestHandler.Protocol);
+                        this.requestHandler.OnMessageReceived += this.RequestHandler_OnMessageReceived;
+                        this.requestHandler.KeepAlive(this.keepAlive);
+                        this.requestHandler.Startup();
+                    }
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    var test = this.Test();
+                    test.ContinueWith(ta =>
+                    {
+                        if (ta.Exception != null)
+                        {
+                            this.requestHandler.Dispose();
+                            this.requestHandler.OnMessageReceived -= this.RequestHandler_OnMessageReceived;
+                            this.requestHandler = new ClientRequestHadler(this.serverEndPoint, this.requestHandler.Protocol);
+                            this.requestHandler.OnMessageReceived += this.RequestHandler_OnMessageReceived;
+                            this.requestHandler.KeepAlive(this.keepAlive);
+                            this.requestHandler.Startup();
+                        }
+                    });
+                }
+                catch
+                {
+
+                }
+
+            });          
         }
 
         /// <summary>
@@ -127,9 +210,8 @@ namespace Never.Configuration.ConfigCenter.Remoting
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="name"></param>
         /// <returns></returns>
-        public Task<IRemoteResponse> Test(string name)
+        public Task<IRemoteResponse> Test()
         {
             var task = this.requestHandler.Excute(new Request(Encoding.UTF8, ConfigFileCommand.Test)
             {
@@ -137,6 +219,5 @@ namespace Never.Configuration.ConfigCenter.Remoting
 
             return task.Task;
         }
-
     }
 }

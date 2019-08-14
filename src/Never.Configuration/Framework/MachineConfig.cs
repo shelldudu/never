@@ -39,6 +39,17 @@ namespace Never.Configuration
                 return System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("~");
             }
         }
+
+        /// <summary>
+        /// 打开配置文件
+        /// </summary>
+        public static System.Configuration.Configuration OpenFile(FileInfo xmlFile)
+        {
+            if (xmlFile == null || xmlFile.Exists == false)
+                throw new FileNotFoundException("文件不存在");
+
+            return System.Configuration.ConfigurationManager.OpenExeConfiguration(xmlFile.FullName);
+        }
     }
 }
 

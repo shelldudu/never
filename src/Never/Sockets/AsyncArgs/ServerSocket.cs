@@ -13,7 +13,7 @@ namespace Never.Sockets.AsyncArgs
     /// <summary>
     /// tcp socket 服务端
     /// </summary>
-    public class ServerSocket : IWorkService
+    public class ServerSocket : IWorkService, IDisposable
     {
         #region field ctor
 
@@ -57,6 +57,25 @@ namespace Never.Sockets.AsyncArgs
         }
 
         #endregion
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing == false)
+                return;
+
+            this.Close();
+        }
 
         /// <summary>
         /// 开始

@@ -12,7 +12,7 @@ namespace Never.Sockets.AsyncArgs
     /// <summary>
     /// tcp socket 客户端
     /// </summary>
-    public class ClientSocket : IWorkService
+    public class ClientSocket : IWorkService, IDisposable
     {
         #region field and ctor
         private readonly List<ResultEventHandler<OnReceivedSocketEventArgs, byte[]>> eventHandlers = null;
@@ -54,6 +54,25 @@ namespace Never.Sockets.AsyncArgs
         }
 
         #endregion
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing == false)
+                return;
+
+            this.Close();
+        }
 
         /// <summary>
         /// connection
@@ -125,6 +144,7 @@ namespace Never.Sockets.AsyncArgs
         public ClientSocket Close()
         {
             this.Connection.Dispose();
+            this.Connection = null;
             return this;
         }
 

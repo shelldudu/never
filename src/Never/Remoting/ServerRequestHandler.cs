@@ -21,13 +21,9 @@ namespace Never.Remoting
     /// <summary>
     /// 响应处理
     /// </summary>
-    public class ServerRequestHandler : IWorkService
+    public class ServerRequestHandler : IWorkService, IDisposable
     {
         #region field and ctor
-
-        private readonly ServerSocket service = null;
-
-        private readonly IRemoteProtocol remoteProtocol = null;
 
         /// <summary>
         /// 当消息来临的时候
@@ -49,8 +45,8 @@ namespace Never.Remoting
         /// </summary>
         /// <param name="listeningEndPoint"></param>
         /// <param name="responseHandler"></param>
-        /// <param name="remoteProtocol"></param>
-        public ServerRequestHandler(EndPoint listeningEndPoint, IResponseHandler responseHandler, IRemoteProtocol remoteProtocol) : this(listeningEndPoint, responseHandler, new SocketSetting(), remoteProtocol)
+        /// <param name="Protocol"></param>
+        public ServerRequestHandler(EndPoint listeningEndPoint, IResponseHandler responseHandler, IRemoteProtocol Protocol) : this(listeningEndPoint, responseHandler, new SocketSetting(), Protocol)
         {
         }
 
@@ -60,23 +56,53 @@ namespace Never.Remoting
         /// <param name="listeningEndPoint"></param>
         /// <param name="setting"></param>
         /// <param name="responseHandler"></param>
-        /// <param name="remoteProtocol"></param>
-        public ServerRequestHandler(EndPoint listeningEndPoint, IResponseHandler responseHandler, SocketSetting setting, IRemoteProtocol remoteProtocol)
+        /// <param name="Protocol"></param>
+        public ServerRequestHandler(EndPoint listeningEndPoint, IResponseHandler responseHandler, SocketSetting setting, IRemoteProtocol Protocol)
         {
-            this.remoteProtocol = remoteProtocol;
-            if (this.remoteProtocol == null)
-                throw new ArgumentNullException("remoteProtocol", "remoteProtocol is null");
+            this.Protocol = Protocol;
+            if (this.Protocol == null)
+                throw new ArgumentNullException("Protocol", "Protocol is null");
 
-            this.service = new ServerSocket(setting, new SocketBufferProvider(setting), listeningEndPoint);
-            this.service.OnMessageReceived += Service_OnMessageReceived;
-            this.service.OnConnectionAccepted += (s, e) => { this.OnConnectionAccepted?.Invoke(s, e); };
-            this.service.OnConnectionClosed += (s, e) => { this.OnConnectionClosed?.Invoke(s, e); };
+            this.Socket = new ServerSocket(setting, new SocketBufferProvider(setting), listeningEndPoint);
+            this.Socket.OnMessageReceived += Service_OnMessageReceived;
+            this.Socket.OnConnectionAccepted += (s, e) => { this.OnConnectionAccepted?.Invoke(s, e); };
+            this.Socket.OnConnectionClosed += (s, e) => { this.OnConnectionClosed?.Invoke(s, e); };
             this.ResponseHandler = responseHandler;
         }
 
         #endregion field and ctor
 
         #region handle
+
+        /// <summary>
+        /// socket
+        /// </summary>
+        public ServerSocket Socket { get; private set; }
+
+        /// <summary>
+        /// protocl
+        /// </summary>
+        public IRemoteProtocol Protocol { get; private set; }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing == false)
+                return;
+
+            this.Socket.Dispose();
+            this.Socket = null;
+        }
 
         /// <summary>
         /// 处理上下文
@@ -105,7 +131,7 @@ namespace Never.Remoting
             CurrentRequest current;
             try
             {
-                current = this.remoteProtocol.ToRequest(e);
+                current = this.Protocol.ToRequest(e);
             }
             catch
             {
@@ -149,7 +175,7 @@ namespace Never.Remoting
 
             try
             {
-                return this.remoteProtocol.FromResponse(current, response);
+                return this.Protocol.FromResponse(current, response);
             }
             catch
             {
@@ -162,7 +188,7 @@ namespace Never.Remoting
         /// </summary>
         public void Startup()
         {
-            this.service.Start();
+            this.Socket.Start();
         }
 
         /// <summary>
@@ -170,7 +196,7 @@ namespace Never.Remoting
         /// </summary>
         public void Shutdown()
         {
-            this.service.Close();
+            this.Socket.Close();
         }
 
         /// <summary>
@@ -193,8 +219,8 @@ namespace Never.Remoting
         /// <param name="sessiongId"></param>
         public void Send(IResponseHandlerResult response, CurrentRequest request, ulong sessiongId = 0)
         {
-            var bytes = this.remoteProtocol.FromResponse(request, response);
-            this.service.Push(sessiongId, bytes);
+            var bytes = this.Protocol.FromResponse(request, response);
+            this.Socket.Push(sessiongId, bytes);
         }
 
         #endregion handle
