@@ -106,7 +106,7 @@ namespace Never.Configuration.ConfigCenter
                             return this;
 
                         //替（1）/**/，（2）//
-                        content = Regex.Replace(content, "/\\*(?<name>[\\w\\W]+)\\*/", (m) =>
+                        content = Regex.Replace(content, "/\\*(?<name>[\\w\\W]+?)\\*/", (m) =>
                         {
                             return string.Empty;
                         });
@@ -132,7 +132,7 @@ namespace Never.Configuration.ConfigCenter
                             return this;
 
                         //替（1）<!--**-->
-                        content = Regex.Replace(content, "<!--(?<name>[\\w\\W]+)-->", (m) =>
+                        content = Regex.Replace(content, "<!--(?<name>[\\w\\W]+?)-->", (m) =>
                         {
                             return string.Empty;
                         });
@@ -160,8 +160,10 @@ namespace Never.Configuration.ConfigCenter
                 return null;
 
             var config = reader.ChildNodes[1];
-            if (config == null || !config.HasChildNodes)
+            if (config == null || config.HasChildNodes == false)
+            {
                 return null;
+            }
 
             var list = new List<KeyValueTuple<string, string>>(config.ChildNodes.Count);
             var templateNode = config.ChildNodes[0];
