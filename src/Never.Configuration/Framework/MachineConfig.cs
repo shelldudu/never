@@ -41,14 +41,15 @@ namespace Never.Configuration
         }
 
         /// <summary>
-        /// 打开配置文件
+        /// 打开配置文件，由于<seealso cref="System.Configuration.ConfigurationManager"/>方法会私自在文件名加上 ".config"后缀名，
+        /// 所以要读取web.config的话，只能传web
         /// </summary>
-        public static System.Configuration.Configuration OpenFile(FileInfo xmlFile)
+        public static System.Configuration.Configuration OpenFile(string xmlFileFullName)
         {
-            if (xmlFile == null || xmlFile.Exists == false)
-                throw new FileNotFoundException("文件不存在");
+            if (xmlFileFullName.IsNullOrWhiteSpace())
+                throw new FileNotFoundException("文件路径为空");
 
-            return System.Configuration.ConfigurationManager.OpenExeConfiguration(xmlFile.FullName);
+            return System.Configuration.ConfigurationManager.OpenExeConfiguration(xmlFileFullName);
         }
     }
 }
