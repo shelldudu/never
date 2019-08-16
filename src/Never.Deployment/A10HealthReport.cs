@@ -104,6 +104,7 @@ namespace Never.Deployment
                 this.timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(intervalSecond));
             }
 
+            this.isWorking = true;
             return this;
         }
 

@@ -41,8 +41,7 @@ namespace Never.Configuration
         }
 
         /// <summary>
-        /// 打开配置文件，由于<seealso cref="System.Configuration.ConfigurationManager"/>方法会私自在文件名加上 ".config"后缀名，
-        /// 所以要读取web.config的话，只能传web
+        /// 打开配置文件，<seealso cref="System.Configuration.ConfigurationManager"/>方法当打开web.config的时候，要求web.config要存在，但是读取内容却是web.config.config文件
         /// </summary>
         public static System.Configuration.Configuration OpenFile(string xmlFileFullName)
         {
