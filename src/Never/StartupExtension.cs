@@ -712,6 +712,7 @@ namespace Never
             {
                 x.ProcessType(new[] { new CommandStartupService.CommandHandlerCtorParameterProcessor(ignoreTypes ?? Type.EmptyTypes) });
             });
+
             return startup;
         }
 

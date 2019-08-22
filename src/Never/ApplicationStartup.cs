@@ -198,7 +198,7 @@ namespace Never
         }
 
         /// <summary>
-        /// 新增初始化上下文服务
+        /// 新增初始化上下文服务，服务会按order排序
         /// </summary>
         /// <param name="order">排序</param>
         /// <param name="onStarting">启动服务</param>
@@ -209,7 +209,7 @@ namespace Never
         }
 
         /// <summary>
-        /// 新增初始化上下文服务
+        /// 新增初始化上下文服务，服务会按order排序
         /// </summary>
         /// <param name="startService">启动服务</param>
         /// <returns></returns>
@@ -225,7 +225,7 @@ namespace Never
         }
 
         /// <summary>
-        /// 新增初始化上下文服务
+        /// 新增初始化上下文服务，服务会按order排序，如果是再后一个的，则按加入顺序执行
         /// </summary>
         /// <param name="last">是否放在最后一个服务中</param>
         /// <param name="onStarting">启动服务</param>
@@ -244,7 +244,7 @@ namespace Never
         }
 
         /// <summary>
-        /// 新增初始化上下文服务
+        /// 新增初始化上下文服务，服务会按order排序，如果是再后一个的，则按加入顺序执行
         /// </summary>
         /// <param name="startService">启动服务</param>
         /// <param name="last">是否放在最后一个服务中</param>
@@ -264,7 +264,34 @@ namespace Never
         }
 
         /// <summary>
-        /// 增初始化上下文服务，该方法会在最后执行
+        /// 增初始化上下文服务，该方法会在最后执行，按加入顺序执行
+        /// </summary>
+        /// <param name="startupService">启动服务</param>
+        /// <returns></returns>
+        public ApplicationStartup AddIntoFinalStartService(IStartupService startupService)
+        {
+            if (this.IsStarted)
+                throw new FriendlyException("程序已启动，无法注册");
+
+            this.lastStartServices.Add(startupService);
+            return this;
+        }
+
+        /// <summary>
+        /// 新增初始化上下文服务，该方法会在最后执行，按加入顺序执行
+        /// </summary>
+        /// <param name="onStarting">启动服务</param>
+        public ApplicationStartup AddIntoFinalStartService(Action<StartupContext> onStarting)
+        {
+            if (this.IsStarted)
+                throw new FriendlyException("程序已启动，无法注册");
+
+            this.lastStartServices.Add(new MyStartService() { order = int.MaxValue, onStarting = onStarting });
+            return this;
+        }
+
+        /// <summary>
+        /// 增初始化上下文服务，该方法会在最后执行，并且插入第一个执行位置
         /// </summary>
         /// <param name="startupService">启动服务</param>
         /// <returns></returns>
@@ -278,7 +305,7 @@ namespace Never
         }
 
         /// <summary>
-        /// 新增初始化上下文服务，该方法会在最后执行
+        /// 新增初始化上下文服务，该方法会在最后执行，并且插入第一个执行位置
         /// </summary>
         /// <param name="onStarting">启动服务</param>
         public ApplicationStartup InsertIntoFinalStartService(Action<StartupContext> onStarting)
@@ -286,8 +313,7 @@ namespace Never
             if (this.IsStarted)
                 throw new FriendlyException("程序已启动，无法注册");
 
-            this.lastStartServices.Insert(0, (new MyStartService() { order = int.MaxValue, onStarting = onStarting }));
-
+            this.lastStartServices.Insert(0, new MyStartService() { order = int.MaxValue, onStarting = onStarting });
             return this;
         }
 
@@ -483,6 +509,7 @@ namespace Never
                 service.OnStarting(context);
             }
 
+            //this.lastStartServices.Sort(this.StartServiceComparison);
             foreach (var service in this.lastStartServices)
             {
                 if (service == null)
@@ -562,8 +589,7 @@ namespace Never
 
             easyContainer.Init();
 
-
-            this.InsertIntoFinalStartService((x) =>
+            this.InsertIntoFinalStartService(x => 
             {
                 if (onStarting != null)
                     easyContainer.OnStarting += (s, e) => { onStarting.Invoke((RegisterRuleCollector)e.Collector, e.TypeFinder, e.Assemblies); };
