@@ -1326,7 +1326,7 @@ namespace Never.Mappers
                             //emit.Nop();
                             //emit.MarkLabel(dictionaryDoneLabel);
                             //emit.LoadLocal(subToLocal);
-                            ///*局部变量*/
+                            //*局部变量*/
                             //if (fromType.IsValueType)
                             //    emit.LoadLocalAddress(fromLocal); // from
                             //else
@@ -1340,7 +1340,7 @@ namespace Never.Mappers
                             //emit.LoadArgument(1);
                             //emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoEnumerable").MakeGenericMethod(enumerableTypes));
 
-                            ///*局部变量*/
+                            //*局部变量*/
                             //if (toType.IsValueType)
                             //    emit.LoadLocalAddress(toLocal); // from
                             //else

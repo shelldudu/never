@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Never.Web\Never.Web.csproj" />
     <ProjectReference Include="..\Never\Never.csproj" />
   </ItemGroup>
 

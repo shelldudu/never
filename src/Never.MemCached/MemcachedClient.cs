@@ -686,6 +686,31 @@ namespace Never.Memcached
         }
 
         /// <summary>
+        /// 向缓存中插入某一项，默认为10分钟过期，有可能会出现异常
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="key">键值</param>
+        /// <param name="item">要插入的值</param>
+        /// <returns></returns>
+        public bool Add<T>(string key, T item)
+        {
+            return this.Add<T>(key, item, TimeSpan.FromMinutes(10));
+        }
+
+        /// <summary>
+        /// 向缓存中插入某一项，有可能会出现异常
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="key">键值</param>
+        /// <param name="item">要插入的值</param>
+        /// <param name="ts">缓存中过期时间</param>
+        /// <returns></returns>
+        public bool Add<T>(string key, T item, TimeSpan expireTime)
+        {
+            return this.TryAddResult(key, item, expireTime);
+        }
+
+        /// <summary>
         /// 释放资源
         /// </summary>
         public void Dispose()

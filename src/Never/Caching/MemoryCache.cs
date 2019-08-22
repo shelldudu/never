@@ -141,6 +141,44 @@ namespace Never.Caching
             return true;
         }
 
+        /// <summary>
+        /// 向缓存中插入某一项，默认为10分钟过期，有可能会出现异常
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="key">键值</param>
+        /// <param name="item">要插入的值</param>
+        /// <returns></returns>
+        public bool Add<T>(string key, T item)
+        {
+            return this.Add(key, item, TimeSpan.Zero);
+        }
+
+        /// <summary>
+        /// 向缓存中插入某一项，有可能会出现异常
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="key">键值</param>
+        /// <param name="item">要插入的值</param>
+        /// <param name="ts">缓存中过期时间</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">缓存的key不能为空</exception>
+        public bool Add<T>(string key, T item, TimeSpan ts)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException("缓存的key不能为空");
+
+            if (item == null)
+                return false;
+
+            if (ts <= TimeSpan.Zero)
+                ts = TimeSpan.FromMinutes(10);
+            var policy = new CacheItemPolicy()
+            {
+                AbsoluteExpiration = DateTime.Now + ts
+            };
+            this.cache.Add(new CacheItem(key, item), policy);
+            return true;
+        }
         #endregion
 
         #region IDisposable成员

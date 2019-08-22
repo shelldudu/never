@@ -1056,7 +1056,7 @@ namespace Never.Mappers
                             //emit.Call(typeof(System.Linq.Enumerable).GetMethod("Empty").MakeGenericMethod(enumerableTypes[0]));
                             //emit.StoreLocal(subToLocal);
                             //emit.LoadLocal(subToLocal);
-                            ///*局部变量*/
+                            //*局部变量*/
                             //if (fromType.IsValueType)
                             //    emit.LoadLocalAddress(fromLocal); // from
                             //else
@@ -1070,7 +1070,7 @@ namespace Never.Mappers
                             //emit.LoadArgument(1);
                             //emit.Call(typeof(MapperBuilderHelper).GetMethod("LoadIntoEnumerable").MakeGenericMethod(enumerableTypes));
 
-                            ///*局部变量*/
+                            //*局部变量*/
                             //if (toType.IsValueType)
                             //    emit.LoadLocalAddress(toLocal); // from
                             //else
