@@ -429,6 +429,7 @@ namespace Never.IoC.Injections
             }
 
             var lasttype = default(Type);
+            var lastException = default(Exception);
             /*构造函数查询，查询最多构造参数的一个*/
             foreach (var ctor in ctors)
             {
@@ -690,9 +691,13 @@ namespace Never.IoC.Injections
                 }
                 catch (Exception ex)
                 {
+                    lastException = ex;
                     continue;
                 }
             }
+
+            if (lastException != null)
+                throw lastException;
 
             throw new ArgumentNullException(string.Format("{0} type can not invoke on the ctor,it miss {1} parameter", rule.ImplementationType.FullName, lasttype.FullName));
         }
@@ -752,6 +757,7 @@ namespace Never.IoC.Injections
             }
 
             var lasttype = default(Type);
+            var lastException = default(Exception);
             foreach (var ctor in ctors)
             {
                 try
@@ -1010,8 +1016,9 @@ namespace Never.IoC.Injections
 
                     return emit.CreateDelegate();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    lastException = ex;
                     continue;
                 }
             }
@@ -1020,6 +1027,9 @@ namespace Never.IoC.Injections
             {
                 return new Func<RegisterRule, IRegisterRuleQuery, ILifetimeScope, IResolveContext, object>((x, y, s, z) => { return null; });
             }
+
+            if (lastException != null)
+                throw lastException;
 
             throw new ArgumentNullException(string.Format("{0} type can not invoke on the ctor,it miss {1} parameter", rule.ImplementationType.FullName, lasttype.FullName));
         }

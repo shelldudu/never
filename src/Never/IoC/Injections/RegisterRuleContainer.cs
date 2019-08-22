@@ -290,7 +290,7 @@ namespace Never.IoC.Injections
             }
             catch (Exception ex)
             {
-                rule.CanNotResolve = ex;
+                rule.CanNotResolve = new Exception(ex.Message) { Source = ex.Source, HelpLink = ex.HelpLink };
                 throw new Exception(string.Format("can not resolve the {0}", rule.ServiceType.FullName), rule.CanNotResolve);
             }
         }
@@ -314,7 +314,7 @@ namespace Never.IoC.Injections
             }
             catch (Exception ex)
             {
-                rule.CanNotOptionalResolve = ex;
+                rule.CanNotOptionalResolve = new Exception(ex.Message) { Source = ex.Source, HelpLink = ex.HelpLink };
                 throw new Exception(string.Format("can not resolve the {0}", rule.ServiceType.FullName), rule.CanNotOptionalResolve);
             }
         }
