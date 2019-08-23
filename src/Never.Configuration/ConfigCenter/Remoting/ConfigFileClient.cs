@@ -36,20 +36,11 @@ namespace Never.Configuration.ConfigCenter.Remoting
 
         private void RequestHandler_OnMessageReceived(object sender, IRemoteResponse response, OnReceivedSocketEventArgs args)
         {
+            //你发送了test命令，对方响应了，这个时候你又收到了test消息，那么你这里又开始发消息，这个就形成了死循环，所以收到了消息只能是服务器主动发送的消息
             if (this.allFiles == null || this.saveFile == null)
                 return;
 
             if (response.CommandType.IsEquals(ConfigFileCommand.Pull))
-            {
-                System.Threading.ThreadPool.QueueUserWorkItem(x =>
-                {
-                    foreach (var file in this.allFiles)
-                    {
-                        this.Push(file.FileName);
-                    }
-                });
-            }
-            else if (response.CommandType.IsEquals(ConfigFileCommand.Test))
             {
                 System.Threading.ThreadPool.QueueUserWorkItem(x =>
                 {

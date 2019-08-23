@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Never.Commands;
+﻿using Never.Commands;
 using Never.EventStreams;
 using Never.IoC;
 using Never.IoC.Providers;
-using Never.Utils;
+using System.Collections.Generic;
+using static Never.Test.MyCtorTest;
 
 namespace Never.Test
 {
@@ -17,8 +16,9 @@ namespace Never.Test
             var app = new Never.ApplicationStartup(new AppDomainAssemblyProvider()).RegisterAssemblyFilter("Never".CreateAssemblyFilter())
                 .UseEasyIoC((x, y, z) =>
                 {
-                    //x.RegisterType<MyEventHandler, MyEventHandler>();
-                    //x.RegisterType(typeof(MyGenericType<>), typeof(MyGenericType<>), string.Empty, ComponentLifeStyle.Transient);
+                    x.RegisterType<MMMTTT, MMMTTT>();
+                    x.RegisterType<TTTMMM, TTTMMM>();
+                    x.RegisterType(typeof(GRegistory<>), typeof(IRegistory<>), string.Empty, ComponentLifeStyle.Scoped);
                 })
                 .UseForceCheckCommandHandlerCtor()
                 .UseForceCheckEventHandlerCtor()
@@ -36,7 +36,22 @@ namespace Never.Test
                 .UseConcurrentCache("CounterDict")
                 //.UseHttpRuntimeCache("RuntimeCache")
                 //.UseMemoryCache("MemoryCache")
-                .Startup();
+                .Startup(x =>
+                {
+                    using (var sc = x.ServiceLocator.BeginLifetimeScope())
+                    {
+                        var a = sc.Resolve<MMMTTT>();
+                        var b = sc.Resolve<IRegistory<int>>();
+                        System.Console.WriteLine(b.GetHashCode());
+                    }
+
+                    using (var sc = x.ServiceLocator.BeginLifetimeScope())
+                    {
+                        var a = sc.Resolve<TTTMMM>();
+                        var b = sc.Resolve<IRegistory<int>>();
+                        System.Console.WriteLine(b.GetHashCode());
+                    }
+                });
         }
 
         public T Resolve<T>(string key = null)
@@ -85,7 +100,8 @@ namespace Never.Test
 
         private static void Main(string[] args)
         {
-            new MemcachedTest().TestAddValueOnTextMode();
+            var p = new Program();
+            p.Release();
         }
 
         private static void ChangeABC(ABC a)

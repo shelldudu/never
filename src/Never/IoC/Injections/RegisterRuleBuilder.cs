@@ -499,7 +499,7 @@ namespace Never.IoC.Injections
                                             registerRule.PasteParameters(rule);
                                         }
 
-                                        container.Update(containerRule);
+                                        ((RegisterRuleContainer)container).AlwayUpdate(containerRule);
                                         item = registerRule;
                                         ctorRules[ic] = item;
                                         continue;
@@ -569,7 +569,7 @@ namespace Never.IoC.Injections
                                     registerRule.PasteParameters(rule);
                                 }
 
-                                container.Update(containerRule);
+                                ((RegisterRuleContainer)container).AlwayUpdate(containerRule);
                                 item = registerRule;
                                 ctorRules[ic] = item;
                                 continue;
@@ -826,7 +826,7 @@ namespace Never.IoC.Injections
                                             registerRule.PasteParameters(rule);
                                         }
 
-                                        container.Update(containerRule);
+                                        ((RegisterRuleContainer)container).AlwayUpdate(containerRule);
                                         item = registerRule;
                                         ctorRules[ic] = item;
                                         continue;
@@ -896,7 +896,7 @@ namespace Never.IoC.Injections
                                     registerRule.PasteParameters(rule);
                                 }
 
-                                container.Update(containerRule);
+                                ((RegisterRuleContainer)container).AlwayUpdate(containerRule);
                                 item = registerRule;
                                 ctorRules[ic] = item;
                                 continue;

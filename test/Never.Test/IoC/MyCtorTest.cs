@@ -267,6 +267,30 @@ namespace Never.Test
             }
         }
 
+        public class GRegistory<T> : IRegistory<T>
+        {
+            public GRegistory()
+            {
+
+            }
+        }
+
+        public class MMMTTT
+        {
+            public MMMTTT(IRegistory<int> registory)
+            {
+                Console.WriteLine(registory.GetHashCode());
+            }
+        }
+
+        public class TTTMMM
+        {
+            public TTTMMM(IRegistory<int> registory)
+            {
+                Console.WriteLine(registory.GetHashCode());
+            }
+        }
+
         [Xunit.Fact]
         public void TestResolveAAA()
         {

@@ -350,11 +350,19 @@ namespace Never.IoC.Injections
             if (option != null && option.Value.Unabled)
                 return;
 
+            this.AlwayUpdate(collector);
+        }
+
+        /// <summary>
+        /// 更新容器规则
+        /// </summary>
+        /// <param name="collector"></param>
+        public void AlwayUpdate(RegisterRuleCollector collector)
+        {
             lock (locker)
             {
                 foreach (var r in collector.Rules)
                 {
-                    this.Remove(r);
                     this.rules.Add(r);
                 }
 
@@ -367,7 +375,6 @@ namespace Never.IoC.Injections
 
                     foreach (var sr in subRules)
                     {
-                        this.Remove(sr);
                         this.rules.Add(sr);
                     }
 
@@ -400,7 +407,6 @@ namespace Never.IoC.Injections
 
                 foreach (var r in proxyRules)
                 {
-                    this.Remove(r);
                     this.rules.Add(r);
                 }
 
@@ -433,20 +439,6 @@ namespace Never.IoC.Injections
                 this.Update(containerRule);
                 return containerRule.Rules[0];
             }
-        }
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="other"></param>
-        private void Remove(RegisterRule other)
-        {
-            /*假设已经有构造的行为，则删除原来*/
-            //if (other.Builded || other.OptionalBuilded)
-            //{
-            //}
-            /*是否允许注册相同的规则*/
-            //this.rules.RemoveAll(o => o.Match(other));
         }
 
         /// <summary>
