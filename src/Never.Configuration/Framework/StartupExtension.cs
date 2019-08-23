@@ -76,7 +76,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static int IntInAppSettings(this IConfigReader config, string key)
         {
-            return StringInAppSettings(config, key).AsInt();
+            return config[key].AsInt();
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static float FloatInAppSettings(this IConfigReader config, string key)
         {
-            return StringInAppSettings(config, key).AsFloat();
+            return config[key].AsFloat();
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static double DoubleInAppSettings(this IConfigReader config, string key)
         {
-            return StringInAppSettings(config, key).AsDouble();
+            return config[key].AsDouble();
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static bool BooleanInAppSettings(this IConfigReader config, string key)
         {
-            return StringInAppSettings(config, key).AsBool();
+            return config[key].AsBool();
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static short ShortInAppSettings(this IConfigReader config, string key)
         {
-            return StringInAppSettings(config, key).AsShort();
+            return config[key].AsShort();
         }
 
         /// <summary>
@@ -142,12 +142,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static string StringInConnections(this IConfigReader config, string key)
         {
-            if (config is AppConfigReader)
-            {
-                return ((AppConfigReader)config).SettingInConnections(key)?.ConnectionString;
-            }
-
-            return null;
+            return config?.Configuration?.ConnectionStrings?.ConnectionStrings[key]?.ConnectionString;
         }
 
         /// <summary>
@@ -158,12 +153,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static System.Configuration.ConnectionStringSettings SettingInConnections(this IConfigReader config, string key)
         {
-            if (config is AppConfigReader)
-            {
-                return ((AppConfigReader)config).SettingInConnections(key);
-            }
-
-            return null;
+            return config?.Configuration?.ConnectionStrings?.ConnectionStrings[key];
         }
 
         /// <summary>
@@ -174,12 +164,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static System.Configuration.ConfigurationSection GetSection(this IConfigReader config, string key)
         {
-            if (config is AppConfigReader)
-            {
-                return ((AppConfigReader)config).GetSection(key);
-            }
-
-            return null;
+            return config?.Configuration?.GetSection(key);
         }
 
         /// <summary>
@@ -190,12 +175,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static System.Configuration.ConfigurationSectionGroup GetSectionGroup(this IConfigReader config, string key)
         {
-            if (config is AppConfigReader)
-            {
-                return ((AppConfigReader)config).GetSectionGroup(key);
-            }
-
-            return null;
+            return config?.Configuration?.GetSectionGroup(key);
         }
 
         #endregion Section值读取

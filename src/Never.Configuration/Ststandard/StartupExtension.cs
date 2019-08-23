@@ -57,7 +57,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static int IntInAppConfig(this IConfigReader config, string key)
         {
-            return StringInAppConfig(config, key).AsInt();
+            return config[key].AsInt();
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static float FloatInAppConfig(this IConfigReader config, string key)
         {
-            return StringInAppConfig(config, key).AsFloat();
+            return config[key].AsFloat();
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static double DoubleInAppConfig(this IConfigReader config, string key)
         {
-            return StringInAppConfig(config, key).AsDouble();
+            return config[key].AsDouble();
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static bool BooleanInAppConfig(this IConfigReader config, string key)
         {
-            return StringInAppConfig(config, key).AsBool();
+            return config[key].AsBool();
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static short ShortInAppConfig(this IConfigReader config, string key)
         {
-            return StringInAppConfig(config, key).AsShort();
+            return config[key].AsShort();
         }
 
         /// <summary>
@@ -123,17 +123,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static Microsoft.Extensions.Configuration.IConfigurationSection GetSection(this IConfigReader config, string key)
         {
-            if (config is AppConfigReader)
-            {
-                return ((AppConfigReader)config).GetSection(key);
-            }
-
-            if (config is Microsoft.Extensions.Configuration.IConfiguration)
-            {
-                return ((Microsoft.Extensions.Configuration.IConfiguration)config).GetSection(key);
-            }
-
-            return null;
+            return config?.Configuration?.GetSection(key);
         }
 
         /// <summary>
@@ -143,17 +133,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static IEnumerable<Microsoft.Extensions.Configuration.IConfigurationSection> GetChildren(this IConfigReader config)
         {
-            if (config is AppConfigReader)
-            {
-                return ((AppConfigReader)config).GetChildren();
-            }
-
-            if (config is Microsoft.Extensions.Configuration.IConfiguration)
-            {
-                return ((Microsoft.Extensions.Configuration.IConfiguration)config).GetChildren();
-            }
-
-            return null;
+            return config?.Configuration?.GetChildren();
         }
 
         /// <summary>
@@ -163,17 +143,7 @@ namespace Never.Configuration
         /// <returns></returns>
         public static Microsoft.Extensions.Primitives.IChangeToken GetReloadToken(this IConfigReader config)
         {
-            if (config is AppConfigReader)
-            {
-                return ((AppConfigReader)config).GetReloadToken();
-            }
-
-            if (config is Microsoft.Extensions.Configuration.IConfiguration)
-            {
-                return ((Microsoft.Extensions.Configuration.IConfiguration)config).GetReloadToken();
-            }
-
-            return null;
+            return config?.Configuration?.GetReloadToken();
         }
 
 #endregion

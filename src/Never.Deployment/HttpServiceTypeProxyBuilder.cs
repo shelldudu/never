@@ -116,17 +116,18 @@ namespace Never.Deployment
         /// 是否为基元类型
         /// </summary>
         /// <param name="type"></param>
+        /// <param name="nullableType"></param>
         /// <returns></returns>
-        public override bool IsNullablePrimitiveOrInsideHandleType(Type type)
+        public override bool IsNullablePrimitiveOrInsideHandleType(Type type, out Type nullableType)
         {
-            var nullableType = Nullable.GetUnderlyingType(type);
+            nullableType = Nullable.GetUnderlyingType(type);
             if (nullableType == null)
                 return false;
 
             if (TypeHelper.IsPrimitiveType(nullableType))
                 return true;
 
-            if (nullableType == typeof(string) || nullableType == typeof(DateTime) || nullableType == typeof(decimal))
+            if (nullableType == typeof(DateTime) || nullableType == typeof(decimal))
                 return true;
 
             return false;
@@ -476,7 +477,16 @@ namespace Never.Deployment
                                 continue;
                             }
 
-                            if (this.IsNullablePrimitiveOrInsideHandleType(parameters[i].ParameterType))
+                            if (parameters[i].ParameterType.IsEnum)
+                            {
+                                il.LoadLocal(dictionlocal);
+                                il.LoadConstant(parameters[i].Name);
+                                il.LoadArgument((ushort)(i + 1));
+                                il.Call(typeof(HttpServiceTypeProxyBuilder<object>).GetMethod("LoadEmunTypeParameter", BindingFlags.Public | BindingFlags.Static).MakeGenericMethod(parameters[i].ParameterType));
+                                continue;
+                            }
+
+                            if (this.IsNullablePrimitiveOrInsideHandleType(parameters[i].ParameterType, out var nullableType))
                             {
                                 il.LoadLocal(dictionlocal);
                                 il.LoadConstant(parameters[i].Name);
@@ -485,12 +495,21 @@ namespace Never.Deployment
                                 continue;
                             }
 
-                            if (parameters[i].ParameterType == typeof(Guid?))
+                            if (nullableType != null && parameters[i].ParameterType == typeof(Guid))
                             {
                                 il.LoadLocal(dictionlocal);
                                 il.LoadConstant(parameters[i].Name);
                                 il.LoadArgument((ushort)(i + 1));
                                 il.Call(typeof(HttpServiceTypeProxyBuilder<object>).GetMethod("LoadNullGuidTypeParameter", BindingFlags.Public | BindingFlags.Static));
+                                continue;
+                            }
+
+                            if (nullableType != null && nullableType.IsEnum)
+                            {
+                                il.LoadLocal(dictionlocal);
+                                il.LoadConstant(parameters[i].Name);
+                                il.LoadArgument((ushort)(i + 1));
+                                il.Call(typeof(HttpServiceTypeProxyBuilder<object>).GetMethod("LoadNullEmunTypeParameter", BindingFlags.Public | BindingFlags.Static).MakeGenericMethod(nullableType));
                                 continue;
                             }
 
@@ -904,6 +923,31 @@ namespace Never.Deployment
         public static void LoadGuidTypeParameter(Dictionary<string, string> request, string name, Guid value)
         {
             request[name] = value.ToString();
+        }
+
+        /// <summary>
+        /// 加载参数
+        /// </summary>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static void LoadEmunTypeParameter<TParameter>(Dictionary<string, string> request, string name, TParameter value) where TParameter : struct
+        {
+            request[name] = value.ToString();
+        }
+
+        /// <summary>
+        /// 加载参数
+        /// </summary>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static void LoadNullEmunTypeParameter<TParameter>(Dictionary<string, string> request, string name, TParameter? value) where TParameter : struct, IConvertible
+        {
+            if (value.HasValue)
+            {
+                request[name] = value.ToString();
+            }
+            else
+            {
+                request[name] = string.Empty;
+            }
         }
 
         /// <summary>

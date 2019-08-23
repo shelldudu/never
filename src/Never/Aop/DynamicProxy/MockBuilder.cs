@@ -295,19 +295,29 @@ namespace Never.Aop.DynamicProxy
         /// <returns></returns>
         public virtual bool IsNullablePrimitiveOrInsideHandleType(Type type)
         {
-            var nullableType = Nullable.GetUnderlyingType(type);
+            return this.IsNullablePrimitiveOrInsideHandleType(type, out var nullableType);
+        }
+
+        /// <summary>
+        /// 是否为基元类型
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="nullableType"></param>
+        /// <returns></returns>
+        public virtual bool IsNullablePrimitiveOrInsideHandleType(Type type, out Type nullableType)
+        {
+            nullableType = Nullable.GetUnderlyingType(type);
             if (nullableType == null)
                 return false;
 
             if (TypeHelper.IsPrimitiveType(nullableType))
                 return true;
 
-            if (nullableType == typeof(string) || nullableType == typeof(DateTime) || nullableType == typeof(DateTimeOffset) || nullableType == typeof(Guid) || nullableType == typeof(TimeSpan) || nullableType == typeof(decimal))
+            if (nullableType == typeof(DateTime) || nullableType == typeof(DateTimeOffset) || nullableType == typeof(Guid) || nullableType == typeof(TimeSpan) || nullableType == typeof(decimal))
                 return true;
 
             return false;
         }
-
         /// <summary>
         /// 是否为enumType
         /// </summary>
