@@ -118,6 +118,9 @@ namespace Never.EasySql
             var doc = new System.Xml.XmlDocument();
             foreach (var file in files)
             {
+                if (doc == null)
+                    doc = new System.Xml.XmlDocument();
+
                 using (var stream = assembly.GetManifestResourceStream(file))
                 {
                     try

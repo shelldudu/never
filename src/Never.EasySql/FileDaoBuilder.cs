@@ -46,7 +46,7 @@ namespace Never.EasySql
                 if (exists.Contains(file.FullName))
                     continue;
 
-                if (file.Exists)
+                if (file.Exists == false)
                     throw new FileNotFoundException(string.Format("{0} not exists", file.FullName));
 
                 yield return file.OpenRead();
@@ -77,11 +77,28 @@ namespace Never.EasySql
             var doc = new System.Xml.XmlDocument();
             foreach (var file in files)
             {
+                if (doc == null)
+                    doc = new System.Xml.XmlDocument();
+
                 if (file.LastIndexOf(".xml", System.StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     using (var stream = File.Open(file, FileMode.Open))
                     {
-                        doc.Load(File.Open(file, FileMode.Open));
+                        try
+                        {
+                            /*不是xml文件*/
+                            doc.Load(stream);
+                        }
+                        catch
+                        {
+                        }
+
+                        if (doc == null && checking != null)
+                        {
+                            checking(doc, file);
+                            continue;
+                        }
+
                         var @namespaces = doc["namespace"];
                         if (@namespaces == null)
                             continue;

@@ -5,7 +5,7 @@
     <title>Never.EasySql</title>
     <authors>Never</authors>
     <owners>Never</owners>
-    <version>1.0.1</version>
+    <version>1.0.1.1</version>
     <tags>sqlclient</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
