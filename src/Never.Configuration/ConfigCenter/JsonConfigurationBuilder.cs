@@ -214,7 +214,7 @@ namespace Never.Configuration.ConfigCenter
         /// <returns></returns>
         protected string Link(string share, List<string> keys)
         {
-            var jsonShareItem = this.share.FirstOrDefault(ta => ta.JsonShareFile != null && ta.JsonShareFile.Name == share);
+            var jsonShareItem = this.share.FirstOrDefault(ta => ta.JsonShareFile != null && ta.JsonShareFile.Name.IsEquals(share, StringComparison.OrdinalIgnoreCase));
             if (jsonShareItem != null)
             {
                 var sharelist = jsonShareItem.JsonShareFile;
@@ -222,7 +222,7 @@ namespace Never.Configuration.ConfigCenter
                     throw new Exception(string.Format("the share {0} file has no node;", share, this.File.File.Name));
 
                 var key = string.Join(":", keys);
-                var first = sharelist.Node.FirstOrDefault(ta => ta.Key == key);
+                var first = sharelist.Node.FirstOrDefault(ta => ta.Key.IsEquals(key, StringComparison.OrdinalIgnoreCase));
                 if (first == null)
                     throw new Exception(string.Format("can not find the key {1} in the share {0} file", share, key));
 
@@ -232,7 +232,7 @@ namespace Never.Configuration.ConfigCenter
                 return first.Value;
             }
 
-            var xmlShareItem = this.share.FirstOrDefault(ta => ta.XmlShareFile != null && ta.XmlShareFile.Name == share);
+            var xmlShareItem = this.share.FirstOrDefault(ta => ta.XmlShareFile != null && ta.XmlShareFile.Name.IsEquals(share, StringComparison.OrdinalIgnoreCase));
             if (xmlShareItem != null)
             {
                 var sharelist = xmlShareItem.XmlShareFile;
@@ -240,7 +240,7 @@ namespace Never.Configuration.ConfigCenter
                     throw new Exception(string.Format("the share {0} file has no node;", share, this.File.File.Name));
 
                 var key = string.Join(":", keys);
-                var first = sharelist.Node.FirstOrDefault(ta => ta.Key == key);
+                var first = sharelist.Node.FirstOrDefault(ta => ta.Key.IsEquals(key, StringComparison.OrdinalIgnoreCase));
                 if (first == null)
                     throw new Exception(string.Format("can not find the key {1} in the share {0} file", share, key));
 
