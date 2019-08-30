@@ -13,7 +13,7 @@ namespace Never.EasySql
     /// sql参数，只接受key-value这种形式的对象，如果是value文本参数，请传入<see cref="KeyValueEasySqlParameter{T}"/>对象
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class EasySqlParameter<T>
+    public abstract class EasySqlParameter<T> : DataEmitBuilder<T>
     {
         #region ctor
 
@@ -140,35 +140,29 @@ namespace Never.EasySql
                 //return list.AsReadOnly();
             }
 
-            var members = objectType.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+            var members = this.GetMembers(objectType);// objectType.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
             var list = new List<KeyValueTuple<string, object>>(members.Count());
             foreach (var member in members)
             {
-                switch (member.MemberType)
+                switch (member.Member.MemberType)
                 {
                     case System.Reflection.MemberTypes.Property:
                         {
                             try
                             {
-                                var p = member as System.Reflection.PropertyInfo;
-                                if (!p.CanRead)
-                                    continue;
-
+                                var p = member.Member as System.Reflection.PropertyInfo;
                                 var value = p.GetValue(target);
-                                var attributes = p.GetCustomAttributes(typeof(TypeHandlerAttribute), true);
-                                if (attributes.IsNullOrEmpty())
+                                if (member.TypeHandler == null || member.TypeHandler.TypeHandler == null)
                                 {
-                                    list.Add(new KeyValueTuple<string, object>(member.Name, value));
-                                    continue;
-                                }
-
-                                foreach (TypeHandlerAttribute attribute in attributes)
-                                {
-                                    if (attribute.TypeHandler.IsAssignableFromType(typeof(ICastingValueToParameterTypeHandler<>)))
                                     {
-                                        list.Add(new KeyValueTuple<string, object>(member.Name, attribute.GetOnInitingParameterCallBack()(attribute, value)));
-                                        break;
+                                        list.Add(new KeyValueTuple<string, object>(member.GetMemberName(), value));
+                                        continue;
                                     }
+                                }
+                                if (member.TypeHandler.TypeHandler.IsAssignableFromType(typeof(ICastingValueToParameterTypeHandler<>)))
+                                {
+                                    list.Add(new KeyValueTuple<string, object>(member.GetMemberName(), member.TypeHandler.GetOnInitingParameterCallBack()(member.TypeHandler, value)));
+                                    continue;
                                 }
                             }
                             catch
@@ -182,22 +176,19 @@ namespace Never.EasySql
                         {
                             try
                             {
-                                var f = member as System.Reflection.FieldInfo;
+                                var f = member.Member as System.Reflection.FieldInfo;
                                 var value = f.GetValue(target);
-                                var attributes = f.GetCustomAttributes(typeof(TypeHandlerAttribute), true);
-                                if (attributes.IsNullOrEmpty())
+                                if (member.TypeHandler == null || member.TypeHandler.TypeHandler == null)
                                 {
-                                    list.Add(new KeyValueTuple<string, object>(member.Name, value));
-                                    continue;
-                                }
-
-                                foreach (TypeHandlerAttribute attribute in attributes)
-                                {
-                                    if (attribute.TypeHandler.IsAssignableFromType(typeof(ICastingValueToParameterTypeHandler<>)))
                                     {
-                                        list.Add(new KeyValueTuple<string, object>(member.Name, attribute.GetOnInitingParameterCallBack()(attribute, value)));
-                                        break;
+                                        list.Add(new KeyValueTuple<string, object>(member.GetMemberName(), value));
+                                        continue;
                                     }
+                                }
+                                if (member.TypeHandler.TypeHandler.IsAssignableFromType(typeof(ICastingValueToParameterTypeHandler<>)))
+                                {
+                                    list.Add(new KeyValueTuple<string, object>(member.GetMemberName(), member.TypeHandler.GetOnInitingParameterCallBack()(member.TypeHandler, value)));
+                                    continue;
                                 }
                             }
                             catch
@@ -213,6 +204,48 @@ namespace Never.EasySql
                 this.Count = list.Count;
 
             return list.AsReadOnly();
+        }
+
+        /// <summary>
+        /// 获取成员
+        /// </summary>
+        public override List<DataMemberInfo> GetMembers(Type targetType, BindingFlags bindingFlags)
+        {
+            var members = targetType.GetMembers(bindingFlags);
+            if (members == null || members.Length == 0)
+                return new List<DataMemberInfo>(0);
+
+            var list = new List<DataMemberInfo>(members.Length);
+            foreach (var member in members)
+            {
+                var primary = member.GetAttribute<PrimaryAttribute>();
+                var typehandler = member.GetAttribute<TypeHandlerAttribute>();
+                if (member.MemberType == MemberTypes.Property)
+                {
+                    var p = (PropertyInfo)member;
+                    if (p.CanRead)
+                    {
+                        list.Add(new DataMemberInfo()
+                        {
+                            Member = member,
+                            Primary = primary,
+                            TypeHandler = typehandler,
+                        });
+                    }
+                }
+                else if (member.MemberType == MemberTypes.Field)
+                {
+                    var f = (FieldInfo)member;
+                    list.Add(new DataMemberInfo()
+                    {
+                        Member = member,
+                        Primary = primary,
+                        TypeHandler = typehandler,
+                    });
+                }
+            }
+
+            return list;
         }
 
         #endregion convey

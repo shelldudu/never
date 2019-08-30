@@ -21,12 +21,6 @@ namespace Never.Mappers
         public string[] IgnoredMembers { get; set; }
 
         /// <summary>
-        /// 是复合对象，如果是浅复制，则该值所描述的对象都使用相同副本
-        /// </summary>
-        [System.Obsolete]
-        public string[] ComplexMembers { get; set; }
-
-        /// <summary>
         /// 当两个类型不相同，但是名字相同，是否进行强制转换（在转换过程可能会有异常，溢出等行为）
         /// </summary>
         public bool ForceConvertWhenTypeNotSame { get; set; }
@@ -53,7 +47,6 @@ namespace Never.Mappers
         {
             this.Name = name ?? "Map";
             this.IgnoredMembers = null;
-            this.ComplexMembers = null;
             this.ForceConvertWhenTypeNotSame = true;
             this.ShallowCopy = true;
             this.AlwaysNewTraget = false;

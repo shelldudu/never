@@ -9,7 +9,7 @@ namespace Never.SqlClient
     /// <summary>
     /// 对在读每一行进行Emit构建
     /// </summary>
-    public class DataRecordBuilder<T>
+    public class DataRecordBuilder<T> : DataEmitBuilder<T>
     {
         #region field
 
@@ -45,15 +45,16 @@ namespace Never.SqlClient
 
             var type = typeof(T);
             var emit = EasyEmitBuilder<Func<IDataRecord, T>>.NewDynamicMethod(string.Format("{0}", type.Name));
+            var builder = new DataRecordBuilder<T>();
             /*normal*/
             if (DataRecordBuilderHelper.DefinedTypeDict.ContainsKey(type))
             {
-                BuildDefinedType(emit);
+                builder.BuildDefinedType(emit);
                 return emit.CreateDelegate();
             }
             else if (type.IsEnum)
             {
-                BuildEnumType(emit);
+                builder.BuildEnumType(emit);
                 return emit.CreateDelegate();
             }
 
@@ -64,17 +65,17 @@ namespace Never.SqlClient
                 var genericType = type.GetGenericArguments()[0];
                 if (DataRecordBuilderHelper.DefinedTypeDict.ContainsKey(genericType))
                 {
-                    BuildNullableDefinedType(emit, genericType);
+                    builder.BuildNullableDefinedType(emit, genericType);
                     return emit.CreateDelegate();
                 }
                 else if (genericType.IsEnum)
                 {
-                    BuildNullableEnumType(emit, genericType);
+                    builder.BuildNullableEnumType(emit, genericType);
                     return emit.CreateDelegate();
                 }
             }
 
-            BuildObject(emit);
+            builder.BuildObject(emit);
             return emit.CreateDelegate();
         }
 
@@ -82,7 +83,7 @@ namespace Never.SqlClient
         /// 对对象进行emit操作
         /// </summary>
         /// <param name="emit">The emit.</param>
-        public static void BuildObject(EasyEmitBuilder<Func<IDataRecord, T>> emit)
+        public void BuildObject(EasyEmitBuilder<Func<IDataRecord, T>> emit)
         {
             var type = typeof(T);
             var targetMembers = GetMembers(type);
@@ -130,7 +131,7 @@ namespace Never.SqlClient
                 throw new ArgumentException(string.Format("the type {0} can not find the no parameter of ctor method", typeof(T).FullName));
             }
 
-        _Read:
+            _Read:
             {
                 var locals = new[]
                 {
@@ -148,32 +149,31 @@ namespace Never.SqlClient
                 for (var i = 0; i < targetMembers.Count; i++)
                 {
                     var member = targetMembers[i];
-                    Type memberType = member.MemberType == MemberTypes.Property ? ((PropertyInfo)member).PropertyType : ((FieldInfo)member).FieldType;
+                    Type memberType = member.Member.MemberType == MemberTypes.Property ? ((PropertyInfo)member.Member).PropertyType : ((FieldInfo)member.Member).FieldType;
 
                     if (i > 0)
                         emit.MarkLabel(labels[i]);
 
-                    var attribute = member.GetCustomAttribute<TypeHandlerAttribute>();
-                    if (attribute != null && attribute.TypeHandler.IsAssignableFromType(typeof(IReadingFromDataRecordToValueTypeHandler<>)))
+                    //var attribute = member.GetCustomAttribute<TypeHandlerAttribute>();
+                    if (member.TypeHandler != null && member.TypeHandler.TypeHandler.IsAssignableFromType(typeof(IReadingFromDataRecordToValueTypeHandler<>)))
                     {
-                        TypeHandlerAttributeStorager<T>.Storage(attribute, member.Name);
-
+                        TypeHandlerAttributeStorager<T>.Storage(member.TypeHandler, member.GetMemberName());
                         if (type.IsValueType)
                             emit.LoadLocalAddress(instanceLocal);
                         else
                             emit.LoadLocal(instanceLocal);
 
                         emit.LoadArgument(0);
-                        emit.LoadConstant(member.Name);
-                        if (member.MemberType == MemberTypes.Property)
+                        emit.LoadConstant(member.GetMemberName());
+                        if (member.Member.MemberType == MemberTypes.Property)
                         {
-                            emit.Call(typeof(DataRecordBuilderHelper).GetMethod("ReadingValueFromDataRecordTypeHandler").MakeGenericMethod(new[] { ((PropertyInfo)member).PropertyType, type }));
-                            emit.Call(((PropertyInfo)member).GetSetMethod(true));
+                            emit.Call(typeof(DataRecordBuilderHelper).GetMethod("ReadingValueFromDataRecordTypeHandler").MakeGenericMethod(new[] { ((PropertyInfo)member.Member).PropertyType, type }));
+                            emit.Call(((PropertyInfo)member.Member).GetSetMethod(true));
                         }
                         else
                         {
-                            emit.Call(typeof(DataRecordBuilderHelper).GetMethod("ReadingValueFromDataRecordTypeHandler").MakeGenericMethod(new[] { ((FieldInfo)member).FieldType, type }));
-                            emit.StoreField(((FieldInfo)member));
+                            emit.Call(typeof(DataRecordBuilderHelper).GetMethod("ReadingValueFromDataRecordTypeHandler").MakeGenericMethod(new[] { ((FieldInfo)member.Member).FieldType, type }));
+                            emit.StoreField(((FieldInfo)member.Member));
                         }
 
                         if (i < labels.Count - 1)
@@ -185,7 +185,7 @@ namespace Never.SqlClient
 
                     /*reader*/
                     emit.LoadArgument(0);
-                    emit.LoadConstant(member.Name);
+                    emit.LoadConstant(member.GetMemberName());
                     emit.Call(DataRecordBuilderHelper._mGetOrdinal);
                     emit.StoreLocal(locals[1]);
                     emit.LoadLocal(locals[1]);
@@ -215,13 +215,13 @@ namespace Never.SqlClient
                         emit.LoadArgument(0);
                         emit.LoadLocal(locals[1]);
                         emit.Call(DataRecordBuilderHelper.DefinedTypeDict[memberType]);
-                        if (member.MemberType == MemberTypes.Property)
+                        if (member.Member.MemberType == MemberTypes.Property)
                         {
-                            emit.Call(((PropertyInfo)member).GetSetMethod(true));
+                            emit.Call(((PropertyInfo)member.Member).GetSetMethod(true));
                         }
                         else
                         {
-                            emit.StoreField(((FieldInfo)member));
+                            emit.StoreField(((FieldInfo)member.Member));
                         }
 
                         if (i < labels.Count - 1)
@@ -246,13 +246,13 @@ namespace Never.SqlClient
                         //emit.Call(DataRecordBuilderHelper.DefinedTypeDict[typeof(long)]);
                         //emit.Call(typeof(DataRecordBuilderHelper).GetMethod("_EnumParse", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(memberType));
 
-                        if (member.MemberType == MemberTypes.Property)
+                        if (member.Member.MemberType == MemberTypes.Property)
                         {
-                            emit.Call(((PropertyInfo)member).GetSetMethod(true));
+                            emit.Call(((PropertyInfo)member.Member).GetSetMethod(true));
                         }
                         else
                         {
-                            emit.StoreField(((FieldInfo)member));
+                            emit.StoreField(((FieldInfo)member.Member));
                         }
                         if (i < labels.Count - 1)
                             emit.Branch(labels[i + 1]);
@@ -280,13 +280,13 @@ namespace Never.SqlClient
                             //emit.Call(DataRecordBuilderHelper.DefinedTypeDict[typeof(long)]);
                             //emit.Call(typeof(DataRecordBuilderHelper).GetMethod("_EnumParse", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(nullable));
                             emit.NewObject(memberType, new[] { nullable });
-                            if (member.MemberType == MemberTypes.Property)
+                            if (member.Member.MemberType == MemberTypes.Property)
                             {
-                                emit.Call(((PropertyInfo)member).GetSetMethod(true));
+                                emit.Call(((PropertyInfo)member.Member).GetSetMethod(true));
                             }
                             else
                             {
-                                emit.StoreField(((FieldInfo)member));
+                                emit.StoreField(((FieldInfo)member.Member));
                             }
                             if (i < labels.Count - 1)
                                 emit.Branch(labels[i + 1]);
@@ -306,13 +306,13 @@ namespace Never.SqlClient
                         emit.LoadLocal(locals[1]);
                         emit.Call(DataRecordBuilderHelper.DefinedTypeDict[nullable]);
                         emit.NewObject(memberType, new[] { nullable });
-                        if (member.MemberType == MemberTypes.Property)
+                        if (member.Member.MemberType == MemberTypes.Property)
                         {
-                            emit.Call(((PropertyInfo)member).GetSetMethod(true));
+                            emit.Call(((PropertyInfo)member.Member).GetSetMethod(true));
                         }
                         else
                         {
-                            emit.StoreField(((FieldInfo)member));
+                            emit.StoreField(((FieldInfo)member.Member));
                         }
                         if (i < labels.Count - 1)
                             emit.Branch(labels[i + 1]);
@@ -339,7 +339,7 @@ namespace Never.SqlClient
         /// 对常见的值类型进行emit操作
         /// </summary>
         /// <param name="emit">emit操作</param>
-        private static void BuildDefinedType(EasyEmitBuilder<Func<IDataRecord, T>> emit)
+        private void BuildDefinedType(EasyEmitBuilder<Func<IDataRecord, T>> emit)
         {
             var type = typeof(T);
             var dbnullLabel = emit.DefineLabel();
@@ -380,7 +380,7 @@ namespace Never.SqlClient
         /// </summary>
         /// <param name="emit">emit操作</param>
         /// <param name="innerType">对象类型</param>
-        private static void BuildNullableDefinedType(EasyEmitBuilder<Func<IDataRecord, T>> emit, Type innerType)
+        private void BuildNullableDefinedType(EasyEmitBuilder<Func<IDataRecord, T>> emit, Type innerType)
         {
             var type = typeof(T);
             var dbnullLabel = emit.DefineLabel();
@@ -421,7 +421,7 @@ namespace Never.SqlClient
         /// 对枚举进行emit操作
         /// </summary>
         /// <param name="emit"></param>
-        private static void BuildEnumType(EasyEmitBuilder<Func<IDataRecord, T>> emit)
+        private void BuildEnumType(EasyEmitBuilder<Func<IDataRecord, T>> emit)
         {
             var type = typeof(T);
             var underlyingType = Enum.GetUnderlyingType(type);
@@ -473,7 +473,7 @@ namespace Never.SqlClient
         /// </summary>
         /// <param name="emit"></param>
         /// <param name="innerType">对象类型</param>
-        private static void BuildNullableEnumType(EasyEmitBuilder<Func<IDataRecord, T>> emit, Type innerType)
+        private void BuildNullableEnumType(EasyEmitBuilder<Func<IDataRecord, T>> emit, Type innerType)
         {
             var type = typeof(T);
             var dbnullLabel = emit.DefineLabel();
@@ -529,33 +529,10 @@ namespace Never.SqlClient
         /// 获取成员
         /// </summary>
         /// <param name="targetType"></param>
-        /// <returns></returns>
-        public static List<MemberInfo> GetMembers(Type targetType)
+        /// <param name="bindingFlags"></param>
+        public override List<DataMemberInfo> GetMembers(Type targetType, BindingFlags bindingFlags)
         {
-            var members = targetType.GetMembers(BindingFlags.Public | BindingFlags.Instance);
-            if (members == null || members.Length == 0)
-                return new List<MemberInfo>(0);
-
-            var list = new List<MemberInfo>(members.Length);
-            foreach (var member in members)
-            {
-                if (member.MemberType == MemberTypes.Property)
-                {
-                    var p = (PropertyInfo)member;
-                    if (p.CanWrite)
-                        list.Add(member);
-                }
-                else if (member.MemberType == MemberTypes.Field)
-                {
-                    var f = (FieldInfo)member;
-                    if (f.IsInitOnly)
-                        continue;
-
-                    list.Add(member);
-                }
-            }
-
-            return list;
+            return base.GetMembers(targetType, bindingFlags);
         }
 
         #endregion members
