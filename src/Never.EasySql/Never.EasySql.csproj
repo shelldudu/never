@@ -16,9 +16,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Linq\**" />
-    <EmbeddedResource Remove="Linq\**" />
-    <None Remove="Linq\**" />
+    <Compile Remove="Linq\MySql\**" />
+    <EmbeddedResource Remove="Linq\MySql\**" />
+    <None Remove="Linq\MySql\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Linq\EasySqlContext.cs" />
+    <Compile Remove="Linq\EasySqlExtension.cs" />
+    <Compile Remove="Linq\EasySqlQueryable.cs" />
+    <Compile Remove="Linq\IEasySqlContext.cs" />
+    <Compile Remove="Linq\IEasySqlQueryable.cs" />
+    <Compile Remove="Linq\ISqlarameter.cs" />
+    <Compile Remove="Linq\Predicate.cs" />
   </ItemGroup>
 
   <ItemGroup>

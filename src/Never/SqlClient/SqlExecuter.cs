@@ -964,6 +964,593 @@ namespace Never.SqlClient
         }
 
         /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>> QueryForEnumerable<T1, T2>(IDbCommand command)
+        {
+            return this.QueryForEnumerable<T1, T2>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>> QueryForEnumerable<T1, T2>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = new List<T1>();
+                var item2 = new List<T2>();
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    while (reader.Read())
+                    {
+                        var value = d1(rd.Load(reader));
+                        item1.Add(value);
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        while (reader.Read())
+                        {
+                            var value = d2(rd.Load(reader));
+                            item2.Add(value);
+                        }
+                    }
+                }
+
+                return new Tuple<IEnumerable<T1>, IEnumerable<T2>>(item1, item2);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>> QueryForEnumerable<T1, T2, T3>(IDbCommand command)
+        {
+            return this.QueryForEnumerable<T1, T2, T3>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>> QueryForEnumerable<T1, T2, T3>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = new List<T1>();
+                var item2 = new List<T2>();
+                var item3 = new List<T3>();
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    while (reader.Read())
+                    {
+                        var value = d1(rd.Load(reader));
+                        item1.Add(value);
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        while (reader.Read())
+                        {
+                            var value = d2(rd.Load(reader));
+                            item2.Add(value);
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            while (reader.Read())
+                            {
+                                var value = d3(rd.Load(reader));
+                                item3.Add(value);
+                            }
+                        }
+                    }
+
+
+                }
+
+                return new Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>>(item1, item2, item3);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>> QueryForEnumerable<T1, T2, T3, T4>(IDbCommand command)
+        {
+            return this.QueryForEnumerable<T1, T2, T3, T4>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>> QueryForEnumerable<T1, T2, T3, T4>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = new List<T1>();
+                var item2 = new List<T2>();
+                var item3 = new List<T3>();
+                var item4 = new List<T4>();
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    while (reader.Read())
+                    {
+                        var value = d1(rd.Load(reader));
+                        item1.Add(value);
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        while (reader.Read())
+                        {
+                            var value = d2(rd.Load(reader));
+                            item2.Add(value);
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            while (reader.Read())
+                            {
+                                var value = d3(rd.Load(reader));
+                                item3.Add(value);
+                            }
+
+                            if (reader.NextResult())
+                            {
+                                var d4 = DataRecordBuilder<T4>.Func;
+                                rd = new IDataRecordDecorator(reader);
+                                while (reader.Read())
+                                {
+                                    var value = d4(rd.Load(reader));
+                                    item4.Add(value);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return new Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>>(item1, item2, item3, item4);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>> QueryForEnumerable<T1, T2, T3, T4, T5>(IDbCommand command)
+        {
+            return this.QueryForEnumerable<T1, T2, T3, T4, T5>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>> QueryForEnumerable<T1, T2, T3, T4, T5>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = new List<T1>();
+                var item2 = new List<T2>();
+                var item3 = new List<T3>();
+                var item4 = new List<T4>();
+                var item5 = new List<T5>();
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    while (reader.Read())
+                    {
+                        var value = d1(rd.Load(reader));
+                        item1.Add(value);
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        while (reader.Read())
+                        {
+                            var value = d2(rd.Load(reader));
+                            item2.Add(value);
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            while (reader.Read())
+                            {
+                                var value = d3(rd.Load(reader));
+                                item3.Add(value);
+                            }
+
+                            if (reader.NextResult())
+                            {
+                                var d4 = DataRecordBuilder<T4>.Func;
+                                rd = new IDataRecordDecorator(reader);
+                                while (reader.Read())
+                                {
+                                    var value = d4(rd.Load(reader));
+                                    item4.Add(value);
+                                }
+
+                                if (reader.NextResult())
+                                {
+                                    var d5 = DataRecordBuilder<T5>.Func;
+                                    rd = new IDataRecordDecorator(reader);
+                                    while (reader.Read())
+                                    {
+                                        var value = d5(rd.Load(reader));
+                                        item5.Add(value);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                return new Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>>(item1, item2, item3, item4, item5);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <typeparam name="T6">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>> QueryForEnumerable<T1, T2, T3, T4, T5, T6>(IDbCommand command)
+        {
+            return this.QueryForEnumerable<T1, T2, T3, T4, T5, T6>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <typeparam name="T6">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>> QueryForEnumerable<T1, T2, T3, T4, T5, T6>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = new List<T1>();
+                var item2 = new List<T2>();
+                var item3 = new List<T3>();
+                var item4 = new List<T4>();
+                var item5 = new List<T5>();
+                var item6 = new List<T6>();
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    while (reader.Read())
+                    {
+                        var value = d1(rd.Load(reader));
+                        item1.Add(value);
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        while (reader.Read())
+                        {
+                            var value = d2(rd.Load(reader));
+                            item2.Add(value);
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            while (reader.Read())
+                            {
+                                var value = d3(rd.Load(reader));
+                                item3.Add(value);
+                            }
+
+                            if (reader.NextResult())
+                            {
+                                var d4 = DataRecordBuilder<T4>.Func;
+                                rd = new IDataRecordDecorator(reader);
+                                while (reader.Read())
+                                {
+                                    var value = d4(rd.Load(reader));
+                                    item4.Add(value);
+                                }
+
+                                if (reader.NextResult())
+                                {
+                                    var d5 = DataRecordBuilder<T5>.Func;
+                                    rd = new IDataRecordDecorator(reader);
+                                    while (reader.Read())
+                                    {
+                                        var value = d5(rd.Load(reader));
+                                        item5.Add(value);
+                                    }
+
+                                    if (reader.NextResult())
+                                    {
+                                        var d6 = DataRecordBuilder<T6>.Func;
+                                        rd = new IDataRecordDecorator(reader);
+                                        while (reader.Read())
+                                        {
+                                            var value = d6(rd.Load(reader));
+                                            item6.Add(value);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                return new Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>>(item1, item2, item3, item4, item5, item6);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <typeparam name="T6">返回对象类型</typeparam>
+        /// <typeparam name="T7">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>> QueryForEnumerable<T1, T2, T3, T4, T5, T6, T7>(IDbCommand command)
+        {
+            return this.QueryForEnumerable<T1, T2, T3, T4, T5, T6, T7>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <typeparam name="T6">返回对象类型</typeparam>
+        /// <typeparam name="T7">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>> QueryForEnumerable<T1, T2, T3, T4, T5, T6, T7>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = new List<T1>();
+                var item2 = new List<T2>();
+                var item3 = new List<T3>();
+                var item4 = new List<T4>();
+                var item5 = new List<T5>();
+                var item6 = new List<T6>();
+                var item7 = new List<T7>();
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    while (reader.Read())
+                    {
+                        var value = d1(rd.Load(reader));
+                        item1.Add(value);
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        while (reader.Read())
+                        {
+                            var value = d2(rd.Load(reader));
+                            item2.Add(value);
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            while (reader.Read())
+                            {
+                                var value = d3(rd.Load(reader));
+                                item3.Add(value);
+                            }
+
+                            if (reader.NextResult())
+                            {
+                                var d4 = DataRecordBuilder<T4>.Func;
+                                rd = new IDataRecordDecorator(reader);
+                                while (reader.Read())
+                                {
+                                    var value = d4(rd.Load(reader));
+                                    item4.Add(value);
+                                }
+
+                                if (reader.NextResult())
+                                {
+                                    var d5 = DataRecordBuilder<T5>.Func;
+                                    rd = new IDataRecordDecorator(reader);
+                                    while (reader.Read())
+                                    {
+                                        var value = d5(rd.Load(reader));
+                                        item5.Add(value);
+                                    }
+
+                                    if (reader.NextResult())
+                                    {
+                                        var d6 = DataRecordBuilder<T6>.Func;
+                                        rd = new IDataRecordDecorator(reader);
+                                        while (reader.Read())
+                                        {
+                                            var value = d6(rd.Load(reader));
+                                            item6.Add(value);
+                                        }
+
+                                        if (reader.NextResult())
+                                        {
+                                            var d7 = DataRecordBuilder<T7>.Func;
+                                            rd = new IDataRecordDecorator(reader);
+                                            while (reader.Read())
+                                            {
+                                                var value = d7(rd.Load(reader));
+                                                item7.Add(value);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                return new Tuple<IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>>(item1, item2, item3, item4, item5, item6, item7);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
         /// 读取单条记录
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -1039,6 +1626,567 @@ namespace Never.SqlClient
             }
 
             return default(T);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2> QueryForObject<T1, T2>(IDbCommand command)
+        {
+            return this.QueryForObject<T1, T2>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2> QueryForObject<T1, T2>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = default(T1);
+                var item2 = default(T2);
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    if (reader.Read())
+                    {
+                        item1 = d1(rd.Load(reader));
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        if (reader.Read())
+                        {
+                            item2 = d2(rd.Load(reader));
+                        }
+                    }
+                }
+
+                return new Tuple<T1, T2>(item1, item2);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3> QueryForObject<T1, T2, T3>(IDbCommand command)
+        {
+            return this.QueryForObject<T1, T2, T3>(command, true);
+        }
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3> QueryForObject<T1, T2, T3>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = default(T1);
+                var item2 = default(T2);
+                var item3 = default(T3);
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    if (reader.Read())
+                    {
+                        item1 = d1(rd.Load(reader));
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        if (reader.Read())
+                        {
+                            item2 = d2(rd.Load(reader));
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            if (reader.Read())
+                            {
+                                item3 = d3(rd.Load(reader));
+                            }
+                        }
+                    }
+
+
+                }
+
+                return new Tuple<T1, T2, T3>(item1, item2, item3);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3, T4> QueryForObject<T1, T2, T3, T4>(IDbCommand command)
+        {
+            return this.QueryForObject<T1, T2, T3, T4>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3, T4> QueryForObject<T1, T2, T3, T4>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = default(T1);
+                var item2 = default(T2);
+                var item3 = default(T3);
+                var item4 = default(T4);
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    if (reader.Read())
+                    {
+                        item1 = d1(rd.Load(reader));
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        if (reader.Read())
+                        {
+                            item2 = d2(rd.Load(reader));
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            if (reader.Read())
+                            {
+                                item3 = d3(rd.Load(reader));
+                            }
+
+                            if (reader.NextResult())
+                            {
+                                var d4 = DataRecordBuilder<T4>.Func;
+                                rd = new IDataRecordDecorator(reader);
+                                if (reader.Read())
+                                {
+                                    item4 = d4(rd.Load(reader));
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return new Tuple<T1, T2, T3, T4>(item1, item2, item3, item4);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3, T4, T5> QueryForObject<T1, T2, T3, T4, T5>(IDbCommand command)
+        {
+            return this.QueryForObject<T1, T2, T3, T4, T5>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3, T4, T5> QueryForObject<T1, T2, T3, T4, T5>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = default(T1);
+                var item2 = default(T2);
+                var item3 = default(T3);
+                var item4 = default(T4);
+                var item5 = default(T5);
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    if (reader.Read())
+                    {
+                        item1 = d1(rd.Load(reader));
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        if (reader.Read())
+                        {
+                            item2 = d2(rd.Load(reader));
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            if (reader.Read())
+                            {
+                                item3 = d3(rd.Load(reader));
+                            }
+
+                            if (reader.NextResult())
+                            {
+                                var d4 = DataRecordBuilder<T4>.Func;
+                                rd = new IDataRecordDecorator(reader);
+                                if (reader.Read())
+                                {
+                                    item4 = d4(rd.Load(reader));
+                                }
+
+                                if (reader.NextResult())
+                                {
+                                    var d5 = DataRecordBuilder<T5>.Func;
+                                    rd = new IDataRecordDecorator(reader);
+                                    if (reader.Read())
+                                    {
+                                        item5 = d5(rd.Load(reader));
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                return new Tuple<T1, T2, T3, T4, T5>(item1, item2, item3, item4, item5);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <typeparam name="T6">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3, T4, T5, T6> QueryForObject<T1, T2, T3, T4, T5, T6>(IDbCommand command)
+        {
+            return this.QueryForObject<T1, T2, T3, T4, T5, T6>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <typeparam name="T6">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3, T4, T5, T6> QueryForObject<T1, T2, T3, T4, T5, T6>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = default(T1);
+                var item2 = default(T2);
+                var item3 = default(T3);
+                var item4 = default(T4);
+                var item5 = default(T5);
+                var item6 = default(T6);
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    if (reader.Read())
+                    {
+                        item1 = d1(rd.Load(reader));
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        if (reader.Read())
+                        {
+                            item2 = d2(rd.Load(reader));
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            if (reader.Read())
+                            {
+                                item3 = d3(rd.Load(reader));
+                            }
+
+                            if (reader.NextResult())
+                            {
+                                var d4 = DataRecordBuilder<T4>.Func;
+                                rd = new IDataRecordDecorator(reader);
+                                if (reader.Read())
+                                {
+                                    item4 = d4(rd.Load(reader));
+                                }
+
+                                if (reader.NextResult())
+                                {
+                                    var d5 = DataRecordBuilder<T5>.Func;
+                                    rd = new IDataRecordDecorator(reader);
+                                    if (reader.Read())
+                                    {
+                                        item5 = d5(rd.Load(reader));
+                                    }
+
+                                    if (reader.NextResult())
+                                    {
+                                        var d6 = DataRecordBuilder<T6>.Func;
+                                        rd = new IDataRecordDecorator(reader);
+                                        if (reader.Read())
+                                        {
+                                            item6 = d6(rd.Load(reader));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                return new Tuple<T1, T2, T3, T4, T5, T6>(item1, item2, item3, item4, item5, item6);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
+        }
+
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <typeparam name="T6">返回对象类型</typeparam>
+        /// <typeparam name="T7">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3, T4, T5, T6, T7> QueryForObject<T1, T2, T3, T4, T5, T6, T7>(IDbCommand command)
+        {
+            return this.QueryForObject<T1, T2, T3, T4, T5, T6, T7>(command, true);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <typeparam name="T1">返回对象类型</typeparam>
+        /// <typeparam name="T2">返回对象类型</typeparam>
+        /// <typeparam name="T3">返回对象类型</typeparam>
+        /// <typeparam name="T4">返回对象类型</typeparam>
+        /// <typeparam name="T5">返回对象类型</typeparam>
+        /// <typeparam name="T6">返回对象类型</typeparam>
+        /// <typeparam name="T7">返回对象类型</typeparam>
+        /// <param name="command">查询命令</param>
+        /// <param name="closeConnection">关闭数据库连接</param>
+        /// <returns></returns>
+        protected virtual Tuple<T1, T2, T3, T4, T5, T6, T7> QueryForObject<T1, T2, T3, T4, T5, T6, T7>(IDbCommand command, bool closeConnection)
+        {
+            IDataReader reader = null;
+            try
+            {
+                var item1 = default(T1);
+                var item2 = default(T2);
+                var item3 = default(T3);
+                var item4 = default(T4);
+                var item5 = default(T5);
+                var item6 = default(T6);
+                var item7 = default(T7);
+                using (reader = this.CreateReader(command))
+                {
+                    var d1 = DataRecordBuilder<T1>.Func;
+                    var rd = new IDataRecordDecorator(reader);
+                    if (reader.Read())
+                    {
+                        item1 = d1(rd.Load(reader));
+                    }
+
+                    if (reader.NextResult())
+                    {
+                        var d2 = DataRecordBuilder<T2>.Func;
+                        rd = new IDataRecordDecorator(reader);
+                        if (reader.Read())
+                        {
+                            item2 = d2(rd.Load(reader));
+                        }
+
+                        if (reader.NextResult())
+                        {
+                            var d3 = DataRecordBuilder<T3>.Func;
+                            rd = new IDataRecordDecorator(reader);
+                            if (reader.Read())
+                            {
+                                item3 = d3(rd.Load(reader));
+                            }
+
+                            if (reader.NextResult())
+                            {
+                                var d4 = DataRecordBuilder<T4>.Func;
+                                rd = new IDataRecordDecorator(reader);
+                                if (reader.Read())
+                                {
+                                    item4 = d4(rd.Load(reader));
+                                }
+
+                                if (reader.NextResult())
+                                {
+                                    var d5 = DataRecordBuilder<T5>.Func;
+                                    rd = new IDataRecordDecorator(reader);
+                                    if (reader.Read())
+                                    {
+                                        item5 = d5(rd.Load(reader));
+                                    }
+
+                                    if (reader.NextResult())
+                                    {
+                                        var d6 = DataRecordBuilder<T6>.Func;
+                                        rd = new IDataRecordDecorator(reader);
+                                        if (reader.Read())
+                                        {
+                                            item6 = d6(rd.Load(reader));
+                                        }
+
+                                        if (reader.NextResult())
+                                        {
+                                            var d7 = DataRecordBuilder<T7>.Func;
+                                            rd = new IDataRecordDecorator(reader);
+                                            if (reader.Read())
+                                            {
+                                                item7 = d7(rd.Load(reader));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                return new Tuple<T1, T2, T3, T4, T5, T6, T7>(item1, item2, item3, item4, item5, item6, item7);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
+                    reader.Close();
+            }
         }
 
         #endregion reader

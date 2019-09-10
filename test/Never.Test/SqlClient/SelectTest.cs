@@ -25,6 +25,9 @@ namespace Never.Test
 
                 return;
             });
+
+            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            dao.ToEasyLinqDao().Update(new User() { }).乐观锁(ta => ta.Balance, 0).Change();
         }
 
         [Xunit.Fact]
