@@ -6,17 +6,26 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    public class Delete: DMLContext
+
+    public abstract class Delete<T>
     {
+        public Result ToResult<Result>()
+        {
+            return default(Result);
+        }
+
+        public int ToChange()
+        {
+            return 0;
+        }
+
+        public Delete<T> Where()
+        {
+            return this;
+        }
     }
 
-
-    public class Delete<T> : Delete
-    {
-
-    }
-
-    public class Delete<T1, T2> : Delete
+    public abstract class Delete<T1, T2>
     {
 
     }

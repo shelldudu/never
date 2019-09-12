@@ -39,6 +39,7 @@ namespace Never.EasySql
         {
             return new Update<T>();
         }
+
         public Delete<T> Delete<T>(T info)
         {
             return new Delete<T>();

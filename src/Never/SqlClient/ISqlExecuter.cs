@@ -25,6 +25,20 @@ namespace Never.SqlClient
         #endregion connection
 
         #region reader
+        /// <summary>
+        /// 获取DbDataReader,高速度，推荐使用，默认为Sql查询
+        /// </summary>
+        /// <param name="sql">查询字符串</param>
+        /// <param name="parameter">查询参数</param>
+        IDataReader CreateReader(string sql, object @parameter);
+
+        /// <summary>
+        /// 获取DbDataReader
+        /// </summary>
+        /// <param name="sql">查询字符串</param>
+        /// <param name="commandType">查询命令的解释模式</param>
+        /// <param name="parameter">查询参数</param>
+        IDataReader CreateReader(string sql, CommandType commandType, object @parameter);
 
         /// <summary>
         /// 读取列表

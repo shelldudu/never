@@ -936,21 +936,13 @@ namespace Never.SqlClient
         /// <returns></returns>
         protected virtual IEnumerable<T> QueryForEnumerable<T>(IDbCommand command, bool closeConnection)
         {
-            var @delegate = DataRecordBuilder<T>.Func;
-            var result = new List<T>();
             IDataReader reader = null;
             try
             {
                 using (reader = this.CreateReader(command))
                 {
-                    var rd = new IDataRecordDecorator(reader);
-                    while (reader.Read())
-                    {
-                        var value = @delegate(rd.Load(reader));
-                        result.Add(value);
-                    }
+                    return ReadingForEnumerable<T>(reader);
                 }
-                return result;
             }
             catch
             {
@@ -961,6 +953,70 @@ namespace Never.SqlClient
                 if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
                     reader.Close();
             }
+        }
+
+        /// <summary>
+        /// 读取一个object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static T ReadingForObject<T>(IDataReader reader)
+        {
+            return ReadingForObject<T>(reader, null);
+        }
+
+        /// <summary>
+        /// 读取一个object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <param name="comparer">字段名的严谨匹配</param>
+        /// <returns></returns>
+        public static T ReadingForObject<T>(IDataReader reader, IEqualityComparer<string> comparer)
+        {
+            var @delegate = DataRecordBuilder<T>.Func;
+            var rd = new IDataRecordDecorator(reader, comparer);
+            var result = new List<T>();
+            if (reader.Read())
+            {
+                var value = @delegate(rd.Load(reader));
+                result.Add(value);
+            }
+
+            return result.Count == 0 ? default(T) : result[0];
+        }
+
+        /// <summary>
+        /// 读取N个object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> ReadingForEnumerable<T>(IDataReader reader)
+        {
+            return ReadingForEnumerable<T>(reader, null);
+        }
+
+        /// <summary>
+        /// 读取N个object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <param name="comparer">字段名的严谨匹配</param>
+        /// <returns></returns>
+        public static IEnumerable<T> ReadingForEnumerable<T>(IDataReader reader, IEqualityComparer<string> comparer)
+        {
+            var @delegate = DataRecordBuilder<T>.Func;
+            var rd = new IDataRecordDecorator(reader, comparer);
+            var result = new List<T>();
+            while (reader.Read())
+            {
+                var value = @delegate(rd.Load(reader));
+                result.Add(value);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -1602,17 +1658,12 @@ namespace Never.SqlClient
         /// <returns></returns>
         protected virtual T QueryForObject<T>(IDbCommand command, bool closeConnection)
         {
-            var @delegate = DataRecordBuilder<T>.Func;
             IDataReader reader = null;
             try
             {
                 using (reader = this.CreateReader(command))
                 {
-                    var rd = new IDataRecordDecorator(reader);
-                    if (reader.Read())
-                    {
-                        return @delegate(rd.Load(reader));
-                    }
+                    return ReadingForObject<T>(reader);
                 }
             }
             catch
@@ -1624,8 +1675,6 @@ namespace Never.SqlClient
                 if (this.Transaction == null && closeConnection && reader != null && !reader.IsClosed)
                     reader.Close();
             }
-
-            return default(T);
         }
 
         /// <summary>

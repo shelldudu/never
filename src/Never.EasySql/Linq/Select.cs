@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    public class Select : DMLContext
+    public class Select
     {
     }
 
