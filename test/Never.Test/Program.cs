@@ -40,6 +40,7 @@ namespace Never.Test
                 {
                     using (var sc = x.ServiceLocator.BeginLifetimeScope())
                     {
+                        var ser = sc.Resolve<Never.Serialization.IJsonSerializer>();
                         var a = sc.Resolve<MMMTTT>();
                         var b = sc.Resolve<IRegistory<int>>();
                         System.Console.WriteLine(b.GetHashCode());

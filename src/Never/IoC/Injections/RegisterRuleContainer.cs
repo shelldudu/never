@@ -82,32 +82,36 @@ namespace Never.IoC.Injections
              （3）如果key为空并且找不到空key的对象，则取最后一个注册的，
              （4）如果key不为空，则抛异常或不处理*/
 
+            RegisterRule rule = null, last = null;
             /*因为key不为空是不可能查询为空的规则*/
             if (!string.IsNullOrEmpty(key))
             {
                 /*先查询全量匹配的key，找到则直接返回*/
                 for (var i = this.rules.Count - 1; i >= 0; i--)
                 {
-                    if (rules[i].Key.IsEquals(key) && rules[i].Match(serviceType))
-                        return rules[i];
+                    rule = rules[i];
+                    if (rule.Key.IsEquals(key) && rule.Match(serviceType))
+                        return rule;
                 }
 
                 return null;
             }
 
-            RegisterRule rule = null;
             /*当key为空并且找不到空key的对象，获取最后一个注册的*/
             for (var i = this.rules.Count - 1; i >= 0; i--)
-            {
+            {       
                 if (rules[i].Match(serviceType))
                 {
                     rule = rules[i];
-                    if (rules[i].Key.IsNullOrEmpty())
-                        return rules[i];
+                    if (last == null)
+                        last = rule;
+
+                    if (rule.Key.IsNullOrEmpty())
+                        return rule;
                 }
             }
 
-            return rule;
+            return last ?? rule;
         }
 
         /// <summary>
