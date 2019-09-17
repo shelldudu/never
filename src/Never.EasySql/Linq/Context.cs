@@ -11,5 +11,6 @@ namespace Never.EasySql.Linq
     /// </summary>
     internal class Context
     {
+       public IDao dao { get; set; }
     }
 }

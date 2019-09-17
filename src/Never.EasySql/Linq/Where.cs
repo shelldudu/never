@@ -9,31 +9,31 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// 
     /// </summary>
-    public abstract class Where
+    public struct Where
     {
     }
 
-    public sealed class OrderBy : Where
-    {
-
-    }
-
-    public sealed class OrderByDesc : Where
+    public struct OrderBy 
     {
 
     }
 
-    public sealed class And : Where
+    public struct OrderByDesc
     {
 
     }
 
-    public sealed class Or : Where
+    public struct And
     {
 
     }
 
-    public sealed class Page : Where
+    public struct Or
+    {
+
+    }
+
+    public struct Page
     {
 
     }

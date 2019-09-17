@@ -20,8 +20,19 @@ namespace Never.EasySql
     /// <summary>
     /// 可空类型
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public interface IReferceNullableParameter : INullableParameter
+    /// <typeparam name="T"></typeparam>
+    public interface IGenericeNullableParameter<T> : INullableParameter
+    {
+        /// <summary>
+        /// 值
+        /// </summary>
+        NullableObject<T> Target { get; }
+    }
+
+    /// <summary>
+    /// 可空类型
+    /// </summary>
+    internal interface IReferceNullableParameter : INullableParameter
     {
         /// <summary>
         /// 值
@@ -30,16 +41,23 @@ namespace Never.EasySql
     }
 
     /// <summary>
-    /// 可空类型
+    /// 可空类型的值
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public interface IGenericeNullableParameter<T> : INullableParameter
+    public struct NullableObject<T>
     {
         /// <summary>
         /// 值
         /// </summary>
-        T Value { get; }
+        internal T Value { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        public NullableObject(T value) : this()
+        {
+            this.Value = value;
+        }
     }
 
     internal class StructNullableParameter<T> : INullableParameter, IReferceNullableParameter, IGenericeNullableParameter<T> where T : struct
@@ -55,7 +73,7 @@ namespace Never.EasySql
 
         object IReferceNullableParameter.Value => this.value.HasValue ? (object)this.value.Value : null;
 
-        T IGenericeNullableParameter<T>.Value => this.value.HasValue ? this.value.Value : default(T);
+        NullableObject<T> IGenericeNullableParameter<T>.Target => new NullableObject<T>(this.value.HasValue ? this.value.Value : default(T));
     }
 
     internal class StringNullableParameter : INullableParameter, IReferceNullableParameter, IGenericeNullableParameter<string>
@@ -71,7 +89,7 @@ namespace Never.EasySql
 
         object IReferceNullableParameter.Value => this.value.IsNotNullOrEmpty() ? this.value : null;
 
-        string IGenericeNullableParameter<string>.Value => this.value.IsNotNullOrEmpty() ? this.value : null;
+        NullableObject<string> IGenericeNullableParameter<string>.Target => new NullableObject<string>(this.value.IsNotNullOrEmpty() ? this.value : null);
     }
 
     internal class GuidNullableParameter : INullableParameter, IReferceNullableParameter, IGenericeNullableParameter<Guid>
@@ -87,7 +105,7 @@ namespace Never.EasySql
 
         object IReferceNullableParameter.Value => this.value != Guid.Empty ? this.value : Guid.Empty;
 
-        Guid IGenericeNullableParameter<Guid>.Value => this.value != Guid.Empty ? this.value : Guid.Empty;
+        NullableObject<Guid> IGenericeNullableParameter<Guid>.Target => new NullableObject<Guid>(this.value != Guid.Empty ? this.value : Guid.Empty);
     }
 
     internal class EnumerableNullableParameter<T> : INullableParameter, IReferceNullableParameter, IGenericeNullableParameter<IEnumerable<T>>
@@ -103,6 +121,6 @@ namespace Never.EasySql
 
         object IReferceNullableParameter.Value => this.value;
 
-        IEnumerable<T> IGenericeNullableParameter<IEnumerable<T>>.Value => this.value;
+        NullableObject<IEnumerable<T>> IGenericeNullableParameter<IEnumerable<T>>.Target => new NullableObject<IEnumerable<T>>(this.value);
     }
 }

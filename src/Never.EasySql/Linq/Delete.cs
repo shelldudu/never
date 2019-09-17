@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Never.EasySql.Linq
 {
 
-    public abstract class Delete<T>
+    public struct Delete<Parameter>
     {
         public Result ToResult<Result>()
         {
@@ -19,13 +19,13 @@ namespace Never.EasySql.Linq
             return 0;
         }
 
-        public Delete<T> Where()
+        public Delete<Parameter> Where()
         {
             return this;
         }
     }
 
-    public abstract class Delete<T1, T2>
+    public struct Delete<T1, T2>
     {
 
     }

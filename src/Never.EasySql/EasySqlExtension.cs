@@ -85,10 +85,31 @@ namespace Never.EasySql
         /// 对idao进一步装饰
         /// </summary>
         /// <param name="dao"></param>
+        /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedLinqDao ToEasyLinqDao(this IDao dao)
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, T parameter)
         {
-            return new EasyDecoratedLinqDao(dao);
+            return new EasyDecoratedLinqDao<T>(dao, new KeyValueEasySqlParameter<T>(parameter));
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="V"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="table"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T, V>(this IDao dao, T table, IEnumerable<V> parameter)
+        {
+            if (table is INullableParameter)
+                throw new ArgumentException("table类型不能是INullableParameter");
+
+            if (parameter is INullableParameter)
+                throw new ArgumentException("parameter类型不能是INullableParameter");
+
+            return new EasyDecoratedLinqDao<T>(dao, new ArrayEasySqlParameter<T, V>(table, parameter));
         }
 
         /// <summary>

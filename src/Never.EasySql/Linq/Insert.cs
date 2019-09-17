@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    public abstract class Insert<T>
+    public struct Insert<T>
     {
         internal Context Context { get; set; }
 
@@ -46,7 +46,7 @@ namespace Never.EasySql.Linq
         }
     }
 
-    public abstract class Insert<T1, T2>
+    public struct Insert<T1, T2>
     {
         internal Context Context { get; set; }
 

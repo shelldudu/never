@@ -27,7 +27,13 @@ namespace Never.Test
             });
 
             var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
-            dao.ToEasyLinqDao().Update(new User() { }).乐观锁(ta => ta.Balance, 0).Change();
+            var builder1 = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().Where((p, t) => t.EmbeddedSqlMaps.Count() >= p.Id).ToSingle().GetResult();
+            var builder2 = dao.ToEasyLinqDao(new { }).Select<SqlServerBuilder, SqlServerBuilder>().LeftJoin((p, t1, t2) => t1.EmbeddedSqlMaps == t2.EmbeddedSqlMaps)
+                .Where(null).ToList(1, 5).ToSingle().GetResult();
+
+            var builder3 = dao.ToEasyLinqDao(new { }).Select<SqlServerBuilder, SqlServerBuilder, SqlServerBuilder>().LeftJoin((p, t1, t2, t3) => t1.EmbeddedSqlMaps == t2.EmbeddedSqlMaps && t1.EmbeddedSqlMaps == t3.EmbeddedSqlMaps)
+                .Where(null).ToList(1, 5).ToSingle().ToSingle().GetResult();
+
         }
 
         [Xunit.Fact]

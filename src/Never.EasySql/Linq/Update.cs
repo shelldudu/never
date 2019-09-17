@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    public class Update : DMLContext
+    public struct Update
     {
     }
 
-    public class Update<T> : Update
+    public struct Update<T>
     {
         public Update<T> 乐观锁(System.Linq.Expressions.Expression<Func<T, object>> expression, int abc)
         {
@@ -33,7 +33,7 @@ namespace Never.EasySql.Linq
         }
     }
 
-    public class Update<T1, T2> : Update
+    public struct Update<T1, T2>
     {
 
     }
