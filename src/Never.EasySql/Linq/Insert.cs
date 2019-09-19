@@ -14,6 +14,16 @@ namespace Never.EasySql.Linq
     public struct Insert<Parameter>
     {
         /// <summary>
+        /// 上下文
+        /// </summary>
+        internal Context Context { get; set; }
+
+        /// <summary>
+        /// 参数
+        /// </summary>
+        internal EasySqlParameter<Parameter> SqlParameter { get; set; }
+
+        /// <summary>
         /// 更新的字段名
         /// </summary>
         public Insert<Parameter> SetColum(Expression<Func<Parameter, object>> expression)
@@ -42,7 +52,13 @@ namespace Never.EasySql.Linq
         /// </summary>
         public Result GetResult<Result>()
         {
-            return default(Result);
+            if (this.Context.dao.CurrentSession != null)
+                return (Result)this.Context.dao.Insert<Parameter>(this.Context.Build(), this.SqlParameter);
+
+            using (this.Context.dao)
+            {
+                return (Result)this.Context.dao.Insert<Parameter>(this.Context.Build(), this.SqlParameter);
+            }
         }
 
         /// <summary>
@@ -59,6 +75,14 @@ namespace Never.EasySql.Linq
         public NWhere<Parameter> Where<TMember>(Expression<Func<Parameter, TMember, object>> expression, TMember value)
         {
             return new NWhere<Parameter>();
+        }
+
+        /// <summary>
+        /// 返回最后插入语句
+        /// </summary>
+        public NLastInsertId<Parameter> LastInsertId()
+        {
+            return new NLastInsertId<Parameter>();
         }
 
         /// <summary>
@@ -137,6 +161,21 @@ namespace Never.EasySql.Linq
             public NWhere<NParameter> NotIn(Func<TableInfo, string> notexists)
             {
                 return this;
+            }
+        }
+
+        /// <summary>
+        /// 返回最后插入语句
+        /// </summary>
+        /// <typeparam name="NParameter"></typeparam>
+        public struct NLastInsertId<NParameter>
+        {
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public Result GetResult<Result>()
+            {
+                return default(Result);
             }
         }
     }

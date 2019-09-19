@@ -1,4 +1,6 @@
-﻿using Never.EasySql.Linq;
+﻿using Never.EasySql.Client;
+using Never.EasySql.Linq;
+using Never.EasySql.Linq.Expressions;
 using Never.EasySql.Text;
 using Never.EasySql.Xml;
 using System;
@@ -20,7 +22,6 @@ namespace Never.EasySql
 
         private readonly IDao dao = null;
         private readonly EasySqlParameter<Parameter> parameter = null;
-        private readonly Context context = null;
         #endregion field
 
         #region ctor
@@ -34,13 +35,36 @@ namespace Never.EasySql
         {
             this.dao = dao;
             this.parameter = parameter;
-            this.context = new Context()
-            {
-                dao = dao
-            };
         }
 
         #endregion ctor
+
+        #region context
+
+        private Context InitContext()
+        {
+            if (this.dao.SqlExecuter is MySqlExecuter)
+                return new MySqlContext();
+
+            if (this.dao.SqlExecuter is SqlServerExecuter)
+                return new SqlServerContext();
+
+            if (this.dao.SqlExecuter is OdbcServerExecuter)
+                return new OdbcServerContext();
+
+            if (this.dao.SqlExecuter is OleDbServerExecuter)
+                return new OleDbServerContext();
+
+            if (this.dao.SqlExecuter is OracleServerExecuter)
+                return new OracleServerContext();
+
+            if (this.dao.SqlExecuter is PostgreSqlExecuter)
+                return new PostgreSqlContext();
+
+            throw new Exception("dao.SqlExecuter 无法识别，不能创建上下文");
+        }
+
+        #endregion
 
         #region trans
 
@@ -113,7 +137,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public Update<Parameter> Update()
         {
-            return new Update<Parameter>();
+            return new Update<Parameter>() { Context = this.InitContext() };
         }
 
         /// <summary>
@@ -122,7 +146,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public Delete<Parameter> Delete()
         {
-            return new Delete<Parameter>();
+            return new Delete<Parameter>() { Context = this.InitContext() };
         }
 
         /// <summary>
@@ -131,7 +155,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public Insert<Parameter> Insert()
         {
-            return new Insert<Parameter>();
+            return new Insert<Parameter>() { Context = this.InitContext() };
         }
 
         /// <summary>
@@ -141,7 +165,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public Select<Parameter, T> Select<T>()
         {
-            return new Select<Parameter, T>();
+            return new Select<Parameter, T>() { Context = this.InitContext() };
         }
 
         /// <summary>
@@ -151,7 +175,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public Select<Parameter, T> Select<T>(params Expression<Func<Parameter, T, object>>[] expression)
         {
-            return new Select<Parameter, T>();
+            return new Select<Parameter, T>() { Context = this.InitContext() };
         }
 
         /// <summary>
@@ -172,19 +196,6 @@ namespace Never.EasySql
             {
                 return this.dao.Call<Parameter>(sqlTag, this.parameter, callmode);
             }
-        }
-
-        /// <summary>
-        /// 执行方法
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="callmode"></param>
-        /// <returns></returns>
-        public object Call(Action<Parameter, StringBuilder> sql, CallMode callmode = CallMode.ExecuteScalar | CallMode.CommandText)
-        {
-            var sb = new StringBuilder();
-            sql(this.parameter.Object, sb);
-            return this.Call(sb.ToString(), callmode);
         }
 
         #endregion crud

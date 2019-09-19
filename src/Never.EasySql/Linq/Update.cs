@@ -14,6 +14,16 @@ namespace Never.EasySql.Linq
     public struct Update<Parameter>
     {
         /// <summary>
+        /// 上下文
+        /// </summary>
+        internal Context Context { get; set; }
+
+        /// <summary>
+        /// 参数
+        /// </summary>
+        internal EasySqlParameter<Parameter> SqlParameter { get; set; }
+
+        /// <summary>
         /// 更新的字段名
         /// </summary>
         public Update<Parameter> SetColum(Expression<Func<Parameter, object>> expression)
@@ -40,9 +50,15 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 获取结果
         /// </summary>
-        public Result GetResult<Result>()
+        public int GetResult()
         {
-            return default(Result);
+            if (this.Context.dao.CurrentSession != null)
+                return this.Context.dao.Update(this.Context.Build(), this.SqlParameter);
+
+            using (this.Context.dao)
+            {
+                return this.Context.dao.Update(this.Context.Build(), this.SqlParameter);
+            }
         }
 
         /// <summary>

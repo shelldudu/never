@@ -25,6 +25,7 @@ namespace Never.SqlClient
         #endregion connection
 
         #region reader
+
         /// <summary>
         /// 获取DbDataReader,高速度，推荐使用，默认为Sql查询
         /// </summary>

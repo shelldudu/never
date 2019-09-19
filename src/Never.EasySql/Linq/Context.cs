@@ -9,8 +9,17 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// 上下文
     /// </summary>
-    internal class Context
+    internal abstract class Context
     {
-       public IDao dao { get; set; }
+        /// <summary>
+        /// dao
+        /// </summary>
+        public IDao dao { get; set; }
+
+        /// <summary>
+        /// 构建
+        /// </summary>
+        /// <returns></returns>
+        public abstract SqlTag Build();
     }
 }

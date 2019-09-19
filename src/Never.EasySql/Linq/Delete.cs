@@ -14,11 +14,27 @@ namespace Never.EasySql.Linq
     public struct Delete<Parameter>
     {
         /// <summary>
+        /// 上下文
+        /// </summary>
+        internal Context Context { get; set; }
+
+        /// <summary>
+        /// 参数
+        /// </summary>
+        internal EasySqlParameter<Parameter> SqlParameter { get; set; }
+
+        /// <summary>
         /// 获取结果
         /// </summary>
-        public Result GetResult<Result>()
+        public int GetResult()
         {
-            return default(Result);
+            if (this.Context.dao.CurrentSession != null)
+                return this.Context.dao.Delete(this.Context.Build(), this.SqlParameter);
+
+            using (this.Context.dao)
+            {
+                return this.Context.dao.Delete(this.Context.Build(), this.SqlParameter);
+            }
         }
 
         /// <summary>
@@ -26,7 +42,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public NWhere<Parameter> Where()
         {
-            return new NWhere<Parameter>();
+            return new NWhere<Parameter>() { Context = this.Context };
         }
 
         /// <summary>
@@ -43,6 +59,11 @@ namespace Never.EasySql.Linq
         /// <typeparam name="NParameter">查询参数</typeparam>
         public struct NWhere<NParameter>
         {
+            /// <summary>
+            /// 上下文
+            /// </summary>
+            internal Context Context { get; set; }
+
             /// <summary>
             /// 存在
             /// </summary>

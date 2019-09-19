@@ -232,19 +232,6 @@ namespace Never.EasySql
         }
 
         /// <summary>
-        /// 执行方法
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="callmode"></param>
-        /// <returns></returns>
-        public object Call(Action<Parameter, StringBuilder> sql, CallMode callmode = CallMode.ExecuteScalar | CallMode.CommandText)
-        {
-            var sb = new StringBuilder();
-            sql(this.parameter.Object, sb);
-            return this.Call(sb.ToString(), callmode);
-        }
-
-        /// <summary>
         /// 开启新事务
         /// </summary>
         /// <returns></returns>

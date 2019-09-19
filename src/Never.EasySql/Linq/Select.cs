@@ -15,6 +15,16 @@ namespace Never.EasySql.Linq
     public struct Select<Parameter, T>
     {
         /// <summary>
+        /// 上下文
+        /// </summary>
+        internal Context Context { get; set; }
+
+        /// <summary>
+        /// 参数
+        /// </summary>
+        internal EasySqlParameter<Parameter> SqlParameter { get; set; }
+
+        /// <summary>
         /// 字段名
         /// </summary>
         public Select<Parameter, T> SelectColum(Expression<Func<Parameter, T, object>> expression)
