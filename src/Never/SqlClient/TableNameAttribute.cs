@@ -9,6 +9,7 @@ namespace Never.SqlClient
     /// <summary>
     /// 表名特性
     /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
     public class TableNameAttribute : Attribute
     {
         /// <summary>

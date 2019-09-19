@@ -1,4 +1,5 @@
-﻿using Never.Exceptions;
+﻿using Never.EasySql.Xml;
+using Never.Exceptions;
 using Never.Serialization.Json;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Never.EasySql.Xml
+namespace Never.EasySql
 {
     /// <summary>
     /// sqltag
@@ -533,7 +534,7 @@ namespace Never.EasySql.Xml
                                     var ss = start + 1;
                                     var se = end2 - start;
                                     var name = text.Sub(ss, se);
-                                    var parameter = new ParameterPosition()
+                                    var parameter = new SqlTagParameterPosition()
                                     {
                                         Name = name,
                                         SourcePrefix = new string(text[start], 1),
@@ -602,7 +603,7 @@ namespace Never.EasySql.Xml
                             }
 
                             var name = text.Sub(i + 1, end - i);
-                            var parameter = new ParameterPosition()
+                            var parameter = new SqlTagParameterPosition()
                             {
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
@@ -649,7 +650,7 @@ namespace Never.EasySql.Xml
                             }
 
                             var name = text.Sub(i + 1, end - i);
-                            var parameter = new ParameterPosition()
+                            var parameter = new SqlTagParameterPosition()
                             {
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
@@ -823,7 +824,7 @@ namespace Never.EasySql.Xml
                                     var ss = start + 1;
                                     var se = end2 - start;
                                     var name = text.Sub(ss, se);
-                                    var parameter = new ParameterPosition()
+                                    var parameter = new SqlTagParameterPosition()
                                     {
                                         Name = name,
                                         SourcePrefix = new string(text[start], 1),
@@ -895,7 +896,7 @@ namespace Never.EasySql.Xml
                             }
 
                             var name = text.Sub(i + 1, end - i);
-                            var parameter = new ParameterPosition()
+                            var parameter = new SqlTagParameterPosition()
                             {
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
@@ -944,7 +945,7 @@ namespace Never.EasySql.Xml
                             }
 
                             var name = text.Sub(i + 1, end - i);
-                            var parameter = new ParameterPosition()
+                            var parameter = new SqlTagParameterPosition()
                             {
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),

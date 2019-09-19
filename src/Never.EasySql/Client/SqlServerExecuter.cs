@@ -6,12 +6,11 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 
-namespace Never.EasySql.SqlClient
+namespace Never.EasySql.Client
 {
     /// <summary>
     /// sqlserver数据库
     /// </summary>
-    [Obsolete("use client namespace")]
     public sealed class SqlServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild

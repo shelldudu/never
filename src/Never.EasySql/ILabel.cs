@@ -4,18 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Xml
+namespace Never.EasySql
 {
     /// <summary>
     /// 标签类型
     /// </summary>
     public interface ILabel
     {
-        /// <summary>
-        /// 标签类型
-        /// </summary>
-        LabelType GetLabelType();
-
         /// <summary>
         /// sql语句
         /// </summary>

@@ -11,7 +11,7 @@ namespace Never.EasySql.SqlClient
     /// <summary>
     /// mySql数据库
     /// </summary>
-
+    [Obsolete("use client namespace")]
     public sealed class MySqlExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild

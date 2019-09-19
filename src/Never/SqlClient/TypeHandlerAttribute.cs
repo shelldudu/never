@@ -11,11 +11,6 @@ namespace Never.SqlClient
     public class TypeHandlerAttribute : Attribute
     {
         /// <summary>
-        /// 名字
-        /// </summary>
-        public string AliasName { get; set; }
-
-        /// <summary>
         /// 类型处理者
         /// </summary>
         public Type TypeHandler { get; set; }

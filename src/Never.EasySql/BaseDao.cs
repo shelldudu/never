@@ -154,90 +154,39 @@ namespace Never.EasySql
         #region crud
 
         /// <summary>
-        /// 获取Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        protected virtual SqlTag GetSqlTag(string id)
-        {
-            return this.SqlTagProvider.Get(id);
-        }
-
-        /// <summary>
         /// 得到sqltag
         /// </summary>
-        /// <param name="sqlId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <param name="formatText"></param>
         /// <returns></returns>
-        public SqlTagFormat GetSqlTagFormat<T>(string sqlId, EasySqlParameter<T> parameter, bool formatText = false)
+        public SqlTagFormat GetSqlTagFormat<T>(SqlTag sqlTag, EasySqlParameter<T> parameter, bool formatText = false)
         {
-            var tag = this.GetSqlTag(sqlId);
-            if (tag == null)
-            {
-                throw new KeyNotExistedException(sqlId, "the sql tag '{0}' not found in the sql files", sqlId);
-            }
-
-            return formatText ? tag.FormatForText(parameter) : tag.Format(parameter);
+            return formatText ? sqlTag.FormatForText(parameter) : sqlTag.Format(parameter);
         }
 
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="deleteId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public int Delete<T>(string deleteId, EasySqlParameter<T> parameter)
+        public virtual int Delete<T>(SqlTag sqlTag, EasySqlParameter<T> parameter)
         {
-            var tag = this.GetSqlTag(deleteId);
-            if (tag == null)
-            {
-                throw new KeyNotExistedException(deleteId, "the sql tag '{0}' not found in the sql files", deleteId);
-            }
-
-            return this.Delete<T>(tag, parameter);
-        }
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
-        public virtual int Delete<T>(SqlTag tag, EasySqlParameter<T> parameter)
-        {
-            var format = tag.Format(parameter);
+            var format = sqlTag.Format(parameter);
             return this.SqlExecuter.Delete(format.ToString(), CommandType.Text, format.Parameters.ToArray());
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="insertId"></param>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
-        public object Insert<T>(string insertId, EasySqlParameter<T> parameter)
-        {
-            var tag = this.GetSqlTag(insertId);
-            if (tag == null)
-            {
-                throw new KeyNotExistedException(insertId, "the sql tag '{0}' not found in the sql files", insertId);
-            }
-
-            return this.Insert<T>(tag, parameter);
         }
 
         /// <summary>
         /// 插入
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="tag"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public virtual object Insert<T>(SqlTag tag, EasySqlParameter<T> parameter)
+        public virtual object Insert<T>(SqlTag sqlTag, EasySqlParameter<T> parameter)
         {
-            var format = tag.Format(parameter);
+            var format = sqlTag.Format(parameter);
             if (format.ReturnType.IsNullOrEmpty())
             {
                 return this.SqlExecuter.Insert(format.ToString(), CommandType.Text, format.Parameters.ToArray());
@@ -303,31 +252,12 @@ namespace Never.EasySql
         /// </summary>
         /// <typeparam name="Result"></typeparam>
         /// <typeparam name="T"></typeparam>
-        /// <param name="selectId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public Result QueryForObject<Result, T>(string selectId, EasySqlParameter<T> parameter)
+        public virtual Result QueryForObject<Result, T>(SqlTag sqlTag, EasySqlParameter<T> parameter)
         {
-            var tag = this.GetSqlTag(selectId);
-            if (tag == null)
-            {
-                throw new KeyNotExistedException(selectId, "the sql tag '{0}' not found in the sql files", selectId);
-            }
-
-            return this.QueryForObject<Result, T>(tag, parameter);
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="Result"></typeparam>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tag"></param>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
-        public virtual Result QueryForObject<Result, T>(SqlTag tag, EasySqlParameter<T> parameter)
-        {
-            var format = tag.Format(parameter);
+            var format = sqlTag.Format(parameter);
             return this.SqlExecuter.QueryForObject<Result>(format.ToString(), CommandType.Text, format.Parameters.ToArray());
         }
 
@@ -336,31 +266,12 @@ namespace Never.EasySql
         /// </summary>
         /// <typeparam name="Result"></typeparam>
         /// <typeparam name="T"></typeparam>
-        /// <param name="selectId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public IEnumerable<Result> QueryForEnumerable<Result, T>(string selectId, EasySqlParameter<T> parameter)
+        public virtual IEnumerable<Result> QueryForEnumerable<Result, T>(SqlTag sqlTag, EasySqlParameter<T> parameter)
         {
-            var tag = this.GetSqlTag(selectId);
-            if (tag == null)
-            {
-                throw new KeyNotExistedException(selectId, "the sql tag '{0}' not found in the sql files", selectId);
-            }
-
-            return this.QueryForEnumerable<Result, T>(tag, parameter);
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="Result"></typeparam>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tag"></param>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
-        public virtual IEnumerable<Result> QueryForEnumerable<Result, T>(SqlTag tag, EasySqlParameter<T> parameter)
-        {
-            var format = tag.Format(parameter);
+            var format = sqlTag.Format(parameter);
             var temp = this.SqlExecuter.QueryForEnumerable<Result>(format.ToString(), CommandType.Text, format.Parameters.ToArray());
             return temp == null ? new Result[0] : temp;
         }
@@ -369,30 +280,12 @@ namespace Never.EasySql
         ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="updateId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public int Update<T>(string updateId, EasySqlParameter<T> parameter)
+        public virtual int Update<T>(SqlTag sqlTag, EasySqlParameter<T> parameter)
         {
-            var tag = this.GetSqlTag(updateId);
-            if (tag == null)
-            {
-                throw new KeyNotExistedException(updateId, "the sql tag '{0}' not found in the sql files", updateId);
-            }
-
-            return this.Update<T>(tag, parameter);
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tag"></param>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
-        public virtual int Update<T>(SqlTag tag, EasySqlParameter<T> parameter)
-        {
-            var format = tag.Format(parameter);
+            var format = sqlTag.Format(parameter);
             return this.SqlExecuter.Update(format.ToString(), CommandType.Text, format.Parameters.ToArray());
         }
 
@@ -400,32 +293,13 @@ namespace Never.EasySql
         ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="callId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <param name="callmode"></param>
         /// <returns></returns>
-        public object Call<T>(string callId, EasySqlParameter<T> parameter, CallMode callmode)
+        public virtual object Call<T>(SqlTag sqlTag, EasySqlParameter<T> parameter, CallMode callmode)
         {
-            var tag = this.GetSqlTag(callId);
-            if (tag == null)
-            {
-                throw new KeyNotExistedException(callId, "the sql tag '{0}' not found in the sql files", callId);
-            }
-
-            return this.Call<T>(tag, parameter, callmode);
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tag"></param>
-        /// <param name="parameter"></param>
-        /// <param name="callmode"></param>
-        /// <returns></returns>
-        public virtual object Call<T>(SqlTag tag, EasySqlParameter<T> parameter, CallMode callmode)
-        {
-            var format = tag.Format(parameter);
+            var format = sqlTag.Format(parameter);
             if ((callmode & CallMode.ExecuteScalar) == CallMode.ExecuteScalar)
             {
                 if ((callmode & CallMode.CommandText) == CallMode.CommandText)

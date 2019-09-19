@@ -17,7 +17,7 @@ namespace Never.EasySql
         /// <summary>
         /// 获取所有的SqlMap文件
         /// </summary>
-        public abstract FileInfo[] FileSqlMaps { get; }
+        public virtual FileInfo[] FileSqlMaps { get; }
 
         #endregion property
 
@@ -67,7 +67,7 @@ namespace Never.EasySql
         /// <param name="path">路径</param>
         /// <param name="checking"></param>
         /// <returns></returns>
-        protected virtual FileInfo[] GetXmlContentFromPath(string path, System.Func<System.Xml.XmlDocument, string, bool> checking)
+        protected FileInfo[] GetXmlContentFromPath(string path, System.Func<System.Xml.XmlDocument, string, bool> checking)
         {
             var files = System.IO.Directory.GetFiles(path, "*", SearchOption.TopDirectoryOnly);
             if (files == null || files.Length <= 0)

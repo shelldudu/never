@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Xml
+namespace Never.EasySql
 {
     /// <summary>
     /// sqltag提供者
@@ -141,7 +141,7 @@ namespace Never.EasySql.Xml
         /// <param name="node"></param>
         /// <param name="sqlTag"></param>
         /// <returns></returns>
-        private static bool LoadCommandName(System.Xml.XmlNode node, SqlTag sqlTag)
+        internal bool LoadCommandName(System.Xml.XmlNode node, SqlTag sqlTag)
         {
             switch (node.Name)
             {

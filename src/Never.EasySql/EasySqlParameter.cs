@@ -218,7 +218,7 @@ namespace Never.EasySql
             var list = new List<DataMemberInfo>(members.Length);
             foreach (var member in members)
             {
-                var primary = member.GetAttribute<PrimaryAttribute>();
+                var column = member.GetAttribute<ColumnAttribute>();
                 var typehandler = member.GetAttribute<TypeHandlerAttribute>();
                 if (member.MemberType == MemberTypes.Property)
                 {
@@ -228,7 +228,7 @@ namespace Never.EasySql
                         list.Add(new DataMemberInfo()
                         {
                             Member = member,
-                            Primary = primary,
+                            Column = column,
                             TypeHandler = typehandler,
                         });
                     }
@@ -239,7 +239,7 @@ namespace Never.EasySql
                     list.Add(new DataMemberInfo()
                     {
                         Member = member,
-                        Primary = primary,
+                        Column = column,
                         TypeHandler = typehandler,
                     });
                 }

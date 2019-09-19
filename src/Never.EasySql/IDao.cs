@@ -70,67 +70,67 @@ namespace Never.EasySql
         /// 更新
         /// </summary>
         /// <typeparam name="Parameter"></typeparam>
-        /// <param name="updateId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        int Update<Parameter>(string updateId, EasySqlParameter<Parameter> parameter);
+        int Update<Parameter>(SqlTag sqlTag, EasySqlParameter<Parameter> parameter);
 
         /// <summary>
         /// 删除
         /// </summary>
         /// <typeparam name="Parameter"></typeparam>
-        /// <param name="deleteId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        int Delete<Parameter>(string deleteId, EasySqlParameter<Parameter> parameter);
+        int Delete<Parameter>(SqlTag sqlTag, EasySqlParameter<Parameter> parameter);
 
         /// <summary>
         /// 插入
         /// </summary>
         /// <typeparam name="Parameter"></typeparam>
-        /// <param name="insertId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        object Insert<Parameter>(string insertId, EasySqlParameter<Parameter> parameter);
+        object Insert<Parameter>(SqlTag sqlTag, EasySqlParameter<Parameter> parameter);
 
         /// <summary>
         /// 查询某一行
         /// </summary>
         /// <typeparam name="Result"></typeparam>
         /// <typeparam name="Parameter"></typeparam>
-        /// <param name="selectId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        Result QueryForObject<Result, Parameter>(string selectId, EasySqlParameter<Parameter> parameter);
+        Result QueryForObject<Result, Parameter>(SqlTag sqlTag, EasySqlParameter<Parameter> parameter);
 
         /// <summary>
         /// 查询数组
         /// </summary>
         /// <typeparam name="Result"></typeparam>
         /// <typeparam name="Parameter"></typeparam>
-        /// <param name="selectId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        IEnumerable<Result> QueryForEnumerable<Result, Parameter>(string selectId, EasySqlParameter<Parameter> parameter);
+        IEnumerable<Result> QueryForEnumerable<Result, Parameter>(SqlTag sqlTag, EasySqlParameter<Parameter> parameter);
 
         /// <summary>
         /// 执行查询
         /// </summary>
         /// <typeparam name="Parameter"></typeparam>
-        /// <param name="callId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <param name="callmode">请使用枚举的位运算如<see cref="CallMode.CommandStoredProcedure"/> | <see cref="CallMode.ExecuteScalar"/> </param>
         /// <returns></returns>
-        object Call<Parameter>(string callId, EasySqlParameter<Parameter> parameter, CallMode callmode);
+        object Call<Parameter>(SqlTag sqlTag, EasySqlParameter<Parameter> parameter, CallMode callmode);
 
         /// <summary>
         /// 获取格式化
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="sqlId"></param>
+        /// <param name="sqlTag"></param>
         /// <param name="parameter"></param>
         /// <param name="formatText"></param>
         /// <returns></returns>
-        SqlTagFormat GetSqlTagFormat<T>(string sqlId, EasySqlParameter<T> parameter, bool formatText = false);
+        SqlTagFormat GetSqlTagFormat<T>(SqlTag sqlTag, EasySqlParameter<T> parameter, bool formatText = false);
     }
 }

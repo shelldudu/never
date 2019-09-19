@@ -50,12 +50,12 @@ namespace Never.EasySql.Xml
         /// <param name="parameters"></param>
         /// <param name="start"></param>
         /// <returns></returns>
-        protected virtual ParameterPosition MathPosition(List<ParameterPosition> parameters, int start)
+        protected virtual SqlTagParameterPosition MathPosition(List<SqlTagParameterPosition> parameters, int start)
         {
             if (parameters.Count == 0)
                 return null;
 
-            ParameterPosition found = null;
+            SqlTagParameterPosition found = null;
             for (var i = 0; i < parameters.Count; i++)
             {
                 if (parameters[i].PrefixStart == start)

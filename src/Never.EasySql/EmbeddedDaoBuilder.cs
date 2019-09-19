@@ -20,7 +20,7 @@ namespace Never.EasySql
         /// <summary>
         /// 获取所有的SqlMap文件
         /// </summary>
-        public abstract string[] EmbeddedSqlMaps { get; }
+        public virtual string[] EmbeddedSqlMaps { get; }
 
         #endregion property
 
@@ -107,7 +107,7 @@ namespace Never.EasySql
         /// <param name="assembly">程序集</param>
         /// <param name="checking"></param>
         /// <returns></returns>
-        protected virtual string[] GetXmlContentFromAssembly(Assembly assembly, System.Func<System.Xml.XmlDocument, string, bool> checking)
+        protected string[] GetXmlContentFromAssembly(Assembly assembly, System.Func<System.Xml.XmlDocument, string, bool> checking)
         {
             var assemblyName = assembly.GetName();
             var files = assembly.GetManifestResourceNames();

@@ -55,32 +55,32 @@ namespace Never.EasySql
         /// </summary>
         public ISqlTagProvider SqlTagProvider => this.dao.SqlTagProvider;
 
-        object IDao.Call<T>(string deleteId, EasySqlParameter<T> parameter, CallMode callmode)
+        object IDao.Call<T>(SqlTag deleteId, EasySqlParameter<T> parameter, CallMode callmode)
         {
             return this.dao.Call<T>(deleteId, parameter, callmode);
         }
 
-        int IDao.Delete<T>(string deleteId, EasySqlParameter<T> parameter)
+        int IDao.Delete<T>(SqlTag deleteId, EasySqlParameter<T> parameter)
         {
             return this.dao.Delete<T>(deleteId, parameter);
         }
 
-        object IDao.Insert<T>(string insertId, EasySqlParameter<T> parameter)
+        object IDao.Insert<T>(SqlTag insertId, EasySqlParameter<T> parameter)
         {
             return this.dao.Insert<T>(insertId, parameter);
         }
 
-        Result IDao.QueryForObject<Result, T>(string selectId, EasySqlParameter<T> parameter)
+        Result IDao.QueryForObject<Result, T>(SqlTag selectId, EasySqlParameter<T> parameter)
         {
             return this.dao.QueryForObject<Result, T>(selectId, parameter);
         }
 
-        IEnumerable<Result> IDao.QueryForEnumerable<Result, T>(string selectId, EasySqlParameter<T> parameter)
+        IEnumerable<Result> IDao.QueryForEnumerable<Result, T>(SqlTag selectId, EasySqlParameter<T> parameter)
         {
             return this.dao.QueryForEnumerable<Result, T>(selectId, parameter);
         }
 
-        int IDao.Update<T>(string updateId, EasySqlParameter<T> parameter)
+        int IDao.Update<T>(SqlTag updateId, EasySqlParameter<T> parameter)
         {
             return this.dao.Update<T>(updateId, parameter);
         }
@@ -115,7 +115,7 @@ namespace Never.EasySql
             this.dao.RollBackTransaction(closeConnection);
         }
 
-        SqlTagFormat IDao.GetSqlTagFormat<T>(string sqlId, EasySqlParameter<T> parameter, bool formatText)
+        SqlTagFormat IDao.GetSqlTagFormat<T>(SqlTag sqlId, EasySqlParameter<T> parameter, bool formatText)
         {
             return this.dao.GetSqlTagFormat<T>(sqlId, parameter, formatText);
         }

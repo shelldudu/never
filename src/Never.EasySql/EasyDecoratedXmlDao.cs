@@ -1,4 +1,5 @@
 ﻿using Never.EasySql.Xml;
+using Never.Exceptions;
 using Never.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -47,14 +48,20 @@ namespace Never.EasySql
         /// <returns></returns>
         public T QueryForObject<T>(string selectId)
         {
+            var tag = this.dao.SqlTagProvider.Get(selectId);
+            if (tag == null)
+            {
+                throw new KeyNotExistedException(selectId, "the sql tag '{0}' not found in the sql files", selectId);
+            }
+
             if (this.dao.CurrentSession != null)
             {
-                return this.dao.QueryForObject<T, Parameter>(selectId, this.parameter);
+                return this.dao.QueryForObject<T, Parameter>(tag, this.parameter);
             }
 
             using (this.dao)
             {
-                return this.dao.QueryForObject<T, Parameter>(selectId, this.parameter);
+                return this.dao.QueryForObject<T, Parameter>(tag, this.parameter);
             }
         }
 
@@ -66,14 +73,20 @@ namespace Never.EasySql
         /// <returns></returns>
         public IEnumerable<T> QueryForEnumerable<T>(string selectId)
         {
+            var tag = this.dao.SqlTagProvider.Get(selectId);
+            if (tag == null)
+            {
+                throw new KeyNotExistedException(selectId, "the sql tag '{0}' not found in the sql files", selectId);
+            }
+
             if (this.dao.CurrentSession != null)
             {
-                return this.dao.QueryForEnumerable<T, Parameter>(selectId, this.parameter);
+                return this.dao.QueryForEnumerable<T, Parameter>(tag, this.parameter);
             }
 
             using (this.dao)
             {
-                return this.dao.QueryForEnumerable<T, Parameter>(selectId, this.parameter);
+                return this.dao.QueryForEnumerable<T, Parameter>(tag, this.parameter);
             }
         }
 
@@ -84,14 +97,20 @@ namespace Never.EasySql
         /// <returns></returns>
         public int Delete(string deleteId)
         {
+            var tag = this.dao.SqlTagProvider.Get(deleteId);
+            if (tag == null)
+            {
+                throw new KeyNotExistedException(deleteId, "the sql tag '{0}' not found in the sql files", deleteId);
+            }
+
             if (this.dao.CurrentSession != null)
             {
-                return this.dao.Delete(deleteId, this.parameter);
+                return this.dao.Delete(tag, this.parameter);
             }
 
             using (this.dao)
             {
-                return this.dao.Delete(deleteId, this.parameter);
+                return this.dao.Delete(tag, this.parameter);
             }
         }
 
@@ -102,32 +121,44 @@ namespace Never.EasySql
         /// <returns></returns>
         public int Update(string updateId)
         {
+            var tag = this.dao.SqlTagProvider.Get(updateId);
+            if (tag == null)
+            {
+                throw new KeyNotExistedException(updateId, "the sql tag '{0}' not found in the sql files", updateId);
+            }
+
             if (this.dao.CurrentSession != null)
             {
-                return this.dao.Update(updateId, this.parameter);
+                return this.dao.Update(tag, this.parameter);
             }
 
             using (this.dao)
             {
-                return this.dao.Update(updateId, this.parameter);
+                return this.dao.Update(tag, this.parameter);
             }
         }
 
         /// <summary>
         /// 插入
         /// </summary>
-        /// <param name="insertSqlId"></param>
+        /// <param name="insertId"></param>
         /// <returns></returns>
-        public object Insert(string insertSqlId)
+        public object Insert(string insertId)
         {
+            var tag = this.dao.SqlTagProvider.Get(insertId);
+            if (tag == null)
+            {
+                throw new KeyNotExistedException(insertId, "the sql tag '{0}' not found in the sql files", insertId);
+            }
+
             if (this.dao.CurrentSession != null)
             {
-                return this.dao.Insert(insertSqlId, this.parameter);
+                return this.dao.Insert(tag, this.parameter);
             }
 
             using (this.dao)
             {
-                return this.dao.Insert(insertSqlId, this.parameter);
+                return this.dao.Insert(tag, this.parameter);
             }
         }
 
@@ -135,18 +166,24 @@ namespace Never.EasySql
         /// 插入
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="insertSqlId"></param>
+        /// <param name="insertId"></param>
         /// <returns></returns>
-        public T Insert<T>(string insertSqlId)
+        public T Insert<T>(string insertId)
         {
+            var tag = this.dao.SqlTagProvider.Get(insertId);
+            if (tag == null)
+            {
+                throw new KeyNotExistedException(insertId, "the sql tag '{0}' not found in the sql files", insertId);
+            }
+
             if (this.dao.CurrentSession != null)
             {
-                return (T)this.dao.Insert(insertSqlId, this.parameter);
+                return (T)this.dao.Insert(tag, this.parameter);
             }
 
             using (this.dao)
             {
-                return (T)this.dao.Insert(insertSqlId, this.parameter);
+                return (T)this.dao.Insert(tag, this.parameter);
             }
         }
 
@@ -158,14 +195,20 @@ namespace Never.EasySql
         /// <returns></returns>
         public object Call(string callId, CallMode callmode)
         {
+            var tag = this.dao.SqlTagProvider.Get(callId);
+            if (tag == null)
+            {
+                throw new KeyNotExistedException(callId, "the sql tag '{0}' not found in the sql files", callId);
+            }
+
             if (this.dao.CurrentSession != null)
             {
-                return this.dao.Call(callId, this.parameter, callmode);
+                return this.dao.Call(tag, this.parameter, callmode);
             }
 
             using (this.dao)
             {
-                return this.dao.Call(callId, this.parameter, callmode);
+                return this.dao.Call(tag, this.parameter, callmode);
             }
         }
 
@@ -177,7 +220,13 @@ namespace Never.EasySql
         /// <returns></returns>
         public SqlTagFormat GetSqlTagFormat(string sqlId, bool formatText = false)
         {
-            return this.dao.GetSqlTagFormat(sqlId, this.parameter, formatText);
+            var tag = this.dao.SqlTagProvider.Get(sqlId);
+            if (tag == null)
+            {
+                throw new KeyNotExistedException(sqlId, "the sql tag '{0}' not found in the sql files", sqlId);
+            }
+
+            return this.dao.GetSqlTagFormat(tag, this.parameter, formatText);
         }
 
         /// <summary>

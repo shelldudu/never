@@ -25,7 +25,10 @@ namespace Never.EasySql
         /// 所有的流内容
         /// </summary>
         /// <returns></returns>
-        protected abstract IEnumerable<Stream> GetAllStreams();
+        protected virtual IEnumerable<Stream> GetAllStreams()
+        {
+            return null;
+        }
 
         /// <summary>
         /// 开启连接
@@ -135,19 +138,8 @@ namespace Never.EasySql
 
             this.sqlTagProvider.Build(stringPrefix);
             this.OnStarted(streams);
-            this.InitSessionProvider();
+            this.currentSessionThreadLocal = new System.Threading.ThreadLocal<ISession>(false);
             this.started = true;
-        }
-
-        /// <summary>
-        /// 初始化session驱动
-        /// </summary>
-        public void InitSessionProvider()
-        {
-            if (this.currentSessionThreadLocal == null)
-            {
-                this.currentSessionThreadLocal = new System.Threading.ThreadLocal<ISession>(false) ;
-            }
         }
 
         /// <summary>

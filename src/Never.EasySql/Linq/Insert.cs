@@ -1,162 +1,142 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    public struct Insert<T>
+    /// <summary>
+    /// 插入语法
+    /// </summary>
+    /// <typeparam name="Parameter"></typeparam>
+    public struct Insert<Parameter>
     {
-        internal Context Context { get; set; }
-
-        public _LastInsertId LastInsertId()
+        /// <summary>
+        /// 更新的字段名
+        /// </summary>
+        public Insert<Parameter> SetColum(Expression<Func<Parameter, object>> expression)
         {
-            return new _LastInsertId() { Parent = this };
+            return this;
         }
 
-        public Result AsObject<Result>()
+        /// <summary>
+        /// 更新的字段名
+        /// </summary>
+        public Insert<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember, object>> expression, TMember value)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// 更新的字段名
+        /// </summary>
+        public Insert<Parameter> SetColumFunc(Expression<Func<Parameter, object>> expression, string function)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public Result GetResult<Result>()
         {
             return default(Result);
         }
 
-        public object ToChange()
+        /// <summary>
+        /// where
+        /// </summary>
+        public NWhere<Parameter> Where()
         {
-            return null;
+            return new NWhere<Parameter>();
         }
 
-        public Result ToChange<Result>()
+        /// <summary>
+        /// where
+        /// </summary>
+        public NWhere<Parameter> Where<TMember>(Expression<Func<Parameter, TMember, object>> expression, TMember value)
         {
-            return default(Result);
+            return new NWhere<Parameter>();
         }
 
-        public struct _LastInsertId
+        /// <summary>
+        /// where 条件
+        /// </summary>
+        /// <typeparam name="NParameter">查询参数</typeparam>
+        public struct NWhere<NParameter>
         {
-            internal Insert<T> Parent { get; set; }
-
-            public object ToChange()
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <typeparam name="T1">另外的表中</typeparam>
+            public NWhere<NParameter> Exists<T1>(Expression<Func<Parameter, T1, object>> expression)
             {
-                return this.Parent.ToChange();
+                return this;
             }
 
-            public Result ToChange<Result>()
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="exists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter> Exists(Func<TableInfo, string> exists)
             {
-                return this.Parent.ToChange<Result>();
-            }
-        }
-    }
-
-    public struct Insert<T1, T2>
-    {
-        internal Context Context { get; set; }
-
-        public _Join Join()
-        {
-            return this;
-        }
-
-        public _LeftJoin LeftJoin()
-        {
-            return this;
-        }
-
-        public _InnerJoin InnerJoin()
-        {
-            return this;
-        }
-
-        public _RightJoin RightJoin()
-        {
-            return this;
-        }
-
-        public _LastInsertId LastInsertId()
-        {
-            return new _InsertLastInsertId() { Parent = this };
-        }
-
-        public object ToChange()
-        {
-            return null;
-        }
-
-        public Result ToChange<Result>()
-        {
-            return default(Result);
-        }
-
-        public struct _Join
-        {
-            internal Insert<T1, T2> Parent { get; set; }
-
-            public object ToChange()
-            {
-                return this.Parent.ToChange();
+                return this;
             }
 
-            public Result ToChange<Result>()
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <typeparam name="T1">另外的表中</typeparam>
+            public NWhere<NParameter> NotExists<T1>(Expression<Func<Parameter, T1, object>> expression)
             {
-                return this.Parent.ToChange<Result>();
-            }
-        }
-
-        public struct _LeftJoin
-        {
-            internal Insert<T1, T2> Parent { get; set; }
-
-            public object ToChange()
-            {
-                return this.Parent.ToChange();
+                return this;
             }
 
-            public Result ToChange<Result>()
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="notexists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter> NotExists(Func<TableInfo, string> notexists)
             {
-                return this.Parent.ToChange<Result>();
-            }
-        }
-
-        public struct _InnerJoin
-        {
-            internal Insert<T1, T2> Parent { get; set; }
-
-            public object ToChange()
-            {
-                return this.Parent.ToChange();
+                return this;
             }
 
-            public Result ToChange<Result>()
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <typeparam name="T1">另外的表中</typeparam>
+            public NWhere<NParameter> In<T1>(Expression<Func<Parameter, T1, object>> expression)
             {
-                return this.Parent.ToChange<Result>();
-            }
-        }
-
-        public struct _RightJoin
-        {
-            internal Insert<T1, T2> Parent { get; set; }
-
-            public object ToChange()
-            {
-                return this.Parent.ToChange();
+                return this;
             }
 
-            public Result ToChange<Result>()
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="notexists">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter> In(Func<TableInfo, string> notexists)
             {
-                return this.Parent.ToChange<Result>();
-            }
-        }
-
-        public struct _LastInsertId
-        {
-            internal Insert<T1, T2> Parent { get; set; }
-
-            public object ToChange()
-            {
-                return this.Parent.ToChange();
+                return this;
             }
 
-            public Result ToChange<Result>()
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <typeparam name="T1">另外的表中</typeparam>
+            public NWhere<NParameter> NotIn<T1>(Expression<Func<Parameter, T1, object>> expression)
             {
-                return this.Parent.ToChange<Result>();
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="notexists">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter> NotIn(Func<TableInfo, string> notexists)
+            {
+                return this;
             }
         }
     }

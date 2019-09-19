@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Xml
+namespace Never.EasySql
 {
     /// <summary>
     /// 参数位置
     /// </summary>
-    public class ParameterPosition : IEquatable<ParameterPosition>
+    public class SqlTagParameterPosition : IEquatable<SqlTagParameterPosition>
     {
         /// <summary>
         /// 参数名字 
@@ -57,7 +57,7 @@ namespace Never.EasySql.Xml
         /// <returns>
         /// 如果当前对象等于 <paramref name="other" /> 参数，则为 <see langword="true" />；否则为 <see langword="false" />。
         /// </returns>
-        public bool Equals(ParameterPosition other)
+        public bool Equals(SqlTagParameterPosition other)
         {
             return this.Name == other.Name;
         }

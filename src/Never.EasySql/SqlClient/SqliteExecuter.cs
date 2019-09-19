@@ -11,6 +11,7 @@ namespace Never.EasySql.SqlClient
     /// <summary>
     /// sqlite数据库
     /// </summary>
+    [Obsolete("use client namespace")]
     public sealed class SqliteExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild

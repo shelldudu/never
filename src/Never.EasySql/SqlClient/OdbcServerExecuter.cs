@@ -11,6 +11,7 @@ namespace Never.EasySql.SqlClient
     /// <summary>
     /// odbcserver数据库
     /// </summary>
+    [Obsolete("use client namespace")]
     public sealed class OdbcServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild

@@ -1,9 +1,11 @@
 ﻿using Never.EasySql.Linq;
+using Never.EasySql.Text;
 using Never.EasySql.Xml;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -143,128 +145,32 @@ namespace Never.EasySql
         }
 
         /// <summary>
-        /// 查询
+        /// 查询，如果查询对象里面含有别的表，则通过表达式来查询相应的属性或字段
         /// </summary>
-        /// <typeparam name="T1">对象</typeparam>
-        /// <typeparam name="T2">对象</typeparam>
+        /// <typeparam name="T">对象</typeparam>
         /// <returns></returns>
-        public Select<Parameter, T1, T2> Select<T1, T2>()
+        public Select<Parameter, T> Select<T>(params Expression<Func<Parameter, T, object>>[] expression)
         {
-            return new Select<Parameter, T1, T2>();
-        }
-
-        /// <summary>
-        /// 查询
-        /// </summary>
-        /// <typeparam name="T1">对象</typeparam>
-        /// <typeparam name="T2">对象</typeparam>
-        /// <typeparam name="T3">对象</typeparam>
-        /// <returns></returns>
-        public Select<Parameter, T1, T2, T3> Select<T1, T2, T3>()
-        {
-            return new Select<Parameter, T1, T2, T3>();
-        }
-
-        /// <summary>
-        /// 查询
-        /// </summary>
-        /// <typeparam name="T1">对象</typeparam>
-        /// <typeparam name="T2">对象</typeparam>
-        /// <typeparam name="T3">对象</typeparam>
-        /// <typeparam name="T4">对象</typeparam>
-        /// <returns></returns>
-        public Select<Parameter, T1, T2, T3, T4> Select<T1, T2, T3, T4>()
-        {
-            return new Select<Parameter, T1, T2, T3, T4>();
-        }
-
-        /// <summary>
-        /// 查询
-        /// </summary>
-        /// <typeparam name="T1">对象</typeparam>
-        /// <typeparam name="T2">对象</typeparam>
-        /// <typeparam name="T3">对象</typeparam>
-        /// <typeparam name="T4">对象</typeparam>
-        /// <typeparam name="T5">对象</typeparam>
-        /// <returns></returns>
-        public Select<Parameter, T1, T2, T3, T4, T5> Select<T1, T2, T3, T4, T5>()
-        {
-            return new Select<Parameter, T1, T2, T3, T4, T5>();
-        }
-
-        /// <summary>
-        /// 查询
-        /// </summary>
-        /// <typeparam name="T1">对象</typeparam>
-        /// <typeparam name="T2">对象</typeparam>
-        /// <typeparam name="T3">对象</typeparam>
-        /// <typeparam name="T4">对象</typeparam>
-        /// <typeparam name="T5">对象</typeparam>
-        /// <typeparam name="T6">对象</typeparam>
-        /// <returns></returns>
-        public Select<Parameter, T1, T2, T3, T4, T5, T6> Select<T1, T2, T3, T4, T5, T6>()
-        {
-            return new Select<Parameter, T1, T2, T3, T4, T5, T6>();
-        }
-
-        /// <summary>
-        /// 查询
-        /// </summary>
-        /// <typeparam name="T1">对象</typeparam>
-        /// <typeparam name="T2">对象</typeparam>
-        /// <typeparam name="T3">对象</typeparam>
-        /// <typeparam name="T4">对象</typeparam>
-        /// <typeparam name="T5">对象</typeparam>
-        /// <typeparam name="T6">对象</typeparam>
-        /// <typeparam name="T7">对象</typeparam>
-        /// <returns></returns>
-        public Select<Parameter, T1, T2, T3, T4, T5, T6, T7> Select<T1, T2, T3, T4, T5, T6, T7>()
-        {
-            return new Select<Parameter, T1, T2, T3, T4, T5, T6, T7>();
+            return new Select<Parameter, T>();
         }
 
         /// <summary>
         /// 执行方法
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="parameter"></param>
         /// <param name="callmode"></param>
         /// <returns></returns>
-        public object Call(string sql, Parameter @parameter, CallMode callmode)
+        public object Call(string sql, CallMode callmode)
         {
-            var sqlTag = EasyDecoratedTextDaoHelper.SelectSqlTag(sql, this.dao);
+            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
             if (this.dao.CurrentSession != null)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Call(sqlTag, new KeyValueEasySqlParameter<Parameter>(parameter), callmode);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Call(sqlTag, new KeyValueEasySqlParameter<Parameter>(parameter), callmode);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.Call<Parameter>(sqlTag, this.parameter, callmode);
             }
 
             using (this.dao)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Call(sqlTag, new KeyValueEasySqlParameter<Parameter>(parameter), callmode);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Call(sqlTag, new KeyValueEasySqlParameter<Parameter>(parameter), callmode);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.Call<Parameter>(sqlTag, this.parameter, callmode);
             }
         }
 
@@ -272,14 +178,13 @@ namespace Never.EasySql
         /// 执行方法
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="parameter"></param>
         /// <param name="callmode"></param>
         /// <returns></returns>
-        public object Call(Action<Parameter, StringBuilder> sql, Parameter @parameter, CallMode callmode = CallMode.ExecuteScalar | CallMode.CommandText)
+        public object Call(Action<Parameter, StringBuilder> sql, CallMode callmode = CallMode.ExecuteScalar | CallMode.CommandText)
         {
             var sb = new StringBuilder();
-            sql(parameter, sb);
-            return this.Call(sb.ToString(), @parameter, callmode);
+            sql(this.parameter.Object, sb);
+            return this.Call(sb.ToString(), callmode);
         }
 
         #endregion crud

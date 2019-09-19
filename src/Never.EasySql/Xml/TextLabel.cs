@@ -22,7 +22,7 @@ namespace Never.EasySql.Xml
         /// <summary>
         /// sql参数
         /// </summary>
-        private List<ParameterPosition> parameterPositions = null;
+        private List<SqlTagParameterPosition> parameterPositions = null;
 
         /// <summary>
         /// sql参数个数
@@ -32,11 +32,11 @@ namespace Never.EasySql.Xml
         /// <summary>
         /// sql参数
         /// </summary>
-        public IEnumerable<ParameterPosition> ParameterPositions
+        public IEnumerable<SqlTagParameterPosition> ParameterPositions
         {
             get
             {
-                return this.parameterPositions == null ? Enumerable.Empty<ParameterPosition>() : this.parameterPositions.AsEnumerable();
+                return this.parameterPositions == null ? Enumerable.Empty<SqlTagParameterPosition>() : this.parameterPositions.AsEnumerable();
             }
         }
 
@@ -55,11 +55,11 @@ namespace Never.EasySql.Xml
         /// 新加参数
         /// </summary>
         /// <param name="parameter"></param>
-        public void Add(ParameterPosition parameter)
+        public void Add(SqlTagParameterPosition parameter)
         {
             if (this.parameterPositions == null)
             {
-                this.parameterPositions = new List<ParameterPosition>();
+                this.parameterPositions = new List<SqlTagParameterPosition>();
                 this.parameterPositions.Add(parameter);
                 this.parameterPositionCount++;
                 return;
@@ -73,7 +73,7 @@ namespace Never.EasySql.Xml
         /// 复制参数
         /// </summary>
         /// <returns></returns>
-        protected List<ParameterPosition> Copy()
+        protected List<SqlTagParameterPosition> Copy()
         {
             return this.parameterPositions.ToList();
         }

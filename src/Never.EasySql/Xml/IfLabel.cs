@@ -64,7 +64,7 @@ namespace Never.EasySql.Xml
             format.IfContainer = true;
             format.IfThenCount = 0;
             var splitCount = 0;
-            foreach (var lable in this.Labels)
+            foreach (BaseLabel lable in this.Labels)
             {
                 switch (lable.GetLabelType())
                 {

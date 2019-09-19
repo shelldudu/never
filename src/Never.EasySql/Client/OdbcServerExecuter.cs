@@ -6,13 +6,12 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 
-namespace Never.EasySql.SqlClient
+namespace Never.EasySql.Client
 {
     /// <summary>
-    /// sqlserver数据库
+    /// odbcserver数据库
     /// </summary>
-    [Obsolete("use client namespace")]
-    public sealed class SqlServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
+    public sealed class OdbcServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild
 
@@ -29,18 +28,18 @@ namespace Never.EasySql.SqlClient
         /// Initializes a new instance of the <see cref="SqlServerExecuter"/> class.
         /// </summary>
         /// <param name="connectionString">连接字符串.</param>
-        [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlClient.SqlServerExecuter.DbProviderFactory")]
-        public SqlServerExecuter(string connectionString)
-            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.SqlServerExecuter.InitInstance()), connectionString)
+        [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlClient.OdbcServerExecuter.DbProviderFactory")]
+        public OdbcServerExecuter(string connectionString)
+            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.OdbcServerExecuter.InitInstance()), connectionString)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqlServerExecuter"/> class.
+        /// Initializes a new instance of the <see cref="OdbcServerExecuter"/> class.
         /// </summary>
         /// <param name="provider">驱动</param>
         /// <param name="connectionString">连接字符串.</param>
-        public SqlServerExecuter(DbProviderFactory provider, string connectionString)
+        public OdbcServerExecuter(DbProviderFactory provider, string connectionString)
             : base("@", provider, connectionString)
         {
             //cache the provider

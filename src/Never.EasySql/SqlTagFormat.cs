@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Xml
+namespace Never.EasySql
 {
     /// <summary>
     /// sqltag格式化
@@ -101,7 +101,7 @@ namespace Never.EasySql.Xml
         /// </summary>
         /// <param name="parameterPosition"></param>
         /// <returns></returns>
-        public virtual bool IfTextParameter(ParameterPosition parameterPosition)
+        public virtual bool IfTextParameter(SqlTagParameterPosition parameterPosition)
         {
             return parameterPosition.TextParameter;
         }
@@ -187,7 +187,7 @@ namespace Never.EasySql.Xml
             {
             }
 
-            public override bool IfTextParameter(ParameterPosition parameterPosition)
+            public override bool IfTextParameter(SqlTagParameterPosition parameterPosition)
             {
                 return true;
             }

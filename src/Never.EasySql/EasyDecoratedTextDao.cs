@@ -1,4 +1,5 @@
-﻿using Never.EasySql.Xml;
+﻿using Never.EasySql.Text;
+using Never.EasySql.Xml;
 using Never.SqlClient;
 using Never.Utils;
 using System;
@@ -12,175 +13,6 @@ using System.Xml;
 
 namespace Never.EasySql
 {
-    internal sealed class EasyDecoratedTextDaoHelper
-    {
-        internal static SqlTag SelectSqlTag(string sql, IDao dao)
-        {
-            var sqltag = new SqlTag()
-            {
-                CommandType = null,
-                Id = NewId.GenerateString(NewId.StringLength.L24),
-                IndentedOnNameSpace = false,
-                IndentedOnSqlTag = false,
-                NameSpace = null,
-                Labels = new List<ILabel>(1),
-            };
-
-            var label = sqltag.ReadTextNode(sql, new Serialization.Json.ThunderWriter(sql.Length), new Serialization.Json.SequenceStringReader("1"), dao.SqlExecuter.GetParameterPrefix());
-            sqltag.Labels.Add(new DecoratedTextLabel(label));
-            return sqltag;
-        }
-    }
-
-    internal sealed class DecoratedTextLabel : Xml.TextLabel, ILabel
-    {
-        private readonly Xml.TextLabel lable = null;
-        private List<ParameterPosition> parameterPositions = null;
-        private readonly int parameterPositionCount = 0;
-
-        public DecoratedTextLabel(Xml.TextLabel lable)
-        {
-            this.lable = lable;
-            this.parameterPositions = new List<ParameterPosition>(lable.ParameterPositions);
-            this.parameterPositionCount = this.parameterPositions.Count;
-        }
-
-        public override void Format<T>(SqlTagFormat format, EasySqlParameter<T> parameter, IReadOnlyList<KeyValueTuple<string, object>> convert)
-        {
-            if (this.lable.SqlText.IsNullOrEmpty())
-            {
-                return;
-            }
-
-            if (this.parameterPositions == null || this.parameterPositionCount == 0)
-            {
-                format.Write(this.lable.SqlText);
-                return;
-            }
-
-            for (var i = 0; i < this.lable.SqlText.Length; i++)
-            {
-                var para = this.MathPosition(this.parameterPositions, i);
-                if (para == null)
-                {
-                    format.Write(this.lable.SqlText[i]);
-                    continue;
-                }
-
-                var firstConvert = convert.FirstOrDefault(o => o.Key.IsEquals(para.Name));
-                if (firstConvert == null)
-                {
-                    throw new Exception(string.Format("当前在sql语句中参数为{0}的值在所提供的参数列表中找不到", para.Name));
-                }
-
-                var value = firstConvert.Value;
-                if (value is INullableParameter)
-                {
-                    value = ((IReferceNullableParameter)firstConvert.Value).Value;
-                }
-
-                var isArray = value is System.Collections.IEnumerable;
-                if (!isArray || value is string)
-                {
-                    if (format.IfTextParameter(para))
-                    {
-                        if (value == null)
-                        {
-                            //format.WriteOnTextMode("\'null\'");
-                            //format.WriteOnTextMode("null");
-                        }
-                        if (value == DBNull.Value)
-                        {
-                            //format.WriteOnTextMode("\'null\'");
-                            format.WriteOnTextMode("null");
-                        }
-                        else
-                        {
-                            //format.WriteOnTextMode('\'');
-                            format.WriteOnTextMode(value.ToString());
-                            //format.WriteOnTextMode('\'');
-                        }
-
-                        i += para.PositionLength + 1;
-                        format.WriteOnTextMode(this.lable.SqlText[i]);
-                    }
-                    else
-                    {
-                        var item = convert.FirstOrDefault(o => o.Key.Equals(para.Name));
-                        if (item == null)
-                        {
-                            throw new Exception(string.Format("当前在sql语句中参数为{0}的值在所提供的参数列表中找不到", para.Name));
-                        }
-
-                        format.Write(this.lable.SqlText, para.PrefixStart, para.PositionLength + 1);
-                        format.AddParameter(item);
-                        i += para.PositionLength + 1;
-                        format.Write(this.lable.SqlText[i]);
-                    }
-                }
-                else
-                {
-                    var item = value as System.Collections.IEnumerable;
-                    var ator = item.GetEnumerator();
-                    var hadA = false;
-                    var arrayLevel = 0;
-                    if (format.IfTextParameter(para))
-                    {
-                        while (ator.MoveNext())
-                        {
-                            if (ator.Current == null || ator.Current == DBNull.Value)
-                            {
-                                continue;
-                            }
-
-                            if (hadA)
-                            {
-                                format.WriteOnTextMode(",");
-                            }
-
-                            //format.WriteOnTextMode('\'');
-                            format.WriteOnTextMode(ator.Current.ToString());
-                            //format.WriteOnTextMode('\'');
-                            hadA = true;
-                        }
-
-                        i += para.PositionLength + 1;
-                        format.WriteOnTextMode(this.lable.SqlText[i]);
-                    }
-                    else
-                    {
-                        format.Write(this.lable.SqlText[i]);
-                        while (ator.MoveNext())
-                        {
-                            if (ator.Current == null || ator.Current == DBNull.Value)
-                            {
-                                continue;
-                            }
-
-                            var newvalue = (ator.Current == null || ator.Current == DBNull.Value) ? DBNull.Value : ator.Current;
-                            var newkey = string.Format("{0}x{1}z", para.Name, arrayLevel);
-
-                            if (hadA)
-                            {
-                                format.Write(",");
-                                format.Write(para.ActualPrefix);
-                            }
-
-                            format.Write(newkey);
-                            arrayLevel++;
-
-                            format.AddParameter(newkey, newvalue);
-                            hadA = true;
-                        }
-
-                        i += para.PositionLength + 1;
-                        format.Write(this.lable.SqlText[i]);
-                    }
-                }
-            }
-        }
-    }
-
     /// <summary>
     /// 对难用的语法进行一下装饰查询，更好的使用Idao接口，该对象每次执行一次都会释放IDao接口，请不要重复使用
     /// </summary>
@@ -220,43 +52,15 @@ namespace Never.EasySql
         /// <returns></returns>
         public T QueryForObject<T>(string sql)
         {
-            return this.QueryForObject<T>(sql, EasyDecoratedTextDaoHelper.SelectSqlTag(sql, this.dao));
-        }
-
-        private T QueryForObject<T>(string sql, SqlTag sqlTag)
-        {
+            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
             if (this.dao.CurrentSession != null)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.QueryForObject<T, Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return sqlDao.QueryForObject<T, Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.QueryForObject<T, Parameter>(sqlTag, this.parameter);
             }
 
             using (this.dao)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.QueryForObject<T, Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.QueryForObject<T, Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.QueryForObject<T, Parameter>(sqlTag, this.parameter);
             }
         }
 
@@ -268,43 +72,15 @@ namespace Never.EasySql
         /// <returns></returns>
         public IEnumerable<T> QueryForEnumerable<T>(string sql)
         {
-            return this.QueryForEnumerable<T>(sql, EasyDecoratedTextDaoHelper.SelectSqlTag(sql, this.dao));
-        }
-
-        private IEnumerable<T> QueryForEnumerable<T>(string sql, SqlTag sqlTag)
-        {
+            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
             if (this.dao.CurrentSession != null)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.QueryForEnumerable<T, Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.QueryForEnumerable<T, Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.QueryForEnumerable<T, Parameter>(sqlTag, this.parameter);
             }
 
             using (this.dao)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.QueryForEnumerable<T, Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.QueryForEnumerable<T, Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.QueryForEnumerable<T, Parameter>(sqlTag, this.parameter);
             }
         }
 
@@ -328,43 +104,15 @@ namespace Never.EasySql
         /// <returns></returns>
         public int Delete(string sql)
         {
-            return this.Delete(sql, EasyDecoratedTextDaoHelper.SelectSqlTag(sql, this.dao));
-        }
-
-        private int Delete(string sql, SqlTag sqlTag)
-        {
+            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
             if (this.dao.CurrentSession != null)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Delete<Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Delete<Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.Delete<Parameter>(sqlTag, this.parameter);
             }
 
             using (this.dao)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Delete<Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Delete<Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.Delete<Parameter>(sqlTag, this.parameter);
             }
         }
 
@@ -387,43 +135,15 @@ namespace Never.EasySql
         /// <returns></returns>
         public int Update(string sql)
         {
-            return this.Update(sql, EasyDecoratedTextDaoHelper.SelectSqlTag(sql, this.dao));
-        }
-
-        private int Update(string sql, SqlTag sqlTag)
-        {
+            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
             if (this.dao.CurrentSession != null)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Update<Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Update<Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.Update<Parameter>(sqlTag, this.parameter);
             }
 
             using (this.dao)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Update<Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Update<Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.Update<Parameter>(sqlTag, this.parameter);
             }
         }
 
@@ -446,7 +166,16 @@ namespace Never.EasySql
         /// <returns></returns>
         public object Insert(string sql)
         {
-            return this.Insert(sql, EasyDecoratedTextDaoHelper.SelectSqlTag(sql, this.dao));
+            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
+            if (this.dao.CurrentSession != null)
+            {
+                return this.dao.Insert<Parameter>(sqlTag, this.parameter);
+            }
+
+            using (this.dao)
+            {
+                return this.dao.Insert<Parameter>(sqlTag, this.parameter);
+            }
         }
 
         /// <summary>
@@ -457,44 +186,17 @@ namespace Never.EasySql
         /// <returns></returns>
         public T Insert<T>(string sql)
         {
-            return (T)this.Insert(sql, EasyDecoratedTextDaoHelper.SelectSqlTag(sql, this.dao));
-        }
-
-        private object Insert(string sql, SqlTag sqlTag)
-        {
+            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
             if (this.dao.CurrentSession != null)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Insert<Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Insert<Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return (T)this.dao.Insert<Parameter>(sqlTag, this.parameter);
             }
 
             using (this.dao)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Insert<Parameter>(sqlTag, this.parameter);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Insert<Parameter>(sqlTag, this.parameter);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return (T)this.dao.Insert<Parameter>(sqlTag, this.parameter);
             }
+
         }
 
         /// <summary>
@@ -517,43 +219,15 @@ namespace Never.EasySql
         /// <returns></returns>
         public object Call(string sql, CallMode callmode)
         {
-            return this.Call(sql, EasyDecoratedTextDaoHelper.SelectSqlTag(sql, this.dao), callmode);
-        }
-
-        private object Call(string sql, SqlTag sqlTag, CallMode callmode)
-        {
+            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
             if (this.dao.CurrentSession != null)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Call<Parameter>(sqlTag, this.parameter, callmode);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Call<Parameter>(sqlTag, this.parameter, callmode);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.Call<Parameter>(sqlTag, this.parameter, callmode);
             }
 
             using (this.dao)
             {
-                var baseDao = this.dao as BaseDao;
-                if (baseDao != null)
-                {
-                    return baseDao.Call<Parameter>(sqlTag, this.parameter, callmode);
-                }
-
-                var sqlDao = this.dao as ISqlTagDao;
-                if (sqlDao != null)
-                {
-                    return baseDao.Call<Parameter>(sqlTag, this.parameter, callmode);
-                }
-
-                throw new NotSupportedException("the dao must impl the ISqlTagDao interface");
+                return this.dao.Call<Parameter>(sqlTag, this.parameter, callmode);
             }
         }
 

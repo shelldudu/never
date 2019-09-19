@@ -11,6 +11,7 @@ namespace Never.EasySql.SqlClient
     /// <summary>
     /// oracle数据库
     /// </summary>
+    [Obsolete("use client namespace")]
     public sealed class OleDbServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild

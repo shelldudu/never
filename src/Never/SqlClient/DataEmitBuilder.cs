@@ -28,7 +28,7 @@ namespace Never.SqlClient
             /// <summary>
             /// 主键配置
             /// </summary>
-            public PrimaryAttribute Primary { get; set; }
+            public ColumnAttribute Column { get; set; }
 
             /// <summary>
             /// 类型处理
@@ -41,11 +41,8 @@ namespace Never.SqlClient
             /// <returns></returns>
             public string GetMemberName()
             {
-                if (this.Primary != null && this.Primary.AliasName.IsNotNullOrWhiteSpace())
-                    return this.Primary.AliasName;
-
-                if (this.TypeHandler != null && this.TypeHandler.AliasName.IsNotNullOrWhiteSpace())
-                    return this.TypeHandler.AliasName;
+                if (this.Column != null && this.Column.Alias.IsNotNullOrWhiteSpace())
+                    return this.Column.Alias;
 
                 return this.Member.Name;
             }
@@ -90,7 +87,7 @@ namespace Never.SqlClient
             var list = new List<DataMemberInfo>(members.Length);
             foreach (var member in members)
             {
-                var primary = member.GetAttribute<PrimaryAttribute>();
+                var column = member.GetAttribute<ColumnAttribute>();
                 var typehandler = member.GetAttribute<TypeHandlerAttribute>();
                 if (member.MemberType == MemberTypes.Property)
                 {
@@ -100,7 +97,7 @@ namespace Never.SqlClient
                         list.Add(new DataMemberInfo()
                         {
                             Member = member,
-                            Primary = primary,
+                            Column = column,
                             TypeHandler = typehandler,
                         });
                     }
@@ -114,7 +111,7 @@ namespace Never.SqlClient
                     list.Add(new DataMemberInfo()
                     {
                         Member = member,
-                        Primary = primary,
+                        Column = column,
                         TypeHandler = typehandler,
                     });
                 }
