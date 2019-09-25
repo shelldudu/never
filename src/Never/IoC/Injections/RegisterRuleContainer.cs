@@ -99,7 +99,7 @@ namespace Never.IoC.Injections
 
             /*当key为空并且找不到空key的对象，获取最后一个注册的*/
             for (var i = this.rules.Count - 1; i >= 0; i--)
-            {       
+            {
                 if (rules[i].Match(serviceType))
                 {
                     rule = rules[i];
@@ -294,7 +294,8 @@ namespace Never.IoC.Injections
             }
             catch (Exception ex)
             {
-                rule.CanNotResolve = new Exception(ex.Message) { Source = ex.Source, HelpLink = ex.HelpLink };
+                var inner = ex.GetInnerException();
+                rule.CanNotResolve = new Exception(inner.Message) { Source = inner.Source, HelpLink = inner.HelpLink };
                 throw new Exception(string.Format("can not resolve the {0}", rule.ServiceType.FullName), rule.CanNotResolve);
             }
         }
@@ -318,7 +319,8 @@ namespace Never.IoC.Injections
             }
             catch (Exception ex)
             {
-                rule.CanNotOptionalResolve = new Exception(ex.Message) { Source = ex.Source, HelpLink = ex.HelpLink };
+                var inner = ex.GetInnerException();
+                rule.CanNotOptionalResolve = new Exception(inner.Message) { Source = inner.Source, HelpLink = inner.HelpLink };
                 throw new Exception(string.Format("can not resolve the {0}", rule.ServiceType.FullName), rule.CanNotOptionalResolve);
             }
         }

@@ -314,6 +314,17 @@ namespace Never
         /// <summary>
         /// 启用命令事件发布模式,生命周期通常声明为单例
         /// </summary>
+        /// <param name="startup">程序宿主环境配置服务</param>
+        /// <returns></returns>
+        [Summary(Descn = "领域事件与发布事件分别储存")]
+        public static ApplicationStartup UseInprocEventProviderCommandBus(this ApplicationStartup startup)
+        {
+            return UseInprocEventProviderCommandBus<DefaultCommandContext>(startup, EmptyEventStreamStorager.Empty);
+        }
+
+        /// <summary>
+        /// 启用命令事件发布模式,生命周期通常声明为单例
+        /// </summary>
         /// <typeparam name="TCommandContext">命令上下文，如果使用内存模式，请配合MQ使用</typeparam>
         /// <param name="startup">程序宿主环境配置服务</param>
         /// <returns></returns>
@@ -377,6 +388,19 @@ namespace Never
         #endregion inproc eventprovider commandbus
 
         #region mq event provider commandbus
+
+        /// <summary>
+        /// 启用消息队列模式命令事件发布模式,生命周期通常声明为单例
+        /// </summary>
+        /// <param name="startup">程序宿主环境配置服务</param>
+        /// <param name="messageProducerProvider">当领域对象产生一个事件的时候，如何查询出消息提供者</param>
+        /// <returns></returns>
+        [Summary(Descn = "领域事件与发布事件分别储存")]
+        [Summary(Descn = "这个方法要提供IMessageProducerProvider接口，发布领域事件")]
+        public static ApplicationStartup UseMQEventProviderCommandBus(this ApplicationStartup startup, IMessageProducerProvider messageProducerProvider)
+        {
+            return UseMQEventProviderCommandBus<DefaultCommandContext>(startup, messageProducerProvider, EmptyEventStreamStorager.Empty);
+        }
 
         /// <summary>
         /// 启用消息队列模式命令事件发布模式,生命周期通常声明为单例
