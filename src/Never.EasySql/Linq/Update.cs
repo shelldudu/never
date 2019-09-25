@@ -34,14 +34,6 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public Update<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember, object>> expression, TMember value)
-        {
-            return this;
-        }
-
-        /// <summary>
-        /// 更新的字段名
-        /// </summary>
         public Update<Parameter> SetColumFunc(Expression<Func<Parameter, object>> expression, string function)
         {
             return this;
@@ -66,15 +58,15 @@ namespace Never.EasySql.Linq
         /// </summary>
         public NWhere<Parameter> Where()
         {
-            return new NWhere<Parameter>();
+            return new NWhere<Parameter>() { update = this };
         }
 
         /// <summary>
         /// where
         /// </summary>
-        public NWhere<Parameter> Where<TMember>(Expression<Func<Parameter, TMember, object>> expression, TMember value)
+        public NWhere<Parameter> Where<TMember>(Expression<Func<Parameter, object>> expression, string @operator, TMember value)
         {
-            return new NWhere<Parameter>();
+            return new NWhere<Parameter>() { update = this };
         }
 
         /// <summary>
@@ -83,6 +75,11 @@ namespace Never.EasySql.Linq
         /// <typeparam name="NParameter">查询参数</typeparam>
         public struct NWhere<NParameter>
         {
+            /// <summary>
+            /// 
+            /// </summary>
+            internal Update<NParameter> update;
+
             /// <summary>
             /// 存在
             /// </summary>
@@ -153,6 +150,14 @@ namespace Never.EasySql.Linq
             public NWhere<NParameter> NotIn(Func<TableInfo, string> notexists)
             {
                 return this;
+            }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public int GetResult()
+            {
+                return this.update.GetResult();
             }
         }
     }

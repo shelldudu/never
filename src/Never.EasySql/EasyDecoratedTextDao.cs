@@ -23,7 +23,7 @@ namespace Never.EasySql
 
         private readonly IDao dao = null;
         private readonly EasySqlParameter<Parameter> parameter = null;
-
+        private string cacheId = null;
         #endregion field
 
         #region ctor
@@ -45,6 +45,17 @@ namespace Never.EasySql
         #region crud
 
         /// <summary>
+        /// 将sql语句分析好后缓存起来
+        /// </summary>
+        /// <param name="cacheId"></param>
+        /// <returns></returns>
+        public EasyDecoratedTextDao<Parameter> TextCached(string cacheId)
+        {
+            this.cacheId = cacheId;
+            return this;
+        }
+
+        /// <summary>
         /// 查询某一行
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -52,7 +63,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public T QueryForObject<T>(string sql)
         {
-            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
+            var sqlTag = TextLabelBuilder.Build(sql,this.cacheId, this.dao);
             if (this.dao.CurrentSession != null)
             {
                 return this.dao.QueryForObject<T, Parameter>(sqlTag, this.parameter);
@@ -72,7 +83,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public IEnumerable<T> QueryForEnumerable<T>(string sql)
         {
-            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
+            var sqlTag = TextLabelBuilder.Build(sql, this.cacheId, this.dao);
             if (this.dao.CurrentSession != null)
             {
                 return this.dao.QueryForEnumerable<T, Parameter>(sqlTag, this.parameter);
@@ -104,7 +115,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public int Delete(string sql)
         {
-            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
+            var sqlTag = TextLabelBuilder.Build(sql, this.cacheId, this.dao);
             if (this.dao.CurrentSession != null)
             {
                 return this.dao.Delete<Parameter>(sqlTag, this.parameter);
@@ -135,7 +146,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public int Update(string sql)
         {
-            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
+            var sqlTag = TextLabelBuilder.Build(sql, this.cacheId, this.dao);
             if (this.dao.CurrentSession != null)
             {
                 return this.dao.Update<Parameter>(sqlTag, this.parameter);
@@ -166,7 +177,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public object Insert(string sql)
         {
-            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
+            var sqlTag = TextLabelBuilder.Build(sql, this.cacheId, this.dao);
             if (this.dao.CurrentSession != null)
             {
                 return this.dao.Insert<Parameter>(sqlTag, this.parameter);
@@ -186,7 +197,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public T Insert<T>(string sql)
         {
-            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
+            var sqlTag = TextLabelBuilder.Build(sql, this.cacheId, this.dao);
             if (this.dao.CurrentSession != null)
             {
                 return (T)this.dao.Insert<Parameter>(sqlTag, this.parameter);
@@ -219,7 +230,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public object Call(string sql, CallMode callmode)
         {
-            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
+            var sqlTag = TextLabelBuilder.Build(sql, this.cacheId, this.dao);
             if (this.dao.CurrentSession != null)
             {
                 return this.dao.Call<Parameter>(sqlTag, this.parameter, callmode);

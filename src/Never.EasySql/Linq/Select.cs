@@ -33,6 +33,46 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// join
+        /// </summary>
+        /// <param name="on"></param>
+        /// <param name="where"></param>
+        public Select<Parameter, T> Join<T2>(Expression<Func<Parameter, T, T2, object>> on, Expression<Func<Parameter, T, T2, object>> where)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// left join
+        /// </summary>
+        /// <param name="on"></param>
+        /// <param name="where"></param>
+        public Select<Parameter, T> LeftJoin<T2>(Expression<Func<Parameter, T, T2, object>> on, Expression<Func<Parameter, T, T2, object>> where)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// right join
+        /// </summary>
+        /// <param name="on"></param>
+        /// <param name="where"></param>
+        public Select<Parameter, T> RightJoin<T2>(Expression<Func<Parameter, T, T2, object>> on, Expression<Func<Parameter, T, T2, object>> where)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// inner join
+        /// </summary>
+        /// <param name="on"></param>
+        /// <param name="where"></param>
+        public Select<Parameter, T> InnerJoin<T2>(Expression<Func<Parameter, T, T2, object>> on, Expression<Func<Parameter, T, T2, object>> where)
+        {
+            return this;
+        }
+
+        /// <summary>
         /// where 条件
         /// </summary>
         public NWhere<Parameter, T> Where(Expression<Func<Parameter, T, object>> expression)
@@ -253,7 +293,6 @@ namespace Never.EasySql.Linq
                 return new NToSingle<T>();
             }
         }
-
 
         /// <summary>
         /// orderbyasc

@@ -26,7 +26,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public Insert<Parameter> SetColum(Expression<Func<Parameter, object>> expression)
+        public Insert<Parameter> ValueColum(Expression<Func<Parameter, object>> expression)
         {
             return this;
         }
@@ -34,15 +34,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public Insert<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember, object>> expression, TMember value)
-        {
-            return this;
-        }
-
-        /// <summary>
-        /// 更新的字段名
-        /// </summary>
-        public Insert<Parameter> SetColumFunc(Expression<Func<Parameter, object>> expression, string function)
+        public Insert<Parameter> ValueColumFunc(Expression<Func<Parameter, object>> expression, string function)
         {
             return this;
         }
@@ -65,14 +57,6 @@ namespace Never.EasySql.Linq
         /// where
         /// </summary>
         public NWhere<Parameter> Where()
-        {
-            return new NWhere<Parameter>();
-        }
-
-        /// <summary>
-        /// where
-        /// </summary>
-        public NWhere<Parameter> Where<TMember>(Expression<Func<Parameter, TMember, object>> expression, TMember value)
         {
             return new NWhere<Parameter>();
         }
@@ -162,6 +146,15 @@ namespace Never.EasySql.Linq
             {
                 return this;
             }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public Result GetResult<Result>()
+            {
+                return default(Result);
+            }
+
         }
 
         /// <summary>
@@ -170,6 +163,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="NParameter"></typeparam>
         public struct NLastInsertId<NParameter>
         {
+            /// where
+            /// </summary>
+            public NWhere<NParameter> Where()
+            {
+                return new NWhere<NParameter>();
+            }
+
             /// <summary>
             /// 获取结果
             /// </summary>

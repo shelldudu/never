@@ -22,6 +22,7 @@ namespace Never.EasySql
 
         private readonly IDao dao = null;
         private readonly EasySqlParameter<Parameter> parameter = null;
+        private string cacheId = null;
         #endregion field
 
         #region ctor
@@ -132,6 +133,17 @@ namespace Never.EasySql
         #region crud
 
         /// <summary>
+        /// 将sql语句分析好后缓存起来
+        /// </summary>
+        /// <param name="cacheId"></param>
+        /// <returns></returns>
+        public EasyDecoratedLinqDao<Parameter> ExpressionCached(string cacheId)
+        {
+            this.cacheId = cacheId;
+            return this;
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <returns></returns>
@@ -186,7 +198,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public object Call(string sql, CallMode callmode)
         {
-            var sqlTag = TextLabelBuilder.Build(sql, this.dao);
+            var sqlTag = TextLabelBuilder.Build(sql, this.cacheId, this.dao);
             if (this.dao.CurrentSession != null)
             {
                 return this.dao.Call<Parameter>(sqlTag, this.parameter, callmode);

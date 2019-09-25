@@ -35,6 +35,8 @@ namespace Never.EasySql
                     this.Count = ((ICollection)this.Object).Count;
                 }
             }
+
+            this.Members = new List<KeyValueTuple<string, object>>();
         }
 
         #endregion ctor
@@ -71,6 +73,11 @@ namespace Never.EasySql
         /// </summary>
         public T @Object { get; private set; }
 
+        /// <summary>
+        /// 参数
+        /// </summary>
+        public IEnumerable<KeyValueTuple<string, object>> Members { get; }
+
         #endregion prop
 
         #region convey
@@ -95,52 +102,42 @@ namespace Never.EasySql
             if (this.IsIDictionary)
             {
                 var ator = target as IDictionary;
-                var diction = new List<KeyValueTuple<string, object>>(ator.Count);
+                var dictionary = new List<KeyValueTuple<string, object>>(ator.Count);
                 foreach (var key in ator.Keys)
                 {
                     if (key == null)
                         continue;
 
-                    diction.Add(new KeyValueTuple<string, object>(key.ToString(), ator[key]));
+                    dictionary.Add(new KeyValueTuple<string, object>(key.ToString(), ator[key]));
+                }
+
+                foreach(var member in this.Members)
+                {
+                    if (dictionary.Any(ta => ta.Key.IsEquals(member.Key, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        dictionary.RemoveAll(ta => ta.Key.IsEquals(member.Key, StringComparison.OrdinalIgnoreCase));
+                        dictionary.Add(member);
+                        continue;
+                    }
+
+                    dictionary.Add(member);
                 }
 
                 if (this.Count <= 0)
-                    this.Count = diction.Count;
+                    this.Count = dictionary.Count;
 
-                return diction.AsReadOnly();
+                return dictionary.AsReadOnly();
             }
             else if (this.IsIList)
             {
-                return new List<KeyValueTuple<string, object>>(0).AsReadOnly();
-                //var ator = target as IList;
-                //list = new List<KeyValueTuple<string, object>>(ator.Count);
-                //foreach (var key in ator.Keys)
-                //{
-                //    if (key == null)
-                //        continue;
-
-                //    list.Add(new KeyValueTuple<string, object>(key.ToString(), ator[key]));
-                //}
-
-                //return list.AsReadOnly();
+                return this.Members.AsReadOnly();
             }
             else if (this.IsICollection)
             {
-                return new List<KeyValueTuple<string, object>>(0).AsReadOnly();
-                //var ator = target as ICollection;
-                //list = new List<KeyValueTuple<string, object>>(ator.Count);
-                //foreach (var key in ator.Keys)
-                //{
-                //    if (key == null)
-                //        continue;
-
-                //    list.Add(new KeyValueTuple<string, object>(key.ToString(), ator[key]));
-                //}
-
-                //return list.AsReadOnly();
+                return this.Members.AsReadOnly();
             }
 
-            var members = this.GetMembers(objectType);// objectType.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+            var members = this.GetMembers(objectType);
             var list = new List<KeyValueTuple<string, object>>(members.Count());
             foreach (var member in members)
             {
@@ -200,6 +197,18 @@ namespace Never.EasySql
                 }
             }
 
+            foreach (var member in this.Members)
+            {
+                if (list.Any(ta => ta.Key.IsEquals(member.Key, StringComparison.OrdinalIgnoreCase)))
+                {
+                    list.RemoveAll(ta => ta.Key.IsEquals(member.Key, StringComparison.OrdinalIgnoreCase));
+                    list.Add(member);
+                    continue;
+                }
+
+                list.Add(member);
+            }
+
             if (this.Count <= 0)
                 this.Count = list.Count;
 
@@ -246,6 +255,28 @@ namespace Never.EasySql
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// 新加一些参数
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        internal EasySqlParameter<T> ReplaceParameter(string key, object parameter)
+        {
+            return this.ReplaceParameter(new KeyValueTuple<string, object>(key, parameter));
+        }
+
+        /// <summary>
+        /// 新加一些参数
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        internal EasySqlParameter<T> ReplaceParameter(KeyValueTuple<string, object> parameter)
+        {
+            ((List<KeyValueTuple<string, object>>)this.Members).Add(parameter);
+            return this;
         }
 
         #endregion convey

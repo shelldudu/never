@@ -15,24 +15,36 @@ namespace Never.Test
         [Xunit.Fact]
         public void TestId_1()
         {
-            var list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyTextDao(new { Id = 1, UserId = DBNull.Value, IdArray = new[] { 1, 2, 3, 4 } }).QueryForEnumerable<User>("select * from [user] where Id = $Id$and Id in ($IdArray)");
-            list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyXmlDao(new { Id = 1, UserId = 1, IdArray = new[] { 1, 2, 3, 4 } }).QueryForEnumerable<User>("qryUser");
-            list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyTextDao(new { Id = 1, UserId = DBNull.Value, IdArray = new[] { 1, 2, 3, 4 } }).QueryForEnumerable<User>((x, s) =>
-            {
-                s.Append("select * from user ");
-                if (x.Id > 2)
-                    s.Append(" where Id = " + x.Id);
+            //var list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyTextDao(new { Id = 1, UserId = DBNull.Value, IdArray = new[] { 1, 2, 3, 4 } }).QueryForEnumerable<User>("select * from [user] where Id = $Id$and Id in ($IdArray)");
+            //list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyXmlDao(new { Id = 1, UserId = 1, IdArray = new[] { 1, 2, 3, 4 } }).QueryForEnumerable<User>("qryUser");
+            //list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyTextDao(new { Id = 1, UserId = DBNull.Value, IdArray = new[] { 1, 2, 3, 4 } }).QueryForEnumerable<User>((x, s) =>
+            //{
+            //    s.Append("select * from user ");
+            //    if (x.Id > 2)
+            //        s.Append(" where Id = " + x.Id);
 
-                return;
-            });
+            //    return;
+            //});
+
+            int a = 0; int b = 0; var c = a == b;
 
             var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
-            var builder1 = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().Where((p, t) => t.EmbeddedSqlMaps.Count() >= p.Id).ToSingle().GetResult();
-            var builder2 = dao.ToEasyLinqDao(new { }).Select<SqlServerBuilder, SqlServerBuilder>().LeftJoin((p, t1, t2) => t1.EmbeddedSqlMaps == t2.EmbeddedSqlMaps)
-                .Where(null).ToList(1, 5).ToSingle().GetResult();
 
-            var builder3 = dao.ToEasyLinqDao(new { }).Select<SqlServerBuilder, SqlServerBuilder, SqlServerBuilder>().LeftJoin((p, t1, t2, t3) => t1.EmbeddedSqlMaps == t2.EmbeddedSqlMaps && t1.EmbeddedSqlMaps == t3.EmbeddedSqlMaps)
-                .Where(null).ToList(1, 5).ToSingle().ToSingle().GetResult();
+            //返回单条
+            var one = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().Where((p, t) => t.EmbeddedSqlMaps.Count() >= p.Id).ToSingle().GetResult();
+            //返回列表
+            var array = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().Where(null).ToList(1, 5).GetResult();
+            //返回列表，里面join了其他表
+            var array2 = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().LeftJoin<SqlServerBuilder>((p, t1, t2) => t1.EmbeddedSqlMaps == t2.EmbeddedSqlMaps, (p, t1, t2) => t2.EmbeddedSqlMaps.Count() == p.Id)
+                .Where(null).ToList(1, 5).GetResult();
+            //更新
+            var update = dao.ToEasyLinqDao<SqlServerBuilder>(new SqlServerBuilder()).Update().SetColum(m => m.EmbeddedSqlMaps).SetColumFunc(m => m.ConnectionString, "now()").Where(p => p.ConnectionString, ">=", "abc")
+                .NotExists<SqlServerBuilder>((p, t1) => t1.ConnectionString == p.ConnectionString).GetResult();
+            //删除
+            var delete = dao.ToEasyLinqDao<SqlServerBuilder>(new SqlServerBuilder()).Delete().Where(p => p.ConnectionString, "=", "abc")
+                .NotExists<SqlServerBuilder>((p, t1) => t1.ConnectionString == p.ConnectionString).GetResult();
+            //推入
+            var insert = dao.ToEasyLinqDao<SqlServerBuilder>(new SqlServerBuilder()).Insert().ValueColum(m => m.EmbeddedSqlMaps).ValueColumFunc(m => m.ConnectionString, "uuid()").LastInsertId().GetResult<int>();
 
         }
 

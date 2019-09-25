@@ -42,15 +42,15 @@ namespace Never.EasySql.Linq
         /// </summary>
         public NWhere<Parameter> Where()
         {
-            return new NWhere<Parameter>() { Context = this.Context };
+            return new NWhere<Parameter>() { Context = this.Context, delete = this };
         }
 
         /// <summary>
         /// where
         /// </summary>
-        public NWhere<Parameter> Where<TMember>(Expression<Func<Parameter, TMember, object>> expression, TMember value)
+        public NWhere<Parameter> Where<TMember>(Expression<Func<Parameter, object>> expression, string @operator, TMember value)
         {
-            return new NWhere<Parameter>();
+            return new NWhere<Parameter>() { Context = this.Context, delete = this };
         }
 
         /// <summary>
@@ -59,6 +59,8 @@ namespace Never.EasySql.Linq
         /// <typeparam name="NParameter">查询参数</typeparam>
         public struct NWhere<NParameter>
         {
+            internal Delete<NParameter> delete;
+
             /// <summary>
             /// 上下文
             /// </summary>
@@ -134,6 +136,14 @@ namespace Never.EasySql.Linq
             public NWhere<NParameter> NotIn(Func<TableInfo, string> notexists)
             {
                 return this;
+            }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public int GetResult()
+            {
+                return this.delete.GetResult();
             }
         }
     }

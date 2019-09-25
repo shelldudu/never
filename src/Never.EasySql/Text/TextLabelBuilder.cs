@@ -1,5 +1,6 @@
 ﻿using Never.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,12 +14,39 @@ namespace Never.EasySql.Text
     public sealed class TextLabelBuilder
     {
         /// <summary>
+        /// 缓存起来的东西
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, SqlTag> cached = new ConcurrentDictionary<string, SqlTag>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="cacheId">缓存key</param>
+        /// <param name="dao"></param>
+        /// <returns></returns>
+        public static SqlTag Build(string sql, string cacheId, IDao dao)
+        {
+            if (cacheId.IsNotNullOrWhiteSpace())
+            {
+                if (cached.TryGetValue(cacheId, out var tag))
+                    return tag;
+
+                tag = Build(sql, dao);
+                cached.TryAdd(cacheId, tag);
+                return tag;
+            }
+
+            return Build(sql, dao);
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dao"></param>
         /// <returns></returns>
-        public static SqlTag Build(string sql, IDao dao)
+        static SqlTag Build(string sql, IDao dao)
         {
             var sqltag = new SqlTag()
             {
