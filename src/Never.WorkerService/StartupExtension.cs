@@ -1,4 +1,4 @@
-﻿using Never.Hosting.IoC;
+﻿using Never.WorkerService.IoC;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,12 +8,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Never.Hosting
+namespace Never.WorkerService
 {
     /// <summary>
     /// 扩展
     /// </summary>
-    public static class HostingExtension
+    public static class StartupExtension
     {
         public static Func<HostBuilderContext, IEnumerable<FileInfo>> ConfigFileBuilder(IEnumerable<string> fileName)
         {
@@ -30,25 +30,13 @@ namespace Never.Hosting
             });
         }
 
-
         /// <summary>
         /// Specify the startup type to be used by the host
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IHostBuilder UseStartup<T>(this IHostBuilder builder) where T : AppStartup
-        {
-            return UseStartup<T>(builder, null);
-        }
-
-        /// <summary>
-        /// Specify the startup type to be used by the host
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        public static IHostBuilder UseStartup<T>(this IHostBuilder builder, Func<HostBuilderContext, IEnumerable<FileInfo>> jsonConfigFiles) where T : AppStartup
+        public static IHostBuilder UseStartup<T>(this IHostBuilder builder, Func<HostBuilderContext, IEnumerable<FileInfo>> jsonConfigFiles = null) where T : HostStartup
         {
             //config builder
             builder.ConfigureAppConfiguration((h, g) =>
@@ -65,7 +53,7 @@ namespace Never.Hosting
                     }
                 }
 
-                builder.Properties["Never.Hosting.Extension.IConfigurationBuilder"] = g;
+                builder.Properties["Never.WorkerService.Extension.IConfigurationBuilder"] = g;
             });
 
             //config ioc
@@ -91,7 +79,7 @@ namespace Never.Hosting
                             paramters.Add(i);
                             continue;
                         }
-                        if (p.ParameterType == typeof(IHostingEnvironment))
+                        if (p.ParameterType == typeof(IHostEnvironment))
                         {
                             paramters.Add(h.HostingEnvironment);
                             continue;
@@ -103,8 +91,8 @@ namespace Never.Hosting
                         }
                         if (p.ParameterType == typeof(IConfigurationBuilder))
                         {
-                            var config = builder.Properties["Never.Hosting.Extension.IConfigurationBuilder"] as IConfigurationBuilder;
-                            builder.Properties.Remove("Never.Hosting.Extension.IConfigurationBuilder");
+                            var config = builder.Properties["Never.WorkerService.Extension.IConfigurationBuilder"] as IConfigurationBuilder;
+                            builder.Properties.Remove("Never.WorkerService.Extension.IConfigurationBuilder");
                             paramters.Add(config);
                             continue;
                         }

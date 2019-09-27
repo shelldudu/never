@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Never.Configuration;
 using Never.Web.WebApi;
 using System;
@@ -13,11 +14,11 @@ namespace Never.TestWebApi
     public class Startup : Never.Web.WebApi.WebStartup
     {
         public IConfiguration Configuration { get; private set; }
-        public IHostingEnvironment Environment { get; private set; }
+        public IHostEnvironment Environment { get; private set; }
         public IServiceProvider autofac { get; set; }
         public IServiceProvider easyioc { get; set; }
 
-        public Startup(IConfiguration configuration, IHostingEnvironment environment) : base(() => new Never.Web.WebApplicationStartup())
+        public Startup(IConfiguration configuration, IHostEnvironment environment) : base(() => new Never.Web.WebApplicationStartup())
         {
             this.Environment = environment;
             this.Configuration = configuration;
@@ -46,7 +47,7 @@ namespace Never.TestWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public override IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(r => { });
+            services.AddMvc(r => { r.EnableEndpointRouting = false; });
             services.AddScoped<ApiServiceScopeClearMiddleware>();
             var provider = base.ConfigureServices(services);
             return provider;

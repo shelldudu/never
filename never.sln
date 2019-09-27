@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{523D1460-3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Test", "test\Never.Test\Never.Test.csproj", "{42A4EB21-2ABA-486B-9BD0-9BECA80EC24A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.TestWorkFlow", "test\Never.TestWorkflow\Never.TestWorkFlow.csproj", "{1E5E2598-0EC0-4D15-A379-47B1162D3E08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.TestWorkerService", "test\Never.TestWorkerService\Never.TestWorkerService.csproj", "{1E5E2598-0EC0-4D15-A379-47B1162D3E08}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.Memcached", "src\Never.MemCached\Never.Memcached.csproj", "{DC657EAA-D075-4C18-9D3B-ECC70DBAEC7A}"
 EndProject
@@ -32,6 +32,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Never.TestMvc", "test\Never.TestMvc\Never.TestMvc.csproj", "{60177A6A-35BB-4528-8098-6838C9BDBA41}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.TestWebApi", "test\Never.TestWebApi\Never.TestWebApi.csproj", "{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Never.WorkerService", "src\Never.WorkerService\Never.WorkerService.csproj", "{975E53F5-B1F7-4494-943C-22A5AF3EB742}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +97,10 @@ Global
 		{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DDF5CE6-9F12-4A43-8242-D5D3E9143D49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{975E53F5-B1F7-4494-943C-22A5AF3EB742}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{975E53F5-B1F7-4494-943C-22A5AF3EB742}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{975E53F5-B1F7-4494-943C-22A5AF3EB742}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{975E53F5-B1F7-4494-943C-22A5AF3EB742}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

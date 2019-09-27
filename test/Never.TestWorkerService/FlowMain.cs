@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace Never.WorkFlow.Test
 {
-    internal class MyMain
+    internal class FlowMain
     {
-        public static void Main222(string[] args)
+        public static void Enter(string[] args)
         {
             var workflowEngine = TypeCreate();
             var query = workflowEngine.CreateQueue();
@@ -60,39 +60,7 @@ namespace Never.WorkFlow.Test
             return workflowEngine;
         }
 
-        public static IWorkFlowEngine IoCCreate()
-        {
-            var app = new Never.ApplicationStartup(IoC.Providers.AppDomainAssemblyProvider.Default)
-                  .RegisterAssemblyFilter("Never".CreateAssemblyFilter())
-                  .UsePublishSubscribeBus()
-                  .UseEasyIoC((x, y, z) =>
-                  {
-                      x.RegisterCallBack("eee", ComponentLifeStyle.Singleton, () => new IoCMySqlTemplateRepository());
-                  })
-                  .UseWorlFlow(new IoCMySqlTemplateRepository(), new IoCMySqlExecutingRepository(), new Never.Serialization.EasyJsonSerializer(), (w) =>
-                   {
-                       w.TemplateEngine.Register(new Template("请病假申请").Next<请假申请>().Next<组长审批, 主管审批>(CoordinationMode.Meanwhile).Next<人事审批>().End());
-                       w.TemplateEngine.Register(new Template("请节日假申请").Next<请假申请>().Next<组长审批>().Next<人事审批>().End());
-                       w.TemplateEngine.Register(new Template("请婚姻假申请").Next<请假申请>().Next<组长审批, 主管审批>().Next<人事审批>().End());
-                       w.TemplateEngine.TestCompliant += (o, e) =>
-                       {
-                           e.Register<请假申请>(new 请假申请消息(), (x, y) => { return y is 请假申请消息; });
-                           e.Register<主管审批>(new 主管审批意见结果(), (x, y) => { return y is 请假申请消息; });
-                           e.Register<组长审批>(new 组长审批意见结果(), (x, y) => { return y is 请假申请消息; });
-                           e.Register<人事审批>(new 人事审批请假意见结果(), (x, y) => { return y is 组长审批意见结果 || y is 主管审批意见结果; });
-                       };
-                   })
-                   .Startup(x =>
-                   {
-
-                   });
-
-            var eee = app.ServiceLocator.Resolve<IoCMySqlTemplateRepository>("eee");
-            eee = app.ServiceLocator.Resolve<IoCMySqlTemplateRepository>();
-            return app.ServiceLocator.Resolve<IWorkFlowEngine>("abc");
-        }
-
-        private class IoCMySqlTemplateRepository : SingleTableMySqlExecutingRepository
+        internal class IoCMySqlTemplateRepository : SingleTableMySqlExecutingRepository
         {
             protected override string TablePrefixName
             {
@@ -109,7 +77,7 @@ namespace Never.WorkFlow.Test
             }
         }
 
-        private class IoCMySqlExecutingRepository : SingleTableSqlServerExecutingRepository
+        internal class IoCMySqlExecutingRepository : SingleTableSqlServerExecutingRepository
         {
             protected override string TablePrefixName
             {

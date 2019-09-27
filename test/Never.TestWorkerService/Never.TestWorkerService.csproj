@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.0" />
     <PackageReference Include="MySql.Data" Version="8.0.16" />
   </ItemGroup>
 
@@ -15,8 +13,18 @@
     <ProjectReference Include="..\..\src\Never.Configuration\Never.Configuration.csproj" />
     <ProjectReference Include="..\..\src\Never.Deployment\Never.Deployment.csproj" />
     <ProjectReference Include="..\..\src\Never.EasySql\Never.EasySql.csproj" />
+    <ProjectReference Include="..\..\src\Never.WorkerService\Never.WorkerService.csproj" />
     <ProjectReference Include="..\..\src\Never.WorkFlow\Never.WorkFlow.csproj" />
     <ProjectReference Include="..\..\src\Never\Never.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="install.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="uninstall.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

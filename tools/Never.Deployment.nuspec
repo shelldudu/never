@@ -15,10 +15,10 @@
     <summary>never library</summary>
     <dependencies>
       <group targetFramework=".NETFramework4.6.1" >
-        <dependency id="Never" version="1.0.4" />
+        <dependency id="Never" version="1.0.5.3" />
       </group>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="Never" version="1.0.4" />
+        <dependency id="Never" version="1.0.5.3" />
       </group>
     </dependencies>
     <frameworkAssemblies>
