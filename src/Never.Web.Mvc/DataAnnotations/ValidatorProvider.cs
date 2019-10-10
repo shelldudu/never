@@ -28,11 +28,10 @@ namespace Never.Web.Mvc.DataAnnotations
             if (type == null)
                 return null;
 
-            var attribute = default(ValidatorAttribute);
-            if (!TypeProcessor.all.TryGetValue(type, out attribute) || attribute == null)
+            if (!TypeProcessor.TryGetValidator(type, out var validator))
                 return null;
 
-            return System.Activator.CreateInstance(attribute.ValidatorType) as IValidator;
+            return validator;
         }
     }
 
@@ -102,11 +101,10 @@ namespace Never.Web.Mvc.DataAnnotations
             if (type == null)
                 return null;
 
-            var attribute = default(ValidatorAttribute);
-            if (!TypeProcessor.all.TryGetValue(type, out attribute) || attribute == null)
+            if (!TypeProcessor.TryGetValidator(type, out var validator))
                 return null;
 
-            return System.Activator.CreateInstance(attribute.ValidatorType) as IValidator;
+            return validator;
         }
 
         #endregion IValidator

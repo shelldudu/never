@@ -142,7 +142,7 @@ namespace Never.Web.WebApi.DataAnnotations
         /// <param name="type"></param>
         /// <param name="validator"></param>
         /// <returns></returns>
-        public static bool TryGetActivator(Type type, out IValidator validator)
+        public static bool TryGetValidator(Type type, out IValidator validator)
         {
             if (all.TryGetValue(type, out var value))
             {

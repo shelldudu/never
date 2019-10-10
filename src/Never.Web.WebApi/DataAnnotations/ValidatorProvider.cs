@@ -40,8 +40,7 @@ namespace Never.Web.WebApi.DataAnnotations
             if (type == null)
                 return null;
 
-            var validator = default(IValidator);
-            if (!TypeProcessor.TryGetActivator(type, out validator))
+            if (!TypeProcessor.TryGetValidator(type, out var validator))
                 return null;
 
             return validator;
@@ -107,8 +106,7 @@ namespace Never.Web.WebApi.DataAnnotations
             if (type == null)
                 return null;
 
-            var validator = default(IValidator);
-            if (!TypeProcessor.TryGetActivator(type, out validator))
+            if (!TypeProcessor.TryGetValidator(type, out var validator))
                 return null;
 
             return validator;
