@@ -40,11 +40,11 @@ namespace Never.Web.WebApi.DataAnnotations
             if (type == null)
                 return null;
 
-            var attribute = default(ValidatorAttribute);
-            if (!TypeProcessor.all.TryGetValue(type, out attribute) || attribute == null)
+            var validator = default(IValidator);
+            if (!TypeProcessor.TryGetActivator(type, out validator))
                 return null;
 
-            return System.Activator.CreateInstance(attribute.ValidatorType) as IValidator;
+            return validator;
         }
     }
 
@@ -107,11 +107,11 @@ namespace Never.Web.WebApi.DataAnnotations
             if (type == null)
                 return null;
 
-            var attribute = default(ValidatorAttribute);
-            if (!TypeProcessor.all.TryGetValue(type, out attribute) || attribute == null)
+            var validator = default(IValidator);
+            if (!TypeProcessor.TryGetActivator(type, out validator))
                 return null;
 
-            return System.Activator.CreateInstance(attribute.ValidatorType) as IValidator;
+            return validator;
         }
     }
 

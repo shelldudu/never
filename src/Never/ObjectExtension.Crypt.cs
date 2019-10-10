@@ -114,7 +114,7 @@ namespace Never
                 return password;
 
             byte[] pwd = encoding.GetBytes(password);
-            HashAlgorithm sha256 = SHA256Managed.Create();
+            HashAlgorithm sha256 = SHA256.Create();
 
             return ComputeHash(pwd, sha256);
         }
@@ -145,7 +145,7 @@ namespace Never
                 return password;
 
             byte[] pwd = encoding.GetBytes(password);
-            HashAlgorithm sha384 = SHA384Managed.Create();
+            HashAlgorithm sha384 = SHA384.Create();
 
             return ComputeHash(pwd, sha384);
         }
@@ -176,7 +176,7 @@ namespace Never
                 return password;
 
             byte[] pwd = encoding.GetBytes(password);
-            HashAlgorithm sha512 = SHA512Managed.Create();
+            HashAlgorithm sha512 = SHA512.Create();
 
             return ComputeHash(pwd, sha512);
         }
@@ -304,7 +304,7 @@ namespace Never
             if (key.Length != 24)
                 throw new ArgumentOutOfRangeException("key的长度要为24个字符");
 
-            using (var des = new TripleDESCryptoServiceProvider() { Key = ASCIIEncoding.ASCII.GetBytes(key), Mode = CipherMode.ECB })
+            using (var des = new TripleDESCryptoServiceProvider() { Key = Encoding.ASCII.GetBytes(key), Mode = CipherMode.ECB })
             {
                 var encrypt = des.CreateEncryptor();
                 var data = Encoding.UTF8.GetBytes(text);
@@ -323,7 +323,7 @@ namespace Never
             if (key.Length != 24)
                 throw new ArgumentOutOfRangeException("key的长度要为24个字符");
 
-            using (var des = new TripleDESCryptoServiceProvider() { Key = ASCIIEncoding.ASCII.GetBytes(key), Mode = CipherMode.ECB })
+            using (var des = new TripleDESCryptoServiceProvider() { Key = Encoding.ASCII.GetBytes(key), Mode = CipherMode.ECB })
             {
                 var encrypt = des.CreateEncryptor();
                 return encrypt.TransformFinalBlock(data, 0, data.Length);
@@ -366,7 +366,7 @@ namespace Never
             if (key.Length != 24)
                 throw new ArgumentOutOfRangeException("key的长度要为24个字符");
 
-            using (var des = new TripleDESCryptoServiceProvider() { Key = ASCIIEncoding.ASCII.GetBytes(key), Mode = CipherMode.ECB })
+            using (var des = new TripleDESCryptoServiceProvider() { Key = Encoding.ASCII.GetBytes(key), Mode = CipherMode.ECB })
             {
                 var decrypt = des.CreateDecryptor();
                 var data = Convert.FromBase64String(text);

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Never.DataAnnotations
 {
@@ -47,5 +49,47 @@ namespace Never.DataAnnotations
         /// 成功对象
         /// </summary>
         public static ValidationResult Success { get { return new ValidationResult(); } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="Target"></typeparam>
+        /// <param name="target"></param>
+        /// <param name="express"></param>
+        /// <returns></returns>
+        public static ValidationResult Expression<Target>(Target target, Func<Target, IEnumerable<KeyValuePair<Expression<System.Func<Target, object>>, string>>> express)
+        {
+            var collection = express(target);
+            if (collection.IsNullOrEmpty())
+                return ValidationResult.Success;
+
+            var list = new List<ValidationFailure>();
+            foreach (var r in collection)
+                Validator<object>.AddErrors(list, r.Key.Body, r.Value);
+
+            return new ValidationResult(list);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="Target"></typeparam>
+        /// <param name="target"></param>
+        /// <param name="express"></param>
+        /// <returns></returns>
+        public static ValidationResult Expression<Target>(Target target, Action<ICollection<KeyValuePair<Expression<System.Func<Target, object>>, string>>, Target> express)
+        {
+            var collection = new List<KeyValuePair<Expression<System.Func<Target, object>>, string>>();
+            express(collection, target);
+            if (collection.Count == 0)
+                return ValidationResult.Success;
+
+            var list = new List<ValidationFailure>();
+            foreach (var r in collection)
+                Validator<object>.AddErrors(list, r.Key.Body, r.Value);
+
+            return new ValidationResult(list);
+        }
+
     }
 }

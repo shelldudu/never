@@ -577,21 +577,10 @@ namespace Never
         /// <typeparam name="T"></typeparam>
         /// <param name="validator"></param>
         /// <returns></returns>
-        public static ValidationResult Validate<T>(this IValidator<T> validator)
+        public static ValidationResult Validate<T>(this IAmValidator validator)
         {
             var data = validator.Validate();
-            if (data.IsNullOrEmpty())
-            {
-                return new ValidationResult();
-            }
-
-            var list = new List<ValidationFailure>();
-            foreach (var r in data)
-            {
-                Validator<object>.AddErrors(list, r.Key.Body, r.Value);
-            }
-
-            return new ValidationResult(list);
+            return data;
         }
 
         #endregion validator

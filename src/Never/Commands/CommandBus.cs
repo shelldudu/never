@@ -167,9 +167,9 @@ namespace Never.Commands
         protected virtual ValidationResult CommandValidate<TCommand>(TCommand command, Type commandType) where TCommand : ICommand
         {
             /*新加命令参数验证*/
-            var validator = command as IValidator<TCommand>;
+            var validator = command as IAmValidator;
             if (validator != null)
-                return AnonymousExtension.Validate(validator);
+                return validator.Validate();
 
             var commandAttribute = CommandBehaviorStorager.Default.GetAttribute<ValidatorAttribute>(commandType);
             if (commandAttribute != null && commandAttribute.ValidatorType != null)

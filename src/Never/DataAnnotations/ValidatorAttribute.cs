@@ -3,9 +3,9 @@
 namespace Never.DataAnnotations
 {
     /// <summary>
-    /// 数组验证模型特性<see cref="ValidatorAttribute.ValidatorType"/>类型通常是实现了<see cref="IValidator{T}"/>接口
+    /// 数组验证模型特性<see cref="ValidatorAttribute.ValidatorType"/>类型通常是实现了<see cref="IValidator"/>接口
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     public class ValidatorAttribute : Attribute
     {
         #region prop

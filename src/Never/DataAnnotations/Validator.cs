@@ -73,6 +73,16 @@ namespace Never.DataAnnotations
         /// <returns></returns>
         public virtual ValidationResult Validate(object target)
         {
+            return this.Match(target);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public virtual ValidationResult Match(object target)
+        {
             if (target is T)
             {
                 var data = this.RuleFor((T)target);
