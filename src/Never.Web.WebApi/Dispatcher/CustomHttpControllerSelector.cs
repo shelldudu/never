@@ -41,7 +41,6 @@ namespace Never.Web.WebApi.Dispatcher
         /// </summary>
         private static readonly HashSet<Type> httpMethodProvider = null;
 
-        private static bool count = false;
         #endregion field
 
         #region ctor
@@ -68,8 +67,27 @@ namespace Never.Web.WebApi.Dispatcher
         {
             foreach (var controller in application.Controllers)
             {
-                var controllerAttribute = controller.Attributes.FirstOrDefault(o => o is ApiAreaRemarkAttribute);
-                string areaName = (controllerAttribute == null) ? string.Empty : (((ApiAreaRemarkAttribute)controllerAttribute).Area);
+                var apiAreaRemarkAttribute = controller.Attributes.FirstOrDefault(o => o is ApiAreaRemarkAttribute) as ApiAreaRemarkAttribute;
+                var routeAttribute = controller.Attributes.FirstOrDefault(o => o is Microsoft.AspNetCore.Mvc.RouteAttribute) as RouteAttribute;
+                string areaName = string.Empty, routeAreaName = string.Empty;
+                if (routeAttribute != null && routeAttribute.Template.IsNotNullOrEmpty())
+                {
+                    var splits = routeAttribute.Template.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (splits.Length > 0 && splits[0].IsEquals("api", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        for (var i = 1; i < splits.Length; i++)
+                        {
+                            if (i == splits.Length - 1)
+                                areaName = string.Concat(areaName, splits[i]);
+                            else
+                                areaName = string.Concat(areaName, splits[i], "/");
+                        }
+
+                        routeAreaName = areaName;
+                    }
+                }
+
+                areaName = areaName.IsNullOrEmpty() ? string.Concat(areaName, apiAreaRemarkAttribute?.Area) : string.Concat(areaName, "/", apiAreaRemarkAttribute?.Area);
                 if (areaName.IsNotNullOrEmpty() && !areas.Contains(areaName))
                     areas.Add(areaName);
 
@@ -84,26 +102,28 @@ namespace Never.Web.WebApi.Dispatcher
                         continue;
 
                     var routeName = string.Concat(areaName.IsNullOrEmpty() ? "" : (areaName + "/"), attribute.UniqueId);
+                    var template = routeAreaName.IsNullOrEmpty() ? routeName : routeName.Sub(routeAreaName.Length + 1);
                     string actionName = action.ActionName;
-                    if (!count && routeDict.ContainsKey(routeName))
+                    if (routeDict.ContainsKey(routeName))
+                    {
                         throw new KeyExistedException(routeName, string.Format("在api控件器中找到相同的标识,当前控制器和方法为{0}-{1}，已经存在的控制器和方法为{2}-{3}", controller.ControllerType.FullName, actionName, routeDict[routeName].ControllerName, routeDict[routeName].ActionMethod.Name));
-
-                    if (!count && action.Selectors.Where(o => o.AttributeRouteModel != null && o.AttributeRouteModel.Template.IsEquals(routeName)).Any())
+                    }
+                    if (action.Selectors.Where(o => o.AttributeRouteModel != null && o.AttributeRouteModel.Template.IsEquals(routeName)).Any())
+                    {
                         throw new KeyExistedException(routeName, string.Format("已经注册过{0}的路由，请检查当前系统路由配置", routeName));
+                    }
 
-                    routeDict[routeName] = new ActionResultMetadata() { ControllerName = controller.ControllerName, ControllerType = controller.ControllerType, ActionMethod = action.ActionMethod, AreaName = areaName };
+                    routeDict[routeName] = new ActionResultMetadata() { ControllerName = controller.ControllerName, ControllerType = controller.ControllerType, ActionMethod = action.ActionMethod, AreaName = apiAreaRemarkAttribute?.Area };
                     var httpMethod = httpMethodProvider.FirstOrDefault(o => o.Name.IndexOf(attribute.HttpMethod, StringComparison.OrdinalIgnoreCase) >= 0);
                     if (httpMethod == null)
                     {
-                        action.Selectors.Add(new SelectorModel() { AttributeRouteModel = new AttributeRouteModel(new HttpGetAttribute(routeName)) });
+                        action.Selectors.Add(new SelectorModel() { AttributeRouteModel = new AttributeRouteModel(new HttpGetAttribute(template)) });
                         continue;
                     }
 
-                    action.Selectors.Add(new SelectorModel() { AttributeRouteModel = new AttributeRouteModel(Activator.CreateInstance(httpMethod, new[] { routeName }) as HttpMethodAttribute) });
+                    action.Selectors.Add(new SelectorModel() { AttributeRouteModel = new AttributeRouteModel(Activator.CreateInstance(httpMethod, new[] { template }) as HttpMethodAttribute) });
                 }
             }
-
-            count = true;
         }
     }
 }

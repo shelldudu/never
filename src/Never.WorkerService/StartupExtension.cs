@@ -36,7 +36,7 @@ namespace Never.WorkerService
         /// <typeparam name="T"></typeparam>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IHostBuilder UseStartup<T>(this IHostBuilder builder, Func<HostBuilderContext, IEnumerable<FileInfo>> jsonConfigFiles = null) where T : HostStartup
+        public static IHostBuilder UseStartup<T>(this IHostBuilder builder, Func<HostBuilderContext, IEnumerable<FileInfo>> jsonConfigFiles = null) where T : WorkerStartup
         {
             //config builder
             builder.ConfigureAppConfiguration((h, g) =>

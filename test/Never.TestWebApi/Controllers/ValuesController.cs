@@ -19,20 +19,20 @@ namespace Never.TestWebApi.Controllers
         }
 
         // GET api/values
-        [ApiActionRemark("a914012f291b", "HttpGet")]
+        [ApiActionRemark("a914012f291b", "HttpGet"), HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        [Never.Attributes.ApiActionRemark("a91500c8ca64", "HttpGet")]
-        public string Get(int id)
-        {
-           // var value = AppConfig.StringInAppSettings("ApiLoad");
-            return "value";
-        }
+        //// GET api/values/5
+        //[HttpGet("{id}")]
+        //[Never.Attributes.ApiActionRemark("a91500c8ca64", "HttpGet")]
+        //public string Get(int id)
+        //{
+        //   // var value = AppConfig.StringInAppSettings("ApiLoad");
+        //    return "value";
+        //}
 
         [ApiActionRemark("Regiseter", "HttpPost"), HttpPost]
         public string Regiseter(CreateUserReqs reqs)

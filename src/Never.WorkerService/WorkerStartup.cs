@@ -11,7 +11,7 @@ namespace Never.WorkerService
     /// <summary>
     /// 定义对 .NET Core 应用程序内所有应用程序对象公用的方法、属性和事件。
     /// </summary>
-    public class HostStartup
+    public class WorkerStartup
     {
         /// <summary>
         /// 构造函数，目前构造参数只支持如下类型：
@@ -22,7 +22,7 @@ namespace Never.WorkerService
         /// <see cref="Microsoft.Extensions.Configuration.IConfigurationBuilder"/>
         /// </summary>
         /// <param name="startup"></param>
-        protected HostStartup(Func<ApplicationStartup> startup)
+        protected WorkerStartup(Func<ApplicationStartup> startup)
         {
             this.startup = startup;
         }

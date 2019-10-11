@@ -8,8 +8,8 @@ using Never.Attributes;
 
 namespace Never.TestWebApi.Controllers.v1._1
 {
-    [Route("api/")]
-    [ApiAreaRemark("v1.1")]
+    [Route("api/v1.1")]
+    //[ApiAreaRemark("v1.1")]
     public class ValuesController : Controller
     {
         // GET api/values

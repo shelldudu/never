@@ -12,7 +12,7 @@ using static Never.WorkFlow.Test.FlowMain;
 
 namespace Never.WorkFlow.Test
 {
-    class Startup : Never.WorkerService.HostStartup
+    class Startup : Never.WorkerService.WorkerStartup
     {
         public Startup() : base(() => new Never.ApplicationStartup())
         {
