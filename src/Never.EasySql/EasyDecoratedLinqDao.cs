@@ -42,25 +42,25 @@ namespace Never.EasySql
 
         #region context
 
-        private Context InitContext()
+        private Context GetContext()
         {
             if (this.dao.SqlExecuter is MySqlExecuter)
-                return new MySqlContext();
+                return new MySqlContext() { CacheId = this.cacheId };
 
             if (this.dao.SqlExecuter is SqlServerExecuter)
-                return new SqlServerContext();
+                return new SqlServerContext() { CacheId = this.cacheId };
 
             if (this.dao.SqlExecuter is OdbcServerExecuter)
-                return new OdbcServerContext();
+                return new OdbcServerContext() { CacheId = this.cacheId };
 
             if (this.dao.SqlExecuter is OleDbServerExecuter)
-                return new OleDbServerContext();
+                return new OleDbServerContext() { CacheId = this.cacheId };
 
             if (this.dao.SqlExecuter is OracleServerExecuter)
-                return new OracleServerContext();
+                return new OracleServerContext() { CacheId = this.cacheId };
 
             if (this.dao.SqlExecuter is PostgreSqlExecuter)
-                return new PostgreSqlContext();
+                return new PostgreSqlContext() { CacheId = this.cacheId };
 
             throw new Exception("dao.SqlExecuter 无法识别，不能创建上下文");
         }
@@ -149,7 +149,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public Update<Parameter> Update()
         {
-            return new Update<Parameter>() { Context = this.InitContext() };
+            return new Update<Parameter>() { Context = this.GetContext() };
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public Delete<Parameter> Delete()
         {
-            return new Delete<Parameter>() { Context = this.InitContext() };
+            return new Delete<Parameter>() { Context = this.GetContext() };
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public Insert<Parameter> Insert()
         {
-            return new Insert<Parameter>() { Context = this.InitContext() };
+            return new Insert<Parameter>() { Context = this.GetContext() };
         }
 
         /// <summary>
@@ -177,17 +177,25 @@ namespace Never.EasySql
         /// <returns></returns>
         public Select<Parameter, T> Select<T>()
         {
-            return new Select<Parameter, T>() { Context = this.InitContext() };
-        }
+            if (this.dao.SqlExecuter is MySqlExecuter)
+                return new Linq.MySql.Select<Parameter, T>() { CacheId = this.cacheId };
 
-        /// <summary>
-        /// 查询，如果查询对象里面含有别的表，则通过表达式来查询相应的属性或字段
-        /// </summary>
-        /// <typeparam name="T">对象</typeparam>
-        /// <returns></returns>
-        public Select<Parameter, T> Select<T>(params Expression<Func<Parameter, T, object>>[] expression)
-        {
-            return new Select<Parameter, T>() { Context = this.InitContext() };
+            if (this.dao.SqlExecuter is SqlServerExecuter)
+                return new SqlServerContext() { CacheId = this.cacheId };
+
+            if (this.dao.SqlExecuter is OdbcServerExecuter)
+                return new OdbcServerContext() { CacheId = this.cacheId };
+
+            if (this.dao.SqlExecuter is OleDbServerExecuter)
+                return new OleDbServerContext() { CacheId = this.cacheId };
+
+            if (this.dao.SqlExecuter is OracleServerExecuter)
+                return new OracleServerContext() { CacheId = this.cacheId };
+
+            if (this.dao.SqlExecuter is PostgreSqlExecuter)
+                return new PostgreSqlContext() { CacheId = this.cacheId };
+
+            return new Select<Parameter, T>() { Context = this.GetContext() };
         }
 
         /// <summary>

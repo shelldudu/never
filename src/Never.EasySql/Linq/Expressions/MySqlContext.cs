@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq.Expressions
 {
-    class MySqlContext : Context
+    public class MySqlContext : Context
     {
     }
 }

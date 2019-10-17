@@ -59,6 +59,9 @@ namespace Never.EasySql.Linq
         /// <typeparam name="NParameter">查询参数</typeparam>
         public struct NWhere<NParameter>
         {
+            /// <summary>
+            /// 
+            /// </summary>
             internal Delete<NParameter> delete;
 
             /// <summary>
@@ -67,10 +70,26 @@ namespace Never.EasySql.Linq
             internal Context Context { get; set; }
 
             /// <summary>
+            /// and
+            /// </summary>
+            public NWhere<NParameter> And<TMember>(Expression<Func<Parameter, object>> expression, string @operator, TMember value)
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// or
+            /// </summary>
+            public NWhere<NParameter> Or<TMember>(Expression<Func<Parameter, object>> expression, string @operator, TMember value)
+            {
+                return this;
+            }
+
+            /// <summary>
             /// 存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter> Exists<T1>(Expression<Func<Parameter, T1, object>> expression)
+            public NWhere<NParameter> AndExists<T1>(Expression<Func<Parameter, T1, object>> expression)
             {
                 return this;
             }
@@ -79,7 +98,7 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <param name="exists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter> Exists(Func<TableInfo, string> exists)
+            public NWhere<NParameter> AndExists(Func<TableInfo, string> exists)
             {
                 return this;
             }
@@ -88,7 +107,7 @@ namespace Never.EasySql.Linq
             /// 不存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter> NotExists<T1>(Expression<Func<Parameter, T1, object>> expression)
+            public NWhere<NParameter> AndNotExists<T1>(Expression<Func<Parameter, T1, object>> expression)
             {
                 return this;
             }
@@ -97,7 +116,7 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <param name="notexists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter> NotExists(Func<TableInfo, string> notexists)
+            public NWhere<NParameter> AndNotExists(Func<TableInfo, string> notexists)
             {
                 return this;
             }
@@ -106,7 +125,7 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter> In<T1>(Expression<Func<Parameter, T1, object>> expression)
+            public NWhere<NParameter> AndIn<T1>(Expression<Func<Parameter, T1, object>> expression)
             {
                 return this;
             }
@@ -115,7 +134,7 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <param name="notexists">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter> In(Func<TableInfo, string> notexists)
+            public NWhere<NParameter> AndIn(Func<TableInfo, string> notexists)
             {
                 return this;
             }
@@ -124,7 +143,7 @@ namespace Never.EasySql.Linq
             /// 不存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter> NotIn<T1>(Expression<Func<Parameter, T1, object>> expression)
+            public NWhere<NParameter> AndNotIn<T1>(Expression<Func<Parameter, T1, object>> expression)
             {
                 return this;
             }
@@ -133,7 +152,79 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <param name="notexists">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter> NotIn(Func<TableInfo, string> notexists)
+            public NWhere<NParameter> AndNotIn(Func<TableInfo, string> notexists)
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <typeparam name="T1">另外的表中</typeparam>
+            public NWhere<NParameter> OrExists<T1>(Expression<Func<Parameter, T1, object>> expression)
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="exists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter> OrExists(Func<TableInfo, string> exists)
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <typeparam name="T1">另外的表中</typeparam>
+            public NWhere<NParameter> OrNotExists<T1>(Expression<Func<Parameter, T1, object>> expression)
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="notexists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter> OrNotExists(Func<TableInfo, string> notexists)
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <typeparam name="T1">另外的表中</typeparam>
+            public NWhere<NParameter> OrIn<T1>(Expression<Func<Parameter, T1, object>> expression)
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="notexists">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter> OrIn(Func<TableInfo, string> notexists)
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <typeparam name="T1">另外的表中</typeparam>
+            public NWhere<NParameter> OrNotIn<T1>(Expression<Func<Parameter, T1, object>> expression)
+            {
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="notexists">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter> OrNotIn(Func<TableInfo, string> notexists)
             {
                 return this;
             }

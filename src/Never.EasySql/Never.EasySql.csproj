@@ -16,12 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Linq\MySql\**" />
-    <EmbeddedResource Remove="Linq\MySql\**" />
-    <None Remove="Linq\MySql\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Linq\EasySqlContext.cs" />
     <Compile Remove="Linq\EasySqlExtension.cs" />
     <Compile Remove="Linq\EasySqlQueryable.cs" />
@@ -51,5 +45,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Never\Never.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Linq\PostgreSql\" />
+    <Folder Include="Linq\Oracle\" />
+    <Folder Include="Linq\SqlServer\" />
+    <Folder Include="Linq\Sqlite\" />
   </ItemGroup>
 </Project>

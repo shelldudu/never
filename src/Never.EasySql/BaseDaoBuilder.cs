@@ -22,15 +22,6 @@ namespace Never.EasySql
         #region init
 
         /// <summary>
-        /// 所有的流内容
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerable<Stream> GetAllStreams()
-        {
-            return null;
-        }
-
-        /// <summary>
         /// 开启连接
         /// </summary>
         /// <returns></returns>
@@ -41,6 +32,12 @@ namespace Never.EasySql
         /// </summary>
         public abstract string ConnectionString { get; }
 
+        /// <summary>
+        /// 初始化sqlTag提供者
+        /// </summary>
+        /// <returns></returns>
+        public abstract ISqlTagProvider InitSqlTagProviderOnStart();
+
         #endregion init
 
         #region dao
@@ -50,7 +47,7 @@ namespace Never.EasySql
         /// <summary>
         /// 标签提供者
         /// </summary>
-        private readonly SqlTagProvider sqlTagProvider = null;
+        private ISqlTagProvider sqlTagProvider = null;
 
         /// <summary>
         /// 构建者
@@ -69,6 +66,11 @@ namespace Never.EasySql
         }
 
         /// <summary>
+        /// sql参数前辍
+        /// </summary>
+        public string ParameterPrefix { get; private set; }
+
+        /// <summary>
         /// 会话管理
         /// </summary>
         private System.Threading.ThreadLocal<ISession> currentSessionThreadLocal = null;
@@ -84,6 +86,7 @@ namespace Never.EasySql
             {
                 return session.Dao;
             }
+
             //System.Threading.Thread.CurrentThread.
             return new MyDao(this.CreateSqlExecuter(), this.currentSessionThreadLocal)
             {
@@ -92,18 +95,6 @@ namespace Never.EasySql
         }
 
         #endregion dao
-
-        #region ctor
-
-        /// <summary>
-        ///
-        /// </summary>
-        protected BaseDaoBuilder()
-        {
-            this.sqlTagProvider = new SqlTagProvider();
-        }
-
-        #endregion ctor
 
         /// <summary>
         /// 开始工作
@@ -116,47 +107,18 @@ namespace Never.EasySql
                 return;
             }
 
-            var streams = this.GetAllStreams();
-            if (streams != null)
-            {
-                streams = streams.Where(o => o != null).ToArray();
-                foreach (var i in streams)
-                {
-                    this.sqlTagProvider.Load(i, null);
-                }
-            }
-
-            var stringPrefix = string.Empty;
             var sql = this.CreateSqlExecuter();
             {
                 var test = sql as IParameterPrefixProvider;
                 if (test != null)
                 {
-                    stringPrefix = test.GetParameterPrefix();
+                    this.ParameterPrefix = test.GetParameterPrefix();
                 }
             }
 
-            this.sqlTagProvider.Build(stringPrefix);
-            this.OnStarted(streams);
+            this.sqlTagProvider = this.InitSqlTagProviderOnStart();
             this.currentSessionThreadLocal = new System.Threading.ThreadLocal<ISession>(false);
             this.started = true;
-        }
-
-        /// <summary>
-        /// 在启动后
-        /// </summary>
-        /// <param name="streams"></param>
-        protected virtual void OnStarted(IEnumerable<Stream> streams)
-        {
-            if (streams == null)
-            {
-                return;
-            }
-
-            foreach (var i in streams)
-            {
-                i.Dispose();
-            }
         }
 
         /// <summary>

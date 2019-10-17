@@ -21,5 +21,15 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <returns></returns>
         public abstract SqlTag Build();
+
+        /// <summary>
+        /// 缓存cached
+        /// </summary>
+        public string CacheId { get; set; }
+
+        /// <summary>
+        /// label的集合
+        /// </summary>
+        public ICollection<ILabel> Labels { get; }
     }
 }
