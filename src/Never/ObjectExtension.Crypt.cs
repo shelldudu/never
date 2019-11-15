@@ -484,6 +484,9 @@ namespace Never
         /// <returns></returns>
         public static string ToBase64(this string text, Encoding encoding)
         {
+            if (text.IsNullOrEmpty())
+                return text;
+
             var @byte = encoding.GetBytes(text);
             return Convert.ToBase64String(@byte);
         }
@@ -506,6 +509,9 @@ namespace Never
         /// <returns></returns>
         public static string FromBase64(this string text, Encoding encoding)
         {
+            if (text.IsNullOrEmpty())
+                return text;
+
             var @byte = Convert.FromBase64String(text);
             return encoding.GetString(@byte);
         }

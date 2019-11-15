@@ -195,7 +195,14 @@ namespace Never.Commands.Recovery
         /// <returns></returns>
         public RecoveryEventModel DequeueEvent()
         {
-            return this.storager.DequeueEvent();
+            try
+            {
+                return this.storager.DequeueEvent();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         #endregion IFailRecoveryStorager

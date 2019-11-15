@@ -77,36 +77,35 @@ namespace Never.Threading
 
             while (true)
             {
-                //-1表示外部用来停止了
-                if (this.flag == -1)
-                {
-                    lock (syncFlag)
-                    {
-                        Monitor.Wait(syncFlag);
-                    }
-                }
-
-                var timeSpan = TimeSpan.FromSeconds(10);
                 try
                 {
-                    timeSpan = working();
+                    var timeSpan = working();
+                    if (timeSpan != TimeSpan.Zero)
+                        Thread.Sleep(timeSpan);
+
+                    //-1表示外部用来停止了
+                    if (this.flag == -1)
+                    {
+                        lock (syncFlag)
+                        {
+                            Monitor.Wait(syncFlag);
+                        }
+                    }
                 }
                 catch (ThreadAbortException)
                 {
                     /*进行了Close操作*/
+                    Thread.Sleep(TimeSpan.FromSeconds(10));
                 }
                 catch (ThreadInterruptedException)
                 {
                     /*进行了Close操作*/
+                    Thread.Sleep(TimeSpan.FromSeconds(10));
                 }
                 catch (Exception ex)
                 {
                     this.HandleException(ex, string.Empty);
-                }
-                finally
-                {
-                    if (timeSpan != TimeSpan.Zero)
-                        Thread.Sleep(timeSpan);
+                    Thread.Sleep(TimeSpan.FromSeconds(10));
                 }
             }
         }
@@ -130,7 +129,7 @@ namespace Never.Threading
         [Obsolete("it means thread wait")]
         public void Stop()
         {
-            this.Wait();
+            this.Close();
         }
 
         /// <summary>
@@ -158,7 +157,7 @@ namespace Never.Threading
             lock (syncFlag)
             {
                 System.Threading.Interlocked.Exchange(ref this.flag, 0);
-                Monitor.Pulse(syncFlag);
+                Monitor.PulseAll(syncFlag);
             }
         }
 
