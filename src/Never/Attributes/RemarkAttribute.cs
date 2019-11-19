@@ -91,7 +91,7 @@ namespace Never.Attributes
             if (members == null || members.Length == 0)
                 return new Dictionary<TValue, RemarkAttribute>();
 
-            var dict = new Dictionary<TValue, RemarkAttribute>();
+            var dictionary = new Dictionary<TValue, RemarkAttribute>();
             foreach (var member in members)
             {
                 if (member == null)
@@ -103,10 +103,10 @@ namespace Never.Attributes
 
                 var key = default(TValue);
                 key = (TValue)member.GetValue(enumType);
-                dict[key] = attribute;
+                dictionary[key] = attribute;
             }
 
-            return dict;
+            return dictionary;
         }
     }
 }

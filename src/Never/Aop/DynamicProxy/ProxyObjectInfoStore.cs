@@ -87,7 +87,7 @@ namespace Never.Aop.DynamicProxy
                     ProxyAttributes = this.ProxyAttributes,
                     ProxyType = this.ProxyType,
                     Proxy = proxy,
-                    Items = new Dictionary<string, object>()
+                    Items = new System.Collections.Concurrent.ConcurrentDictionary<string, object>()
                 };
             }
 

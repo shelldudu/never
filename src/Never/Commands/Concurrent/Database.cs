@@ -13,7 +13,7 @@ namespace Never.Commands.Concurrent
         /// <summary>
         /// 存储每一个命令的表行记录对象
         /// </summary>
-        private static readonly Dictionary<Type, Table> collections = new Dictionary<Type, Table>(20);
+        private static readonly IDictionary<Type, Table> collections = new System.Collections.Concurrent.ConcurrentDictionary<Type, Table>();
 
         #endregion dict
 

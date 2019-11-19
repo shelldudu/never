@@ -15,7 +15,7 @@ namespace Never.Messages
         /// </summary>
         public DefaultMessageContext()
         {
-            this.Items = new Dictionary<string, object>(20);
+            this.Items = new System.Collections.Concurrent.ConcurrentDictionary<string, object>();
         }
 
         #endregion ctor

@@ -21,7 +21,7 @@ namespace Never.WorkFlow.Coordinations
         /// </summary>
         public WorkContext()
         {
-            this.Items = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            this.Items = new System.Collections.Concurrent.ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             this.WorkTime = DateTime.Now;
         }
 

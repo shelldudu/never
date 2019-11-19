@@ -5,7 +5,7 @@
     <title>Never.Hosting</title>
     <authors>Never</authors>
     <owners>Never</owners>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <tags>hosting</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
@@ -15,7 +15,7 @@
     <summary>never library</summary>
     <dependencies>
       <group targetFramework=".NETStandard2.1">
-        <dependency id="Never" version="1.0.0" />
+        <dependency id="Never" version="1.0.5.3" />
         <dependency id="Microsoft.Extensions.Configuration" version="2.2.0" />
         <dependency id="Microsoft.Extensions.Configuration.Json" version="2.2.0" />  
         <dependency id="Microsoft.Extensions.Hosting" version="2.2.0" />

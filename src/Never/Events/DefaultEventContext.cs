@@ -28,7 +28,7 @@ namespace Never.Events
         {
             this.queue = new Queue<ICommand>(10);
             this.WorkTime = DateTime.Now;
-            this.Items = new Dictionary<string, object>(20);
+            this.Items = new System.Collections.Concurrent.ConcurrentDictionary<string, object>();
         }
 
         #endregion ctor

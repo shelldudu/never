@@ -30,7 +30,7 @@ namespace Never.Commands
         /// </summary>
         public DefaultCommandContext()
         {
-            this.Items = new Dictionary<string, object>();
+            this.Items = new System.Collections.Concurrent.ConcurrentDictionary<string, object>();
             this.WorkTime = DateTime.Now;
             this.LifetimeScopeQueue = new Queue<IAggregateRoot>(1);
         }

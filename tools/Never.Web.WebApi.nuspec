@@ -5,7 +5,7 @@
     <title>Never.Web.WebApi</title>
     <authors>Never</authors>
     <owners>Never</owners>
-    <version>1.0.3</version>
+    <version>1.0.3.1</version>
     <tags>webapi</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
@@ -15,14 +15,14 @@
     <summary>never library</summary>
     <dependencies>
       <group targetFramework=".NETFramework4.6.1" >
-        <dependency id="Never" version="1.0.4" />
-        <dependency id="Never.Web" version="1.0.4" />
+        <dependency id="Never" version="1.0.5.3" />
+        <dependency id="Never.Web" version="1.0.4.1" />
         <dependency id="Microsoft.AspNet.WebApi.Core" version="5.2.7" />
         <dependency id="Microsoft.AspNet.WebApi.WebHost" version="5.2.7" />
       </group>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="Never" version="1.0.4" />
-        <dependency id="Never.Web" version="1.0.4" />
+        <dependency id="Never" version="1.0.5.3" />
+        <dependency id="Never.Web" version="1.0.4.1" />
         <dependency id="Microsoft.AspNetCore" version="2.2.0" />
         <dependency id="Microsoft.AspNetCore.Mvc" version="2.2.0" />
       </group>
