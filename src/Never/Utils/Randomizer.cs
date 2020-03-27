@@ -281,7 +281,7 @@ namespace Never.Utils
             if (array == null)
                 return new T[0];
 
-            return PokerArray(array, array.Length, new Random());
+            return RandomArrary(array, array.Length, new Random());
         }
 
         /// <summary>

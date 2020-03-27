@@ -137,7 +137,7 @@ namespace Never.EasySql
         /// </summary>
         /// <param name="cacheId"></param>
         /// <returns></returns>
-        public EasyDecoratedLinqDao<Parameter> ExpressionCached(string cacheId)
+        public EasyDecoratedLinqDao<Parameter> Cached(string cacheId)
         {
             this.cacheId = cacheId;
             return this;

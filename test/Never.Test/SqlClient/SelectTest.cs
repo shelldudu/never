@@ -35,14 +35,17 @@ namespace Never.Test
             //返回列表
             var array = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().Where(null).ToList(1, 5).GetResult();
             //返回列表，里面join了其他表
-            var array2 = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().LeftJoin<SqlServerBuilder>((p, t1, t2) => t1.EmbeddedSqlMaps == t2.EmbeddedSqlMaps, (p, t1, t2) => t2.EmbeddedSqlMaps.Count() == p.Id)
+            var array2 = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().LeftJoin<SqlServerBuilder>((p, t1, t2) => t1.EmbeddedSqlMaps == t2.EmbeddedSqlMaps)
                 .Where(null).ToList(1, 5).GetResult();
+
             //更新
-            var update = dao.ToEasyLinqDao<SqlServerBuilder>(new SqlServerBuilder()).Update().SetColum(m => m.EmbeddedSqlMaps).SetColumFunc(m => m.ConnectionString, "now()").Where(p => p.ConnectionString, ">=", "abc")
+            var update = dao.ToEasyLinqDao<SqlServerBuilder>(new SqlServerBuilder()).Update().SetColum(m => m.EmbeddedSqlMaps).SetColumFunc(m => m.ConnectionString, "now()").Where(p => p.ConnectionString.Length == 2)
                 .NotExists<SqlServerBuilder>((p, t1) => t1.ConnectionString == p.ConnectionString).GetResult();
+
             //删除
-            var delete = dao.ToEasyLinqDao<SqlServerBuilder>(new SqlServerBuilder()).Delete().Where(p => p.ConnectionString, "=", "abc")
-                .NotExists<SqlServerBuilder>((p, t1) => t1.ConnectionString == p.ConnectionString).GetResult();
+            var delete = dao.ToEasyLinqDao<SqlServerBuilder>(new SqlServerBuilder()).Delete().Where(p => p.ConnectionString == "abc")
+                .AndNotExists<SqlServerBuilder>((p, t1) => t1.ConnectionString == p.ConnectionString).GetResult();
+
             //推入
             var insert = dao.ToEasyLinqDao<SqlServerBuilder>(new SqlServerBuilder()).Insert().ValueColum(m => m.EmbeddedSqlMaps).ValueColumFunc(m => m.ConnectionString, "uuid()").LastInsertId().GetResult<int>();
 

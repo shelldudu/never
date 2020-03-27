@@ -497,6 +497,32 @@ namespace Never.Serialization.Json
         }
 
         /// <summary>
+        /// 是否数字
+        /// </summary>
+        /// <returns></returns>
+        public bool IsDigital()
+        {
+            return this.IsDigital(this.Current);
+        }
+
+        /// <summary>
+        /// 是否数字
+        /// </summary>
+        /// <param name="chr"></param>
+        /// <returns></returns>
+        public bool IsDigital(int chr)
+        {
+            /*
+             *  \0x30  -    - 0
+             *  \0x31  -    - 1
+             *  \0x39  -    - 9
+             */
+
+            return chr >= 0x30 && chr <= 0x39;
+        }
+
+
+        /// <summary>
         /// 是否为空格
         /// </summary>
         /// <returns></returns>
