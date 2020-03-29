@@ -48,7 +48,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public NWhere<Parameter> Where(Expression<Func<Parameter, bool>> expression)
+        public NWhere<Parameter> Where(Expression<Func<Parameter, object>> expression)
         {
             return new NWhere<Parameter>() { Context = this.Context, delete = this };
         }

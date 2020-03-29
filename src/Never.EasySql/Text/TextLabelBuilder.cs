@@ -48,14 +48,11 @@ namespace Never.EasySql.Text
         /// <returns></returns>
         static SqlTag Build(string sql, IDao dao)
         {
-            var sqltag = new Xml.SqlTag()
+            var sqltag = new TextSqlTag()
             {
-                CommandType = null,
                 Id = NewId.GenerateString(NewId.StringLength.L24),
-                IndentedOnNameSpace = false,
-                IndentedOnSqlTag = false,
-                NameSpace = null,
                 Labels = new List<ILabel>(1),
+                TextLength = sql.Length,
             };
 
             var label = sqltag.ReadTextNode(sql, new Serialization.Json.ThunderWriter(sql.Length), new Serialization.Json.SequenceStringReader("1"), dao.SqlExecuter.GetParameterPrefix());

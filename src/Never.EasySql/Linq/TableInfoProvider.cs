@@ -13,7 +13,7 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// 
     /// </summary>
-    public static class BuildingCacheProvider
+    public static class TableInfoProvider
     {
         /// <summary>
         /// 获取表的信息

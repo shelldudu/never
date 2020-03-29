@@ -34,10 +34,10 @@ namespace Never.EasySql
                 }
             }
 
-            var include = new List<Never.EasySql.Xml.SqlTag>();
+            var include = new List<Never.EasySql.Xml.XmlSqlTag>();
             foreach (var i in provider.GetAll())
             {
-                ((Never.EasySql.Xml.SqlTag)i.Value).Build(provider, this.ParameterPrefix, include);
+                ((Never.EasySql.Xml.XmlSqlTag)i.Value).Build(provider, this.ParameterPrefix, include);
             }
 
             foreach (var i in include)
@@ -90,7 +90,7 @@ namespace Never.EasySql
                 if (provider.TryGet(nextId, out var tag))
                     throw new DataFormatException("the {0} is duplicated", nextId);
 
-                var sqlTag = new Never.EasySql.Xml.SqlTag();
+                var sqlTag = new Never.EasySql.Xml.XmlSqlTag();
                 sqlTag.Id = nextId;
                 sqlTag.NameSpace = id;
                 sqlTag.IndentedOnNameSpace = indented;
@@ -105,7 +105,7 @@ namespace Never.EasySql
             }
 
             //加载命令信息
-            bool LoadCommandName(System.Xml.XmlNode node, Never.EasySql.Xml.SqlTag sqlTag)
+            bool LoadCommandName(System.Xml.XmlNode node, Never.EasySql.Xml.XmlSqlTag sqlTag)
             {
                 switch (node.Name)
                 {
