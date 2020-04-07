@@ -14,7 +14,7 @@ namespace Never.EasySql
     /// sqltag提供者
     /// </summary>
     /// <seealso cref="Never.EasySql.ISqlTagProvider" />
-    public class SqlTagProvider : ISqlTagProvider
+    public class SqlTagProvider : ISqlTagProvider, ISqlTagEditableProvider
     {
         #region field
 

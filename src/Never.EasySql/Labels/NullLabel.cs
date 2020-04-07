@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Xml
+namespace Never.EasySql.Labels
 {
     /// <summary>
-    /// 不存在标签
+    /// null label
     /// </summary>
-    /// <seealso cref="Never.EasySql.Xml.BaseLabel" />
-    public class NotExistsLabel : BaseLabel
+    /// <seealso cref="Never.EasySql.Labels.BaseLabel" />
+    public class NullLabel : BaseLabel
     {
         /// <summary>
         /// 验证参数
@@ -31,7 +31,7 @@ namespace Never.EasySql.Xml
         /// 标签类型
         /// </summary>
         /// <returns></returns>
-        public override LabelType GetLabelType() => LabelType.NotExists;
+        public override LabelType GetLabelType() => LabelType.Null;
 
         /// <summary>
         /// 是否找到参数
@@ -55,9 +55,13 @@ namespace Never.EasySql.Xml
         {
             if (item != null)
             {
+                if (item.Value == null)
+                    return true;
+
                 if (item.Value is INullableParameter)
                 {
-                    if (((INullableParameter)item.Value).HasValue)
+                    var @null = (INullableParameter)item.Value;
+                    if (@null.HasValue)
                         return false;
 
                     return true;
@@ -66,7 +70,7 @@ namespace Never.EasySql.Xml
                 return false;
             }
 
-            return true;
+            return false;
         }
 
         /// <summary>

@@ -17,12 +17,12 @@ namespace Never.EasySql
         public string Name { get; set; }
 
         /// <summary>
-        /// 原来前辍的位置
+        /// 原来前辍的名字
         /// </summary>
         public string SourcePrefix { get; set; }
 
         /// <summary>
-        /// 实际前辍的位置
+        /// 实际前辍的名字
         /// </summary>
         public string ActualPrefix { get; set; }
 

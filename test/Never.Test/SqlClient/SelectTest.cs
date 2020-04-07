@@ -31,25 +31,26 @@ namespace Never.Test
             var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
 
             //返回单条
-            var one = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>()
-                .Where((p, t) => t.EmbeddedSqlMaps.Count() >= p.Id)
-                .ToSingle()
-                .GetResult();
+            // var one = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>()
+            //      .Where((p, t) => t.EmbeddedSqlMaps.Count() >= p.Id)
+            //      .ToSingle()
+            //      .GetResult();
 
             //返回列表
-            var array = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().Where(null).ToList(1, 5).GetResult();
+            //var array = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().Where(null).ToList(1, 5).GetResult();
             //返回列表，里面join了其他表
-            var array2 = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().LeftJoin<SqlServerBuilder>((p, t1, t2) => t1.EmbeddedSqlMaps == t2.EmbeddedSqlMaps)
-                .Where(null).ToList(1, 5).GetResult();
+            //var array2 = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().LeftJoin<SqlServerBuilder>((p, t1, t2) => t1.EmbeddedSqlMaps == t2.EmbeddedSqlMaps)
+            //     .Where(null).ToList(1, 5).GetResult();
 
             //更新
-            var update = dao.ToEasyLinqDao(new SqlServerBuilder()).Update()
-                .SetColum(m => m.EmbeddedSqlMaps)
-                .SetColumWithFunc(m => m.ConnectionString, "now()")
-                .Where(p => p.ConnectionString.Length)
-                .NotExists<SqlServerBuilder>((p, t1) => t1.ConnectionString == p.ConnectionString)
+            var update = dao.ToEasyLinqDao(new MyTable()).Update()
+                .SetColum(m => m.Name)
+                .SetColumWithFunc(m => m.CreateTime, "now()")
+                .Where(p => p.Id)
+                .AndNotExists<MyTable2>((p, t) => t.Id == p.Id)
                 .GetResult();
 
+            return;
             //删除
             var delete = dao.ToEasyLinqDao(new SqlServerBuilder()).Delete()
                 .Where(p => p.ConnectionString == "abc")
@@ -69,6 +70,19 @@ namespace Never.Test
         {
             var list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyXmlDao(new { Id = 1, UserName = 666, UserId = 666 }).QueryForEnumerable<User>("qryUser");
             var list2 = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyXmlDao(new { Id = 1, UserId = 2, UserName = "".ToNullableParameter() }).QueryForEnumerable<User>("qryUser");
+        }
+
+        public class MyTable
+        {
+            public int Id;
+            public string Name;
+            public DateTime CreateTime;
+        }
+        public class MyTable2
+        {
+            public int Id;
+            public string Name;
+            public DateTime CreateTime;
         }
     }
 }

@@ -74,7 +74,7 @@ namespace Never.EasySql
         public T @Object { get; private set; }
 
         /// <summary>
-        /// 参数
+        /// 参数，用于过滤或者增加一些自己的参数
         /// </summary>
         public IEnumerable<KeyValueTuple<string, object>> Members { get; }
 
@@ -111,7 +111,7 @@ namespace Never.EasySql
                     dictionary.Add(new KeyValueTuple<string, object>(key.ToString(), ator[key]));
                 }
 
-                foreach(var member in this.Members)
+                foreach (var member in this.Members)
                 {
                     if (dictionary.Any(ta => ta.Key.IsEquals(member.Key, StringComparison.OrdinalIgnoreCase)))
                     {
@@ -275,6 +275,7 @@ namespace Never.EasySql
         /// <returns></returns>
         internal EasySqlParameter<T> ReplaceParameter(KeyValueTuple<string, object> parameter)
         {
+            ((List<KeyValueTuple<string, object>>)this.Members).RemoveAll(t => t.Key.IsEquals(parameter.Key));
             ((List<KeyValueTuple<string, object>>)this.Members).Add(parameter);
             return this;
         }

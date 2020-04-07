@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Xml
+namespace Never.EasySql.Labels
 {
     /// <summary>
-    /// not empty label
+    ///
     /// </summary>
     [Attributes.Summary(Descn = "just for string and guid type parameter")]
-    public class NotEmptyLabel : BaseLabel
+    public class EmptyLabel : BaseLabel
     {
         /// <summary>
         /// 验证参数
@@ -31,7 +31,7 @@ namespace Never.EasySql.Xml
         /// 标签类型
         /// </summary>
         /// <returns></returns>
-        public override LabelType GetLabelType() => LabelType.NotNull;
+        public override LabelType GetLabelType() => LabelType.Empty;
 
         /// <summary>
         /// 是否找到参数
@@ -53,27 +53,30 @@ namespace Never.EasySql.Xml
         /// <returns></returns>
         private bool Match(KeyValueTuple<string, object> item)
         {
-            if (item != null && item.Value != null)
+            if (item != null)
             {
-                if (item.Value is string && ((string)item.Value).IsNotNullOrEmpty())
+                if (item.Value == null)
+                    return true;
+
+                if (item.Value is string && ((string)item.Value).IsNullOrEmpty())
                     return true;
 
                 if (item.Value is IGenericeNullableParameter<string>)
                 {
                     var @null = (IGenericeNullableParameter<string>)item.Value;
-                    if (@null.HasValue)
+                    if (!@null.HasValue)
                         return true;
 
                     return false;
                 }
 
-                if (item.Value is Guid && ((Guid)item.Value) != Guid.Empty)
+                if (item.Value is Guid && ((Guid)item.Value) == Guid.Empty)
                     return true;
 
                 if (item.Value is IGenericeNullableParameter<Guid>)
                 {
                     var @null = (IGenericeNullableParameter<Guid>)item.Value;
-                    if (@null.HasValue)
+                    if (!@null.HasValue)
                         return true;
 
                     return false;
@@ -82,7 +85,7 @@ namespace Never.EasySql.Xml
                 return false;
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>

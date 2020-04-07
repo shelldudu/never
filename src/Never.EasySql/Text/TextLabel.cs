@@ -9,9 +9,9 @@ namespace Never.EasySql.Text
     /// <summary>
     /// text label
     /// </summary>
-    public sealed class TextLabel : Xml.TextLabel, ILabel
+    public sealed class TextLabel : Labels.TextLabel, ILabel
     {
-        private readonly Xml.TextLabel lable = null;
+        private readonly Labels.TextLabel lable = null;
         private List<SqlTagParameterPosition> parameterPositions = null;
         private readonly int parameterPositionCount = 0;
 
@@ -19,7 +19,7 @@ namespace Never.EasySql.Text
         /// 
         /// </summary>
         /// <param name="lable"></param>
-        public TextLabel(Xml.TextLabel lable)
+        public TextLabel(Labels.TextLabel lable)
         {
             this.lable = lable;
             this.parameterPositions = new List<SqlTagParameterPosition>(lable.ParameterPositions);

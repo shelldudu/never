@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Never.EasySql.Text
 {
     /// <summary>
-    /// sqltag
+    /// text tag
     /// </summary>
     public class TextSqlTag : Never.EasySql.SqlTag
     {

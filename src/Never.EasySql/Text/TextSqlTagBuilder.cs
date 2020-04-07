@@ -11,12 +11,12 @@ namespace Never.EasySql.Text
     /// <summary>
     /// text builder
     /// </summary>
-    public sealed class TextLabelBuilder
+    sealed class TextSqlTagBuilder
     {
         /// <summary>
         /// 缓存起来的东西
         /// </summary>
-        private static readonly ConcurrentDictionary<string, SqlTag> cached = new ConcurrentDictionary<string, SqlTag>();
+        private static readonly SqlTagProvider provider = new SqlTagProvider();
 
         /// <summary>
         /// 
@@ -29,11 +29,12 @@ namespace Never.EasySql.Text
         {
             if (cacheId.IsNotNullOrWhiteSpace())
             {
-                if (cached.TryGetValue(cacheId, out var tag))
+                if (provider.TryGet(cacheId, out var tag))
                     return tag;
 
                 tag = Build(sql, dao);
-                cached.TryAdd(cacheId, tag);
+                tag.Id = cacheId;
+                provider.Add(tag);
                 return tag;
             }
 
@@ -46,7 +47,7 @@ namespace Never.EasySql.Text
         /// <param name="sql"></param>
         /// <param name="dao"></param>
         /// <returns></returns>
-        static SqlTag Build(string sql, IDao dao)
+        static TextSqlTag Build(string sql, IDao dao)
         {
             var sqltag = new TextSqlTag()
             {

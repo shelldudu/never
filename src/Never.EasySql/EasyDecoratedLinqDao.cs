@@ -1,8 +1,8 @@
 ﻿using Never.EasySql.Client;
 using Never.EasySql.Linq;
-using Never.EasySql.Linq.Expressions;
 using Never.EasySql.Text;
 using Never.EasySql.Xml;
+using Never.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,7 +16,7 @@ namespace Never.EasySql
     /// <summary>
     /// 对难用的语法进行一下装饰查询，更好的使用Idao接口，该对象每次执行一次都会释放IDao接口，请不要重复使用
     /// </summary>
-    public class EasyDecoratedLinqDao<Parameter> : EasyDecoratedDao, IDao, IDisposable
+    public sealed class EasyDecoratedLinqDao<Parameter> : EasyDecoratedDao, IDao, IDisposable
     {
         #region field
 
@@ -40,32 +40,6 @@ namespace Never.EasySql
 
         #endregion ctor
 
-        #region context
-
-        private Context GetContext()
-        {
-            if (this.dao.SqlExecuter is MySqlExecuter)
-                return new MySqlContext() { CacheId = this.cacheId };
-
-            if (this.dao.SqlExecuter is SqlServerExecuter)
-                return new SqlServerContext() { CacheId = this.cacheId };
-
-            if (this.dao.SqlExecuter is OdbcServerExecuter)
-                return new OdbcServerContext() { CacheId = this.cacheId };
-
-            if (this.dao.SqlExecuter is OleDbServerExecuter)
-                return new OleDbServerContext() { CacheId = this.cacheId };
-
-            if (this.dao.SqlExecuter is OracleServerExecuter)
-                return new OracleServerContext() { CacheId = this.cacheId };
-
-            if (this.dao.SqlExecuter is PostgreSqlExecuter)
-                return new PostgreSqlContext() { CacheId = this.cacheId };
-
-            throw new Exception("dao.SqlExecuter 无法识别，不能创建上下文");
-        }
-
-        #endregion
 
         #region trans
 
@@ -144,12 +118,54 @@ namespace Never.EasySql
         }
 
         /// <summary>
+        /// 查询table信息
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <returns></returns>
+        public TableInfo GetTableInfo<Table>()
+        {
+            return GetTableInfo<Table>(this.cacheId);
+        }
+
+        /// <summary>
+        /// 查询table信息
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <returns></returns>
+        public static TableInfo GetTableInfo<Table>(string cacheId)
+        {
+            if (cacheId.IsNullOrEmpty() && TableInfoProvider.TryGetTableInfo<Table>(out TableInfo tableInfo))
+                return tableInfo;
+
+            if (TableInfoProvider.TryGetTableInfo<Table>(cacheId, out tableInfo))
+                return tableInfo;
+
+            if (TableInfoProvider.TryUpdateTableInfo(typeof(Table), out tableInfo))
+                return tableInfo;
+
+            throw new KeyNotExistedException("table", "table info not found");
+        }
+        /// <summary>
         /// 更新
         /// </summary>
         /// <returns></returns>
         public Update<Parameter> Update()
         {
-            return new Update<Parameter>() { Context = this.GetContext() };
+            if (this.cacheId.IsNotNullOrEmpty())
+            {
+                if (LinqSqlTagProvider.Get(this.cacheId, this, out var tag))
+                {
+                    return new Update<Parameter>()
+                    {
+                        Context = new Linq.MySql.UpdatedContext<Parameter>((LinqSqlTag)tag, this, this.GetTableInfo<Parameter>(), this.parameter)
+                    };
+                }
+            }
+
+            return new Update<Parameter>()
+            {
+                Context = new Linq.MySql.UpdateContext<Parameter>(this.cacheId, this, this.GetTableInfo<Parameter>(), this.parameter)
+            };
         }
 
         /// <summary>
@@ -158,7 +174,21 @@ namespace Never.EasySql
         /// <returns></returns>
         public Delete<Parameter> Delete()
         {
-            return new Delete<Parameter>() { Context = this.GetContext() };
+            if (this.cacheId.IsNotNullOrEmpty())
+            {
+                if (LinqSqlTagProvider.Get(this.cacheId, this, out var tag))
+                {
+                    return new Delete<Parameter>()
+                    {
+                        Context = new Linq.MySql.DeletedContext<Parameter>((LinqSqlTag)tag, this, this.GetTableInfo<Parameter>(), this.parameter)
+                    };
+                }
+            }
+
+            return new Delete<Parameter>()
+            {
+                Context = new Linq.MySql.DeleteContext<Parameter>(this, this.GetTableInfo<Parameter>(), this.parameter)
+            };
         }
 
         /// <summary>
@@ -167,35 +197,45 @@ namespace Never.EasySql
         /// <returns></returns>
         public Insert<Parameter> Insert()
         {
-            return new Insert<Parameter>() { Context = this.GetContext() };
+            if (this.cacheId.IsNotNullOrEmpty())
+            {
+                if (LinqSqlTagProvider.Get(this.cacheId, this, out var tag))
+                {
+                    return new Insert<Parameter>()
+                    {
+                        Context = new Linq.MySql.InsertedContext<Parameter>((LinqSqlTag)tag, this, this.GetTableInfo<Parameter>(), this.parameter)
+                    };
+                }
+            }
+
+            return new Insert<Parameter>()
+            {
+                Context = new Linq.MySql.InsertContext<Parameter>(this, this.GetTableInfo<Parameter>(), this.parameter)
+            };
         }
 
         /// <summary>
         /// 查询
         /// </summary>
-        /// <typeparam name="T">对象</typeparam>
+        /// <typeparam name="Table">对象</typeparam>
         /// <returns></returns>
-        public Select<Parameter, T> Select<T>()
+        public Select<Parameter, Table> Select<Table>()
         {
-            if (this.dao.SqlExecuter is MySqlExecuter)
-                return new Linq.MySql.Select<Parameter, T>() { CacheId = this.cacheId };
+            if (this.cacheId.IsNotNullOrEmpty())
+            {
+                if (LinqSqlTagProvider.Get(this.cacheId, this, out var tag))
+                {
+                    return new Select<Parameter, Table>()
+                    {
+                        Context = new Linq.MySql.SelectedContext<Parameter, Table>((LinqSqlTag)tag, this, this.GetTableInfo<Table>(), this.parameter)
+                    };
+                }
+            }
 
-            if (this.dao.SqlExecuter is SqlServerExecuter)
-                return new SqlServerContext() { CacheId = this.cacheId };
-
-            if (this.dao.SqlExecuter is OdbcServerExecuter)
-                return new OdbcServerContext() { CacheId = this.cacheId };
-
-            if (this.dao.SqlExecuter is OleDbServerExecuter)
-                return new OleDbServerContext() { CacheId = this.cacheId };
-
-            if (this.dao.SqlExecuter is OracleServerExecuter)
-                return new OracleServerContext() { CacheId = this.cacheId };
-
-            if (this.dao.SqlExecuter is PostgreSqlExecuter)
-                return new PostgreSqlContext() { CacheId = this.cacheId };
-
-            return new Select<Parameter, T>() { Context = this.GetContext() };
+            return new Select<Parameter, Table>()
+            {
+                Context = new Linq.MySql.SelectContext<Parameter, Table>(this, this.GetTableInfo<Table>(), this.parameter)
+            };
         }
 
         /// <summary>
@@ -206,7 +246,7 @@ namespace Never.EasySql
         /// <returns></returns>
         public object Call(string sql, CallMode callmode)
         {
-            var sqlTag = TextLabelBuilder.Build(sql, this.cacheId, this.dao);
+            var sqlTag = TextSqlTagBuilder.Build(sql, this.cacheId, this.dao);
             if (this.dao.CurrentSession != null)
             {
                 return this.dao.Call<Parameter>(sqlTag, this.parameter, callmode);

@@ -11,183 +11,45 @@ namespace Never.EasySql.Linq
     /// 单个表的查询
     /// </summary>
     /// <typeparam name="Parameter">查询参数</typeparam>
-    /// <typeparam name="T">查询结果对象</typeparam>
-    public abstract class Select<Parameter, T>
+    /// <typeparam name="Table">查询结果对象</typeparam>
+    public struct Select<Parameter, Table>
     {
-        #region field and ctor
-
         /// <summary>
-        /// 从缓存到得的信息
+        /// 上下文
         /// </summary>
-        private readonly SqlTag sqlTagFromCached = null;
-
-        /// <summary>
-        /// dao
-        /// </summary>
-        protected readonly IDao dao;
-
-        /// <summary>
-        /// 缓存cached
-        /// </summary>
-        protected readonly string cacheId;
-
-        /// <summary>
-        /// label的集合
-        /// </summary>
-        protected readonly ICollection<BuildingLableInfo> labels;
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 参数
         /// </summary>
-        protected readonly EasySqlParameter<Parameter> sqlParameter;
-
-        /// <summary>
-        /// 表的信息
-        /// </summary>
-        protected readonly TableInfo tableInfo;
-
-        /// <summary>
-        /// as新表名
-        /// </summary>
-        protected string @as;
-
-        /// <summary>
-        /// 表名
-        /// </summary>
-        protected string tableName;
-
-        /// <summary>
-        /// 列名
-        /// </summary>
-        protected List<string> columns;
-
-        /// <summary>
-        /// 排序
-        /// </summary>
-        protected List<string> orderby;
-
-        /// <summary>
-        /// 分页
-        /// </summary>
-        protected PagedSearch paged;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="sqlParameter"></param>
-        /// <param name="cacheId"></param>
-        protected Select(IDao dao, EasySqlParameter<Parameter> sqlParameter, string cacheId)
-        {
-            this.dao = dao; this.sqlParameter = sqlParameter; this.cacheId = cacheId;
-            if (this.dao.SqlTagProvider.TryGet(this.cacheId, out sqlTagFromCached) == false)
-            {
-                this.labels = new List<BuildingLableInfo>();
-                this.columns = new List<string>();
-                this.orderby = new List<string>();
-            }
-        }
-
-        #endregion
-
-        #region build
-
-        /// <summary>
-        /// 构建
-        /// </summary>
-        /// <returns></returns>
-        protected virtual SqlTag Build()
-        {
-            return this.sqlTagFromCached;
-        }
-
-        /// <summary>
-        /// 检查table的信息
-        /// </summary>
-        protected void CheckTableInfo()
-        {
-            if (this.tableInfo.TableName != null)
-                return;
-        }
-
-        #endregion
+        internal EasySqlParameter<Parameter> SqlParameter { get; set; }
 
         #region linq
 
         /// <summary>
         /// 字段名
         /// </summary>
-        public Select<Parameter, T> SelectColum(Expression<Func<Parameter, T, object>> expression)
+        public Select<Parameter, Table> SelectColum(Expression<Func<Table, object>> expression)
         {
-            var model = expression.Body as ParameterExpression;
-            if (model != null)
-            {
-                this.columns.Add(model.Name);
-                return this;
-            }
-
-            var member = expression.Body as MemberExpression;
-            if (member != null)
-            {
-                this.columns.Add(member.Member.Name);
-                return this;
-            }
-
-            var unary = expression.Body as UnaryExpression;
-            if (unary != null)
-            {
-                member = unary.Operand as MemberExpression;
-                if (member != null)
-                {
-                    this.columns.Add(member.Member.Name);
-                    return this;
-                }
-            }
-
             return this;
         }
 
         /// <summary>
         /// 字段名
         /// </summary>
-        public Select<Parameter, T> SelectColum(Expression<Func<Parameter, T, object>> expression, string asMemberName)
+        public Select<Parameter, Table> SelectColum(Expression<Func<Table, object>> expression, string asMemberName)
         {
-            var model = expression.Body as ParameterExpression;
-            if (model != null)
-            {
-                this.columns.Add(string.Concat(model.Name, " as ", asMemberName));
-                return this;
-            }
-
-            var member = expression.Body as MemberExpression;
-            if (member != null)
-            {
-                this.columns.Add(member.Member.Name);
-                return this;
-            }
-
-            var unary = expression.Body as UnaryExpression;
-            if (unary != null)
-            {
-                member = unary.Operand as MemberExpression;
-                if (member != null)
-                {
-                    this.columns.Add(member.Member.Name);
-                    return this;
-                }
-            }
-
             return this;
         }
 
         /// <summary>
-        /// 新的表名，可以不用<typeparamref name="T"/>里的表名
+        /// 新的表名，可以不用<typeparamref name="Table"/>里的表名
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public Select<Parameter, T> From(string tableName)
+        public Select<Parameter, Table> From(string tableName)
         {
-            this.tableName = tableName;
+            this.Context.From(tableName);
             return this;
         }
 
@@ -196,9 +58,9 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public Select<Parameter, T> As(string tableName)
+        public Select<Parameter, Table> As(string tableName)
         {
-            this.@as = tableName;
+            this.Context.AsTable(tableName);
             return this;
         }
 
@@ -206,7 +68,7 @@ namespace Never.EasySql.Linq
         /// join
         /// </summary>
         /// <param name="on"></param>
-        public virtual Select<Parameter, T> Join<T2>(Expression<Func<Parameter, T, T2, object>> on)
+        public Select<Parameter, Table> Join<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -215,7 +77,7 @@ namespace Never.EasySql.Linq
         /// left join
         /// </summary>
         /// <param name="on"></param>
-        public virtual Select<Parameter, T> LeftJoin<T2>(Expression<Func<Parameter, T, T2, object>> on)
+        public Select<Parameter, Table> LeftJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -224,7 +86,7 @@ namespace Never.EasySql.Linq
         /// right join
         /// </summary>
         /// <param name="on"></param>
-        public virtual Select<Parameter, T> RightJoin<T2>(Expression<Func<Parameter, T, T2, object>> on)
+        public Select<Parameter, Table> RightJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -233,7 +95,7 @@ namespace Never.EasySql.Linq
         /// inner join
         /// </summary>
         /// <param name="on"></param>
-        public virtual Select<Parameter, T> InnerJoin<T2>(Expression<Func<Parameter, T, T2, object>> on)
+        public Select<Parameter, Table> InnerJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -241,9 +103,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public virtual NWhere<Parameter, T> Where(Expression<Func<Parameter, T, object>> expression)
+        public NWhere<Parameter, Table> Where(Expression<Func<Parameter, Table, object>> expression)
         {
-            return new NWhere<Parameter, T>()
+            return new NWhere<Parameter, Table>()
             {
                 select = this,
             };
@@ -255,12 +117,12 @@ namespace Never.EasySql.Linq
         /// <param name="pageSize"></param>
         /// <param name="pageNow"></param>
         /// <returns></returns>
-        public NToList<Parameter, T> ToList(int pageNow, int pageSize)
+        public NToList<Parameter, Table> ToList(int pageNow, int pageSize)
         {
-            this.paged = new PagedSearch(pageNow, pageSize);
-            return new NToList<Parameter, T>()
+            //this.paged = new PagedSearch(pageNow, pageSize);
+            return new NToList<Parameter, Table>()
             {
-                select = this,
+                crud = this,
             };
         }
 
@@ -268,9 +130,9 @@ namespace Never.EasySql.Linq
         /// 返回单条
         /// </summary>
         /// <returns></returns>
-        public NToSingle<Parameter, T> ToSingle()
+        public NToSingle<Parameter, Table> ToSingle()
         {
-            return new NToSingle<Parameter, T>()
+            return new NToSingle<Parameter, Table>()
             {
                 select = this,
             };
@@ -284,20 +146,21 @@ namespace Never.EasySql.Linq
         /// 返回列表
         /// </summary>
         /// <typeparam name="NParameter">查询参数</typeparam>
-        /// <typeparam name="NT">查询结果对象</typeparam>
-        public struct NToList<NParameter, NT>
+        /// <typeparam name="NTable">查询结果对象</typeparam>
+        public struct NToList<NParameter, NTable>
         {
             /// <summary>
             /// select
             /// </summary>
-            internal Select<NParameter, NT> select;
+            internal Select<NParameter, NTable> crud;
 
             /// <summary>
             /// 返回执行结果
             /// </summary>
-            public IEnumerable<NT> GetResult()
+            public IEnumerable<NTable> GetResult()
             {
-                return this.select.dao.QueryForEnumerable<NT, NParameter>(this.select.Build(), select.sqlParameter);
+                return null;
+                //return this.crud.ToList();
             }
         }
 
@@ -318,7 +181,8 @@ namespace Never.EasySql.Linq
             /// </summary>
             public NT GetResult()
             {
-                return this.select.dao.QueryForObject<NT, NParameter>(this.select.Build(), select.sqlParameter);
+                return default(NT);
+               // return this.select.dao.QueryForObject<NT, NParameter>(this.select.Build(), select.sqlParameter);
             }
         }
 
@@ -342,10 +206,10 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public NToList<NParameter, NT> ToList(int pageNow, int pageSize)
             {
-                this.select.paged = new PagedSearch(pageNow, pageSize);
+               // this.select.paged = new PagedSearch(pageNow, pageSize);
                 return new NToList<NParameter, NT>()
                 {
-                    select = this.select,
+                    crud = this.select,
                 };
             }
 
@@ -365,7 +229,7 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> AndExists<T1>(Expression<Func<Parameter, T, T1, object>> expression)
+            public NWhere<NParameter, NT> AndExists<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
             {
                 return this;
             }
@@ -383,7 +247,7 @@ namespace Never.EasySql.Linq
             /// 不存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> AndNotExists<T1>(Expression<Func<Parameter, T, T1, object>> expression)
+            public NWhere<NParameter, NT> AndNotExists<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
             {
                 return this;
             }
@@ -401,7 +265,7 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> AndIn<T1>(Expression<Func<Parameter, T, T1, object>> expression)
+            public NWhere<NParameter, NT> AndIn<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
             {
                 return this;
             }
@@ -419,7 +283,7 @@ namespace Never.EasySql.Linq
             /// 不存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> AndNotIn<T1>(Expression<Func<Parameter, T, T1, object>> expression)
+            public NWhere<NParameter, NT> AndNotIn<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
             {
                 return this;
             }
@@ -437,7 +301,7 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> OrExists<T1>(Expression<Func<Parameter, T, T1, object>> expression)
+            public NWhere<NParameter, NT> OrExists<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
             {
                 return this;
             }
@@ -455,7 +319,7 @@ namespace Never.EasySql.Linq
             /// 不存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> OrNotExists<T1>(Expression<Func<Parameter, T, T1, object>> expression)
+            public NWhere<NParameter, NT> OrNotExists<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
             {
                 return this;
             }
@@ -473,7 +337,7 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> OrIn<T1>(Expression<Func<Parameter, T, T1, object>> expression)
+            public NWhere<NParameter, NT> OrIn<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
             {
                 return this;
             }
@@ -491,7 +355,7 @@ namespace Never.EasySql.Linq
             /// 不存在
             /// </summary>
             /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> OrNotIn<T1>(Expression<Func<Parameter, T, T1, object>> expression)
+            public NWhere<NParameter, NT> OrNotIn<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
             {
                 return this;
             }
@@ -515,14 +379,14 @@ namespace Never.EasySql.Linq
                 var model = expression.Body as ParameterExpression;
                 if (model != null)
                 {
-                    this.select.orderby.Add(string.Concat(model.Name, " asc"));
+                   // this.select.orderby.Add(string.Concat(model.Name, " asc"));
                     return this;
                 }
 
                 var member = expression.Body as MemberExpression;
                 if (member != null)
                 {
-                    this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
+                   // this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
                     return this;
                 }
 
@@ -532,7 +396,7 @@ namespace Never.EasySql.Linq
                     member = unary.Operand as MemberExpression;
                     if (member != null)
                     {
-                        this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
+                       // this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
                         return this;
                     }
                 }
@@ -550,14 +414,14 @@ namespace Never.EasySql.Linq
                 var model = expression.Body as ParameterExpression;
                 if (model != null)
                 {
-                    this.select.orderby.Add(string.Concat(model.Name, " desc"));
+                   // this.select.orderby.Add(string.Concat(model.Name, " desc"));
                     return this;
                 }
 
                 var member = expression.Body as MemberExpression;
                 if (member != null)
                 {
-                    this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
+                   // this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
                     return this;
                 }
 
@@ -567,7 +431,7 @@ namespace Never.EasySql.Linq
                     member = unary.Operand as MemberExpression;
                     if (member != null)
                     {
-                        this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
+                      //  this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
                         return this;
                     }
                 }

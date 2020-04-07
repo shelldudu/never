@@ -44,13 +44,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public Result GetResult<Result>()
         {
-            if (this.Context.dao.CurrentSession != null)
-                return (Result)this.Context.dao.Insert<Parameter>(this.Context.Build(), this.SqlParameter);
-
-            using (this.Context.dao)
-            {
-                return (Result)this.Context.dao.Insert<Parameter>(this.Context.Build(), this.SqlParameter);
-            }
+            return default(Result);
         }
 
         /// <summary>

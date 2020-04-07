@@ -104,14 +104,15 @@ namespace Never.Test
         #endregion ctor
 
         private static void Main(string[] args)
-        {
+         {
+            new SelectTest().TestId_1();
             //var p = new Program();
             //p.Release();
 
-            var pro = new TypeProcessor();
-            pro.Processing(null, typeof(ABC));
-            var a = TypeProcessor.TryGetAttribute(typeof(ABC), out var attribute);
-            var b = TypeProcessor.TryGetActivator(typeof(ABC), out var validator);
+            //var pro = new TypeProcessor();
+            // pro.Processing(null, typeof(ABC));
+            // var a = TypeProcessor.TryGetAttribute(typeof(ABC), out var attribute);
+            // var b = TypeProcessor.TryGetActivator(typeof(ABC), out var validator);
         }
 
         private static void ChangeABC(ABC a)

@@ -19,11 +19,6 @@ namespace Never.EasySql.Linq
         public TableNameAttribute TableName { get; set; }
 
         /// <summary>
-        /// 表名，因可以使用As方法将表名重新命名
-        /// </summary>
-        public string TableNameAlias { get; set; }
-
-        /// <summary>
         /// 字段信息
         /// </summary>
         public IEnumerable<ColumnInfo> Columns { get; set; }

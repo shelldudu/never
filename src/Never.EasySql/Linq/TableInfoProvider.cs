@@ -50,6 +50,37 @@ namespace Never.EasySql.Linq
             }
         }
 
+        /// <summary>
+        /// 更新表的信息
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static TableInfo AnalyzeTableInfo(Type type)
+        {
+            var table = type.GetAttribute<TableNameAttribute>();
+            var columns = new List<ColumnInfo>();
+            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (member.MemberType == MemberTypes.Property || member.MemberType == MemberTypes.Field)
+                {
+                    var column = new ColumnInfo()
+                    {
+                        Member = member,
+                        Column = member.GetAttribute<ColumnAttribute>(),
+                        TypeHandler = member.GetAttribute<TypeHandlerAttribute>()
+                    };
+
+                    columns.Add(column);
+                }
+            }
+
+            return new TableInfo()
+            {
+                TableName = table,
+                Columns = columns
+            };
+        }
+
         #region type
 
         /// <summary>
@@ -94,26 +125,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public static bool TryAddTableInfo(Type type)
         {
-            var table = type.GetAttribute<TableNameAttribute>();
-            var columns = new List<ColumnInfo>();
-            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField | BindingFlags.GetProperty))
-            {
-                var column = new ColumnInfo()
-                {
-                    Member = member,
-                    Column = member.GetAttribute<ColumnAttribute>(),
-                    TypeHandler = member.GetAttribute<TypeHandlerAttribute>()
-                };
-
-                columns.Add(column);
-            }
-
-            return TryAddTableInfo(type, new TableInfo()
-            {
-                TableName = table,
-                TableNameAlias = null,
-                Columns = columns
-            });
+            return TryUpdateTableInfo(type);
         }
 
         /// <summary>
@@ -143,9 +155,9 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static bool TryChangeTableInfo<T>()
+        public static bool TryUpdateTableInfo<T>()
         {
-            return TryChangeTableInfo(typeof(T));
+            return TryUpdateTableInfo(typeof(T));
         }
 
         /// <summary>
@@ -153,39 +165,32 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static bool TryChangeTableInfo(Type type)
+        public static bool TryUpdateTableInfo(Type type)
         {
-            var table = type.GetAttribute<TableNameAttribute>();
-            var columns = new List<ColumnInfo>();
-            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField | BindingFlags.GetProperty))
-            {
-                var column = new ColumnInfo()
-                {
-                    Member = member,
-                    Column = member.GetAttribute<ColumnAttribute>(),
-                    TypeHandler = member.GetAttribute<TypeHandlerAttribute>()
-                };
-
-                columns.Add(column);
-            }
-
-            return TryChangeTableInfo(type, new TableInfo()
-            {
-                TableName = table,
-                TableNameAlias = null,
-                Columns = columns
-            });
+            var table = AnalyzeTableInfo(type);
+            return TryUpdateTableInfo(type, table);
         }
 
+        /// <summary>
+        /// 更新表的信息
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="tableInfo"></param>
+        /// <returns></returns>
+        public static bool TryUpdateTableInfo(Type type, out TableInfo tableInfo)
+        {
+            tableInfo = AnalyzeTableInfo(type);
+            return TryUpdateTableInfo(type, tableInfo);
+        }
         /// <summary>
         /// 更新表的信息
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tableInfo"></param>
         /// <returns></returns>
-        public static bool TryChangeTableInfo<T>(TableInfo tableInfo)
+        public static bool TryUpdateTableInfo<T>(TableInfo tableInfo)
         {
-            return TryChangeTableInfo(typeof(T), tableInfo);
+            return TryUpdateTableInfo(typeof(T), tableInfo);
         }
 
         /// <summary>
@@ -194,8 +199,9 @@ namespace Never.EasySql.Linq
         /// <param name="type"></param>
         /// <param name="tableInfo"></param>
         /// <returns></returns>
-        public static bool TryChangeTableInfo(Type type, TableInfo tableInfo)
+        public static bool TryUpdateTableInfo(Type type, TableInfo tableInfo)
         {
+            tableInfoDictionary.TryRemove(type, out _);
             tableInfoDictionary[type] = tableInfo;
             return true;
         }
@@ -250,26 +256,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public static bool TryAddTableInfo(string cachedId, Type type)
         {
-            var table = type.GetAttribute<TableNameAttribute>();
-            var columns = new List<ColumnInfo>();
-            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField | BindingFlags.GetProperty))
-            {
-                var column = new ColumnInfo()
-                {
-                    Member = member,
-                    Column = member.GetAttribute<ColumnAttribute>(),
-                    TypeHandler = member.GetAttribute<TypeHandlerAttribute>()
-                };
-
-                columns.Add(column);
-            }
-
-            return TryAddTableInfo(cachedId, type, new TableInfo()
-            {
-                TableName = table,
-                TableNameAlias = null,
-                Columns = columns
-            });
+            return TryUpdateTableInfo(cachedId, type);
         }
 
         /// <summary>
@@ -302,9 +289,9 @@ namespace Never.EasySql.Linq
         /// <typeparam name="T"></typeparam>
         /// <param name="cachedId">缓存key</param>
         /// <returns></returns>
-        public static bool TryChangeTableInfo<T>(string cachedId)
+        public static bool TryUpdateTableInfo<T>(string cachedId)
         {
-            return TryChangeTableInfo(cachedId, typeof(T));
+            return TryUpdateTableInfo(cachedId, typeof(T));
         }
 
         /// <summary>
@@ -313,28 +300,10 @@ namespace Never.EasySql.Linq
         /// <param name="type"></param>
         /// <param name="cachedId">缓存key</param>
         /// <returns></returns>
-        public static bool TryChangeTableInfo(string cachedId, Type type)
+        public static bool TryUpdateTableInfo(string cachedId, Type type)
         {
-            var table = type.GetAttribute<TableNameAttribute>();
-            var columns = new List<ColumnInfo>();
-            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField | BindingFlags.GetProperty))
-            {
-                var column = new ColumnInfo()
-                {
-                    Member = member,
-                    Column = member.GetAttribute<ColumnAttribute>(),
-                    TypeHandler = member.GetAttribute<TypeHandlerAttribute>()
-                };
-
-                columns.Add(column);
-            }
-
-            return TryChangeTableInfo(cachedId, type, new TableInfo()
-            {
-                TableName = table,
-                TableNameAlias = null,
-                Columns = columns
-            });
+            var table = AnalyzeTableInfo(type);
+            return TryUpdateTableInfo(cachedId, type, table);
         }
 
         /// <summary>
@@ -344,9 +313,9 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo"></param>
         /// <param name="cachedId">缓存key</param>
         /// <returns></returns>
-        public static bool TryChangeTableInfo<T>(string cachedId, TableInfo tableInfo)
+        public static bool TryUpdateTableInfo<T>(string cachedId, TableInfo tableInfo)
         {
-            return TryChangeTableInfo(cachedId, typeof(T), tableInfo);
+            return TryUpdateTableInfo(cachedId, typeof(T), tableInfo);
         }
 
         /// <summary>
@@ -356,9 +325,9 @@ namespace Never.EasySql.Linq
         /// <param name="cachedId">缓存key</param>
         /// <param name="tableInfo"></param>
         /// <returns></returns>
-        public static bool TryChangeTableInfo(string cachedId, Type type, TableInfo tableInfo)
+        public static bool TryUpdateTableInfo(string cachedId, Type type, TableInfo tableInfo)
         {
-            customTableInfoDictionary.TryRemove(new TypeStringKey() { Type = type, Cached = cachedId }, out var temp);
+            customTableInfoDictionary.TryRemove(new TypeStringKey() { Type = type, Cached = cachedId }, out _);
             customTableInfoDictionary[new TypeStringKey() { Type = type, Cached = cachedId }] = tableInfo;
             return true;
         }

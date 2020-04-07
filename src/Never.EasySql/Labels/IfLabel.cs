@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Xml
+namespace Never.EasySql.Labels
 {
     /// <summary>
     /// if标签
     /// </summary>
-    /// <seealso cref="Never.EasySql.Xml.BaseLabel" />
+    /// <seealso cref="Never.EasySql.Labels.BaseLabel" />
     public class IfLabel : BaseLabel
     {
         /// <summary>

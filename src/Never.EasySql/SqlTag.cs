@@ -1,4 +1,5 @@
-﻿using Never.EasySql.Xml;
+﻿using Never.EasySql.Labels;
+using Never.EasySql.Xml;
 using Never.Exceptions;
 using Never.Serialization.Json;
 using System;
@@ -43,7 +44,7 @@ namespace Never.EasySql
         /// <typeparam name="T"></typeparam>
         /// <param name="parameter">The parameter.</param>
         /// <returns></returns>
-        public SqlTagFormat Format<T>(EasySqlParameter<T> parameter)
+        public virtual SqlTagFormat Format<T>(EasySqlParameter<T> parameter)
         {
             var format = new SqlTagFormat(this.TextLength, parameter.Count) { Id = this.Id };
             if (this.Labels.Any())
@@ -64,7 +65,7 @@ namespace Never.EasySql
         /// <typeparam name="T"></typeparam>
         /// <param name="parameter">The parameter.</param>
         /// <returns></returns>
-        public SqlTagFormat FormatForText<T>(EasySqlParameter<T> parameter)
+        public virtual SqlTagFormat FormatForText<T>(EasySqlParameter<T> parameter)
         {
             var format = new SqlTagFormat.TextSqlTagFormat(this.TextLength, parameter.Count) { Id = this.Id };
             if (this.Labels.Any())
@@ -81,21 +82,7 @@ namespace Never.EasySql
 
         #endregion format
 
-
         #region 读取
-
-        /// <summary>
-        /// 读取textLabel
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="writer"></param>
-        /// <param name="readerHelper"></param>
-        /// <param name="parameterPrefix"></param>
-        /// <returns></returns>
-        public TextLabel ReadTextNode(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
-        {
-            return this.ReadTextNode(node.InnerText, writer, readerHelper, parameterPrefix);
-        }
 
         /// <summary>
         /// 读取textLabel
@@ -325,19 +312,6 @@ namespace Never.EasySql
             this.TextLength += label.SqlText.Length;
             writer.Clear();
             return label;
-        }
-
-        /// <summary>
-        /// 读取textLabel
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="writer"></param>
-        /// <param name="readerHelper"></param>
-        /// <param name="parameterPrefix"></param>
-        /// <returns></returns>
-        public TextLabel ReadTextNodeUsingFormatLine(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
-        {
-            return this.ReadTextNodeUsingFormatLine(node.InnerText, writer, readerHelper, parameterPrefix);
         }
 
         /// <summary>
@@ -641,19 +615,6 @@ namespace Never.EasySql
         /// <summary>
         /// 读取return标签
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="writer"></param>
-        /// <param name="readerHelper"></param>
-        /// <param name="parameterPrefix"></param>
-        /// <returns></returns>
-        public TextLabel ReadReturnNode(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
-        {
-            return this.ReadReturnNode(node.InnerText, writer, readerHelper, parameterPrefix);
-        }
-
-        /// <summary>
-        /// 读取return标签
-        /// </summary>
         /// <param name="text"></param>
         /// <param name="writer"></param>
         /// <param name="readerHelper"></param>
@@ -662,19 +623,6 @@ namespace Never.EasySql
         public TextLabel ReadReturnNode(string text, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
         {
             return new TextLabel() { SqlText = text };
-        }
-
-        /// <summary>
-        /// 读取return标签
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="writer"></param>
-        /// <param name="readerHelper"></param>
-        /// <param name="parameterPrefix"></param>
-        /// <returns></returns>
-        public TextLabel ReadReturnNodeUsingFormatLine(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
-        {
-            return this.ReadReturnNodeUsingFormatLine(node.InnerText, writer, readerHelper, parameterPrefix);
         }
 
         /// <summary>
@@ -748,7 +696,6 @@ namespace Never.EasySql
             writer.Clear();
             return label;
         }
-
 
         /// <summary>
         /// 参数停顿

@@ -31,5 +31,7 @@ namespace Never.EasySql
         /// </summary>
         /// <returns></returns>
         IEnumerable<KeyValuePair<string, SqlTag>> GetAll();
+
+
     }
 }

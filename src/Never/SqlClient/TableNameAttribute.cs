@@ -13,8 +13,8 @@ namespace Never.SqlClient
     public class TableNameAttribute : Attribute
     {
         /// <summary>
-        /// 表名别名
+        /// 表名
         /// </summary>
-        public string Alias { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Never.Exceptions;
+﻿using Never.EasySql.Labels;
+using Never.Exceptions;
 using Never.Serialization.Json;
 using System;
 using System.Collections.Generic;
@@ -444,6 +445,59 @@ namespace Never.EasySql.Xml
                 }
             }
         }
+
+
+        /// <summary>
+        /// 读取textLabel
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="writer"></param>
+        /// <param name="readerHelper"></param>
+        /// <param name="parameterPrefix"></param>
+        /// <returns></returns>
+        public TextLabel ReadTextNode(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
+        {
+            return this.ReadTextNode(node.InnerText, writer, readerHelper, parameterPrefix);
+        }
+
+        /// <summary>
+        /// 读取textLabel
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="writer"></param>
+        /// <param name="readerHelper"></param>
+        /// <param name="parameterPrefix"></param>
+        /// <returns></returns>
+        public TextLabel ReadTextNodeUsingFormatLine(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
+        {
+            return this.ReadTextNodeUsingFormatLine(node.InnerText, writer, readerHelper, parameterPrefix);
+        }
+
+        /// <summary>
+        /// 读取return标签
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="writer"></param>
+        /// <param name="readerHelper"></param>
+        /// <param name="parameterPrefix"></param>
+        /// <returns></returns>
+        public TextLabel ReadReturnNode(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
+        {
+            return this.ReadReturnNode(node.InnerText, writer, readerHelper, parameterPrefix);
+        }
+        /// <summary>
+        /// 读取return标签
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="writer"></param>
+        /// <param name="readerHelper"></param>
+        /// <param name="parameterPrefix"></param>
+        /// <returns></returns>
+        public TextLabel ReadReturnNodeUsingFormatLine(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
+        {
+            return this.ReadReturnNodeUsingFormatLine(node.InnerText, writer, readerHelper, parameterPrefix);
+        }
+
 
         #endregion
     }

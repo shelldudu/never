@@ -52,7 +52,7 @@ namespace Never.Test
 
         protected override IEasySqlExecuter CreateSqlExecuter()
         {
-            return new EasySql.SqlClient.SqlServerExecuter(this.ConnectionString);
+            return new EasySql.Client.SqlServerExecuter(this.ConnectionString);
         }
     }
 
@@ -79,7 +79,7 @@ namespace Never.Test
 
         protected override IEasySqlExecuter CreateSqlExecuter()
         {
-            return new EasySql.SqlClient.MySqlExecuter(this.ConnectionString);
+            return new EasySql.Client.MySqlExecuter(this.ConnectionString);
         }
     }
 
@@ -106,7 +106,7 @@ namespace Never.Test
 
         protected override IEasySqlExecuter CreateSqlExecuter()
         {
-            return new EasySql.SqlClient.PostgreSqlExecuter(this.ConnectionString);
+            return new EasySql.Client.PostgreSqlExecuter(this.ConnectionString);
         }
     }
 

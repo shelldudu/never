@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 namespace Never.EasySql.Linq
 {
     /// <summary>
-    /// 
+    /// and 还是 or
     /// </summary>
-    public class BuildingLableInfo
+    public enum AndOrOption
     {
         /// <summary>
-        /// 标签
+        /// and
         /// </summary>
-        public ILabel Label { get; set; }
+        and = 0,
 
         /// <summary>
-        /// 是否已经构建了
+        /// or
         /// </summary>
-        public bool Builded { get; set; }
+        or = 1
     }
 }

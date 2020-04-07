@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Xml
+namespace Never.EasySql.Labels
 {
     /// <summary>
     /// not null label
     /// </summary>
-    /// <seealso cref="Never.EasySql.Xml.BaseLabel" />
+    /// <seealso cref="Never.EasySql.Labels.BaseLabel" />
     public class NotNullLabel : BaseLabel
     {
         /// <summary>
