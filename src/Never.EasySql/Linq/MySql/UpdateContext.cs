@@ -96,6 +96,25 @@ namespace Never.EasySql.Linq.MySql
         public override Linq.UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression)
         {
             var tableInfo = EasyDecoratedLinqDao<Parameter>.GetTableInfo<Table>(string.Empty);
+            var binary = expression.Body as System.Linq.Expressions.BinaryExpression;
+            if (binary != null)
+            {
+                switch (binary.NodeType) 
+                {
+                    case ExpressionType.Equal: 
+                        {
+                            
+                        }break;
+                    case ExpressionType.NotEqual: 
+                        {
+                        
+                        }break;
+                }
+                var left = binary.Left;
+                var right = binary.Right;
+                
+            }
+
             //string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
             string columnName = null;
             var label = new TextLabel()
@@ -197,7 +216,7 @@ namespace Never.EasySql.Linq.MySql
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, object value)
+        public override Linq.UpdateContext<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out _);
             this.templateParameter.Add(columnName, value);

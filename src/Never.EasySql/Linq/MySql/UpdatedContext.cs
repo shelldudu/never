@@ -90,7 +90,7 @@ namespace Never.EasySql.Linq.MySql
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, object value)
+        public override Linq.UpdateContext<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
             this.templateParameter.Add(this.FindColumnName(expression, this.tableInfo, out _), value);
             return this;

@@ -114,7 +114,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, object value);
+        public abstract UpdateContext<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value);
 
         /// <summary>
         /// where
@@ -129,22 +129,22 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract UpdateContext<Parameter> Exists<T1>(AndOrOption option, Expression<Func<Parameter, T1, bool>> expression);
+        public abstract UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
 
         /// <summary>
         /// 不存在
         /// </summary>
-        public abstract UpdateContext<Parameter> NotExists<T1>(AndOrOption option, Expression<Func<Parameter, T1, bool>> expression);
+        public abstract UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
 
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract UpdateContext<Parameter> In<T1>(AndOrOption option, Expression<Func<Parameter, T1, bool>> expression);
+        public abstract UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, object>> source, Expression<Func<Table, object>> target, Expression<Func<Table, bool>> where);
 
         /// <summary>
         /// 不存在
         /// </summary>
-        public abstract UpdateContext<Parameter> NotIn<T1>(AndOrOption option, Expression<Func<Parameter, T1, bool>> expression);
+        public abstract UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, object>> source, Expression<Func<Table, object>> target, Expression<Func<Table, bool>> where);
 
         /// <summary>
         /// 存在

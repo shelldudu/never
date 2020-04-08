@@ -46,8 +46,10 @@ namespace Never.Test
             var update = dao.ToEasyLinqDao(new MyTable()).Update()
                 .SetColum(m => m.Name)
                 .SetColumWithFunc(m => m.CreateTime, "now()")
+                .SetColumWithValue(m => m.Name, "abc")
                 .Where(p => p.Id)
-                .AndNotExists<MyTable2>((p, t) => t.Id == p.Id)
+                .AndNotExists<MyTable2>((p, t) => t.Id == p.Id && p.Id >= t.Id)
+                .AndNotIn<MyTable2>((p, t) => t.Id == p.Id && p.Id >= t.Id)
                 .GetResult();
 
             return;
