@@ -198,6 +198,9 @@ namespace Never.Serialization.Json.Deserialize
                     continue;
                 }
 
+                if (this.BuildForJsonObject(emit, instanceLocal, sourceType, member, memberType, attributes))
+                    continue;
+
                 if (this.BuildForTypeModule(emit, instanceLocal, sourceType, member, memberType, attributes))
                     continue;
 
@@ -2017,6 +2020,38 @@ namespace Never.Serialization.Json.Deserialize
             emit.LoadNull();
             emit.Call(DeseralizerBuilderHelper.GetParseMethod(memberType));
             emit.Nop();
+
+            return true;
+        }
+
+        /// <summary>
+        /// 构建Type
+        /// </summary>
+        /// <param name="emit"></param>
+        /// <param name="instanceLocal"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="member"></param>
+        /// <param name="memberType"></param>
+        /// <param name="memberAttributes"></param>
+        /// <returns></returns>
+        protected virtual bool BuildForJsonObject(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, ILocal instanceLocal, Type sourceType, MemberInfo member, Type memberType, Attribute[] memberAttributes)
+        {
+            if (memberType != typeof(JsonObject))
+                return false;
+
+            if (sourceType.IsValueType)
+                emit.LoadLocalAddress(instanceLocal);
+            else
+                emit.LoadLocal(instanceLocal);
+
+            emit.LoadArgument(0);
+            emit.LoadArgument(1);
+            emit.LoadConstant(this.LoadNotNullMemberName(member, memberAttributes));
+            emit.Call(DeseralizerBuilderHelper.GetParseMethod(memberType));
+            if (member.MemberType == MemberTypes.Property)
+                emit.Call(((PropertyInfo)member).GetSetMethod(true));
+            else
+                emit.StoreField((FieldInfo)member);
 
             return true;
         }

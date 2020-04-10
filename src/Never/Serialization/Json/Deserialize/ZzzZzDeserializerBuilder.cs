@@ -73,7 +73,6 @@ namespace Never.Serialization.Json.Deserialize
             }
 
             this.Build(emit);
-
             emit.Return();
             return emit.CreateDelegate();
         }

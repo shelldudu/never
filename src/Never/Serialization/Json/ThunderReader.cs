@@ -33,6 +33,10 @@ namespace Never.Serialization.Json
         private readonly char[] chars = null;
 
         /// <summary>
+        /// 是否已经初始化了
+        /// </summary>
+        private bool inited = false;
+        /// <summary>
         /// Initializes a new instance of the <see cref="ThunderReader"/> class.
         /// </summary>
         /// <param name="json">The json.</param>
@@ -46,6 +50,7 @@ namespace Never.Serialization.Json
             this.nodes = this.AnalyzeNode();
             if (this.nodes == null)
                 this.nodes = new List<JsonContentNode>(0);
+            this.inited = true;
         }
 
         /// <summary>
@@ -70,6 +75,7 @@ namespace Never.Serialization.Json
 
                 this.nodes = (IList<JsonContentNode>)node.Node;
             }
+            this.inited = true;
         }
 
         #endregion ctor
@@ -132,8 +138,11 @@ namespace Never.Serialization.Json
         /// 对jsontext进行节点解析
         /// </summary>
         /// <returns></returns>
-        protected IList<JsonContentNode> AnalyzeNode()
+        internal IList<JsonContentNode> AnalyzeNode()
         {
+            if (this.inited)
+                return this.nodes;
+
             if (this.original == null)
                 return new JsonContentNode[0];
 
