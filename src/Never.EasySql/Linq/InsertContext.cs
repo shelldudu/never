@@ -64,6 +64,46 @@ namespace Never.EasySql.Linq
         /// <param name="flag"></param>
         /// <returns></returns>
         public abstract InsertContext<Parameter> Entrance(char flag);
+
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public abstract Result GetResult<Result>();
+
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public abstract void GetResult();
+
+        /// <summary>
+        /// 最后自增字符串
+        /// </summary>
+        /// <returns></returns>
+        public abstract InsertContext<Parameter> InsertLastInsertId();
+
+        /// <summary>
+        /// 插入的字段
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public abstract InsertContext<Parameter> Colum(Expression<Func<Parameter, object>> expression);
+
+        /// <summary>
+        /// 插入的字段
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public abstract InsertContext<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function);
+
+        /// <summary>
+        /// 插入的字段
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public abstract InsertContext<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value);
+
     }
 
 }

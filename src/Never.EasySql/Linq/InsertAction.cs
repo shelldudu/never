@@ -31,20 +31,20 @@ namespace Never.EasySql.Linq
         /// 单条插入
         /// </summary>
         /// <returns></returns>
-        public InsertGrammar<Parameter> Single()
+        public SingleInsertGrammar<Parameter> ToSingle()
         {
             this.Context.Entrance('s');
-            return new InsertGrammar<Parameter>() { Context = this.Context };
+            return new SingleInsertGrammar<Parameter>() { Context = this.Context };
         }
 
         /// <summary>
         /// 批量插入
         /// </summary>
         /// <returns></returns>
-        public InsertGrammar<Parameter> Bulk()
+        public EnumerableInsertGrammar<Parameter> ToEnumerable()
         {
             this.Context.Entrance('b');
-            return new InsertGrammar<Parameter>() { Context = this.Context };
+            return new EnumerableInsertGrammar<Parameter>() { Context = this.Context };
         }
     }
 }

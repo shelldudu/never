@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public abstract class SelectContext<Parameter,Table> : Context
+    public abstract class SelectContext<Parameter, Table> : Context
     {
         /// <summary>
         /// dao
@@ -37,6 +38,16 @@ namespace Never.EasySql.Linq
         /// 临时参数
         /// </summary>
         protected readonly Dictionary<string, object> templateParameter;
+
+        /// <summary>
+        /// 是否单条记录
+        /// </summary>
+        protected bool isSingle;
+
+        /// <summary>
+        /// 分页
+        /// </summary>
+        protected PagedSearch paged;
 
         /// <summary>
         /// 
@@ -65,5 +76,81 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public abstract void AsTable(string table);
 
+        /// <summary>
+        /// 入口
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> Entrance();
+
+        /// <summary>
+        /// 设为单条
+        /// </summary>
+        /// <returns></returns>
+        public SelectContext<Parameter, Table> SetSingle()
+        {
+            this.isSingle = true;
+            this.paged = null;
+            return this;
+        }
+
+        /// <summary>
+        /// 设为单条
+        /// </summary>
+        /// <returns></returns>
+        public SelectContext<Parameter, Table> SetPage(PagedSearch paged)
+        {
+            this.isSingle = false;
+            this.paged = paged;
+            return this;
+        }
+
+        /// <summary>
+        /// where
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> Where();
+
+        /// <summary>
+        /// where
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression);
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> Exists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> NotExists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> In<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> NotIn<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> Exists(AndOrOption option, string expression);
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> NotExists(AndOrOption option, string expression);
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> In(AndOrOption option, string expression);
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> NotIn(AndOrOption option, string expression);
     }
 }

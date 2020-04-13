@@ -30,16 +30,16 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 从哪一张表删除
         /// </summary>
-        public DeleteAction<Parameter> From(string table)
+        public DeleteGrammar<Parameter> From(string table)
         {
             this.Context.From(table);
-            return this;
+            return new DeleteGrammar<Parameter>() { Context = this.Context };
         }
 
         /// <summary>
         /// where
         /// </summary>
-        public DeleteGrammar<Parameter> Where()
+        public DeleteGrammar<Parameter>.NWhere<Parameter> Where()
         {
             this.Context.Entrance();
             return new DeleteGrammar<Parameter>() { Context = this.Context }.Where();
@@ -48,7 +48,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public DeleteGrammar<Parameter> Where(Expression<Func<Parameter, object>> expression)
+        public DeleteGrammar<Parameter>.NWhere<Parameter> Where(Expression<Func<Parameter, object>> expression)
         {
             this.Context.Entrance();
             return new DeleteGrammar<Parameter>() { Context = this.Context }.Where(expression);

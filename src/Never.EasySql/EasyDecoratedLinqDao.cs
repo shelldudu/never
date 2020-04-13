@@ -158,7 +158,7 @@ namespace Never.EasySql
 
             return new DeleteAction<Parameter>()
             {
-                Context = new Linq.MySql.DeleteContext<Parameter>(this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                Context = new Linq.MySql.DeleteContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -181,7 +181,7 @@ namespace Never.EasySql
 
             return new InsertAction<Parameter>()
             {
-                Context = new Linq.MySql.InsertContext<Parameter>(this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                Context = new Linq.MySql.InsertContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -205,7 +205,7 @@ namespace Never.EasySql
 
             return new SelectAction<Parameter, Table>()
             {
-                Context = new Linq.MySql.SelectContext<Parameter, Table>(this, Linq.Context.GetTableInfo<Table>(), this.parameter)
+                Context = new Linq.MySql.SelectContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Table>(), this.parameter)
             };
         }
 

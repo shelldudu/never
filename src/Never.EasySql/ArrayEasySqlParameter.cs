@@ -12,12 +12,10 @@ namespace Never.EasySql
     /// </summary>
     internal class ArrayEasySqlParameter<T, V> : EasySqlParameter<T>, IEnumerable<V>, ISqlParameterEnumerable
     {
-        public T Value { get; set; }
         public IEnumerable<V> Array { get; set; }
 
-        public ArrayEasySqlParameter(T value, IEnumerable<V> array) : base(value)
+        public ArrayEasySqlParameter(IEnumerable<V> array) : base(default(T))
         {
-            this.Value = value;
             this.Array = array;
         }
 
@@ -29,7 +27,7 @@ namespace Never.EasySql
         /// <returns></returns>
         protected override IReadOnlyList<KeyValueTuple<string, object>> Convert(T target, Type objectType)
         {
-            return base.Convert(target, objectType);
+            return new List<KeyValueTuple<string, object>>().AsReadOnly();
         }
 
         /// <summary>

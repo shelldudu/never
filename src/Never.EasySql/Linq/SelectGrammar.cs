@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 namespace Never.EasySql.Linq
 {
     /// <summary>
-    /// 查询
+    /// 单条查询
     /// </summary>
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">查询结果对象</typeparam>
-    public struct SelectGrammar<Parameter, Table>
+    public struct SingleSelectGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
@@ -25,7 +25,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public SelectGrammar<Parameter, Table> Select(char @all = '*')
+        public SingleSelectGrammar<Parameter, Table> Select(char @all = '*')
         {
             return this;
         }
@@ -33,7 +33,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public SingleSelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             return this;
         }
@@ -41,7 +41,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public SingleSelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             return this;
         }
@@ -50,7 +50,7 @@ namespace Never.EasySql.Linq
         /// join
         /// </summary>
         /// <param name="on"></param>
-        public SelectGrammar<Parameter, Table> Join<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        public SingleSelectGrammar<Parameter, Table> Join<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -59,7 +59,7 @@ namespace Never.EasySql.Linq
         /// left join
         /// </summary>
         /// <param name="on"></param>
-        public SelectGrammar<Parameter, Table> LeftJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        public SingleSelectGrammar<Parameter, Table> LeftJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -68,7 +68,7 @@ namespace Never.EasySql.Linq
         /// right join
         /// </summary>
         /// <param name="on"></param>
-        public SelectGrammar<Parameter, Table> RightJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        public SingleSelectGrammar<Parameter, Table> RightJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -77,9 +77,20 @@ namespace Never.EasySql.Linq
         /// inner join
         /// </summary>
         /// <param name="on"></param>
-        public SelectGrammar<Parameter, Table> InnerJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        public SingleSelectGrammar<Parameter, Table> InnerJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
+        }
+
+        /// <summary>
+        /// where 条件
+        /// </summary>
+        public NWhere<Parameter, Table> Where()
+        {
+            return new NWhere<Parameter, Table>()
+            {
+                crud = this,
+            };
         }
 
         /// <summary>
@@ -89,335 +100,702 @@ namespace Never.EasySql.Linq
         {
             return new NWhere<Parameter, Table>()
             {
-                select = this,
+                crud = this,
             };
         }
 
         /// <summary>
-        /// 返回数组
+        /// 返回执行结果
         /// </summary>
-        /// <param name="pageSize"></param>
-        /// <param name="pageNow"></param>
-        /// <returns></returns>
-        public NToList<Parameter, Table> ToList(int pageNow, int pageSize)
+        public Table GetResult()
         {
-            //this.paged = new PagedSearch(pageNow, pageSize);
-            return new NToList<Parameter, Table>()
+            return default(Table);
+        }
+
+        #endregion
+
+        #region where
+
+        /// <summary>
+        /// where 条件
+        /// </summary>
+        /// <typeparam name="NParameter">查询参数</typeparam>
+        /// <typeparam name="NTable">查询结果对象</typeparam>
+        public struct NWhere<NParameter, NTable>
+        {
+            /// <summary>
+            /// select
+            /// </summary>
+            internal SingleSelectGrammar<NParameter, NTable> crud;
+
+            /// <summary>
+            /// 返回执行结果
+            /// </summary>
+            public NTable GetResult()
+            {
+                return this.crud.GetResult();
+            }
+
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> AndExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.Exists(AndOrOption.and, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">另外一张表的where语句</param>
+            public NWhere<NParameter,NTable> AndExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.Exists(AndOrOption.and, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>        
+            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter,NTable> AndExists(string expression)
+            {
+                this.crud.Context.Exists(AndOrOption.and, expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> AndNotExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.NotExists(AndOrOption.and, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">另外一张表的where语句</param>
+            public NWhere<NParameter,NTable> AndNotExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.NotExists(AndOrOption.and, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter,NTable> AndNotExists(string expression)
+            {
+                this.crud.Context.NotExists(AndOrOption.and, expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> OrExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.Exists(AndOrOption.or, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">另外一张表的where语句</param>
+            public NWhere<NParameter,NTable> OrExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.Exists(AndOrOption.or, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>        
+            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter,NTable> OrExists(string expression)
+            {
+                this.crud.Context.Exists(AndOrOption.or, expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> OrNotExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.NotExists(AndOrOption.or, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">另外一张表的where语句</param>
+            public NWhere<NParameter,NTable> OrNotExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.NotExists(AndOrOption.or, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter,NTable> OrNotExists(string expression)
+            {
+                this.crud.Context.NotExists(AndOrOption.or, expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> AndIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.In(AndOrOption.and, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">where条件</param>
+            public NWhere<NParameter,NTable> AndIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.In(AndOrOption.and, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter,NTable> AndIn(string expression)
+            {
+                this.crud.Context.In(AndOrOption.and, expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> AndNotIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.NotIn(AndOrOption.and, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">where条件</param>
+            public NWhere<NParameter,NTable> AndNotIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.NotIn(AndOrOption.and, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter,NTable> AndNotIn(string expression)
+            {
+                this.crud.Context.NotIn(AndOrOption.and, expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> OrIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.In(AndOrOption.or, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <param name="where">where</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> OrIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.In(AndOrOption.or, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter,NTable> OrIn(string expression)
+            {
+                this.crud.Context.In(AndOrOption.or, expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> OrNotIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.NotIn(AndOrOption.or, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <param name="where"></param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter,NTable> OrNotIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.NotIn(AndOrOption.or, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter,NTable> OrNotIn(string expression)
+            {
+                this.crud.Context.NotIn(AndOrOption.or, expression);
+                return this;
+            }
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// 多条查询
+    /// </summary>
+    /// <typeparam name="Parameter">查询参数</typeparam>
+    /// <typeparam name="Table">查询结果对象</typeparam>
+    public struct EnumerableSelectGrammar<Parameter, Table>
+    {
+        /// <summary>
+        /// 上下文
+        /// </summary>
+        internal SelectContext<Parameter, Table> Context { get; set; }
+
+        #region linq
+
+        /// <summary>
+        /// 查询所有
+        /// </summary>
+        /// <returns></returns>
+        public EnumerableSelectGrammar<Parameter, Table> Select(char @all = '*')
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// 字段名
+        /// </summary>
+        public EnumerableSelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// 字段名
+        /// </summary>
+        public EnumerableSelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// join
+        /// </summary>
+        /// <param name="on"></param>
+        public EnumerableSelectGrammar<Parameter, Table> Join<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// left join
+        /// </summary>
+        /// <param name="on"></param>
+        public EnumerableSelectGrammar<Parameter, Table> LeftJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// right join
+        /// </summary>
+        /// <param name="on"></param>
+        public EnumerableSelectGrammar<Parameter, Table> RightJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// inner join
+        /// </summary>
+        /// <param name="on"></param>
+        public EnumerableSelectGrammar<Parameter, Table> InnerJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// where 条件
+        /// </summary>
+        public NWhere<Parameter, Table> Where()
+        {
+            return new NWhere<Parameter, Table>()
             {
                 crud = this,
             };
         }
 
         /// <summary>
-        /// 返回单条
+        /// where 条件
         /// </summary>
-        /// <returns></returns>
-        public NToSingle<Parameter, Table> ToSingle()
+        public NWhere<Parameter, Table> Where(Expression<Func<Parameter, Table, object>> expression)
         {
-            return new NToSingle<Parameter, Table>()
+            return new NWhere<Parameter, Table>()
             {
-                select = this,
+                crud = this,
             };
+        }
+
+        /// <summary>
+        /// 返回执行结果
+        /// </summary>
+        public IEnumerable<Table> GetResult()
+        {
+            return default(IEnumerable<Table>);
         }
 
         #endregion
 
-        #region where and result
+        #region where
 
         /// <summary>
-        /// 返回列表
+        /// where 条件
         /// </summary>
         /// <typeparam name="NParameter">查询参数</typeparam>
         /// <typeparam name="NTable">查询结果对象</typeparam>
-        public struct NToList<NParameter, NTable>
+        public struct NWhere<NParameter, NTable>
         {
             /// <summary>
             /// select
             /// </summary>
-            internal SelectGrammar<NParameter, NTable> crud;
+            internal EnumerableSelectGrammar<NParameter, NTable> crud;
 
             /// <summary>
             /// 返回执行结果
             /// </summary>
             public IEnumerable<NTable> GetResult()
             {
-                return null;
-                //return this.crud.ToList();
-            }
-        }
-
-        /// <summary>
-        /// 返回单条
-        /// </summary>
-        /// <typeparam name="NParameter">查询参数</typeparam>
-        /// <typeparam name="NT">查询结果对象</typeparam>
-        public struct NToSingle<NParameter, NT>
-        {
-            /// <summary>
-            /// select
-            /// </summary>
-            internal SelectGrammar<NParameter, NT> select;
-
-            /// <summary>
-            /// 返回执行结果
-            /// </summary>
-            public NT GetResult()
-            {
-                return default(NT);
-                // return this.select.dao.QueryForObject<NT, NParameter>(this.select.Build(), select.sqlParameter);
-            }
-        }
-
-        /// <summary>
-        /// where 条件
-        /// </summary>
-        /// <typeparam name="NParameter">查询参数</typeparam>
-        /// <typeparam name="NT">查询结果对象</typeparam>
-        public struct NWhere<NParameter, NT>
-        {
-            /// <summary>
-            /// select
-            /// </summary>
-            internal SelectGrammar<NParameter, NT> select;
-
-            /// <summary>
-            /// 返回数组
-            /// </summary>
-            /// <param name="pageSize"></param>
-            /// <param name="pageNow"></param>
-            /// <returns></returns>
-            public NToList<NParameter, NT> ToList(int pageNow, int pageSize)
-            {
-                // this.select.paged = new PagedSearch(pageNow, pageSize);
-                return new NToList<NParameter, NT>()
-                {
-                    crud = this.select,
-                };
+                return this.crud.GetResult();
             }
 
-            /// <summary>
-            /// 返回单条
-            /// </summary>
-            /// <returns></returns>
-            public NToSingle<NParameter, NT> ToSingle()
-            {
-                return new NToSingle<NParameter, NT>()
-                {
-                    select = this.select,
-                };
-            }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> AndExists<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> AndExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
             {
+                this.crud.Context.Exists(AndOrOption.and, expression, null);
                 return this;
             }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <param name="exists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter, NT> AndExists(Func<TableInfo, string> exists)
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">另外一张表的where语句</param>
+            public NWhere<NParameter, NTable> AndExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
             {
+                this.crud.Context.Exists(AndOrOption.and, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>        
+            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter, NTable> AndExists(string expression)
+            {
+                this.crud.Context.Exists(AndOrOption.and, expression);
                 return this;
             }
 
             /// <summary>
             /// 不存在
             /// </summary>
-            /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> AndNotExists<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> AndNotExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
             {
-                return this;
-            }
-
-            /// <summary>
-            /// 存在
-            /// </summary>
-            /// <param name="notexists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter, NT> AndNotExists(Func<TableInfo, string> notexists)
-            {
-                return this;
-            }
-
-            /// <summary>
-            /// 存在
-            /// </summary>
-            /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> AndIn<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
-            {
-                return this;
-            }
-
-            /// <summary>
-            /// 存在
-            /// </summary>
-            /// <param name="notexists">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter, NT> AndIn(Func<TableInfo, string> notexists)
-            {
+                this.crud.Context.NotExists(AndOrOption.and, expression, null);
                 return this;
             }
 
             /// <summary>
             /// 不存在
             /// </summary>
-            /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> AndNotIn<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">另外一张表的where语句</param>
+            public NWhere<NParameter, NTable> AndNotExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
             {
+                this.crud.Context.NotExists(AndOrOption.and, expression, where);
                 return this;
             }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <param name="notexists">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter, NT> AndNotIn(Func<TableInfo, string> notexists)
+            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter, NTable> AndNotExists(string expression)
             {
+                this.crud.Context.NotExists(AndOrOption.and, expression);
                 return this;
             }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> OrExists<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> OrExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
             {
+                this.crud.Context.Exists(AndOrOption.or, expression, null);
                 return this;
             }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <param name="exists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id Or table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter, NT> OrExists(Func<TableInfo, string> exists)
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">另外一张表的where语句</param>
+            public NWhere<NParameter, NTable> OrExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
             {
+                this.crud.Context.Exists(AndOrOption.or, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>        
+            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter, NTable> OrExists(string expression)
+            {
+                this.crud.Context.Exists(AndOrOption.or, expression);
                 return this;
             }
 
             /// <summary>
             /// 不存在
             /// </summary>
-            /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> OrNotExists<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> OrNotExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
             {
-                return this;
-            }
-
-            /// <summary>
-            /// 存在
-            /// </summary>
-            /// <param name="notexists">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id Or table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter, NT> OrNotExists(Func<TableInfo, string> notexists)
-            {
-                return this;
-            }
-
-            /// <summary>
-            /// 存在
-            /// </summary>
-            /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> OrIn<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
-            {
-                return this;
-            }
-
-            /// <summary>
-            /// 存在
-            /// </summary>
-            /// <param name="notexists">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter, NT> OrIn(Func<TableInfo, string> notexists)
-            {
+                this.crud.Context.NotExists(AndOrOption.or, expression, null);
                 return this;
             }
 
             /// <summary>
             /// 不存在
             /// </summary>
-            /// <typeparam name="T1">另外的表中</typeparam>
-            public NWhere<NParameter, NT> OrNotIn<T1>(Expression<Func<Parameter, Table, T1, object>> expression)
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">另外一张表的where语句</param>
+            public NWhere<NParameter, NTable> OrNotExists<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
             {
+                this.crud.Context.NotExists(AndOrOption.or, expression, where);
                 return this;
             }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <param name="notexists">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public NWhere<NParameter, NT> OrNotIn(Func<TableInfo, string> notexists)
+            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter, NTable> OrNotExists(string expression)
             {
+                this.crud.Context.NotExists(AndOrOption.or, expression);
                 return this;
             }
 
             /// <summary>
-            /// 排序
+            /// 存在
             /// </summary>
             /// <param name="expression"></param>
-            /// <returns></returns>
-            public NWhere<NParameter, NT> Orderby(Expression<Func<NT, object>> expression)
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> AndIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
             {
-                var model = expression.Body as ParameterExpression;
-                if (model != null)
-                {
-                    // this.select.orderby.Add(string.Concat(model.Name, " asc"));
-                    return this;
-                }
-
-                var member = expression.Body as MemberExpression;
-                if (member != null)
-                {
-                    // this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
-                    return this;
-                }
-
-                var unary = expression.Body as UnaryExpression;
-                if (unary != null)
-                {
-                    member = unary.Operand as MemberExpression;
-                    if (member != null)
-                    {
-                        // this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
-                        return this;
-                    }
-                }
-
+                this.crud.Context.In(AndOrOption.and, expression, null);
                 return this;
             }
 
             /// <summary>
-            /// 排序
+            /// 存在
             /// </summary>
-            /// <param name="expression"></param>
-            /// <returns></returns>
-            public NWhere<NParameter, NT> Orderbydesc(Expression<Func<NT, object>> expression)
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">where条件</param>
+            public NWhere<NParameter, NTable> AndIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
             {
-                var model = expression.Body as ParameterExpression;
-                if (model != null)
-                {
-                    // this.select.orderby.Add(string.Concat(model.Name, " desc"));
-                    return this;
-                }
+                this.crud.Context.In(AndOrOption.and, expression, where);
+                return this;
+            }
 
-                var member = expression.Body as MemberExpression;
-                if (member != null)
-                {
-                    // this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
-                    return this;
-                }
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter, NTable> AndIn(string expression)
+            {
+                this.crud.Context.In(AndOrOption.and, expression);
+                return this;
+            }
 
-                var unary = expression.Body as UnaryExpression;
-                if (unary != null)
-                {
-                    member = unary.Operand as MemberExpression;
-                    if (member != null)
-                    {
-                        //  this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
-                        return this;
-                    }
-                }
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> AndNotIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.NotIn(AndOrOption.and, expression, null);
+                return this;
+            }
 
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            /// <param name="where">where条件</param>
+            public NWhere<NParameter, NTable> AndNotIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.NotIn(AndOrOption.and, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter, NTable> AndNotIn(string expression)
+            {
+                this.crud.Context.NotIn(AndOrOption.and, expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> OrIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.In(AndOrOption.or, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <param name="where">where</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> OrIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.In(AndOrOption.or, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter, NTable> OrIn(string expression)
+            {
+                this.crud.Context.In(AndOrOption.or, expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> OrNotIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression)
+            {
+                this.crud.Context.NotIn(AndOrOption.or, expression, null);
+                return this;
+            }
+
+            /// <summary>
+            /// 不存在
+            /// </summary>
+            /// <param name="expression">expression</param>
+            /// <param name="where"></param>
+            /// <typeparam name="Table2">另外的表中</typeparam>
+            public NWhere<NParameter, NTable> OrNotIn<Table2>(Expression<Func<NParameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+            {
+                this.crud.Context.NotIn(AndOrOption.or, expression, where);
+                return this;
+            }
+
+            /// <summary>
+            /// 存在
+            /// </summary>
+            /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public NWhere<NParameter, NTable> OrNotIn(string expression)
+            {
+                this.crud.Context.NotIn(AndOrOption.or, expression);
                 return this;
             }
         }

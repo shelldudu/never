@@ -37,29 +37,25 @@ namespace Never.EasySql.Linq
             return this;
         }
 
+
         /// <summary>
-        /// 
+        /// 查询单条
         /// </summary>
         /// <returns></returns>
-        public SelectGrammar<Parameter, Table> Select(char @all = '*')
+        public SingleSelectGrammar<Parameter, Table> ToSingle()
         {
-            return new SelectGrammar<Parameter, Table>().Select();
+            this.Context.SetSingle().Entrance();
+            return new SingleSelectGrammar<Parameter, Table>();
         }
 
         /// <summary>
-        /// 更新的字段名
+        /// 查询分页
         /// </summary>
-        public SelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public SingleSelectGrammar<Parameter, Table> ToEnumerable(PagedSearch paged)
         {
-            return new SelectGrammar<Parameter, Table>().Select(expression);
+            this.Context.SetPage(paged).Entrance();
+            return new SingleSelectGrammar<Parameter, Table>();
         }
 
-        /// <summary>
-        /// 更新的字段名
-        /// </summary>
-        public SelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
-        {
-            return new SelectGrammar<Parameter, Table>().Select(expression, @as);
-        }
     }
 }
