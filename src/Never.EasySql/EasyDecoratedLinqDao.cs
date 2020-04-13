@@ -40,7 +40,6 @@ namespace Never.EasySql
 
         #endregion ctor
 
-
         #region trans
 
         /// <summary>
@@ -118,37 +117,25 @@ namespace Never.EasySql
         }
 
         /// <summary>
-        /// 查询table信息
-        /// </summary>
-        /// <typeparam name="Table"></typeparam>
-        /// <returns></returns>
-        public static TableInfo GetTableInfo<Table>()
-        {
-            if (TableInfoProvider.TryUpdateTableInfo(typeof(Table), out var tableInfo))
-                return tableInfo;
-
-            throw new KeyNotExistedException("table", "table info not found");
-        }
-        /// <summary>
         /// 更新
         /// </summary>
         /// <returns></returns>
-        public Update<Parameter> Update()
+        public UpdateAction<Parameter> Update()
         {
             if (this.cacheId.IsNotNullOrEmpty())
             {
                 if (LinqSqlTagProvider.Get(this.cacheId, this, out var tag))
                 {
-                    return new Update<Parameter>()
+                    return new UpdateAction<Parameter>()
                     {
-                        Context = new Linq.MySql.UpdatedContext<Parameter>((LinqSqlTag)tag, this, GetTableInfo<Parameter>(), this.parameter)
+                        Context = new Linq.MySql.UpdatedContext<Parameter>((LinqSqlTag)tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
                     };
                 }
             }
 
-            return new Update<Parameter>()
+            return new UpdateAction<Parameter>()
             {
-                Context = new Linq.MySql.UpdateContext<Parameter>(this.cacheId, this, GetTableInfo<Parameter>(), this.parameter)
+                Context = new Linq.MySql.UpdateContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -156,22 +143,22 @@ namespace Never.EasySql
         /// 删除
         /// </summary>
         /// <returns></returns>
-        public Delete<Parameter> Delete()
+        public DeleteAction<Parameter> Delete()
         {
             if (this.cacheId.IsNotNullOrEmpty())
             {
                 if (LinqSqlTagProvider.Get(this.cacheId, this, out var tag))
                 {
-                    return new Delete<Parameter>()
+                    return new DeleteAction<Parameter>()
                     {
-                        Context = new Linq.MySql.DeletedContext<Parameter>((LinqSqlTag)tag, this, GetTableInfo<Parameter>(), this.parameter)
+                        Context = new Linq.MySql.DeletedContext<Parameter>((LinqSqlTag)tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
                     };
                 }
             }
 
-            return new Delete<Parameter>()
+            return new DeleteAction<Parameter>()
             {
-                Context = new Linq.MySql.DeleteContext<Parameter>(this, GetTableInfo<Parameter>(), this.parameter)
+                Context = new Linq.MySql.DeleteContext<Parameter>(this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -179,22 +166,22 @@ namespace Never.EasySql
         /// 插入
         /// </summary>
         /// <returns></returns>
-        public Insert<Parameter> Insert()
+        public InsertAction<Parameter> Insert()
         {
             if (this.cacheId.IsNotNullOrEmpty())
             {
                 if (LinqSqlTagProvider.Get(this.cacheId, this, out var tag))
                 {
-                    return new Insert<Parameter>()
+                    return new InsertAction<Parameter>()
                     {
-                        Context = new Linq.MySql.InsertedContext<Parameter>((LinqSqlTag)tag, this, GetTableInfo<Parameter>(), this.parameter)
+                        Context = new Linq.MySql.InsertedContext<Parameter>((LinqSqlTag)tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
                     };
                 }
             }
 
-            return new Insert<Parameter>()
+            return new InsertAction<Parameter>()
             {
-                Context = new Linq.MySql.InsertContext<Parameter>(this, GetTableInfo<Parameter>(), this.parameter)
+                Context = new Linq.MySql.InsertContext<Parameter>(this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -203,22 +190,22 @@ namespace Never.EasySql
         /// </summary>
         /// <typeparam name="Table">对象</typeparam>
         /// <returns></returns>
-        public Select<Parameter, Table> Select<Table>()
+        public SelectAction<Parameter, Table> Select<Table>()
         {
             if (this.cacheId.IsNotNullOrEmpty())
             {
                 if (LinqSqlTagProvider.Get(this.cacheId, this, out var tag))
                 {
-                    return new Select<Parameter, Table>()
+                    return new SelectAction<Parameter, Table>()
                     {
-                        Context = new Linq.MySql.SelectedContext<Parameter, Table>((LinqSqlTag)tag, this, GetTableInfo<Table>(), this.parameter)
+                        Context = new Linq.MySql.SelectedContext<Parameter, Table>((LinqSqlTag)tag, this, Linq.Context.GetTableInfo<Table>(), this.parameter)
                     };
                 }
             }
 
-            return new Select<Parameter, Table>()
+            return new SelectAction<Parameter, Table>()
             {
-                Context = new Linq.MySql.SelectContext<Parameter, Table>(this, GetTableInfo<Table>(), this.parameter)
+                Context = new Linq.MySql.SelectContext<Parameter, Table>(this, Linq.Context.GetTableInfo<Table>(), this.parameter)
             };
         }
 

@@ -51,7 +51,6 @@ namespace Never.EasySql.Linq
             this.templateParameter = new Dictionary<string, object>(10);
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -95,6 +94,13 @@ namespace Never.EasySql.Linq
         public abstract int GetResult();
 
         /// <summary>
+        /// 表名
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public abstract void From(string table);
+
+        /// <summary>
         /// as新表名
         /// </summary>
         /// <param name="table"></param>
@@ -102,19 +108,24 @@ namespace Never.EasySql.Linq
         public abstract void AsTable(string table);
 
         /// <summary>
-        /// 更新的字段名
+        /// 入口
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember>> expression);
+        public abstract UpdateContext<Parameter> Entrance();
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColumWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value);
+        public abstract UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression);
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value);
+        public abstract UpdateContext<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value);
+
+        /// <summary>
+        /// 更新的字段名
+        /// </summary>
+        public abstract UpdateContext<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value);
 
         /// <summary>
         /// where

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,6 +29,16 @@ namespace Never.EasySql.Linq
         protected readonly EasySqlParameter<Parameter> sqlParameter;
 
         /// <summary>
+        /// labels
+        /// </summary>
+        protected readonly List<ILabel> labels;
+
+        /// <summary>
+        /// 临时参数
+        /// </summary>
+        protected readonly Dictionary<string, object> templateParameter;
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="dao"></param>
@@ -36,6 +47,82 @@ namespace Never.EasySql.Linq
         protected DeleteContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter)
         {
             this.dao = dao; this.tableInfo = tableInfo; this.sqlParameter = sqlParameter;
+            this.labels = new List<ILabel>(10);
+            this.templateParameter = new Dictionary<string, object>(10);
         }
+
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public abstract int GetResult();
+
+        /// <summary>
+        /// 表名
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public abstract void From(string table);
+
+        /// <summary>
+        /// as新表名
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public abstract void AsTable(string table);
+
+        /// <summary>
+        /// 入口
+        /// </summary>
+        public abstract DeleteContext<Parameter> Entrance();
+
+        /// <summary>
+        /// where
+        /// </summary>
+        public abstract UpdateContext<Parameter> Where();
+
+        /// <summary>
+        /// where
+        /// </summary>
+        public abstract UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression);
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public abstract UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public abstract UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public abstract UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public abstract UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public abstract UpdateContext<Parameter> Exists(AndOrOption option, string expression);
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public abstract UpdateContext<Parameter> NotExists(AndOrOption option, string expression);
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public abstract UpdateContext<Parameter> In(AndOrOption option, string expression);
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public abstract UpdateContext<Parameter> NotIn(AndOrOption option, string expression);
     }
 }

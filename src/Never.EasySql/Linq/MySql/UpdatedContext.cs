@@ -79,22 +79,20 @@ namespace Never.EasySql.Linq.MySql
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember>> expression)
+        public override Linq.UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
         {
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> SetColumWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
+        public override Linq.UpdateContext<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
         {
-            this.templateParameter.Add(this.FindColumnName(expression, this.tableInfo, out _), value);
-
+            this.templateParameter[this.FindColumnName(expression, this.tableInfo, out _)] = value;
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        public override Linq.UpdateContext<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
-            this.templateParameter.Add(this.FindColumnName(expression, this.tableInfo, out _), value);
-
+            this.templateParameter[this.FindColumnName(expression, this.tableInfo, out _)] = value;
             return this;
         }
 
@@ -104,11 +102,6 @@ namespace Never.EasySql.Linq.MySql
         }
 
         public override Linq.UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
-        {
-            return this;
-        }
-
-        protected override string Format(string text)
         {
             return this;
         }

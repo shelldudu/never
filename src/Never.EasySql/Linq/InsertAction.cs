@@ -1,0 +1,50 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Never.EasySql.Linq
+{
+    /// <summary>
+    /// 插入语法
+    /// </summary>
+    /// <typeparam name="Parameter"></typeparam>
+    public struct InsertAction<Parameter>
+    {
+        /// <summary>
+        /// 上下文
+        /// </summary>
+        internal InsertContext<Parameter> Context { get; set; }
+
+        /// <summary>
+        /// 从哪一张表插入
+        /// </summary>
+        public InsertAction<Parameter> From(string table)
+        {
+            this.Context.Into(table);
+            return this;
+        }
+
+        /// <summary>
+        /// 单条插入
+        /// </summary>
+        /// <returns></returns>
+        public InsertGrammar<Parameter> Single()
+        {
+            this.Context.Entrance('s');
+            return new InsertGrammar<Parameter>() { Context = this.Context };
+        }
+
+        /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <returns></returns>
+        public InsertGrammar<Parameter> Bulk()
+        {
+            this.Context.Entrance('b');
+            return new InsertGrammar<Parameter>() { Context = this.Context };
+        }
+    }
+}

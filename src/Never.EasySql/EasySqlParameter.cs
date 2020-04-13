@@ -169,7 +169,7 @@ namespace Never.EasySql
                         }
                         break;
 
-                    case System.Reflection.MemberTypes.TypeInfo:
+                    case System.Reflection.MemberTypes.Field:
                         {
                             try
                             {

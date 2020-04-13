@@ -1,4 +1,5 @@
-﻿using Never.Serialization.Json.Deserialize;
+﻿using Never.Serialization.Json;
+using Never.Serialization.Json.Deserialize;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.Serialization.Json
+namespace Never.Serialization
 {
     /// <summary>
     /// json节点对象

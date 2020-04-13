@@ -109,7 +109,7 @@ namespace Never.Serialization.Json.Serialize
         /// <param name="cepaSourceType">当前节点的非洋葱类型</param>
         protected virtual void BuildNotCepaType(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, Type cepaSourceType)
         {
-            if (this.BuildForJsonObjectModule(emit, setting, cepaSourceType))
+            if (this.BuildForJsonObject(emit, setting, cepaSourceType))
                 return;
 
             if (this.BuildForTypeModule(emit, setting, cepaSourceType))
@@ -1097,7 +1097,7 @@ namespace Never.Serialization.Json.Serialize
         /// <param name="emit">emit构建</param>
         /// <param name="setting">配置</param>
         /// <param name="sourceType">成员类型</param>
-        protected virtual bool BuildForJsonObjectModule(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, Type sourceType)
+        protected virtual bool BuildForJsonObject(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, Type sourceType)
         {
             if (!TypeHelper.IsAssignableFrom(sourceType, typeof(JsonObject)))
                 return false;

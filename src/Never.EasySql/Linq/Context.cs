@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Never.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -16,12 +17,17 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 二进制运算
         /// </summary>
-        protected struct BinaryExp
+        protected class BinaryExp
         {
             /// <summary>
             /// 左边
             /// </summary>
             public string Left;
+
+            /// <summary>
+            /// 左边是否常量
+            /// </summary>
+            public bool LeftIsConstant;
 
             /// <summary>
             /// 连接符
@@ -32,6 +38,34 @@ namespace Never.EasySql.Linq
             /// 右边
             /// </summary>
             public string Right;
+
+            /// <summary>
+            /// 右边是否常量
+            /// </summary>
+            public bool RightIsConstant;
+
+            /// <summary>
+            /// 返回字符串
+            /// </summary>
+            /// <returns></returns>
+            public override string ToString()
+            {
+                return string.Concat(this.Left ?? "", this.Join ?? "", this.Right ?? "");
+            }
+
+            /// <summary>
+            /// 返回字符串
+            /// </summary>
+            /// <param name="leftPlaceholder"></param>
+            /// <param name="rightPlaceholder"></param>
+            /// <returns></returns>
+            public string ToString(string leftPlaceholder, string rightPlaceholder)
+            {
+                return string.Concat(this.Left == null ? "" : (this.LeftIsConstant ? this.Left : string.Concat(leftPlaceholder, ".", Left)),
+                    this.Join ?? "",
+                    this.Right == null ? "" : (this.RightIsConstant ? this.Right : string.Concat(rightPlaceholder, ".", Right)));
+            }
+
         }
 
         /// <summary>
@@ -40,6 +74,19 @@ namespace Never.EasySql.Linq
         /// <param name="text"></param>
         /// <returns></returns>
         protected abstract string Format(string text);
+
+        /// <summary>
+        /// 查询table信息
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <returns></returns>
+        public static TableInfo GetTableInfo<Table>()
+        {
+            if (TableInfoProvider.TryUpdateTableInfo(typeof(Table), out var tableInfo))
+                return tableInfo;
+
+            throw new KeyNotExistedException("table", "table info not found");
+        }
 
         /// <summary>
         /// 对表达式的字段提取其名称
@@ -116,6 +163,27 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 查询字段名字
+        /// </summary>
+        /// <param name="memberInfo"></param>
+        /// <param name="tableInfo"></param>
+        /// <returns></returns>
+        protected virtual string FindColumnName(MemberInfo memberInfo, TableInfo tableInfo)
+        {
+            IEnumerable<TableInfo.ColumnInfo> column = tableInfo.Columns.Where(ta => ta.Member == memberInfo);
+            if (column.Any())
+            {
+                if (column.FirstOrDefault().Column != null)
+                {
+                    return column.FirstOrDefault().Column.Alias;
+                }
+
+                return column.FirstOrDefault().Member.Name;
+            }
+
+            return memberInfo.Name;
+        }
+        /// <summary>
         /// 查询tableName
         /// </summary>
         /// <param name="tableInfo"></param>
@@ -134,41 +202,187 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Parameter"></typeparam>
         /// <typeparam name="Table"></typeparam>
         /// <param name="expression"></param>
+        /// <param name="parameterTableInfo"></param>
+        /// <param name="tableInfo"></param>
         /// <param name="templateParameter"></param>
-        /// <param name="parameterCollection"></param>
-        protected virtual void Analyze<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, IDictionary<string, object> templateParameter, List<BinaryExp> parameterCollection)
+        /// <param name="whereCollection"></param>
+        protected virtual void Analyze<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, IDictionary<string, object> templateParameter, List<BinaryExp> whereCollection)
         {
             var binary = expression.Body as BinaryExpression;
             if (binary == null)
                 return;
 
-            var left = binary.Left;
-            var right = binary.Right;
+            this.Analyze(expression.Parameters[0].Name, typeof(Parameter), expression.Parameters[1].Name, typeof(Table), expression.Body, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+        }
+
+        /// <summary>
+        /// 分析表达式
+        /// </summary>
+        /// <param name="leftPlaceholder"></param>
+        /// <param name="leftType"></param>
+        /// <param name="rightPlaceholder"></param>
+        /// <param name="rightType"></param>
+        /// <param name="expression"></param>
+        /// <param name="parameterTableInfo"></param>
+        /// <param name="tableInfo"></param>
+        /// <param name="templateParameter"></param>
+        /// <param name="whereCollection"></param>
+        protected void Analyze(string leftPlaceholder, Type leftType, string rightPlaceholder, Type rightType, Expression expression, TableInfo parameterTableInfo, TableInfo tableInfo, IDictionary<string, object> templateParameter, List<BinaryExp> whereCollection)
+        {
+            var binary = expression as BinaryExpression;
+            if (binary == null)
+                return;
+
+            //是左边还是右边
+            int leftOrRight(Expression expression1)
+            {
+                if (expression1.Type == leftType || (expression1 is ParameterExpression && ((ParameterExpression)expression1).Name == leftPlaceholder))
+                    return 1;
+
+                if (expression1.Type == rightType || (expression1 is ParameterExpression && ((ParameterExpression)expression1).Name == rightPlaceholder))
+                    return -1;
+
+                return 0;
+            }
+
+            BinaryExp current = null;
+            if (binary.Left is BinaryExpression)
+            {
+                whereCollection.Add(new BinaryExp() { Join = "(" });
+                Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Left, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+                whereCollection.Add(new BinaryExp() { Join = ")" });
+            }
+            else
+            {
+                var memberExpress = binary.Left as MemberExpression;
+                var leftConfirm = false;
+                if (memberExpress != null)
+                {
+                    int isleftOrRight = leftOrRight(memberExpress.Expression);
+                    if (isleftOrRight == 1)
+                    {
+                        current = new BinaryExp()
+                        {
+                            Left = this.FindColumnName(memberExpress.Member, parameterTableInfo),
+                            LeftIsConstant = false,
+                        };
+                    }
+                    else if (isleftOrRight == -1)
+                    {
+                        current = new BinaryExp()
+                        {
+                            Right = this.FindColumnName(memberExpress.Member, tableInfo),
+                            LeftIsConstant = false,
+                        };
+                    }
+
+                    leftConfirm = true;
+                }
+
+                var constantExpress = binary.Left as ConstantExpression;
+                if (constantExpress != null)
+                {
+                    current = new BinaryExp()
+                    {
+                        Left = constantExpress.Value.ToString(),
+                        LeftIsConstant = true,
+                    };
+
+                    leftConfirm = true;
+                }
+
+                if (leftConfirm == false)
+                {
+                    throw new Exception("");
+                }
+            }
+
             switch (binary.NodeType)
             {
                 case ExpressionType.AndAlso:
                     {
-                        parameterCollection.Add(new BinaryExp() { Join = "and" });
+                        whereCollection.Add(new BinaryExp() { Join = "and" });
                     }
                     break;
                 case ExpressionType.OrElse:
                     {
-                        parameterCollection.Add(new BinaryExp() { Join = "or" });
+                        whereCollection.Add(new BinaryExp() { Join = "or" });
                     }
                     break;
-                case ExpressionType.Equal: 
+                case ExpressionType.LessThan:
                     {
-                    
-                    }break;
-                case ExpressionType.NotEqual: 
+                        current.Join = " < ";
+                    }
+                    break;
+                case ExpressionType.LessThanOrEqual:
                     {
-                    
-                    }break;
-                case ExpressionType.LessThan: 
+                        current.Join = " <= ";
+                    }
+                    break;
+                case ExpressionType.GreaterThanOrEqual:
                     {
-                    
-                    }break;
+                        current.Join = " >= ";
+                    }
+                    break;
+                case ExpressionType.GreaterThan:
+                    {
+                        current.Join = " > ";
+                    }
+                    break;
+                case ExpressionType.Equal:
+                    {
+                        current.Join = " = ";
+                    }
+                    break;
+                case ExpressionType.NotEqual:
+                    {
+                        current.Join = " != ";
+                    }
+                    break;
             }
+
+            if (binary.Right is BinaryExpression)
+            {
+                whereCollection.Add(new BinaryExp() { Join = "(" });
+                Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Right, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+                whereCollection.Add(new BinaryExp() { Join = ")" });
+            }
+            else
+            {
+                var memberExpress = binary.Right as MemberExpression;
+                var rightConfirm = false;
+                if (memberExpress != null)
+                {
+                    int isleftOrRight = leftOrRight(memberExpress.Expression);
+                    if (isleftOrRight == 1)
+                    {
+                        current.Right = this.FindColumnName(memberExpress.Member, parameterTableInfo);
+                        current.RightIsConstant = false;
+                    }
+                    else if (isleftOrRight == -1)
+                    {
+                        current.Right = this.FindColumnName(memberExpress.Member, tableInfo);
+                        current.RightIsConstant = false;
+                    }
+
+                    rightConfirm = true;
+                }
+
+                var constantExpress = binary.Right as ConstantExpression;
+                if (constantExpress != null)
+                {
+                    current.Right = constantExpress.Value.ToString();
+                    current.RightIsConstant = true;
+                    rightConfirm = true;
+                }
+
+                if (rightConfirm == false)
+                {
+                    throw new Exception("");
+                }
+            }
+
+            whereCollection.Add(current);
         }
     }
 }

@@ -43,12 +43,13 @@ namespace Never.Test
             //     .Where(null).ToList(1, 5).GetResult();
 
             //更新
-            var update = dao.ToEasyLinqDao(new MyTable()).Update()
+            var update = dao.ToEasyLinqDao(new MyTable()).Cached("AAA").Update().From("").As("")
                 .SetColum(m => m.Name)
-                .SetColumWithFunc(m => m.CreateTime, "now()")
-                .SetColumWithValue(m => m.Name, "abc")
+                .SetColumnWithFunc(m => m.CreateTime, "now()")
+                .SetColumnWithValue(m => m.Name, "abc")
                 .Where(p => p.Id)
-                .AndNotExists<MyTable2>((p, t) => t.Id == p.Id && p.Id >= t.Id)
+                //.AndNotExists<MyTable2>((p, t) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2)
+                .AndNotExists<MyTable2>((p, t) => p.Id > 0)
                 .AndNotIn<MyTable2>((p, t) => p.Id == t.Id, t => t.Name == "ee")
                 .GetResult();
 

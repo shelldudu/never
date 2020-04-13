@@ -8,28 +8,32 @@ using System.Threading.Tasks;
 namespace Never.EasySql.Linq
 {
     /// <summary>
-    /// 单个表的查询
+    /// 查询
     /// </summary>
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">查询结果对象</typeparam>
-    public struct Select<Parameter, Table>
+    public struct SelectGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
         internal SelectContext<Parameter, Table> Context { get; set; }
 
-        /// <summary>
-        /// 参数
-        /// </summary>
-        internal EasySqlParameter<Parameter> SqlParameter { get; set; }
-
         #region linq
 
         /// <summary>
+        /// 查询所有
+        /// </summary>
+        /// <returns></returns>
+        public SelectGrammar<Parameter, Table> Select(char @all = '*')
+        {
+            return this;
+        }
+
+        /// <summary>
         /// 字段名
         /// </summary>
-        public Select<Parameter, Table> SelectColum(Expression<Func<Table, object>> expression)
+        public SelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             return this;
         }
@@ -37,30 +41,8 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public Select<Parameter, Table> SelectColum(Expression<Func<Table, object>> expression, string asMemberName)
+        public SelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
-            return this;
-        }
-
-        /// <summary>
-        /// 新的表名，可以不用<typeparamref name="Table"/>里的表名
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public Select<Parameter, Table> From(string tableName)
-        {
-            this.Context.From(tableName);
-            return this;
-        }
-
-        /// <summary>
-        /// as新的表名 
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public Select<Parameter, Table> As(string tableName)
-        {
-            this.Context.AsTable(tableName);
             return this;
         }
 
@@ -68,7 +50,7 @@ namespace Never.EasySql.Linq
         /// join
         /// </summary>
         /// <param name="on"></param>
-        public Select<Parameter, Table> Join<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        public SelectGrammar<Parameter, Table> Join<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -77,7 +59,7 @@ namespace Never.EasySql.Linq
         /// left join
         /// </summary>
         /// <param name="on"></param>
-        public Select<Parameter, Table> LeftJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        public SelectGrammar<Parameter, Table> LeftJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -86,7 +68,7 @@ namespace Never.EasySql.Linq
         /// right join
         /// </summary>
         /// <param name="on"></param>
-        public Select<Parameter, Table> RightJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        public SelectGrammar<Parameter, Table> RightJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -95,7 +77,7 @@ namespace Never.EasySql.Linq
         /// inner join
         /// </summary>
         /// <param name="on"></param>
-        public Select<Parameter, Table> InnerJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
+        public SelectGrammar<Parameter, Table> InnerJoin<T2>(Expression<Func<Parameter, Table, T2, object>> on)
         {
             return this;
         }
@@ -152,7 +134,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// select
             /// </summary>
-            internal Select<NParameter, NTable> crud;
+            internal SelectGrammar<NParameter, NTable> crud;
 
             /// <summary>
             /// 返回执行结果
@@ -174,7 +156,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// select
             /// </summary>
-            internal Select<NParameter, NT> select;
+            internal SelectGrammar<NParameter, NT> select;
 
             /// <summary>
             /// 返回执行结果
@@ -182,7 +164,7 @@ namespace Never.EasySql.Linq
             public NT GetResult()
             {
                 return default(NT);
-               // return this.select.dao.QueryForObject<NT, NParameter>(this.select.Build(), select.sqlParameter);
+                // return this.select.dao.QueryForObject<NT, NParameter>(this.select.Build(), select.sqlParameter);
             }
         }
 
@@ -196,7 +178,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// select
             /// </summary>
-            internal Select<NParameter, NT> select;
+            internal SelectGrammar<NParameter, NT> select;
 
             /// <summary>
             /// 返回数组
@@ -206,7 +188,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public NToList<NParameter, NT> ToList(int pageNow, int pageSize)
             {
-               // this.select.paged = new PagedSearch(pageNow, pageSize);
+                // this.select.paged = new PagedSearch(pageNow, pageSize);
                 return new NToList<NParameter, NT>()
                 {
                     crud = this.select,
@@ -379,14 +361,14 @@ namespace Never.EasySql.Linq
                 var model = expression.Body as ParameterExpression;
                 if (model != null)
                 {
-                   // this.select.orderby.Add(string.Concat(model.Name, " asc"));
+                    // this.select.orderby.Add(string.Concat(model.Name, " asc"));
                     return this;
                 }
 
                 var member = expression.Body as MemberExpression;
                 if (member != null)
                 {
-                   // this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
+                    // this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
                     return this;
                 }
 
@@ -396,7 +378,7 @@ namespace Never.EasySql.Linq
                     member = unary.Operand as MemberExpression;
                     if (member != null)
                     {
-                       // this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
+                        // this.select.orderby.Add(string.Concat(member.Member.Name, " asc"));
                         return this;
                     }
                 }
@@ -414,14 +396,14 @@ namespace Never.EasySql.Linq
                 var model = expression.Body as ParameterExpression;
                 if (model != null)
                 {
-                   // this.select.orderby.Add(string.Concat(model.Name, " desc"));
+                    // this.select.orderby.Add(string.Concat(model.Name, " desc"));
                     return this;
                 }
 
                 var member = expression.Body as MemberExpression;
                 if (member != null)
                 {
-                   // this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
+                    // this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
                     return this;
                 }
 
@@ -431,7 +413,7 @@ namespace Never.EasySql.Linq
                     member = unary.Operand as MemberExpression;
                     if (member != null)
                     {
-                      //  this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
+                        //  this.select.orderby.Add(string.Concat(member.Member.Name, " desc"));
                         return this;
                     }
                 }

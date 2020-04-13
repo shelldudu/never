@@ -423,20 +423,6 @@ namespace Never.Serialization.Json.Serialize
         #region json object
         public static void WriteJsonObject(ISerializerWriter writer, JsonSerializeSetting setting, JsonObject jsonObject)
         {
-            if (jsonObject == null)
-            {
-                if (setting.WriteNullWhenObjectIsNull)
-                {
-                    writer.Write("null");
-                }
-                else
-                {
-                    writer.Write("{}");
-                }
-
-                return;
-            }
-
             writer.Write(jsonObject.ToJsonString());
         }
         #endregion

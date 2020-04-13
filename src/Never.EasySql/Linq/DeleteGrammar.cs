@@ -8,51 +8,14 @@ using System.Threading.Tasks;
 namespace Never.EasySql.Linq
 {
     /// <summary>
-    /// 更新操作
+    /// delete语法
     /// </summary>
-    /// <typeparam name="Parameter"></typeparam>
-    public struct Update<Parameter>
+    public struct DeleteGrammar<Parameter>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal UpdateContext<Parameter> Context { get; set; }
-
-        /// <summary>
-        /// 更新的字段名
-        /// </summary>
-        public Update<Parameter> As(string table)
-        {
-            this.Context.AsTable(table);
-            return this;
-        }
-
-        /// <summary>
-        /// 更新的字段名
-        /// </summary>
-        public Update<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember>> expression)
-        {
-            this.Context.SetColum<TMember>(expression);
-            return this;
-        }
-
-        /// <summary>
-        /// 更新的字段名
-        /// </summary>
-        public Update<Parameter> SetColumWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
-        {
-            this.Context.SetColumWithFunc<TMember>(expression, value);
-            return this;
-        }
-
-        /// <summary>
-        /// 更新的字段名
-        /// </summary>
-        public Update<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
-        {
-            this.Context.SetColumWithValue<TMember>(expression, value);
-            return this;
-        }
+        internal DeleteContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 获取结果
@@ -89,7 +52,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 
             /// </summary>
-            internal Update<NParameter> crud;
+            internal DeleteGrammar<NParameter> crud;
 
             /// <summary>
             /// 存在

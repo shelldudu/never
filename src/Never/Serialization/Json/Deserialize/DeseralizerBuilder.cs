@@ -108,7 +108,7 @@ namespace Never.Serialization.Json.Deserialize
         protected virtual void BuildNotCepaType(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, Type cepaSourceType)
         {
             /*jsonobject*/
-            if (this.BuildForJsonObjectModule(emit, cepaSourceType))
+            if (this.BuildForJsonObject(emit, cepaSourceType))
                 return;
 
             /*type*/
@@ -2008,25 +2008,6 @@ namespace Never.Serialization.Json.Deserialize
             return true;
         }
 
-        /// <summary>
-        /// 构建JsonObject
-        /// </summary>
-        /// <param name="emit"></param>
-        /// <param name="memberType"></param>
-        /// <returns></returns>
-        protected virtual bool BuildForJsonObjectModule(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, Type memberType)
-        {
-            if (!this.IsAssignableFrom(memberType, typeof(JsonObject)))
-                return false;
-
-            emit.LoadArgument(0);
-            emit.LoadArgument(1);
-            emit.LoadNull();
-            emit.Call(DeseralizerBuilderHelper.GetExceptionParseMethod(memberType));
-            emit.Nop();
-
-            return true;
-        }
 
         /// <summary>
         /// 构建Type
@@ -2079,6 +2060,7 @@ namespace Never.Serialization.Json.Deserialize
 
             return true;
         }
+
 
         /// <summary>
         /// 构建Type
