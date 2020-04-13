@@ -15,7 +15,6 @@ namespace Never.Serialization.Json
     {
         #region field and ctor
         private readonly string json;
-        private readonly IList<JsonContentNode> nodes;
         private readonly IDeserializerReader reader;
 
         /// <summary>
@@ -26,7 +25,6 @@ namespace Never.Serialization.Json
         {
             this.json = json;
             this.reader = new ThunderReader(json);
-            this.nodes = ((ThunderReader)reader).AnalyzeNode();
         }
 
         /// <summary>
@@ -45,17 +43,15 @@ namespace Never.Serialization.Json
         {
             this.json = node.ToString();
             this.reader = ThunderReader.Load(node);
-            this.nodes = ((ThunderReader)reader).AnalyzeNode();
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="reader"></param>
-        internal JsonObject(ThunderReader reader)
+        internal JsonObject(IDeserializerReader reader)
         {
             this.reader = reader;
-            this.nodes = reader.AnalyzeNode();
             this.json = reader.ToString();
         }
 

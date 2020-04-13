@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 
     /// </summary>
-    public sealed class UpdateContext<Parameter> : Linq.UpdateContext<Parameter>
+    public class UpdateContext<Parameter> : Linq.UpdateContext<Parameter>
     {
         private LinqSqlTag sqlTag;
         private int textLength;
@@ -33,15 +33,7 @@ namespace Never.EasySql.Linq.MySql
             this.labels.Add(new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, " set") });
         }
 
-        public override Linq.UpdateContext<Parameter> Exists<T1>(AndOrOption option, Expression<Func<Parameter, T1, bool>> expression)
-        {
-            throw new NotImplementedException();
-        }
 
-        public override Linq.UpdateContext<Parameter> Exists(AndOrOption option, string expression)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// 
@@ -83,90 +75,13 @@ namespace Never.EasySql.Linq.MySql
             ((BaseLabel)this.labels[0]).SqlText = string.Concat("update ", this.Format(this.tableName), " as ", table, " set");
         }
 
-        public override Linq.UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Linq.UpdateContext<Parameter> In(AndOrOption option, string expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Linq.UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression)
-        {
-            var tableInfo = EasyDecoratedLinqDao<Parameter>.GetTableInfo<Table>(string.Empty);
-            var binary = expression.Body as System.Linq.Expressions.BinaryExpression;
-            if (binary != null)
-            {
-                switch (binary.NodeType) 
-                {
-                    case ExpressionType.Equal: 
-                        {
-                            
-                        }break;
-                    case ExpressionType.NotEqual: 
-                        {
-                        
-                        }break;
-                }
-                var left = binary.Left;
-                var right = binary.Right;
-                
-            }
-
-            //string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
-            string columnName = null;
-            var label = new TextLabel()
-            {
-                TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", "not exists(select 0 from a where a.Id = ", this.Format(columnName), ".Id", columnName),
-            };
-
-            label.Add(new SqlTagParameterPosition()
-            {
-                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                Name = columnName,
-                PositionLength = 6 + columnName.Length,
-                PrefixStart = 6 + columnName.Length + 2 + 3,
-                StartPosition = 6 + columnName.Length + 2 + 3,
-                StopPosition = 6 + columnName.Length,
-                TextParameter = false,
-            });
-
-            this.labels.Add(label);
-            return this;
-        }
-
-        public override Linq.UpdateContext<Parameter> NotExists(AndOrOption option, string expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Linq.UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Linq.UpdateContext<Parameter> NotIn(AndOrOption option, string expression)
-        {
-            var label = new TextLabel()
-            {
-                TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
-            };
-
-            this.labels.Add(label);
-            return this;
-        }
-
-        public override Linq.UpdateContext<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember>> expression)
-        {
-            string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
-            return this.SetColum(columnName, expression);
-        }
-
+        /// <summary>
+        /// 更新字段名
+        /// </summary>
+        /// <typeparam name="TMember"></typeparam>
+        /// <param name="columnName"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public Linq.UpdateContext<Parameter> SetColum<TMember>(string columnName, Expression<Func<Parameter, TMember>> expression)
         {
             var label = new TextLabel()
@@ -191,6 +106,12 @@ namespace Never.EasySql.Linq.MySql
             return this;
         }
 
+        public override Linq.UpdateContext<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember>> expression)
+        {
+            string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
+            return this.SetColum(columnName, expression);
+        }
+
         public override Linq.UpdateContext<Parameter> SetColumWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out _);
@@ -198,7 +119,7 @@ namespace Never.EasySql.Linq.MySql
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(this.Format(columnName), " = '", value, "'"),
+                SqlText = string.Concat(this.Format(columnName), " = ", value),
             };
 
             label.Add(new SqlTagParameterPosition()
@@ -222,6 +143,38 @@ namespace Never.EasySql.Linq.MySql
             this.templateParameter.Add(columnName, value);
             return this.SetColum(columnName, expression);
         }
+
+
+        public override Linq.UpdateContext<Parameter> In(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq.UpdateContext<Parameter> NotIn(AndOrOption option, string expression)
+        {
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
+            };
+
+            this.labels.Add(label);
+            return this;
+        }
+
+
+        public override Linq.UpdateContext<Parameter> Exists(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq.UpdateContext<Parameter> NotExists(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
 
         public override Linq.UpdateContext<Parameter> Where()
         {
@@ -257,6 +210,69 @@ namespace Never.EasySql.Linq.MySql
 
             this.labels.Add(label);
             return this;
+        }
+
+        public override Linq.UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        {
+            var tableInfo = EasyDecoratedLinqDao<Parameter>.GetTableInfo<Table>();
+            var binary = expression.Body as System.Linq.Expressions.BinaryExpression;
+            if (binary != null)
+            {
+                switch (binary.NodeType)
+                {
+                    case ExpressionType.Equal:
+                        {
+
+                        }
+                        break;
+                    case ExpressionType.NotEqual:
+                        {
+
+                        }
+                        break;
+                }
+                var left = binary.Left;
+                var right = binary.Right;
+
+            }
+
+            //string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
+            string columnName = null;
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", "not exists(select 0 from a where a.Id = ", this.Format(columnName), ".Id", columnName),
+            };
+
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = columnName,
+                PositionLength = 6 + columnName.Length,
+                PrefixStart = 6 + columnName.Length + 2 + 3,
+                StartPosition = 6 + columnName.Length + 2 + 3,
+                StopPosition = 6 + columnName.Length,
+                TextParameter = false,
+            });
+
+            this.labels.Add(label);
+            return this;
+        }
+
+        public override Linq.UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq.UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq.UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        {
+            throw new NotImplementedException();
         }
     }
 }

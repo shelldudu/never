@@ -107,6 +107,10 @@ namespace Never.Serialization.Json.Deserialize
         /// <param name="cepaSourceType">当前节点的非洋葱类型</param>
         protected virtual void BuildNotCepaType(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, Type cepaSourceType)
         {
+            /*jsonobject*/
+            if (this.BuildForJsonObjectModule(emit, cepaSourceType))
+                return;
+
             /*type*/
             if (this.BuildForTypeModule(emit, cepaSourceType))
                 return;
@@ -2005,6 +2009,26 @@ namespace Never.Serialization.Json.Deserialize
         }
 
         /// <summary>
+        /// 构建JsonObject
+        /// </summary>
+        /// <param name="emit"></param>
+        /// <param name="memberType"></param>
+        /// <returns></returns>
+        protected virtual bool BuildForJsonObjectModule(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, Type memberType)
+        {
+            if (!this.IsAssignableFrom(memberType, typeof(JsonObject)))
+                return false;
+
+            emit.LoadArgument(0);
+            emit.LoadArgument(1);
+            emit.LoadNull();
+            emit.Call(DeseralizerBuilderHelper.GetExceptionParseMethod(memberType));
+            emit.Nop();
+
+            return true;
+        }
+
+        /// <summary>
         /// 构建Type
         /// </summary>
         /// <param name="emit"></param>
@@ -2020,38 +2044,6 @@ namespace Never.Serialization.Json.Deserialize
             emit.LoadNull();
             emit.Call(DeseralizerBuilderHelper.GetParseMethod(memberType));
             emit.Nop();
-
-            return true;
-        }
-
-        /// <summary>
-        /// 构建Type
-        /// </summary>
-        /// <param name="emit"></param>
-        /// <param name="instanceLocal"></param>
-        /// <param name="sourceType"></param>
-        /// <param name="member"></param>
-        /// <param name="memberType"></param>
-        /// <param name="memberAttributes"></param>
-        /// <returns></returns>
-        protected virtual bool BuildForJsonObject(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, ILocal instanceLocal, Type sourceType, MemberInfo member, Type memberType, Attribute[] memberAttributes)
-        {
-            if (memberType != typeof(JsonObject))
-                return false;
-
-            if (sourceType.IsValueType)
-                emit.LoadLocalAddress(instanceLocal);
-            else
-                emit.LoadLocal(instanceLocal);
-
-            emit.LoadArgument(0);
-            emit.LoadArgument(1);
-            emit.LoadConstant(this.LoadNotNullMemberName(member, memberAttributes));
-            emit.Call(DeseralizerBuilderHelper.GetParseMethod(memberType));
-            if (member.MemberType == MemberTypes.Property)
-                emit.Call(((PropertyInfo)member).GetSetMethod(true));
-            else
-                emit.StoreField((FieldInfo)member);
 
             return true;
         }
@@ -2087,6 +2079,65 @@ namespace Never.Serialization.Json.Deserialize
 
             return true;
         }
+
+        /// <summary>
+        /// 构建Type
+        /// </summary>
+        /// <param name="emit"></param>
+        /// <param name="memberType"></param>
+        /// <returns></returns>
+        protected virtual bool BuildForJsonObject(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, Type memberType)
+        {
+            if (memberType != typeof(JsonObject))
+                return false;
+
+            var ctors = typeof(JsonObject).GetConstructors();
+            foreach (var ctor in ctors)
+            {
+                if (ctor.IsPublic == false && ctor.GetParameters()[0].ParameterType == typeof(IDeserializerReader))
+                {
+                    emit.LoadArgument(0);
+                    emit.NewObject(ctor);
+                    emit.Nop();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 构建jsonObject
+        /// </summary>
+        /// <param name="emit"></param>
+        /// <param name="instanceLocal"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="member"></param>
+        /// <param name="memberType"></param>
+        /// <param name="memberAttributes"></param>
+        /// <returns></returns>
+        protected virtual bool BuildForJsonObject(EasyEmitBuilder<Func<IDeserializerReader, JsonDeserializeSetting, int, T>> emit, ILocal instanceLocal, Type sourceType, MemberInfo member, Type memberType, Attribute[] memberAttributes)
+        {
+            if (memberType != typeof(JsonObject))
+                return false;
+
+            if (sourceType.IsValueType)
+                emit.LoadLocalAddress(instanceLocal);
+            else
+                emit.LoadLocal(instanceLocal);
+
+            emit.LoadArgument(0);
+            emit.LoadArgument(1);
+            emit.LoadConstant(this.LoadNotNullMemberName(member, memberAttributes));
+            emit.Call(DeseralizerBuilderHelper.GetParseMethod(memberType));
+            if (member.MemberType == MemberTypes.Property)
+                emit.Call(((PropertyInfo)member).GetSetMethod(true));
+            else
+                emit.StoreField((FieldInfo)member);
+
+            return true;
+        }
+
 
         /// <summary>
         /// 构建Type

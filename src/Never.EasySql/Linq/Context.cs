@@ -14,6 +14,27 @@ namespace Never.EasySql.Linq
     public abstract class Context
     {
         /// <summary>
+        /// 二进制运算
+        /// </summary>
+        protected struct BinaryExp
+        {
+            /// <summary>
+            /// 左边
+            /// </summary>
+            public string Left;
+
+            /// <summary>
+            /// 连接符
+            /// </summary>
+            public string Join;
+
+            /// <summary>
+            /// 右边
+            /// </summary>
+            public string Right;
+        }
+
+        /// <summary>
         /// 对字段格式化
         /// </summary>
         /// <param name="text"></param>
@@ -105,6 +126,49 @@ namespace Never.EasySql.Linq
                 return tableInfo.TableName.Name;
 
             return typeof(Parameter).Name;
+        }
+
+        /// <summary>
+        /// 分析语句
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="templateParameter"></param>
+        /// <param name="parameterCollection"></param>
+        protected virtual void Analyze<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, IDictionary<string, object> templateParameter, List<BinaryExp> parameterCollection)
+        {
+            var binary = expression.Body as BinaryExpression;
+            if (binary == null)
+                return;
+
+            var left = binary.Left;
+            var right = binary.Right;
+            switch (binary.NodeType)
+            {
+                case ExpressionType.AndAlso:
+                    {
+                        parameterCollection.Add(new BinaryExp() { Join = "and" });
+                    }
+                    break;
+                case ExpressionType.OrElse:
+                    {
+                        parameterCollection.Add(new BinaryExp() { Join = "or" });
+                    }
+                    break;
+                case ExpressionType.Equal: 
+                    {
+                    
+                    }break;
+                case ExpressionType.NotEqual: 
+                    {
+                    
+                    }break;
+                case ExpressionType.LessThan: 
+                    {
+                    
+                    }break;
+            }
         }
     }
 }

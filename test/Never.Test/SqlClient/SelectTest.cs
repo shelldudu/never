@@ -49,7 +49,7 @@ namespace Never.Test
                 .SetColumWithValue(m => m.Name, "abc")
                 .Where(p => p.Id)
                 .AndNotExists<MyTable2>((p, t) => t.Id == p.Id && p.Id >= t.Id)
-                .AndNotIn<MyTable2>((p, t) => t.Id == p.Id && p.Id >= t.Id)
+                .AndNotIn<MyTable2>((p, t) => p.Id == t.Id, t => t.Name == "ee")
                 .GetResult();
 
             return;

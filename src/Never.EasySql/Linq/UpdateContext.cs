@@ -139,12 +139,12 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, object>> source, Expression<Func<Table, object>> target, Expression<Func<Table, bool>> where);
+        public abstract UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
 
         /// <summary>
         /// 不存在
         /// </summary>
-        public abstract UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, object>> source, Expression<Func<Table, object>> target, Expression<Func<Table, bool>> where);
+        public abstract UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
 
         /// <summary>
         /// 存在

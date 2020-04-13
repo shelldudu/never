@@ -10,7 +10,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 
     /// </summary>
-    public sealed class UpdatedContext<Parameter> : Linq.UpdateContext<Parameter>
+    public sealed class UpdatedContext<Parameter> : UpdateContext<Parameter>
     {
         /// <summary>
         /// 
@@ -24,7 +24,7 @@ namespace Never.EasySql.Linq.MySql
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        public UpdatedContext(LinqSqlTag sqlTag, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(dao, tableInfo, sqlParameter)
+        public UpdatedContext(LinqSqlTag sqlTag, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(sqlTag.Id, dao, tableInfo, sqlParameter)
         {
             this.sqlTag = sqlTag;
         }
@@ -34,7 +34,7 @@ namespace Never.EasySql.Linq.MySql
             return;
         }
 
-        public override Linq.UpdateContext<Parameter> Exists<T1>(AndOrOption option, Expression<Func<Parameter, T1, bool>> expression)
+        public override Linq.UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
             return this;
         }
@@ -49,7 +49,7 @@ namespace Never.EasySql.Linq.MySql
             return this.Execute(this.sqlTag, this.dao, this.sqlParameter);
         }
 
-        public override Linq.UpdateContext<Parameter> In<T1>(AndOrOption option, Expression<Func<Parameter, T1, bool>> expression)
+        public override Linq.UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
             return this;
         }
@@ -59,7 +59,7 @@ namespace Never.EasySql.Linq.MySql
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> NotExists<T1>(AndOrOption option, Expression<Func<Parameter, T1, bool>> expression)
+        public override Linq.UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
             return this;
         }
@@ -69,7 +69,7 @@ namespace Never.EasySql.Linq.MySql
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> NotIn<T1>(AndOrOption option, Expression<Func<Parameter, T1, bool>> expression)
+        public override Linq.UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
             return this;
         }
@@ -87,12 +87,14 @@ namespace Never.EasySql.Linq.MySql
         public override Linq.UpdateContext<Parameter> SetColumWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
         {
             this.templateParameter.Add(this.FindColumnName(expression, this.tableInfo, out _), value);
+
             return this;
         }
 
         public override Linq.UpdateContext<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
             this.templateParameter.Add(this.FindColumnName(expression, this.tableInfo, out _), value);
+
             return this;
         }
 
@@ -108,7 +110,7 @@ namespace Never.EasySql.Linq.MySql
 
         protected override string Format(string text)
         {
-            return text;
+            return this;
         }
     }
 }

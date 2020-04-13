@@ -109,6 +109,9 @@ namespace Never.Serialization.Json.Serialize
         /// <param name="cepaSourceType">当前节点的非洋葱类型</param>
         protected virtual void BuildNotCepaType(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, Type cepaSourceType)
         {
+            if (this.BuildForJsonObjectModule(emit, setting, cepaSourceType))
+                return;
+
             if (this.BuildForTypeModule(emit, setting, cepaSourceType))
                 return;
 
@@ -611,77 +614,6 @@ namespace Never.Serialization.Json.Serialize
             };
         }
 
-
-        protected virtual bool BuildForJsonObjectModule(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, ILocal instanceLocal, Type sourceType, MemberInfo member, Type memberType, Attribute[] attributes)
-        {
-            if (memberType != typeof(JsonObject))
-                return false;
-
-            this.WriteMemberName(emit, setting, member, attributes);
-            this.WriteColon(emit, setting);
-            ILabel returnLbl = null;
-            ILabel nullableLbel = null;
-            if (instanceLocal == null)
-            {
-                if (sourceType.IsValueType)
-                    emit.LoadArgumentAddress(2);
-                else
-                    emit.LoadArgument(2);
-            }
-            else
-            {
-                if (sourceType.IsValueType)
-                    emit.LoadLocalAddress(instanceLocal);
-                else
-                    emit.LoadLocal(instanceLocal);                             // @object
-            }
-
-            if (member.MemberType == MemberTypes.Property)             // @object.get_item()
-                emit.Call(((PropertyInfo)member).GetGetMethod(true));
-            else
-                emit.LoadField(((FieldInfo)member));
-
-            emit.LoadNull();
-            emit.CompareGreaterThan();
-            /*null*/
-            emit.BranchIfFalse(nullableLbel);
-            emit.LoadArgument(0);
-            emit.LoadArgument(1);
-            if (instanceLocal == null)
-            {
-                if (sourceType.IsValueType)
-                    emit.LoadArgumentAddress(2);
-                else
-                    emit.LoadArgument(2);
-            }
-            else
-            {
-                if (sourceType.IsValueType)
-                    emit.LoadLocalAddress(instanceLocal);
-                else
-                    emit.LoadLocal(instanceLocal);                             // @object
-            }
-            if (member.MemberType == MemberTypes.Property)             // @object.get_item()
-                emit.Call(((PropertyInfo)member).GetGetMethod(true));
-            else
-                emit.LoadField(((FieldInfo)member));
-
-            emit.LoadArgument(3);
-            emit.Call(typeof(ParseMethodProviderEngrafting).GetMethod("WriteJsonObject", new[] { typeof(ISerializerWriter), typeof(JsonSerializeSetting), typeof(IEnumerable), typeof(byte) }));
-            emit.Branch(returnLbl);
-
-            emit.MarkLabel(nullableLbel);
-            if (setting.WriteNullWhenObjectIsNull)
-                this.WriteNull(emit, setting);
-            else
-                this.WriteObjectSigil(emit, setting);
-            emit.Branch(returnLbl);
-            emit.MarkLabel(returnLbl);
-            emit.Nop();
-
-            return true;
-        }
-
         /// <summary>
         /// 构建数组模块
         /// </summary>
@@ -1157,6 +1089,116 @@ namespace Never.Serialization.Json.Serialize
 
                 return true;
             };
+        }
+
+        /// <summary>
+        /// 构建JsonObject模块
+        /// </summary>
+        /// <param name="emit">emit构建</param>
+        /// <param name="setting">配置</param>
+        /// <param name="sourceType">成员类型</param>
+        protected virtual bool BuildForJsonObjectModule(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, Type sourceType)
+        {
+            if (!TypeHelper.IsAssignableFrom(sourceType, typeof(JsonObject)))
+                return false;
+
+            var returnLbl = emit.DefineLabel();
+            var nullableLbel = emit.DefineLabel();
+            emit.LoadArgument(2);
+            emit.LoadNull();
+            emit.CompareGreaterThan();
+            /*null*/
+            emit.BranchIfFalse(nullableLbel);
+
+            emit.LoadArgument(0);
+            emit.LoadArgument(1);
+            emit.LoadArgument(2);
+            emit.Call(typeof(ParseMethodProviderEngrafting).GetMethod("WriteJsonObject", new[] { typeof(ISerializerWriter), typeof(JsonSerializeSetting), typeof(IEnumerable), typeof(byte) }));
+            emit.Branch(returnLbl);
+            emit.MarkLabel(nullableLbel);
+            if (setting.WriteNullWhenObjectIsNull)
+                this.WriteNull(emit, setting);
+            else
+                this.WriteObjectSigil(emit, setting);
+            emit.Branch(returnLbl);
+            emit.MarkLabel(returnLbl);
+            emit.Nop();
+            return true;
+        }
+
+        /// <summary>
+        /// 构建JsonObject模块
+        /// </summary>
+        /// <param name="emit">emit构建</param>
+        /// <param name="setting">配置</param>
+        /// <param name="memberType">成员类型</param>
+        protected virtual bool BuildForJsonObjectModule(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, ILocal instanceLocal, Type sourceType, MemberInfo member, Type memberType, Attribute[] attributes)
+        {
+            if (memberType != typeof(JsonObject))
+                return false;
+
+            this.WriteMemberName(emit, setting, member, attributes);
+            this.WriteColon(emit, setting);
+            ILabel returnLbl = null;
+            ILabel nullableLbel = null;
+            if (instanceLocal == null)
+            {
+                if (sourceType.IsValueType)
+                    emit.LoadArgumentAddress(2);
+                else
+                    emit.LoadArgument(2);
+            }
+            else
+            {
+                if (sourceType.IsValueType)
+                    emit.LoadLocalAddress(instanceLocal);
+                else
+                    emit.LoadLocal(instanceLocal);                             // @object
+            }
+
+            if (member.MemberType == MemberTypes.Property)             // @object.get_item()
+                emit.Call(((PropertyInfo)member).GetGetMethod(true));
+            else
+                emit.LoadField(((FieldInfo)member));
+
+            emit.LoadNull();
+            emit.CompareGreaterThan();
+            /*null*/
+            emit.BranchIfFalse(nullableLbel);
+            emit.LoadArgument(0);
+            emit.LoadArgument(1);
+            if (instanceLocal == null)
+            {
+                if (sourceType.IsValueType)
+                    emit.LoadArgumentAddress(2);
+                else
+                    emit.LoadArgument(2);
+            }
+            else
+            {
+                if (sourceType.IsValueType)
+                    emit.LoadLocalAddress(instanceLocal);
+                else
+                    emit.LoadLocal(instanceLocal);                             // @object
+            }
+            if (member.MemberType == MemberTypes.Property)             // @object.get_item()
+                emit.Call(((PropertyInfo)member).GetGetMethod(true));
+            else
+                emit.LoadField(((FieldInfo)member));
+
+            emit.Call(typeof(ParseMethodProviderEngrafting).GetMethod("WriteJsonObject", new[] { typeof(ISerializerWriter), typeof(JsonSerializeSetting), typeof(IEnumerable) }));
+            emit.Branch(returnLbl);
+
+            emit.MarkLabel(nullableLbel);
+            if (setting.WriteNullWhenObjectIsNull)
+                this.WriteNull(emit, setting);
+            else
+                this.WriteObjectSigil(emit, setting);
+            emit.Branch(returnLbl);
+            emit.MarkLabel(returnLbl);
+            emit.Nop();
+
+            return true;
         }
 
         /// <summary>

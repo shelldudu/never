@@ -47,6 +47,15 @@ namespace Never.Serialization.Json.Deserialize
 
         #endregion type
 
+        #region jsonobject
+
+        public static JsonObject TypeJsonObject(IDeserializerReader reader, JsonDeserializeSetting setting, string name)
+        {
+            return new JsonObject(reader.Read(name));
+        }
+
+        #endregion type
+
         #region bool
 
         public static bool BoolParse(IDeserializerReader reader, JsonDeserializeSetting setting, string name)

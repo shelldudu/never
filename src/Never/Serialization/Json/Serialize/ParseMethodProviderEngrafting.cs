@@ -417,7 +417,11 @@ namespace Never.Serialization.Json.Serialize
             ObjectEnumerableProvider.Default.Write(writer, setting, level, array);
         }
 
-        public static void WriteJsonObject(ISerializerWriter writer, JsonSerializeSetting setting, JsonObject jsonObject, byte level)
+
+        #endregion array complex
+
+        #region json object
+        public static void WriteJsonObject(ISerializerWriter writer, JsonSerializeSetting setting, JsonObject jsonObject)
         {
             if (jsonObject == null)
             {
@@ -435,8 +439,7 @@ namespace Never.Serialization.Json.Serialize
 
             writer.Write(jsonObject.ToJsonString());
         }
-
-        #endregion array complex
+        #endregion
 
         #region key value
 

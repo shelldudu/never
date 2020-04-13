@@ -64,7 +64,7 @@ namespace Never.Serialization.Json.Serialize
         public Action<ISerializerWriter, JsonSerializeSetting, T, byte> Build(JsonSerializeSetting setting)
         {
             var emit = EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>>.NewDynamicMethod();
-            if (!IsComplexType(this.TargetType) || this.IsType(this.TargetType) || this.IsAssignableFrom(this.TargetType, typeof(Exception)))
+            if (!IsComplexType(this.TargetType) || this.IsType(this.TargetType) || this.IsAssignableFrom(this.TargetType, typeof(Exception)) || this.IsAssignableFrom(this.TargetType, typeof(JsonObject)))
             {
                 this.BuildNotCepaType(emit, setting, this.TargetType);
                 emit.Return();

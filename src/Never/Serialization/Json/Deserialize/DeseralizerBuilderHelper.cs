@@ -50,6 +50,7 @@ namespace Never.Serialization.Json.Deserialize
             definedWriteMethodDict[typeof(uint)] = methodProvideEngrafting.GetMethod("UInt32Parse", new[] { typeof(IDeserializerReader), typeof(JsonDeserializeSetting), typeof(string) });
             definedWriteMethodDict[typeof(ulong)] = methodProvideEngrafting.GetMethod("UInt64Parse", new[] { typeof(IDeserializerReader), typeof(JsonDeserializeSetting), typeof(string) });
             definedWriteMethodDict[typeof(Type)] = methodProvideEngrafting.GetMethod("TypeParse", new[] { typeof(IDeserializerReader), typeof(JsonDeserializeSetting), typeof(string) });
+            definedWriteMethodDict[typeof(JsonObject)] = methodProvideEngrafting.GetMethod("TypeJsonObject", new[] { typeof(IDeserializerReader), typeof(JsonDeserializeSetting), typeof(string) });
             definedWriteMethodDict[typeof(TimeSpan)] = methodProvideEngrafting.GetMethod("TimeSpanParse", new[] { typeof(IDeserializerReader), typeof(JsonDeserializeSetting), typeof(string) });
 
             var nullableMethodProvideEngrafting = typeof(NullableParseMethodProviderEngrafting);

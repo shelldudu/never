@@ -122,25 +122,9 @@ namespace Never.EasySql
         /// </summary>
         /// <typeparam name="Table"></typeparam>
         /// <returns></returns>
-        public TableInfo GetTableInfo<Table>()
+        public static TableInfo GetTableInfo<Table>()
         {
-            return GetTableInfo<Table>(this.cacheId);
-        }
-
-        /// <summary>
-        /// 查询table信息
-        /// </summary>
-        /// <typeparam name="Table"></typeparam>
-        /// <returns></returns>
-        public static TableInfo GetTableInfo<Table>(string cacheId)
-        {
-            if (cacheId.IsNullOrEmpty() && TableInfoProvider.TryGetTableInfo<Table>(out TableInfo tableInfo))
-                return tableInfo;
-
-            if (TableInfoProvider.TryGetTableInfo<Table>(cacheId, out tableInfo))
-                return tableInfo;
-
-            if (TableInfoProvider.TryUpdateTableInfo(typeof(Table), out tableInfo))
+            if (TableInfoProvider.TryUpdateTableInfo(typeof(Table), out var tableInfo))
                 return tableInfo;
 
             throw new KeyNotExistedException("table", "table info not found");
@@ -157,14 +141,14 @@ namespace Never.EasySql
                 {
                     return new Update<Parameter>()
                     {
-                        Context = new Linq.MySql.UpdatedContext<Parameter>((LinqSqlTag)tag, this, this.GetTableInfo<Parameter>(), this.parameter)
+                        Context = new Linq.MySql.UpdatedContext<Parameter>((LinqSqlTag)tag, this, GetTableInfo<Parameter>(), this.parameter)
                     };
                 }
             }
 
             return new Update<Parameter>()
             {
-                Context = new Linq.MySql.UpdateContext<Parameter>(this.cacheId, this, this.GetTableInfo<Parameter>(), this.parameter)
+                Context = new Linq.MySql.UpdateContext<Parameter>(this.cacheId, this, GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -180,14 +164,14 @@ namespace Never.EasySql
                 {
                     return new Delete<Parameter>()
                     {
-                        Context = new Linq.MySql.DeletedContext<Parameter>((LinqSqlTag)tag, this, this.GetTableInfo<Parameter>(), this.parameter)
+                        Context = new Linq.MySql.DeletedContext<Parameter>((LinqSqlTag)tag, this, GetTableInfo<Parameter>(), this.parameter)
                     };
                 }
             }
 
             return new Delete<Parameter>()
             {
-                Context = new Linq.MySql.DeleteContext<Parameter>(this, this.GetTableInfo<Parameter>(), this.parameter)
+                Context = new Linq.MySql.DeleteContext<Parameter>(this, GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -203,14 +187,14 @@ namespace Never.EasySql
                 {
                     return new Insert<Parameter>()
                     {
-                        Context = new Linq.MySql.InsertedContext<Parameter>((LinqSqlTag)tag, this, this.GetTableInfo<Parameter>(), this.parameter)
+                        Context = new Linq.MySql.InsertedContext<Parameter>((LinqSqlTag)tag, this, GetTableInfo<Parameter>(), this.parameter)
                     };
                 }
             }
 
             return new Insert<Parameter>()
             {
-                Context = new Linq.MySql.InsertContext<Parameter>(this, this.GetTableInfo<Parameter>(), this.parameter)
+                Context = new Linq.MySql.InsertContext<Parameter>(this, GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -227,14 +211,14 @@ namespace Never.EasySql
                 {
                     return new Select<Parameter, Table>()
                     {
-                        Context = new Linq.MySql.SelectedContext<Parameter, Table>((LinqSqlTag)tag, this, this.GetTableInfo<Table>(), this.parameter)
+                        Context = new Linq.MySql.SelectedContext<Parameter, Table>((LinqSqlTag)tag, this, GetTableInfo<Table>(), this.parameter)
                     };
                 }
             }
 
             return new Select<Parameter, Table>()
             {
-                Context = new Linq.MySql.SelectContext<Parameter, Table>(this, this.GetTableInfo<Table>(), this.parameter)
+                Context = new Linq.MySql.SelectContext<Parameter, Table>(this, GetTableInfo<Table>(), this.parameter)
             };
         }
 
