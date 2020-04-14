@@ -8,149 +8,111 @@ using System.Threading.Tasks;
 namespace Never.EasySql.Linq
 {
     /// <summary>
-    /// 查询上下文
+    /// select语法
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public abstract class SelectContext<Parameter, Table> : Context
+    public class SelectContext<Parameter, Table> : _SelectContext<Parameter, Table>
     {
-        /// <summary>
-        /// dao
-        /// </summary>
-        protected readonly IDao dao;
-
-        /// <summary>
-        /// tableInfo
-        /// </summary>
-        protected readonly TableInfo tableInfo;
-
-        /// <summary>
-        /// sqlparameter
-        /// </summary>
-        protected readonly EasySqlParameter<Parameter> sqlParameter;
-
-        /// <summary>
-        /// labels
-        /// </summary>
-        protected readonly List<ILabel> labels;
-
-        /// <summary>
-        /// 临时参数
-        /// </summary>
-        protected readonly Dictionary<string, object> templateParameter;
-
-        /// <summary>
-        /// 是否单条记录
-        /// </summary>
-        protected bool isSingle;
-
-        /// <summary>
-        /// 分页
-        /// </summary>
-        protected PagedSearch paged;
-
+        private readonly string cacheId;
+        private int textLength;
+        private int setTimes;
+        private string tableName;
+        private string asName;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        protected SelectContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter)
+        public SelectContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(dao, tableInfo, sqlParameter)
         {
-            this.dao = dao; this.tableInfo = tableInfo; this.sqlParameter = sqlParameter;
-            this.labels = new List<ILabel>(10);
-            this.templateParameter = new Dictionary<string, object>(10);
+            this.cacheId = cacheId;
+        }
+
+        public override Linq._SelectContext<Parameter, Table> AsTable(string table)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> Entrance()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> Exists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> Exists(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> From(string table)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Table GetResult()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<Table> GetResults()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> In<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> In(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> NotExists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> NotExists(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> NotIn<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> NotIn(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> Where()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Linq._SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// from table
+        /// 对字段格式化
         /// </summary>
-        /// <param name="table"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public abstract void From(string table);
-
-        /// <summary>
-        /// as新表名
-        /// </summary>
-        /// <param name="table"></param>
-        /// <returns></returns>
-        public abstract void AsTable(string table);
-
-        /// <summary>
-        /// 入口
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> Entrance();
-
-        /// <summary>
-        /// 设为单条
-        /// </summary>
-        /// <returns></returns>
-        public SelectContext<Parameter, Table> SetSingle()
+        protected override string Format(string text)
         {
-            this.isSingle = true;
-            this.paged = null;
-            return this;
+            return string.Concat("`", text, "`");
         }
-
-        /// <summary>
-        /// 设为单条
-        /// </summary>
-        /// <returns></returns>
-        public SelectContext<Parameter, Table> SetPage(PagedSearch paged)
-        {
-            this.isSingle = false;
-            this.paged = paged;
-            return this;
-        }
-
-        /// <summary>
-        /// where
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> Where();
-
-        /// <summary>
-        /// where
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression);
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> Exists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> NotExists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> In<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> NotIn<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> Exists(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> NotExists(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> In(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> NotIn(AndOrOption option, string expression);
     }
 }

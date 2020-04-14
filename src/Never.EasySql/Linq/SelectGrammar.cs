@@ -17,7 +17,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Parameter, Table> Context { get; set; }
+        internal _SelectContext<Parameter, Table> Context { get; set; }
 
         #region linq
 
@@ -415,7 +415,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Parameter, Table> Context { get; set; }
+        internal _SelectContext<Parameter, Table> Context { get; set; }
 
         #region linq
 

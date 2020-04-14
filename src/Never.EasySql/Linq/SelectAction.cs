@@ -17,7 +17,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Parameter, Table> Context { get; set; }
+        internal _SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 更新的字段名
@@ -51,10 +51,10 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 查询分页
         /// </summary>
-        public SingleSelectGrammar<Parameter, Table> ToEnumerable(PagedSearch paged)
+        public EnumerableSelectGrammar<Parameter, Table> ToEnumerable(PagedSearch paged)
         {
             this.Context.SetPage(paged).Entrance();
-            return new SingleSelectGrammar<Parameter, Table>();
+            return new EnumerableSelectGrammar<Parameter, Table>();
         }
 
     }

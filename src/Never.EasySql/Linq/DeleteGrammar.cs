@@ -15,7 +15,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 上下文
         /// </summary>
-        internal DeleteContext<Parameter> Context { get; set; }
+        internal _DeleteContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 获取结果

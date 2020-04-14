@@ -15,7 +15,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 上下文
         /// </summary>
-        internal InsertContext<Parameter> Context { get; set; }
+        internal _InsertContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 插入的字段名
@@ -74,17 +74,17 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// insert 语法
     /// </summary>
-    public struct EnumerableInsertGrammar<Parameter>
+    public struct BulkInsertGrammar<Parameter>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal InsertContext<Parameter> Context { get; set; }
+        internal _InsertContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public EnumerableInsertGrammar<Parameter> Colum(Expression<Func<Parameter, object>> expression)
+        public BulkInsertGrammar<Parameter> Colum(Expression<Func<Parameter, object>> expression)
         {
             this.Context.Colum(expression);
             return this;
@@ -93,7 +93,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public EnumerableInsertGrammar<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function)
+        public BulkInsertGrammar<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function)
         {
             this.Context.ColumWithFunc(expression, function);
             return this;
@@ -102,7 +102,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public EnumerableInsertGrammar<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        public BulkInsertGrammar<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
             this.Context.ColumWithValue(expression, value);
             return this;

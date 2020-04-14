@@ -16,7 +16,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 上下文
         /// </summary>
-        internal InsertContext<Parameter> Context { get; set; }
+        internal _InsertContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 从哪一张表插入
@@ -41,10 +41,10 @@ namespace Never.EasySql.Linq
         /// 批量插入
         /// </summary>
         /// <returns></returns>
-        public EnumerableInsertGrammar<Parameter> ToEnumerable()
+        public BulkInsertGrammar<Parameter> ToBulk()
         {
             this.Context.Entrance('b');
-            return new EnumerableInsertGrammar<Parameter>() { Context = this.Context };
+            return new BulkInsertGrammar<Parameter>() { Context = this.Context };
         }
     }
 }

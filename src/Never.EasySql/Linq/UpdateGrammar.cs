@@ -15,7 +15,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 上下文
         /// </summary>
-        internal UpdateContext<Parameter> Context { get; set; }
+        internal _UpdateContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 入口

@@ -17,16 +17,18 @@ namespace Never.EasySql.Linq
         /// 
         /// </summary>
         /// <param name="cacheId">缓存key</param>
-        /// <param name="dao"></param>
         /// <param name="tag"></param>
         /// <returns></returns>
-        public static bool Get(string cacheId, IDao dao, out SqlTag tag)
+        public static bool Get(string cacheId, out LinqSqlTag tag)
         {
             tag = null;
             if (cacheId.IsNotNullOrWhiteSpace())
             {
-                if (provider.TryGet(cacheId, out tag))
+                if (provider.TryGet(cacheId, out var temp))
+                {
+                    tag = (LinqSqlTag)temp;
                     return true;
+                }
 
                 return false;
             }
@@ -39,7 +41,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="sqlTag"></param>
         /// <returns></returns>
-        public static SqlTag Set(LinqSqlTag sqlTag)
+        public static LinqSqlTag Set(LinqSqlTag sqlTag)
         {
             provider.Add(sqlTag);
             return sqlTag;

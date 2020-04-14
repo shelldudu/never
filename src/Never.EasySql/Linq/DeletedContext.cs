@@ -7,114 +7,88 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    /// <summary>
-    /// 删除操作
-    /// </summary>
-    /// <typeparam name="Parameter"></typeparam>
-    public class DeleteContext<Parameter> : _DeleteContext<Parameter>
+    internal sealed class DeletedContext<Parameter> : _DeleteContext<Parameter>
     {
-        private readonly string cacheId;
-        private int textLength;
-        private int setTimes;
-        private string tableName;
-        private string asName;
-        /// <summary>
-        /// 
-        /// </summary> 
-        /// <param name="cacheId"></param>
-        /// <param name="dao"></param>
-        /// <param name="tableInfo"></param>
-        /// <param name="sqlParameter"></param>
-        public DeleteContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(dao, tableInfo, sqlParameter)
+        private readonly LinqSqlTag sqlTag;
+
+        public DeletedContext(LinqSqlTag sqlTag, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(dao, tableInfo, sqlParameter)
         {
-            this.cacheId = cacheId;
+            this.sqlTag = sqlTag;
         }
 
         public override Linq._DeleteContext<Parameter> AsTable(string table)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> Entrance()
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> Exists(AndOrOption option, string expression)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> From(string table)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override int GetResult()
         {
-            var sqlTag = new LinqSqlTag(this.cacheId)
-            {
-                Labels = this.labels.AsEnumerable(),
-                TextLength = this.textLength,
-            };
-
-            LinqSqlTagProvider.Set(sqlTag);
-            return this.Execute(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            return this.Execute(this.sqlTag, this.dao, this.sqlParameter);
         }
 
         public override Linq._DeleteContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> In(AndOrOption option, string expression)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> NotExists(AndOrOption option, string expression)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> NotIn(AndOrOption option, string expression)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> Where()
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override Linq._DeleteContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
-        /// <summary>
-        /// 对字段格式化
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
         protected override string Format(string text)
         {
-            return string.Concat("`", text, "`");
+            return text;
         }
     }
 }

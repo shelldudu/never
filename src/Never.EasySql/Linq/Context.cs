@@ -65,7 +65,6 @@ namespace Never.EasySql.Linq
                     this.Join ?? "",
                     this.Right == null ? "" : (this.RightIsConstant ? this.Right : string.Concat(rightPlaceholder, ".", Right)));
             }
-
         }
 
         /// <summary>
@@ -183,6 +182,7 @@ namespace Never.EasySql.Linq
 
             return memberInfo.Name;
         }
+
         /// <summary>
         /// 查询tableName
         /// </summary>
@@ -311,22 +311,34 @@ namespace Never.EasySql.Linq
                     break;
                 case ExpressionType.LessThan:
                     {
-                        current.Join = " < ";
+                        if (current.Left != null)
+                            current.Join = " < ";
+                        else
+                            current.Join = " >= ";
                     }
                     break;
                 case ExpressionType.LessThanOrEqual:
                     {
-                        current.Join = " <= ";
+                        if (current.Left != null)
+                            current.Join = " <= ";
+                        else
+                            current.Join = " > ";
                     }
                     break;
                 case ExpressionType.GreaterThanOrEqual:
                     {
-                        current.Join = " >= ";
+                        if (current.Left != null)
+                            current.Join = " >= ";
+                        else
+                            current.Join = " < ";
                     }
                     break;
                 case ExpressionType.GreaterThan:
                     {
-                        current.Join = " > ";
+                        if (current.Left != null)
+                            current.Join = " > ";
+                        else
+                            current.Join = " <= ";
                     }
                     break;
                 case ExpressionType.Equal:

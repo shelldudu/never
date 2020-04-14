@@ -1,180 +1,347 @@
-﻿using System;
+﻿using Never.EasySql.Labels;
+using Never.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
     /// <summary>
-    /// 更新操作上下文
+    /// 更新语法
     /// </summary>
-    public abstract class UpdateContext<Parameter> : Context
+    public class UpdateContext<Parameter> : _UpdateContext<Parameter>
     {
-        /// <summary>
-        /// dao
-        /// </summary>
-        protected readonly IDao dao;
+        private readonly string cacheId;
+        private int textLength;
+        private int setTimes;
+        private string tableName;
+        private string asName;
 
         /// <summary>
-        /// tableInfo
+        /// ctor
         /// </summary>
-        protected readonly TableInfo tableInfo;
-
-        /// <summary>
-        /// sqlparameter
-        /// </summary>
-        protected readonly EasySqlParameter<Parameter> sqlParameter;
-
-        /// <summary>
-        /// labels
-        /// </summary>
-        protected readonly List<ILabel> labels;
-
-        /// <summary>
-        /// 临时参数
-        /// </summary>
-        protected readonly Dictionary<string, object> templateParameter;
-
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <param name="cacheId"></param>
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        protected UpdateContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter)
+        public UpdateContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(dao, tableInfo, sqlParameter)
         {
-            this.dao = dao; this.tableInfo = tableInfo; this.sqlParameter = sqlParameter;
-            this.labels = new List<ILabel>(10);
-            this.templateParameter = new Dictionary<string, object>(10);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
-        /// <returns></returns>
-        protected int Execute(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
-        {
-            return dao.Update(sqlTag, sqlParameter);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="isolationLevel"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
-        /// <returns></returns>
-        protected int Execute(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
-        {
-            dao.BeginTransaction(isolationLevel);
-            try
-            {
-                var row = dao.Update(sqlTag, sqlParameter);
-                dao.CommitTransaction();
-                return row;
-            }
-            catch
-            {
-                dao.RollBackTransaction();
-                return -1;
-            }
+            this.cacheId = cacheId;
         }
 
         /// <summary>
         /// 获取结果
         /// </summary>
-        public abstract int GetResult();
+        public override int GetResult()
+        {
+            var sqlTag = new LinqSqlTag(this.cacheId)
+            {
+                Labels = this.labels.AsEnumerable(),
+                TextLength = this.textLength,
+            };
+
+            LinqSqlTagProvider.Set(sqlTag);
+            return this.Execute(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+        }
+
+        /// <summary>
+        /// 对字段格式化
+        /// </summary>
+        protected override string Format(string text)
+        {
+            return text;
+        }
 
         /// <summary>
         /// 表名
         /// </summary>
-        /// <param name="table"></param>
-        /// <returns></returns>
-        public abstract void From(string table);
+        public override _UpdateContext<Parameter> From(string table)
+        {
+            this.tableName = table;
+            return this;
+        }
 
         /// <summary>
-        /// as新表名
+        /// 
         /// </summary>
-        /// <param name="table"></param>
-        /// <returns></returns>
-        public abstract void AsTable(string table);
+        public override _UpdateContext<Parameter> AsTable(string table)
+        {
+            this.asName = table;
+            return this;
+        }
 
         /// <summary>
         /// 入口
         /// </summary>
-        public abstract UpdateContext<Parameter> Entrance();
+        public override _UpdateContext<Parameter> Entrance()
+        {
+            this.tableName = this.tableName.IsNullOrEmpty() ? this.FindTableName<Parameter>(tableInfo) : this.tableName;
+            if (this.asName.IsNullOrEmpty())
+            {
+                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.Format(this.tableName), " set \r") };
+                this.textLength += label.SqlText.Length;
+                this.labels.Add(label);
+            }
+            else
+            {
+                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.Format(this.tableName), " as ", asName, " set \r") };
+                this.textLength += label.SqlText.Length;
+                this.labels.Add(label);
+            }
+
+            return this;
+        }
 
         /// <summary>
-        /// 更新的字段名
+        /// 更新字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression);
+        protected _UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter)
+        {
+            if (setTimes == 0)
+            {
+                setTimes++;
+                var label = new TextLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                    SqlText = string.Concat(this.Format(columnName), " = @", columnName, "\r"),
+                };
+
+                label.Add(new SqlTagParameterPosition()
+                {
+                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    Name = columnName,
+                    PositionLength = 1 + columnName.Length + 1,
+                    PrefixStart = 1 + columnName.Length + 1 + 3,
+                    StartPosition = 1 + columnName.Length + 1 + 3,
+                    StopPosition = columnName.Length,
+                    TextParameter = textParameter,
+                });
+
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+            else
+            {
+
+                var label = new TextLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                    SqlText = string.Concat(",", this.Format(columnName), " = @", columnName, "\r"),
+                };
+
+                label.Add(new SqlTagParameterPosition()
+                {
+                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    Name = columnName,
+                    PositionLength = columnName.Length,
+                    PrefixStart = 1 + 1 + columnName.Length + 1 + 3,
+                    StartPosition = 1 + 1 + columnName.Length + 1 + 3,
+                    StopPosition = columnName.Length,
+                    TextParameter = textParameter,
+                });
+
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
+            return this;
+        }
 
         /// <summary>
-        /// 更新的字段名
+        /// 更新字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value);
+        public override _UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
+        {
+            string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
+            return this.SetColum<TMember>(columnName, false);
+        }
 
         /// <summary>
-        /// 更新的字段名
+        /// 更新字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value);
+        public override _UpdateContext<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
+        {
+            string columnName = this.FindColumnName(expression, this.tableInfo, out _);
+            this.templateParameter[columnName] = value;
+            return this.SetColum<TMember>(columnName, true);
+        }
 
         /// <summary>
-        /// where
+        /// 更新字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> Where();
+        public override _UpdateContext<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        {
+            string columnName = this.FindColumnName(expression, this.tableInfo, out _);
+            this.templateParameter[columnName] = value;
+            return this.SetColum<TMember>(columnName, false);
+        }
 
         /// <summary>
-        /// where
+        /// where 条件
         /// </summary>
-        public abstract UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression);
+        public override _UpdateContext<Parameter> Where()
+        {
+            var label = new TextLabel()
+            {
+                SqlText = "where 1 = 1 \r",
+                TagId = NewId.GenerateNumber(),
+            };
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
+        }
 
         /// <summary>
-        /// 存在
+        /// where 条件
         /// </summary>
-        public abstract UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
+        public override _UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
+        {
+            string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat("where ", this.Format(columnName), " = @", columnName, "\r"),
+            };
+
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = columnName,
+                PositionLength = 6 + 1 + columnName.Length + 1,
+                PrefixStart = 6 + 1 + columnName.Length + 1 + 3,
+                StartPosition = 6 + 1 + columnName.Length + 1 + 3,
+                StopPosition = 6 + 1 + columnName.Length + 1,
+                TextParameter = false,
+            });
+
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
+        }
 
         /// <summary>
-        /// 不存在
+        /// in
         /// </summary>
-        public abstract UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
+        public override _UpdateContext<Parameter> In(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
-        /// 存在
+        /// int
         /// </summary>
-        public abstract UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
+        public override _UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        {
+            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, new List<BinaryExp>());
+            return this;
+        }
 
         /// <summary>
-        /// 不存在
+        /// not in
         /// </summary>
-        public abstract UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where);
+        public override _UpdateContext<Parameter> NotIn(AndOrOption option, string expression)
+        {
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
+            };
+
+            this.labels.Add(label);
+            return this;
+        }
 
         /// <summary>
-        /// 存在
+        /// not in
         /// </summary>
-        public abstract UpdateContext<Parameter> Exists(AndOrOption option, string expression);
+        public override _UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        {
+            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, new List<BinaryExp>());
+            return this;
+        }
 
         /// <summary>
-        /// 不存在
+        /// exists
         /// </summary>
-        public abstract UpdateContext<Parameter> NotExists(AndOrOption option, string expression);
+        public override _UpdateContext<Parameter> Exists(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
-        /// 存在
+        /// exists
         /// </summary>
-        public abstract UpdateContext<Parameter> In(AndOrOption option, string expression);
+        public override _UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        {
+            var tableInfo = GetTableInfo<Table>();
+            var binary = expression.Body as System.Linq.Expressions.BinaryExpression;
+            if (binary != null)
+            {
+                switch (binary.NodeType)
+                {
+                    case ExpressionType.Equal:
+                        {
+
+                        }
+                        break;
+                    case ExpressionType.NotEqual:
+                        {
+
+                        }
+                        break;
+                }
+                var left = binary.Left;
+                var right = binary.Right;
+
+            }
+
+            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, new List<BinaryExp>());
+
+            //string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
+            string columnName = null;
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", "not exists(select 0 from a where a.Id = ", this.Format(columnName), ".Id", columnName),
+            };
+
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = columnName,
+                PositionLength = 6 + columnName.Length,
+                PrefixStart = 6 + columnName.Length + 2 + 3,
+                StartPosition = 6 + columnName.Length + 2 + 3,
+                StopPosition = 6 + columnName.Length,
+                TextParameter = false,
+            });
+
+            this.labels.Add(label);
+            return this;
+        }
 
         /// <summary>
-        /// 不存在
+        /// not exists
         /// </summary>
-        public abstract UpdateContext<Parameter> NotIn(AndOrOption option, string expression);
+        public override _UpdateContext<Parameter> NotExists(AndOrOption option, string expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// not exists
+        /// </summary>
+        public override _UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        {
+            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, new List<BinaryExp>());
+            return this;
+        }
     }
 }
