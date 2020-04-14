@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    internal sealed class InsertedContext<Parameter> : Linq._InsertContext<Parameter>
+    internal sealed class InsertedContext<Parameter> : Linq.InsertContext<Parameter>
     {
         private readonly LinqSqlTag sqlTag;
 
@@ -16,22 +16,22 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override Linq._InsertContext<Parameter> Colum(Expression<Func<Parameter, object>> expression)
+        public override Linq.InsertContext<Parameter> Colum(Expression<Func<Parameter, object>> expression)
         {
             return this;
         }
 
-        public override Linq._InsertContext<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function)
+        public override Linq.InsertContext<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function)
         {
             return this;
         }
 
-        public override Linq._InsertContext<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        public override Linq.InsertContext<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
             return this;
         }
 
-        public override Linq._InsertContext<Parameter> Entrance(char flag)
+        public override Linq.InsertContext<Parameter> Entrance(char flag)
         {
             return this;
         }
@@ -46,12 +46,12 @@ namespace Never.EasySql.Linq
             throw new NotImplementedException();
         }
 
-        public override Linq._InsertContext<Parameter> InsertLastInsertId()
+        public override Linq.InsertContext<Parameter> InsertLastInsertId()
         {
             return this;
         }
 
-        public override Linq._InsertContext<Parameter> Into(string table)
+        public override Linq.InsertContext<Parameter> Into(string table)
         {
             return this;
         }

@@ -11,17 +11,17 @@ namespace Never.EasySql.Linq
     /// 删除操作
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
-    public struct DeleteAction<Parameter>
+    public struct Delete<Parameter>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal _DeleteContext<Parameter> Context { get; set; }
+        internal DeleteContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 删除的表名
         /// </summary>
-        public DeleteAction<Parameter> As(string table)
+        public Delete<Parameter> As(string table)
         {
             this.Context.AsTable(table);
             return this;

@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 删除操作
     /// </summary>
-    public class DeleteContext<Parameter> : Linq.DeleteContext<Parameter>
+    public class DeleteContext<Parameter> : Linq.DeletingContext<Parameter>
     {
         /// <summary>
         /// ctor

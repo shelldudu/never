@@ -10,7 +10,7 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// 
     /// </summary>
-    internal sealed class UpdatedContext<Parameter> : Linq._UpdateContext<Parameter>
+    internal sealed class UpdatedContext<Parameter> : Linq.UpdateContext<Parameter>
     {
         private readonly LinqSqlTag sqlTag;
 
@@ -19,27 +19,27 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override Linq._UpdateContext<Parameter> AsTable(string table)
+        public override Linq.UpdateContext<Parameter> AsTable(string table)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> Entrance()
+        public override Linq.UpdateContext<Parameter> Entrance()
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override Linq.UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> Exists(AndOrOption option, string expression)
+        public override Linq.UpdateContext<Parameter> Exists(AndOrOption option, string expression)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> From(string table)
+        public override Linq.UpdateContext<Parameter> From(string table)
         {
             return this;
         }
@@ -49,59 +49,59 @@ namespace Never.EasySql.Linq
             return this.Execute(this.sqlTag, this.dao, this.sqlParameter);
         }
 
-        public override Linq._UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override Linq.UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> In(AndOrOption option, string expression)
+        public override Linq.UpdateContext<Parameter> In(AndOrOption option, string expression)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override Linq.UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> NotExists(AndOrOption option, string expression)
+        public override Linq.UpdateContext<Parameter> NotExists(AndOrOption option, string expression)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override Linq.UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> NotIn(AndOrOption option, string expression)
+        public override Linq.UpdateContext<Parameter> NotIn(AndOrOption option, string expression)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
+        public override Linq.UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
-        {
-            this.templateParameter[this.FindColumnName(expression, this.tableInfo, out _)] = value;
-            return this;
-        }
-
-        public override Linq._UpdateContext<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        public override Linq.UpdateContext<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
         {
             this.templateParameter[this.FindColumnName(expression, this.tableInfo, out _)] = value;
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> Where()
+        public override Linq.UpdateContext<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        {
+            this.templateParameter[this.FindColumnName(expression, this.tableInfo, out _)] = value;
+            return this;
+        }
+
+        public override Linq.UpdateContext<Parameter> Where()
         {
             return this;
         }
 
-        public override Linq._UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
+        public override Linq.UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
         {
             return this;
         }

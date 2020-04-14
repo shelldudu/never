@@ -120,7 +120,7 @@ namespace Never.EasySql
         /// 更新
         /// </summary>
         /// <returns></returns>
-        public UpdateAction<Parameter> Update()
+        public Update<Parameter> Update()
         {
             LinqSqlTag tag = null;
             if (this.cacheId.IsNotNullOrEmpty())
@@ -129,19 +129,19 @@ namespace Never.EasySql
 
             if (this.SqlExecuter is MySqlExecuter)
             {
-                return new UpdateAction<Parameter>()
+                return new Update<Parameter>()
                 {
                     Context = tag == null ?
                     new Linq.MySql.UpdateContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter) :
-                    (_UpdateContext<Parameter>)new UpdatedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    (UpdateContext<Parameter>)new UpdatedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
                 };
             }
 
-            return new UpdateAction<Parameter>()
+            return new Update<Parameter>()
             {
                 Context = tag == null ?
-                new UpdateContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter) :
-                (_UpdateContext<Parameter>)new UpdatedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                new UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter) :
+                (UpdateContext<Parameter>)new UpdatedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -149,7 +149,7 @@ namespace Never.EasySql
         /// 删除
         /// </summary>
         /// <returns></returns>
-        public DeleteAction<Parameter> Delete()
+        public Delete<Parameter> Delete()
         {
             LinqSqlTag tag = null;
             if (this.cacheId.IsNotNullOrEmpty())
@@ -157,19 +157,19 @@ namespace Never.EasySql
 
             if (this.SqlExecuter is MySqlExecuter)
             {
-                return new DeleteAction<Parameter>()
+                return new Delete<Parameter>()
                 {
                     Context = tag == null ?
                     new Linq.MySql.DeleteContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter) :
-                    (_DeleteContext<Parameter>)new DeletedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    (DeleteContext<Parameter>)new DeletedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
                 };
             }
 
-            return new DeleteAction<Parameter>()
+            return new Delete<Parameter>()
             {
                 Context = tag == null ?
-                new DeleteContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter) :
-                (_DeleteContext<Parameter>)new DeletedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                new DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter) :
+                (DeleteContext<Parameter>)new DeletedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -177,7 +177,7 @@ namespace Never.EasySql
         /// 插入
         /// </summary>
         /// <returns></returns>
-        public InsertAction<Parameter> Insert()
+        public Insert<Parameter> Insert()
         {
             LinqSqlTag tag = null;
             if (this.cacheId.IsNotNullOrEmpty())
@@ -186,20 +186,20 @@ namespace Never.EasySql
 
             if (this.SqlExecuter is MySqlExecuter)
             {
-                return new InsertAction<Parameter>()
+                return new Insert<Parameter>()
                 {
                     Context = tag == null ?
                     new Linq.MySql.InsertContext<Parameter>(this.cacheId, this, Context.GetTableInfo<Parameter>(), this.parameter) :
-                    (_InsertContext<Parameter>)new InsertedContext<Parameter>(tag, this, Context.GetTableInfo<Parameter>(), this.parameter)
+                    (InsertContext<Parameter>)new InsertedContext<Parameter>(tag, this, Context.GetTableInfo<Parameter>(), this.parameter)
                 };
 
             }
 
-            return new InsertAction<Parameter>()
+            return new Insert<Parameter>()
             {
                 Context = tag == null ?
-                new InsertContext<Parameter>(this.cacheId, this, Context.GetTableInfo<Parameter>(), this.parameter) :
-                (_InsertContext<Parameter>)new InsertedContext<Parameter>(tag, this, Context.GetTableInfo<Parameter>(), this.parameter)
+                new InsertingContext<Parameter>(this.cacheId, this, Context.GetTableInfo<Parameter>(), this.parameter) :
+                (InsertContext<Parameter>)new InsertedContext<Parameter>(tag, this, Context.GetTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -208,7 +208,7 @@ namespace Never.EasySql
         /// </summary>
         /// <typeparam name="Table">对象</typeparam>
         /// <returns></returns>
-        public SelectAction<Parameter, Table> Select<Table>()
+        public Select<Parameter, Table> Select<Table>()
         {
             LinqSqlTag tag = null;
             if (this.cacheId.IsNotNullOrEmpty())
@@ -217,19 +217,19 @@ namespace Never.EasySql
 
             if (this.SqlExecuter is MySqlExecuter)
             {
-                return new SelectAction<Parameter, Table>()
+                return new Select<Parameter, Table>()
                 {
                     Context =
                     tag == null ? new Linq.MySql.SelectContext<Parameter, Table>(this.cacheId, this, Context.GetTableInfo<Table>(), this.parameter) :
-                    (_SelectContext<Parameter, Table>)new SelectedContext<Parameter, Table>(tag, this, Context.GetTableInfo<Table>(), this.parameter)
+                    (SelectContext<Parameter, Table>)new SelectedContext<Parameter, Table>(tag, this, Context.GetTableInfo<Table>(), this.parameter)
                 };
             }
 
-            return new SelectAction<Parameter, Table>()
+            return new Select<Parameter, Table>()
             {
                 Context =
-                tag == null ? new SelectContext<Parameter, Table>(this.cacheId, this, Context.GetTableInfo<Table>(), this.parameter) :
-                (_SelectContext<Parameter, Table>)new SelectedContext<Parameter, Table>(tag, this, Context.GetTableInfo<Table>(), this.parameter)
+                tag == null ? new SelectingContext<Parameter, Table>(this.cacheId, this, Context.GetTableInfo<Table>(), this.parameter) :
+                (SelectContext<Parameter, Table>)new SelectedContext<Parameter, Table>(tag, this, Context.GetTableInfo<Table>(), this.parameter)
             };
         }
 

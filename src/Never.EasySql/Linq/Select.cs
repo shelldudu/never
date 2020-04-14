@@ -12,17 +12,17 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">查询结果对象</typeparam>
-    public struct SelectAction<Parameter, Table>
+    public struct Select<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal _SelectContext<Parameter, Table> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public SelectAction<Parameter, Table> As(string table)
+        public Select<Parameter, Table> As(string table)
         {
             this.Context.AsTable(table);
             return this;
@@ -31,7 +31,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 从哪一张表更新
         /// </summary>
-        public SelectAction<Parameter, Table> From(string table)
+        public Select<Parameter, Table> From(string table)
         {
             this.Context.From(table);
             return this;

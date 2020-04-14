@@ -15,7 +15,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 上下文
         /// </summary>
-        internal _InsertContext<Parameter> Context { get; set; }
+        internal InsertContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 插入的字段名
@@ -79,7 +79,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 上下文
         /// </summary>
-        internal _InsertContext<Parameter> Context { get; set; }
+        internal InsertContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 插入的字段名

@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 插入操作
     /// </summary>
-    public class InsertContext<Parameter> : Linq.InsertContext<Parameter>
+    public class InsertContext<Parameter> : Linq.InsertingContext<Parameter>
     {
         /// <summary>
         /// ctor

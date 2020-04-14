@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 查询操作
     /// </summary>
-    public class SelectContext<Parameter, Table> : Linq.SelectContext<Parameter, Table>
+    public class SelectContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor

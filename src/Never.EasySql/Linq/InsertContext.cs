@@ -1,6 +1,4 @@
-﻿using Never.EasySql.Labels;
-using Never.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,90 +8,174 @@ using System.Threading.Tasks;
 namespace Never.EasySql.Linq
 {
     /// <summary>
-    /// 插入语法
+    /// 插入上下文
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
-    public class InsertContext<Parameter> : _InsertContext<Parameter>
+    public abstract class InsertContext<Parameter> : Context
     {
-        private readonly string cacheId;
-        private int textLength;
-        private int setTimes;
-        private string tableName;
+        /// <summary>
+        /// dao
+        /// </summary>
+        protected readonly IDao dao;
+
+        /// <summary>
+        /// tableInfo
+        /// </summary>
+        protected readonly TableInfo tableInfo;
+
+        /// <summary>
+        /// sqlparameter
+        /// </summary>
+        protected readonly EasySqlParameter<Parameter> sqlParameter;
+
+        /// <summary>
+        /// labels
+        /// </summary>
+        protected readonly List<ILabel> labels;
+
+        /// <summary>
+        /// 临时参数
+        /// </summary>
+        protected readonly Dictionary<string, object> templateParameter;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="cacheId"></param>
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        public InsertContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(dao, tableInfo, sqlParameter)
+        protected InsertContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter)
         {
-            this.cacheId = cacheId;
-        }
-
-        /// <summary>
-        /// 对字段格式化
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        protected override string Format(string text)
-        {
-            return string.Concat("`", text, "`");
+            this.dao = dao; this.tableInfo = tableInfo; this.sqlParameter = sqlParameter;
+            this.labels = new List<ILabel>(10);
+            this.templateParameter = new Dictionary<string, object>(10);
         }
 
         /// <summary>
         /// 表名
         /// </summary>
         /// <param name="table"></param>
-        public override Linq._InsertContext<Parameter> Into(string table)
-        {
-            this.tableName = table;
-            return this;
-        }
+        /// <returns></returns>
+        public abstract InsertContext<Parameter> Into(string table);
 
         /// <summary>
         /// 入口
         /// </summary>
+        /// <param name="flag"></param>
         /// <returns></returns>
-        public override Linq._InsertContext<Parameter> Entrance(char flag)
-        {
-            this.tableName = this.tableName.IsNullOrEmpty() ? this.FindTableName<Parameter>(tableInfo) : this.tableName;
-            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("insert into ", this.Format(this.tableName)) };
-            this.textLength += label.SqlText.Length;
-            this.labels.Add(label);
+        public abstract InsertContext<Parameter> Entrance(char flag);
 
-            return this;
+        /// <summary>
+        /// 执行插入
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected T Execute<T>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        {
+            return (T)dao.Insert<Parameter>(sqlTag, sqlParameter);
         }
 
-        public override Result GetResult<Result>()
+        /// <summary>
+        /// 执行插入（事务）
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="isolationLevel"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected T Execute<T>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
-            throw new NotImplementedException();
+            dao.BeginTransaction(isolationLevel);
+            try
+            {
+                var row = (T)dao.Insert<Parameter>(sqlTag, sqlParameter);
+                dao.CommitTransaction();
+                return row;
+            }
+            catch
+            {
+                dao.RollBackTransaction();
+                return default(T);
+            }
         }
 
-        public override void GetResult()
+
+        /// <summary>
+        /// 执行插入
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected void Execute2(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
-            throw new NotImplementedException();
+            dao.Insert<Parameter>(sqlTag, sqlParameter);
         }
 
-        public override Linq._InsertContext<Parameter> InsertLastInsertId()
+        /// <summary>
+        /// 执行插入（事务）
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="isolationLevel"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected void Execute2(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
-            throw new NotImplementedException();
+            dao.BeginTransaction(isolationLevel);
+            try
+            {
+                dao.Insert<Parameter>(sqlTag, sqlParameter);
+                dao.CommitTransaction();
+            }
+            catch
+            {
+                dao.RollBackTransaction();
+                return;
+            }
         }
 
-        public override Linq._InsertContext<Parameter> Colum(Expression<Func<Parameter, object>> expression)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public abstract Result GetResult<Result>();
 
-        public override Linq._InsertContext<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public abstract void GetResult();
 
-        public override Linq._InsertContext<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// 最后自增字符串
+        /// </summary>
+        /// <returns></returns>
+        public abstract InsertContext<Parameter> InsertLastInsertId();
+
+        /// <summary>
+        /// 插入的字段
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public abstract InsertContext<Parameter> Colum(Expression<Func<Parameter, object>> expression);
+
+        /// <summary>
+        /// 插入的字段
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public abstract InsertContext<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function);
+
+        /// <summary>
+        /// 插入的字段
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public abstract InsertContext<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value);
+
     }
+
 }

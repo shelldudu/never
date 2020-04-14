@@ -11,17 +11,17 @@ namespace Never.EasySql.Linq
     /// 更新操作
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
-    public struct UpdateAction<Parameter>
+    public struct Update<Parameter>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal _UpdateContext<Parameter> Context { get; set; }
+        internal UpdateContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateAction<Parameter> As(string table)
+        public Update<Parameter> As(string table)
         {
             this.Context.AsTable(table);
             return this;
@@ -30,7 +30,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 从哪一张表更新
         /// </summary>
-        public UpdateAction<Parameter> From(string table)
+        public Update<Parameter> From(string table)
         {
             this.Context.From(table);
             return this;

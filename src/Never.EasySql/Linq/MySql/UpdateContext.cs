@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 更新操作
     /// </summary>
-    public class UpdateContext<Parameter> : Linq.UpdateContext<Parameter>
+    public class UpdateContext<Parameter> : Linq.UpdatingContext<Parameter>
     {
         /// <summary>
         /// ctor

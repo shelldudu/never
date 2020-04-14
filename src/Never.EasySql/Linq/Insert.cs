@@ -11,17 +11,17 @@ namespace Never.EasySql.Linq
     /// 插入语法
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
-    public struct InsertAction<Parameter>
+    public struct Insert<Parameter>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal _InsertContext<Parameter> Context { get; set; }
+        internal InsertContext<Parameter> Context { get; set; }
 
         /// <summary>
         /// 从哪一张表插入
         /// </summary>
-        public InsertAction<Parameter> From(string table)
+        public Insert<Parameter> From(string table)
         {
             this.Context.Into(table);
             return this;
