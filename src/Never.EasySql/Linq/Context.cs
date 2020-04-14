@@ -258,6 +258,7 @@ namespace Never.EasySql.Linq
                 var leftConfirm = false;
                 if (memberExpress != null)
                 {
+                    /*永远将第一个参数放到左侧，第二个参数放右侧，如果是常量的，则放到右侧*/
                     int isleftOrRight = leftOrRight(memberExpress.Expression);
                     if (isleftOrRight == 1)
                     {
@@ -272,7 +273,7 @@ namespace Never.EasySql.Linq
                         current = new BinaryExp()
                         {
                             Right = this.FindColumnName(memberExpress.Member, tableInfo),
-                            LeftIsConstant = false,
+                            RightIsConstant = false,
                         };
                     }
 
@@ -284,8 +285,8 @@ namespace Never.EasySql.Linq
                 {
                     current = new BinaryExp()
                     {
-                        Left = constantExpress.Value.ToString(),
-                        LeftIsConstant = true,
+                        Right = constantExpress.Value.ToString(),
+                        RightIsConstant = true,
                     };
 
                     leftConfirm = true;
@@ -297,6 +298,7 @@ namespace Never.EasySql.Linq
                 }
             }
 
+            /*.Left不为空，则说明第一个参数是在左侧*/
             switch (binary.NodeType)
             {
                 case ExpressionType.AndAlso:
@@ -365,16 +367,15 @@ namespace Never.EasySql.Linq
                 var rightConfirm = false;
                 if (memberExpress != null)
                 {
-                    int isleftOrRight = leftOrRight(memberExpress.Expression);
-                    if (isleftOrRight == 1)
-                    {
-                        current.Right = this.FindColumnName(memberExpress.Member, parameterTableInfo);
-                        current.RightIsConstant = false;
-                    }
-                    else if (isleftOrRight == -1)
+                    if (current.Left != null)
                     {
                         current.Right = this.FindColumnName(memberExpress.Member, tableInfo);
                         current.RightIsConstant = false;
+                    }
+                    else
+                    {
+                        current.Left = this.FindColumnName(memberExpress.Member, parameterTableInfo);
+                        current.LeftIsConstant = false;
                     }
 
                     rightConfirm = true;
@@ -383,8 +384,17 @@ namespace Never.EasySql.Linq
                 var constantExpress = binary.Right as ConstantExpression;
                 if (constantExpress != null)
                 {
-                    current.Right = constantExpress.Value.ToString();
-                    current.RightIsConstant = true;
+                    if (current.Left != null)
+                    {
+                        current.Right = constantExpress.Value.ToString();
+                        current.RightIsConstant = true;
+                    }
+                    else
+                    {
+                        current.Left = constantExpress.Value.ToString();
+                        current.LeftIsConstant = true;
+                    }
+
                     rightConfirm = true;
                 }
 
@@ -396,5 +406,170 @@ namespace Never.EasySql.Linq
 
             whereCollection.Add(current);
         }
+
+        /// <summary>
+        /// 分析语句
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="tableInfo"></param>
+        /// <param name="whereCollection"></param>
+        protected virtual void Analyze<Parameter>(Expression<Func<Parameter, bool>> expression, TableInfo tableInfo, List<BinaryExp> whereCollection)
+        {
+            var binary = expression.Body as BinaryExpression;
+            if (binary == null)
+                return;
+
+            this.Analyze(expression.Parameters[0].Name, typeof(Parameter), expression.Body, tableInfo, whereCollection);
+        }
+
+        /// <summary>
+        /// 分析表达式
+        /// </summary>
+        /// <param name="leftPlaceholder"></param>
+        /// <param name="leftType"></param>
+        /// <param name="expression"></param>
+        /// <param name="tableInfo"></param>
+        /// <param name="whereCollection"></param>
+        protected void Analyze(string leftPlaceholder, Type leftType, Expression expression, TableInfo tableInfo, List<BinaryExp> whereCollection)
+        {
+            var binary = expression as BinaryExpression;
+            if (binary == null)
+                return;
+
+            BinaryExp current = null;
+            if (binary.Left is BinaryExpression)
+            {
+                whereCollection.Add(new BinaryExp() { Join = "(" });
+                Analyze(leftPlaceholder, leftType, binary.Left, tableInfo, whereCollection);
+                whereCollection.Add(new BinaryExp() { Join = ")" });
+            }
+            else
+            {
+                var memberExpress = binary.Left as MemberExpression;
+                var leftConfirm = false;
+                if (memberExpress != null)
+                {
+                    /*永远将第一个参数放到左侧，第二个参数放右侧，如果是常量的，则放到右侧*/
+                    current = new BinaryExp()
+                    {
+                        Left = this.FindColumnName(memberExpress.Member, tableInfo),
+                        LeftIsConstant = false,
+                    };
+
+                    leftConfirm = true;
+                }
+
+                var constantExpress = binary.Left as ConstantExpression;
+                if (constantExpress != null)
+                {
+                    current = new BinaryExp()
+                    {
+                        Right = constantExpress.Value.ToString(),
+                        RightIsConstant = true,
+                    };
+
+                    leftConfirm = true;
+                }
+
+                if (leftConfirm == false)
+                {
+                    throw new Exception("");
+                }
+            }
+
+            /*.Left不为空，则说明第一个参数是在左侧*/
+            switch (binary.NodeType)
+            {
+                case ExpressionType.AndAlso:
+                    {
+                        whereCollection.Add(new BinaryExp() { Join = "and" });
+                    }
+                    break;
+                case ExpressionType.OrElse:
+                    {
+                        whereCollection.Add(new BinaryExp() { Join = "or" });
+                    }
+                    break;
+                case ExpressionType.LessThan:
+                    {
+                        if (current.Left != null)
+                            current.Join = " < ";
+                        else
+                            current.Join = " >= ";
+                    }
+                    break;
+                case ExpressionType.LessThanOrEqual:
+                    {
+                        if (current.Left != null)
+                            current.Join = " <= ";
+                        else
+                            current.Join = " > ";
+                    }
+                    break;
+                case ExpressionType.GreaterThanOrEqual:
+                    {
+                        if (current.Left != null)
+                            current.Join = " >= ";
+                        else
+                            current.Join = " < ";
+                    }
+                    break;
+                case ExpressionType.GreaterThan:
+                    {
+                        if (current.Left != null)
+                            current.Join = " > ";
+                        else
+                            current.Join = " <= ";
+                    }
+                    break;
+                case ExpressionType.Equal:
+                    {
+                        current.Join = " = ";
+                    }
+                    break;
+                case ExpressionType.NotEqual:
+                    {
+                        current.Join = " != ";
+                    }
+                    break;
+            }
+
+            if (binary.Right is BinaryExpression)
+            {
+                whereCollection.Add(new BinaryExp() { Join = "(" });
+                Analyze(leftPlaceholder, leftType, binary.Right, tableInfo, whereCollection);
+                whereCollection.Add(new BinaryExp() { Join = ")" });
+            }
+            else
+            {
+                var memberExpress = binary.Right as MemberExpression;
+                var rightConfirm = false;
+                if (memberExpress != null)
+                {
+                    current.Left = this.FindColumnName(memberExpress.Member, tableInfo);
+                    current.LeftIsConstant = false;
+
+                    rightConfirm = true;
+                }
+
+                var constantExpress = binary.Right as ConstantExpression;
+                if (constantExpress != null)
+                {
+                    current.Right = constantExpress.Value.ToString();
+                    current.RightIsConstant = true;
+
+                    rightConfirm = true;
+                }
+
+                if (rightConfirm == false)
+                {
+                    throw new Exception("");
+                }
+            }
+
+            whereCollection.Add(current);
+        }
+
     }
 }

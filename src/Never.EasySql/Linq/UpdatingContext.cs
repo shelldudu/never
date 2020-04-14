@@ -271,7 +271,14 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> Exists(AndOrOption option, string expression)
         {
-            throw new NotImplementedException();
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
+            };
+
+            this.labels.Add(label);
+            return this;
         }
 
         /// <summary>
@@ -279,49 +286,46 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            var tableInfo = GetTableInfo<Table>();
-            var binary = expression.Body as System.Linq.Expressions.BinaryExpression;
-            if (binary != null)
+            var collection = new List<BinaryExp>(10);
+            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, collection);
+            if (collection.Any() == false)
+                return this;
+
+            var leftTable = this.asName;
+            if (leftTable == null)
+                leftTable = "t";
+
+            var rightTable = string.Concat(leftTable, leftTable);
+            var sb = new StringBuilder(collection.Count * 10);
+            sb.Append("exists(select 0 from ");
+            sb.Append(this.FindTableName<Table>(GetTableInfo<Table>()));
+            sb.Append(" as ");
+            sb.Append(rightTable);
+            sb.Append(" where ");
+            foreach (var c in collection)
             {
-                switch (binary.NodeType)
-                {
-                    case ExpressionType.Equal:
-                        {
-
-                        }
-                        break;
-                    case ExpressionType.NotEqual:
-                        {
-
-                        }
-                        break;
-                }
-                var left = binary.Left;
-                var right = binary.Right;
-
+                sb.Append(c.ToString(leftTable, rightTable));
             }
 
-            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, new List<BinaryExp>());
+            if (where != null)
+            {
+                collection.Clear();
+                this.Analyze(where, GetTableInfo<Table>(), collection);
+                if (collection.Any())
+                {
+                    sb.Append(" and ");
+                    foreach (var c in collection)
+                    {
+                        sb.Append(c.ToString(leftTable, rightTable));
+                    }
+                }
+            }
 
-            //string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
-            string columnName = null;
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", "not exists(select 0 from a where a.Id = ", this.Format(columnName), ".Id", columnName),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", sb.ToString()),
             };
-
-            label.Add(new SqlTagParameterPosition()
-            {
-                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                Name = columnName,
-                PositionLength = 6 + columnName.Length,
-                PrefixStart = 6 + columnName.Length + 2 + 3,
-                StartPosition = 6 + columnName.Length + 2 + 3,
-                StopPosition = 6 + columnName.Length,
-                TextParameter = false,
-            });
 
             this.labels.Add(label);
             return this;
@@ -332,7 +336,14 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> NotExists(AndOrOption option, string expression)
         {
-            throw new NotImplementedException();
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
+            };
+
+            this.labels.Add(label);
+            return this;
         }
 
         /// <summary>
@@ -340,7 +351,48 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, new List<BinaryExp>());
+            var collection = new List<BinaryExp>(10);
+            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, collection);
+            if (collection.Any() == false)
+                return this;
+
+            var leftTable = this.asName;
+            if (leftTable == null)
+                leftTable = "t";
+
+            var rightTable = string.Concat(leftTable, leftTable);
+            var sb = new StringBuilder(collection.Count * 10);
+            sb.Append("not exists(select 0 from ");
+            sb.Append(this.FindTableName<Table>(GetTableInfo<Table>()));
+            sb.Append(" as ");
+            sb.Append(rightTable);
+            sb.Append(" where ");
+            foreach (var c in collection)
+            {
+                sb.Append(c.ToString(leftTable, rightTable));
+            }
+
+            if (where != null)
+            {
+                collection.Clear();
+                this.Analyze(where, GetTableInfo<Table>(), collection);
+                if (collection.Any())
+                {
+                    sb.Append(" and ");
+                    foreach (var c in collection)
+                    {
+                        sb.Append(c.ToString(leftTable, rightTable));
+                    }
+                }
+            }
+
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", sb.ToString()),
+            };
+
+            this.labels.Add(label);
             return this;
         }
     }
