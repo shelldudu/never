@@ -7,12 +7,12 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Linq.Postgre
+namespace Never.EasySql.Linq.MySql
 {
     /// <summary>
-    /// 更新操作
+    /// 插入操作
     /// </summary>
-    public class UpdateContext<Parameter> : Linq.UpdatingContext<Parameter>
+    public sealed class InsertingContext<Parameter> : Linq.InsertingContext<Parameter>
     {
         /// <summary>
         /// ctor
@@ -21,7 +21,7 @@ namespace Never.EasySql.Linq.Postgre
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        public UpdateContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
+        public InsertingContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
         {
         }
 
@@ -32,7 +32,7 @@ namespace Never.EasySql.Linq.Postgre
         /// <returns></returns>
         protected override string Format(string text)
         {
-            return string.Concat("[", text, "]");
+            return string.Concat("`", text, "`");
         }
     }
 }

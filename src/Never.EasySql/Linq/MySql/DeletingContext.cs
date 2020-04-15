@@ -7,12 +7,12 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Linq.Odbc
+namespace Never.EasySql.Linq.MySql
 {
     /// <summary>
-    /// 查询操作
+    /// 删除操作
     /// </summary>
-    public class SelectContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
+    public sealed class DeletingContext<Parameter> : Linq.DeletingContext<Parameter>
     {
         /// <summary>
         /// ctor
@@ -21,7 +21,7 @@ namespace Never.EasySql.Linq.Odbc
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        public SelectContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
+        public DeletingContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
         {
         }
 
@@ -32,7 +32,7 @@ namespace Never.EasySql.Linq.Odbc
         /// <returns></returns>
         protected override string Format(string text)
         {
-            return string.Concat("[", text, "]");
+            return string.Concat("`", text, "`");
         }
     }
 }

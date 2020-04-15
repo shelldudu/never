@@ -21,7 +21,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 从哪一张表插入
         /// </summary>
-        public Insert<Parameter> From(string table)
+        public Insert<Parameter> Into(string table)
         {
             this.Context.Into(table);
             return this;
@@ -31,17 +31,17 @@ namespace Never.EasySql.Linq
         /// 单条插入
         /// </summary>
         /// <returns></returns>
-        public SingleInsertGrammar<Parameter> ToSingle()
+        public UnitInsertGrammar<Parameter> UseUnit()
         {
             this.Context.Entrance('s');
-            return new SingleInsertGrammar<Parameter>() { Context = this.Context };
+            return new UnitInsertGrammar<Parameter>() { Context = this.Context };
         }
 
         /// <summary>
         /// 批量插入
         /// </summary>
         /// <returns></returns>
-        public BulkInsertGrammar<Parameter> ToBulk()
+        public BulkInsertGrammar<Parameter> UseBulk()
         {
             this.Context.Entrance('b');
             return new BulkInsertGrammar<Parameter>() { Context = this.Context };

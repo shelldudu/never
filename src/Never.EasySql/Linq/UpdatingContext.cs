@@ -14,12 +14,44 @@ namespace Never.EasySql.Linq
     /// </summary>
     public class UpdatingContext<Parameter> : UpdateContext<Parameter>
     {
-        private readonly string cacheId;
-        private int textLength;
-        private int setTimes;
-        private string tableName;
-        private string asName;
-        private int formatAppendCount;
+        /// <summary>
+        /// 缓存Id
+        /// </summary>
+        protected readonly string cacheId;
+        /// <summary>
+        /// 总字符串长度
+        /// </summary>
+        protected int textLength;
+        /// <summary>
+        /// set出现的的次数
+        /// </summary>
+        protected int setTimes;
+        /// <summary>
+        /// tablaName
+        /// </summary>
+        protected string tableName;
+        /// <summary>
+        /// as别名
+        /// </summary>
+        protected string asTableName;
+        /// <summary>
+        /// tableName.
+        /// </summary>
+        protected string tableNamePoint;
+        /// <summary>
+        /// asTable.
+        /// </summary>
+        protected string asTableNamePoint;
+        /// <summary>
+        /// format格式化后增加的长度
+        /// </summary>
+        protected int formatAppendCount;
+
+        /// <summary>
+        /// 等于的前缀
+        /// </summary>
+        protected string equalAndPrefix;
+
         /// <summary>
         /// ctor
         /// </summary>
@@ -65,11 +97,11 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 
+        /// 别名
         /// </summary>
         public override UpdateContext<Parameter> AsTable(string table)
         {
-            this.asName = table;
+            this.asTableName = table;
             return this;
         }
 
@@ -83,76 +115,59 @@ namespace Never.EasySql.Linq
             this.tableName = this.Format(this.tableName);
             this.formatAppendCount = this.tableName.Length - length;
 
-            if (this.asName.IsNullOrEmpty())
+            if (this.asTableName.IsNullOrEmpty())
             {
-                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, " set \r") };
+                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, "\r", "set") };
                 this.textLength += label.SqlText.Length;
                 this.labels.Add(label);
             }
             else
             {
-                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, " as ", asName, " set \r") };
+                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, " ", asTableName, "\r", "set") };
                 this.textLength += label.SqlText.Length;
                 this.labels.Add(label);
             }
 
-
+            this.tableNamePoint = string.Concat(this.tableName, ".");
+            this.asTableNamePoint = this.asTableName.IsNullOrEmpty() ? string.Empty : string.Concat(this.asTableName, ".");
+            this.equalAndPrefix = string.Concat(" = ", this.dao.SqlExecuter.GetParameterPrefix());
             return this;
         }
 
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter)
+        protected virtual UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter)
         {
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+            };
+
             if (setTimes == 0)
             {
                 setTimes++;
-                var label = new TextLabel()
-                {
-                    TagId = NewId.GenerateNumber(),
-                    SqlText = string.Concat(this.Format(columnName), " = @", columnName, "\r"),
-                };
-
-                label.Add(new SqlTagParameterPosition()
-                {
-                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                    Name = columnName,
-                    PositionLength = this.formatAppendCount + columnName.Length,
-                    PrefixStart = this.formatAppendCount + columnName.Length + 3,
-                    StartPosition = this.formatAppendCount + columnName.Length + 3,
-                    StopPosition = this.formatAppendCount + columnName.Length + 3 + columnName.Length,
-                    TextParameter = textParameter,
-                });
-
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
+                label.SqlText = string.Concat(" ", asTableNamePoint, this.Format(columnName), equalAndPrefix, columnName, "\r");
             }
             else
             {
-
-                var label = new TextLabel()
-                {
-                    TagId = NewId.GenerateNumber(),
-                    SqlText = string.Concat(",", this.Format(columnName), " = @", columnName, "\r"),
-                };
-
-                label.Add(new SqlTagParameterPosition()
-                {
-                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                    Name = columnName,
-                    PositionLength = columnName.Length,
-                    PrefixStart = 1 + this.formatAppendCount + columnName.Length + 3,
-                    StartPosition = 1 + this.formatAppendCount + columnName.Length + 3,
-                    StopPosition = 1 + this.formatAppendCount + columnName.Length + 3 + columnName.Length,
-                    TextParameter = textParameter,
-                });
-
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
+                label.SqlText = string.Concat(",", asTableNamePoint, this.Format(columnName), equalAndPrefix, columnName, "\r");
             }
+
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = columnName,
+                PositionLength = this.formatAppendCount + columnName.Length,
+                PrefixStart = 1 + asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                StartPosition = 1 + asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                StopPosition = 1 + asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                TextParameter = textParameter,
+            });
+
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
 
             return this;
         }
@@ -210,7 +225,7 @@ namespace Never.EasySql.Linq
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat("where ", this.Format(columnName), " = @", columnName, "\r"),
+                SqlText = string.Concat("where ", this.asTableNamePoint, this.Format(columnName), this.equalAndPrefix, columnName, "\r"),
             };
 
             label.Add(new SqlTagParameterPosition()
@@ -218,10 +233,10 @@ namespace Never.EasySql.Linq
                 ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 Name = columnName,
-                PositionLength = 6 + this.formatAppendCount + columnName.Length,
-                PrefixStart = 6 + this.formatAppendCount + columnName.Length + 3,
-                StartPosition = 6 + this.formatAppendCount + columnName.Length + 3,
-                StopPosition = 6 + this.formatAppendCount + columnName.Length,
+                PositionLength = this.formatAppendCount + columnName.Length,
+                PrefixStart = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                StartPosition = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                StopPosition = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
                 TextParameter = false,
             });
 
@@ -238,7 +253,7 @@ namespace Never.EasySql.Linq
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
+                SqlText = string.Concat(option == AndOrOption.and ? "and " : "or ", expression, "\r"),
             };
 
             this.labels.Add(label);
@@ -261,7 +276,7 @@ namespace Never.EasySql.Linq
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
+                SqlText = string.Concat(option == AndOrOption.and ? "and " : "or ", expression, "\r"),
             };
 
             this.labels.Add(label);
@@ -312,9 +327,9 @@ namespace Never.EasySql.Linq
             var sb = new StringBuilder(collection.Count * 10);
             var leftAs = leftTableName;
             var rightAs = rightTableName;
-            if (this.asName.IsNotNullOrEmpty())
+            if (this.asTableName.IsNotNullOrEmpty())
             {
-                leftAs = this.asName;
+                leftAs = this.asTableName;
                 rightAs = string.Concat(leftAs, leftAs);
                 sb.Append(leftAs);
                 sb.Append(".");
@@ -351,12 +366,12 @@ namespace Never.EasySql.Linq
                 }
             }
 
-            sb.Append(") ");
+            sb.Append(") \r");
 
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", sb.ToString()),
+                SqlText = string.Concat(option == AndOrOption.and ? "and " : "or ", sb.ToString()),
             };
 
             this.labels.Add(label);
@@ -371,7 +386,7 @@ namespace Never.EasySql.Linq
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
+                SqlText = string.Concat(option == AndOrOption.and ? "and " : "or ", expression, "\r"),
             };
 
             this.labels.Add(label);
@@ -394,7 +409,7 @@ namespace Never.EasySql.Linq
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
+                SqlText = string.Concat(option == AndOrOption.and ? "and " : "or ", expression, "\r"),
             };
 
             this.labels.Add(label);
@@ -424,14 +439,14 @@ namespace Never.EasySql.Linq
             var leftTableName = this.tableName;
             var rightTableName = this.Format(this.FindTableName<Table>(rightTableInfo));
             var sb = new StringBuilder(collection.Count * 10);
-            sb.Append(flag == 'n' ? " not exists(select 0 from " : " exists(select 0 from ");
+            sb.Append(flag == 'n' ? "not exists(select 0 from " : " exists(select 0 from ");
             sb.Append(rightTableName);
 
             var leftAs = leftTableName;
             var rightAs = rightTableName;
-            if (this.asName.IsNotNullOrEmpty())
+            if (this.asTableName.IsNotNullOrEmpty())
             {
-                leftAs = this.asName;
+                leftAs = this.asTableName;
                 rightAs = string.Concat(leftAs, leftAs);
                 sb.Append(" as ");
                 sb.Append(rightAs);
@@ -466,12 +481,12 @@ namespace Never.EasySql.Linq
                 }
             }
 
-            sb.Append(")");
+            sb.Append(") \r");
 
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", sb.ToString()),
+                SqlText = string.Concat(option == AndOrOption.and ? "and " : "or ", sb.ToString()),
             };
 
             this.labels.Add(label);

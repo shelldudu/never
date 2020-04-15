@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 namespace Never.EasySql.Linq.MySql
 {
     /// <summary>
-    /// 删除操作
+    /// 更新操作
     /// </summary>
-    public class DeleteContext<Parameter> : Linq.DeletingContext<Parameter>
+    public sealed class UpdatingContext<Parameter> : Linq.UpdatingContext<Parameter>
     {
         /// <summary>
         /// ctor
@@ -21,7 +21,7 @@ namespace Never.EasySql.Linq.MySql
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        public DeleteContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
+        public UpdatingContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
         {
         }
 

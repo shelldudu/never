@@ -7,12 +7,12 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Linq.OleDb
+namespace Never.EasySql.Linq.Postgre
 {
     /// <summary>
     /// 查询操作
     /// </summary>
-    public class SelectContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
+    public sealed class SelectingContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor
@@ -21,7 +21,7 @@ namespace Never.EasySql.Linq.OleDb
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        public SelectContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
+        public SelectingContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
         {
         }
 

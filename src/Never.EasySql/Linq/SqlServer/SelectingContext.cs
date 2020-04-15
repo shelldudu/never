@@ -7,12 +7,12 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Linq.Oracle
+namespace Never.EasySql.Linq.SqlServer
 {
     /// <summary>
-    /// 删除操作
+    /// 查询操作
     /// </summary>
-    public class DeleteContext<Parameter> : Linq.DeletingContext<Parameter>
+    public sealed class SelectingContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor
@@ -21,7 +21,7 @@ namespace Never.EasySql.Linq.Oracle
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        public DeleteContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
+        public SelectingContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
         {
         }
 

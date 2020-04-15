@@ -7,12 +7,12 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Linq.Oracle
+namespace Never.EasySql.Linq.OleDb
 {
     /// <summary>
-    /// 查询操作
+    /// 插入操作
     /// </summary>
-    public class SelectContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
+    public sealed class InsertingContext<Parameter> : Linq.InsertingContext<Parameter>
     {
         /// <summary>
         /// ctor
@@ -21,7 +21,7 @@ namespace Never.EasySql.Linq.Oracle
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        public SelectContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
+        public InsertingContext(string cacheId, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(cacheId, dao, tableInfo, sqlParameter)
         {
         }
 

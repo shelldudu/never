@@ -10,7 +10,7 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// insert 语法
     /// </summary>
-    public struct SingleInsertGrammar<Parameter>
+    public struct UnitInsertGrammar<Parameter>
     {
         /// <summary>
         /// 上下文
@@ -20,7 +20,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public SingleInsertGrammar<Parameter> Colum(Expression<Func<Parameter, object>> expression)
+        public UnitInsertGrammar<Parameter> Colum(Expression<Func<Parameter, object>> expression)
         {
             this.Context.Colum(expression);
             return this;
@@ -29,7 +29,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public SingleInsertGrammar<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function)
+        public UnitInsertGrammar<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function)
         {
             this.Context.ColumWithFunc(expression, function);
             return this;
@@ -38,7 +38,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public SingleInsertGrammar<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        public UnitInsertGrammar<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
             this.Context.ColumWithValue(expression, value);
             return this;
@@ -47,7 +47,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 返回最后插入语句
         /// </summary>
-        public SingleInsertGrammar<Parameter> LastInsertId()
+        public UnitInsertGrammar<Parameter> LastInsertId()
         {
             this.Context.InsertLastInsertId();
             return this;

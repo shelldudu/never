@@ -43,7 +43,7 @@ namespace Never.Test
             //     .Where(null).ToList(1, 5).GetResult();
 
             //更新
-            var update = dao.ToEasyLinqDao(new MyTable()).Cached("AAA").Update().From("").As("")
+            var update = dao.ToEasyLinqDao(new MyTable()).Cached("AAA").Update().From("user").As("t")
                 .SetColum(m => m.Name)
                 .SetColumnWithFunc(m => m.CreateTime, "now()")
                 .SetColumnWithValue(m => m.Name, "abc")
@@ -63,7 +63,7 @@ namespace Never.Test
 
             //推入
             var insert = dao.ToEasyLinqDao(new SqlServerBuilder()).Insert()
-                .ToSingle()
+                .UseUnit()
                 .Colum(m => m.EmbeddedSqlMaps)
                 .ColumWithFunc(m => m.ConnectionString, "uuid()")
                 .LastInsertId()
@@ -77,12 +77,15 @@ namespace Never.Test
             var list2 = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyXmlDao(new { Id = 1, UserId = 2, UserName = "".ToNullableParameter() }).QueryForEnumerable<User>("qryUser");
         }
 
+        [Never.SqlClient.TableName(Name ="user")]
         public class MyTable
         {
             public int Id;
             public string Name;
             public DateTime CreateTime;
         }
+
+        [Never.SqlClient.TableName(Name = "user_info")]
         public class MyTable2
         {
             public int Id;
