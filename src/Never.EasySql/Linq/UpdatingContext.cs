@@ -19,7 +19,7 @@ namespace Never.EasySql.Linq
         private int setTimes;
         private string tableName;
         private string asName;
-
+        private int formatAppendCount;
         /// <summary>
         /// ctor
         /// </summary>
@@ -79,18 +79,23 @@ namespace Never.EasySql.Linq
         public override UpdateContext<Parameter> Entrance()
         {
             this.tableName = this.tableName.IsNullOrEmpty() ? this.FindTableName<Parameter>(tableInfo) : this.tableName;
+            int length = this.tableName.Length;
+            this.tableName = this.Format(this.tableName);
+            this.formatAppendCount = this.tableName.Length - length;
+
             if (this.asName.IsNullOrEmpty())
             {
-                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.Format(this.tableName), " set \r") };
+                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, " set \r") };
                 this.textLength += label.SqlText.Length;
                 this.labels.Add(label);
             }
             else
             {
-                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.Format(this.tableName), " as ", asName, " set \r") };
+                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, " as ", asName, " set \r") };
                 this.textLength += label.SqlText.Length;
                 this.labels.Add(label);
             }
+
 
             return this;
         }
@@ -114,10 +119,10 @@ namespace Never.EasySql.Linq
                     ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     Name = columnName,
-                    PositionLength = 1 + columnName.Length + 1,
-                    PrefixStart = 1 + columnName.Length + 1 + 3,
-                    StartPosition = 1 + columnName.Length + 1 + 3,
-                    StopPosition = columnName.Length,
+                    PositionLength = this.formatAppendCount + columnName.Length,
+                    PrefixStart = this.formatAppendCount + columnName.Length + 3,
+                    StartPosition = this.formatAppendCount + columnName.Length + 3,
+                    StopPosition = this.formatAppendCount + columnName.Length + 3 + columnName.Length,
                     TextParameter = textParameter,
                 });
 
@@ -139,9 +144,9 @@ namespace Never.EasySql.Linq
                     SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     Name = columnName,
                     PositionLength = columnName.Length,
-                    PrefixStart = 1 + 1 + columnName.Length + 1 + 3,
-                    StartPosition = 1 + 1 + columnName.Length + 1 + 3,
-                    StopPosition = columnName.Length,
+                    PrefixStart = 1 + this.formatAppendCount + columnName.Length + 3,
+                    StartPosition = 1 + this.formatAppendCount + columnName.Length + 3,
+                    StopPosition = 1 + this.formatAppendCount + columnName.Length + 3 + columnName.Length,
                     TextParameter = textParameter,
                 });
 
@@ -213,10 +218,10 @@ namespace Never.EasySql.Linq
                 ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 Name = columnName,
-                PositionLength = 6 + 1 + columnName.Length + 1,
-                PrefixStart = 6 + 1 + columnName.Length + 1 + 3,
-                StartPosition = 6 + 1 + columnName.Length + 1 + 3,
-                StopPosition = 6 + 1 + columnName.Length + 1,
+                PositionLength = 6 + this.formatAppendCount + columnName.Length,
+                PrefixStart = 6 + this.formatAppendCount + columnName.Length + 3,
+                StartPosition = 6 + this.formatAppendCount + columnName.Length + 3,
+                StopPosition = 6 + this.formatAppendCount + columnName.Length,
                 TextParameter = false,
             });
 
@@ -230,7 +235,14 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> In(AndOrOption option, string expression)
         {
-            throw new NotImplementedException();
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", expression),
+            };
+
+            this.labels.Add(label);
+            return this;
         }
 
         /// <summary>
@@ -238,8 +250,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, new List<BinaryExp>());
-            return this;
+            return this.InOrNotIn(option, expression, where, 'i');
         }
 
         /// <summary>
@@ -262,7 +273,93 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, new List<BinaryExp>());
+            return this.InOrNotIn(option, expression, where, 'n');
+        }
+
+        /// <summary>
+        /// in or not in
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="option"></param>
+        /// <param name="expression"></param>
+        /// <param name="where"></param>
+        /// <param name="flag"></param>
+        /// <returns></returns>
+        protected UpdateContext<Parameter> InOrNotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where, char flag)
+        {
+            var collection = new List<BinaryExp>(10);
+            var leftTableInfo = this.tableInfo;
+            var rightTableInfo = GetTableInfo<Table>();
+            this.Analyze(expression, leftTableInfo, rightTableInfo, this.templateParameter, collection);
+            if (collection.Any() == false)
+                return this;
+
+            if (collection.Count > 1)
+            {
+                collection.RemoveAll(p => p.Left.IsEquals("(") || p.Right.IsEquals(")"));
+            }
+
+            if (collection.Any() == false)
+                return this;
+
+            if (collection.Count > 1 || collection[0].Join.IsNotEquals(" = ") || collection[0].LeftIsConstant || collection[0].RightIsConstant)
+            {
+                throw new Exception("in expression must like this (p,t)=>p.Id == t.Id");
+            }
+
+            var leftTableName = this.tableName;
+            var rightTableName = this.Format(this.FindTableName<Table>(rightTableInfo));
+            var sb = new StringBuilder(collection.Count * 10);
+            var leftAs = leftTableName;
+            var rightAs = rightTableName;
+            if (this.asName.IsNotNullOrEmpty())
+            {
+                leftAs = this.asName;
+                rightAs = string.Concat(leftAs, leftAs);
+                sb.Append(leftAs);
+                sb.Append(".");
+                sb.Append(collection[0].Left);
+                sb.Append(flag == 'n' ? " not in (select " : " in (select ");
+                sb.Append(collection[0].Right);
+                sb.Append(" from ");
+                sb.Append(rightTableName);
+                sb.Append(" as ");
+                sb.Append(rightAs);
+            }
+            else
+            {
+                sb.Append(leftTableName);
+                sb.Append(".");
+                sb.Append(collection[0].Left);
+                sb.Append(flag == 'n' ? " not in (select " : " in (select ");
+                sb.Append(collection[0].Right);
+                sb.Append(" from ");
+                sb.Append(rightTableName);
+            }
+
+            if (where != null)
+            {
+                var temp = new List<BinaryExp>(10);
+                this.Analyze(where, GetTableInfo<Table>(), temp);
+                if (collection.Any())
+                {
+                    sb.Append(" where ");
+                    foreach (var c in temp)
+                    {
+                        sb.Append(c.ToString(rightAs, rightAs));
+                    }
+                }
+            }
+
+            sb.Append(") ");
+
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", sb.ToString()),
+            };
+
+            this.labels.Add(label);
             return this;
         }
 
@@ -286,49 +383,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            var collection = new List<BinaryExp>(10);
-            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, collection);
-            if (collection.Any() == false)
-                return this;
-
-            var leftTable = this.asName;
-            if (leftTable == null)
-                leftTable = "t";
-
-            var rightTable = string.Concat(leftTable, leftTable);
-            var sb = new StringBuilder(collection.Count * 10);
-            sb.Append("exists(select 0 from ");
-            sb.Append(this.FindTableName<Table>(GetTableInfo<Table>()));
-            sb.Append(" as ");
-            sb.Append(rightTable);
-            sb.Append(" where ");
-            foreach (var c in collection)
-            {
-                sb.Append(c.ToString(leftTable, rightTable));
-            }
-
-            if (where != null)
-            {
-                collection.Clear();
-                this.Analyze(where, GetTableInfo<Table>(), collection);
-                if (collection.Any())
-                {
-                    sb.Append(" and ");
-                    foreach (var c in collection)
-                    {
-                        sb.Append(c.ToString(leftTable, rightTable));
-                    }
-                }
-            }
-
-            var label = new TextLabel()
-            {
-                TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? " and " : "  or ", sb.ToString()),
-            };
-
-            this.labels.Add(label);
-            return this;
+            return this.ExistsNotExists(option, expression, where, 'e');
         }
 
         /// <summary>
@@ -351,40 +406,67 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
+            return this.ExistsNotExists(option, expression, where, 'n');
+        }
+
+        /// <summary>
+        /// exists or not exists
+        /// </summary>
+        protected UpdateContext<Parameter> ExistsNotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where, char flag)
+        {
             var collection = new List<BinaryExp>(10);
-            this.Analyze(expression, this.tableInfo, GetTableInfo<Table>(), this.templateParameter, collection);
+            var leftTableInfo = this.tableInfo;
+            var rightTableInfo = GetTableInfo<Table>();
+            this.Analyze(expression, leftTableInfo, rightTableInfo, this.templateParameter, collection);
             if (collection.Any() == false)
                 return this;
 
-            var leftTable = this.asName;
-            if (leftTable == null)
-                leftTable = "t";
-
-            var rightTable = string.Concat(leftTable, leftTable);
+            var leftTableName = this.tableName;
+            var rightTableName = this.Format(this.FindTableName<Table>(rightTableInfo));
             var sb = new StringBuilder(collection.Count * 10);
-            sb.Append("not exists(select 0 from ");
-            sb.Append(this.FindTableName<Table>(GetTableInfo<Table>()));
-            sb.Append(" as ");
-            sb.Append(rightTable);
-            sb.Append(" where ");
-            foreach (var c in collection)
+            sb.Append(flag == 'n' ? " not exists(select 0 from " : " exists(select 0 from ");
+            sb.Append(rightTableName);
+
+            var leftAs = leftTableName;
+            var rightAs = rightTableName;
+            if (this.asName.IsNotNullOrEmpty())
             {
-                sb.Append(c.ToString(leftTable, rightTable));
+                leftAs = this.asName;
+                rightAs = string.Concat(leftAs, leftAs);
+                sb.Append(" as ");
+                sb.Append(rightAs);
             }
 
-            if (where != null)
+            sb.Append(" where ");
+            for (var i = 0; i < collection.Count; i++)
             {
-                collection.Clear();
-                this.Analyze(where, GetTableInfo<Table>(), collection);
-                if (collection.Any())
+                if (i == collection.Count - 1)
                 {
-                    sb.Append(" and ");
-                    foreach (var c in collection)
+                    if (where != null)
                     {
-                        sb.Append(c.ToString(leftTable, rightTable));
+                        var temp = new List<BinaryExp>(10);
+                        this.Analyze(where, GetTableInfo<Table>(), temp);
+                        if (collection.Any())
+                        {
+                            sb.Append(" and ");
+                            foreach (var c in temp)
+                            {
+                                sb.Append(c.ToString(leftAs, rightAs));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        sb.Append(collection[i].ToString(leftAs, rightAs));
                     }
                 }
+                else
+                {
+                    sb.Append(collection[i].ToString(leftAs, rightAs));
+                }
             }
+
+            sb.Append(")");
 
             var label = new TextLabel()
             {

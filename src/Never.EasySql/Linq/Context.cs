@@ -61,9 +61,9 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public string ToString(string leftPlaceholder, string rightPlaceholder)
             {
-                return string.Concat(this.Left == null ? "" : (this.LeftIsConstant ? this.Left : string.Concat(leftPlaceholder, ".", Left)),
+                return string.Concat(this.Left == null ? "" : (this.LeftIsConstant ? string.Concat("'", this.Left, "'") : string.Concat(leftPlaceholder, ".", Left)),
                     this.Join ?? "",
-                    this.Right == null ? "" : (this.RightIsConstant ? this.Right : string.Concat(rightPlaceholder, ".", Right)));
+                    this.Right == null ? "" : (this.RightIsConstant ? string.Concat("'", this.Right, "'") : string.Concat(rightPlaceholder, ".", Right)));
             }
         }
 
@@ -248,9 +248,16 @@ namespace Never.EasySql.Linq
             BinaryExp current = null;
             if (binary.Left is BinaryExpression)
             {
-                whereCollection.Add(new BinaryExp() { Join = "(" });
-                Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Left, parameterTableInfo, tableInfo, templateParameter, whereCollection);
-                whereCollection.Add(new BinaryExp() { Join = ")" });
+                if (((BinaryExpression)binary.Left).Left is BinaryExpression)
+                {
+                    whereCollection.Add(new BinaryExp() { Join = "(" });
+                    Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Left, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+                    whereCollection.Add(new BinaryExp() { Join = ")" });
+                }
+                else
+                {
+                    Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Left, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+                }
             }
             else
             {
@@ -280,17 +287,21 @@ namespace Never.EasySql.Linq
                     leftConfirm = true;
                 }
 
-                var constantExpress = binary.Left as ConstantExpression;
-                if (constantExpress != null)
+                if (leftConfirm == false)
                 {
-                    current = new BinaryExp()
+                    var constantExpress = binary.Left as ConstantExpression;
+                    if (constantExpress != null)
                     {
-                        Right = constantExpress.Value.ToString(),
-                        RightIsConstant = true,
-                    };
+                        current = new BinaryExp()
+                        {
+                            Right = constantExpress.Value.ToString(),
+                            RightIsConstant = true,
+                        };
 
-                    leftConfirm = true;
+                        leftConfirm = true;
+                    }
                 }
+
 
                 if (leftConfirm == false)
                 {
@@ -303,12 +314,12 @@ namespace Never.EasySql.Linq
             {
                 case ExpressionType.AndAlso:
                     {
-                        whereCollection.Add(new BinaryExp() { Join = "and" });
+                        whereCollection.Add(new BinaryExp() { Join = " and " });
                     }
                     break;
                 case ExpressionType.OrElse:
                     {
-                        whereCollection.Add(new BinaryExp() { Join = "or" });
+                        whereCollection.Add(new BinaryExp() { Join = " or " });
                     }
                     break;
                 case ExpressionType.LessThan:
@@ -357,9 +368,16 @@ namespace Never.EasySql.Linq
 
             if (binary.Right is BinaryExpression)
             {
-                whereCollection.Add(new BinaryExp() { Join = "(" });
-                Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Right, parameterTableInfo, tableInfo, templateParameter, whereCollection);
-                whereCollection.Add(new BinaryExp() { Join = ")" });
+                if (((BinaryExpression)binary.Right).Right is BinaryExpression)
+                {
+                    whereCollection.Add(new BinaryExp() { Join = "(" });
+                    Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Right, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+                    whereCollection.Add(new BinaryExp() { Join = ")" });
+                }
+                else
+                {
+                    Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Right, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+                }
             }
             else
             {
@@ -380,23 +398,27 @@ namespace Never.EasySql.Linq
 
                     rightConfirm = true;
                 }
-
-                var constantExpress = binary.Right as ConstantExpression;
-                if (constantExpress != null)
+                if (rightConfirm == false)
                 {
-                    if (current.Left != null)
+                    var constantExpress = binary.Right as ConstantExpression;
+                    if (constantExpress != null)
                     {
-                        current.Right = constantExpress.Value.ToString();
-                        current.RightIsConstant = true;
-                    }
-                    else
-                    {
-                        current.Left = constantExpress.Value.ToString();
-                        current.LeftIsConstant = true;
+                        if (current.Left != null)
+                        {
+                            current.Right = constantExpress.Value.ToString();
+                            current.RightIsConstant = true;
+                        }
+                        else
+                        {
+                            current.Left = constantExpress.Value.ToString();
+                            current.LeftIsConstant = true;
+                        }
+
+                        rightConfirm = true;
                     }
 
-                    rightConfirm = true;
                 }
+
 
                 if (rightConfirm == false)
                 {
@@ -404,7 +426,8 @@ namespace Never.EasySql.Linq
                 }
             }
 
-            whereCollection.Add(current);
+            if (current != null)
+                whereCollection.Add(current);
         }
 
         /// <summary>
@@ -440,9 +463,16 @@ namespace Never.EasySql.Linq
             BinaryExp current = null;
             if (binary.Left is BinaryExpression)
             {
-                whereCollection.Add(new BinaryExp() { Join = "(" });
-                Analyze(leftPlaceholder, leftType, binary.Left, tableInfo, whereCollection);
-                whereCollection.Add(new BinaryExp() { Join = ")" });
+                if (((BinaryExpression)binary.Left).Left is BinaryExpression)
+                {
+                    whereCollection.Add(new BinaryExp() { Join = "(" });
+                    Analyze(leftPlaceholder, leftType, binary.Left, tableInfo, whereCollection);
+                    whereCollection.Add(new BinaryExp() { Join = ")" });
+                }
+                else
+                {
+                    Analyze(leftPlaceholder, leftType, binary.Left, tableInfo, whereCollection);
+                }
             }
             else
             {
@@ -537,9 +567,16 @@ namespace Never.EasySql.Linq
 
             if (binary.Right is BinaryExpression)
             {
-                whereCollection.Add(new BinaryExp() { Join = "(" });
-                Analyze(leftPlaceholder, leftType, binary.Right, tableInfo, whereCollection);
-                whereCollection.Add(new BinaryExp() { Join = ")" });
+                if (((BinaryExpression)binary.Right).Right is BinaryExpression)
+                {
+                    whereCollection.Add(new BinaryExp() { Join = "(" });
+                    Analyze(leftPlaceholder, leftType, binary.Right, tableInfo, whereCollection);
+                    whereCollection.Add(new BinaryExp() { Join = ")" });
+                }
+                else
+                {
+                    Analyze(leftPlaceholder, leftType, binary.Right, tableInfo, whereCollection);
+                }
             }
             else
             {
@@ -568,7 +605,9 @@ namespace Never.EasySql.Linq
                 }
             }
 
-            whereCollection.Add(current);
+
+            if (current != null)
+                whereCollection.Add(current);
         }
 
     }

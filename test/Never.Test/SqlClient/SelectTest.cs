@@ -49,6 +49,7 @@ namespace Never.Test
                 .SetColumnWithValue(m => m.Name, "abc")
                 .Where(p => p.Id)
                 //.AndNotExists<MyTable2>((p, t) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2)
+                .AndNotExists<MyTable2>((p, t) => t.Id != 2)
                 .AndNotExists<MyTable2>((p, t) => p.Id > 0)
                 .AndNotIn<MyTable2>((p, t) => p.Id == t.Id, t => t.Name == "ee")
                 .GetResult();
@@ -62,8 +63,9 @@ namespace Never.Test
 
             //推入
             var insert = dao.ToEasyLinqDao(new SqlServerBuilder()).Insert()
-                .ValueColum(m => m.EmbeddedSqlMaps)
-                .ValueColumFunc(m => m.ConnectionString, "uuid()")
+                .ToSingle()
+                .Colum(m => m.EmbeddedSqlMaps)
+                .ColumWithFunc(m => m.ConnectionString, "uuid()")
                 .LastInsertId()
                 .GetResult<int>();
         }

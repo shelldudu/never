@@ -46,11 +46,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Never\Never.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Linq\PostgreSql\" />
-    <Folder Include="Linq\Oracle\" />
-    <Folder Include="Linq\SqlServer\" />
-    <Folder Include="Linq\Sqlite\" />
-  </ItemGroup>
 </Project>
