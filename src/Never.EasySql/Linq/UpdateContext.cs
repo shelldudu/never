@@ -38,6 +38,36 @@ namespace Never.EasySql.Linq
         /// </summary>
         protected readonly Dictionary<string, object> templateParameter;
 
+        #region 
+
+        /// <summary>
+        /// update的jion东西
+        /// </summary>
+        protected struct UpdateJoin
+        {
+            /// <summary>
+            /// join的类型
+            /// </summary>
+            public JoinOption JoinOption;
+
+            /// <summary>
+            /// join后第二张表的别名
+            /// </summary>
+            public string TableAsName;
+
+            /// <summary>
+            /// join的on
+            /// </summary>
+            public Expression On;
+
+            /// <summary>
+            /// join的and
+            /// </summary>
+            public Expression And;
+        }
+
+        #endregion
+
         /// <summary>
         /// 
         /// </summary>
@@ -100,6 +130,46 @@ namespace Never.EasySql.Linq
         public abstract UpdateContext<Parameter> From(string table);
 
         /// <summary>
+        /// join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public abstract UpdateContext<Parameter> Join<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> on, Expression<Func<Table, bool>> and);
+
+        /// <summary>
+        /// inner join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public abstract UpdateContext<Parameter> InnerJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> on, Expression<Func<Table, bool>> and);
+
+        /// <summary>
+        /// left join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public abstract UpdateContext<Parameter> LeftJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> on, Expression<Func<Table, bool>> and);
+
+        /// <summary>
+        /// right join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public abstract UpdateContext<Parameter> RightJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> on, Expression<Func<Table, bool>> and);
+
+        /// <summary>
         /// as新表名
         /// </summary>
         /// <param name="table"></param>
@@ -110,6 +180,12 @@ namespace Never.EasySql.Linq
         /// 入口
         /// </summary>
         public abstract UpdateContext<Parameter> Entrance();
+
+        /// <summary>
+        /// 在update的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint
+        /// </summary>
+        /// <returns></returns>
+        protected abstract string SelectTableNameOnSetolunm();
 
         /// <summary>
         /// 更新的字段名

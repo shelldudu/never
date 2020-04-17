@@ -105,7 +105,18 @@ namespace Never.Test
 
         private static void Main(string[] args)
          {
-            new SelectTest().TestId_1();
+            var a = new System.Text.StringBuilder("a");
+            ChangeBuilder( a);
+            if (a == null)
+            {
+
+                int ac = 0;
+            }
+            else 
+            {
+            
+            }
+            //new SelectTest().TestId_1();
             //var p = new Program();
             //p.Release();
 
@@ -113,6 +124,11 @@ namespace Never.Test
             // pro.Processing(null, typeof(ABC));
             // var a = TypeProcessor.TryGetAttribute(typeof(ABC), out var attribute);
             // var b = TypeProcessor.TryGetActivator(typeof(ABC), out var validator);
+        }
+
+        private static void ChangeBuilder(System.Text.StringBuilder builder) 
+        {
+            builder = new System.Text.StringBuilder("bbb");
         }
 
         private static void ChangeABC(ABC a)

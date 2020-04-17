@@ -37,6 +37,59 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="expression"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public Update<Parameter> Join<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
+        {
+
+            return this;
+        }
+
+        /// <summary>
+        /// inner join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="expression"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public Update<Parameter> InnerJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// left join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="expression"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public Update<Parameter> LeftJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// right join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="expression"></param>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        public Update<Parameter> RightJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        {
+            return this;
+        }
+
+        /// <summary>
         /// 更新的字段名
         /// </summary>
         public UpdateGrammar<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember>> expression)

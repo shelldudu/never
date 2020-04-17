@@ -14,6 +14,9 @@ namespace Never.EasySql.Linq
     /// </summary>
     public class UpdatingContext<Parameter> : UpdateContext<Parameter>
     {
+
+
+        #region prop
         /// <summary>
         /// 缓存Id
         /// </summary>
@@ -51,6 +54,13 @@ namespace Never.EasySql.Linq
         /// 等于的前缀
         /// </summary>
         protected string equalAndPrefix;
+
+        /// <summary>
+        /// update的jion东西
+        /// </summary>
+        protected List<UpdateJoin> updateJoin;
+
+        #endregion
 
         /// <summary>
         /// ctor
@@ -105,6 +115,103 @@ namespace Never.EasySql.Linq
             return this;
         }
 
+
+        /// <summary>
+        /// join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public override UpdateContext<Parameter> Join<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> on, Expression<Func<Table, bool>> and)
+        {
+            if (this.updateJoin == null)
+                this.updateJoin = new List<UpdateJoin>(1);
+
+            this.updateJoin.Add(new UpdateJoin()
+            {
+                TableAsName = tableAsName,
+                And = and,
+                JoinOption = JoinOption.Join,
+                On = on
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// inner join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public override UpdateContext<Parameter> InnerJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> on, Expression<Func<Table, bool>> and)
+        {
+            if (this.updateJoin == null)
+                this.updateJoin = new List<UpdateJoin>(1);
+
+            this.updateJoin.Add(new UpdateJoin()
+            {
+                TableAsName = tableAsName,
+                And = and,
+                JoinOption = JoinOption.InnerJoin,
+                On = on
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// left join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public override UpdateContext<Parameter> LeftJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> on, Expression<Func<Table, bool>> and)
+        {
+            if (this.updateJoin == null)
+                this.updateJoin = new List<UpdateJoin>(1);
+
+            this.updateJoin.Add(new UpdateJoin()
+            {
+                TableAsName = tableAsName,
+                And = and,
+                JoinOption = JoinOption.LeftJoin,
+                On = on
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// right join
+        /// </summary>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="tableAsName"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public override UpdateContext<Parameter> RightJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> on, Expression<Func<Table, bool>> and)
+        {
+            if (this.updateJoin == null)
+                this.updateJoin = new List<UpdateJoin>(1);
+
+            this.updateJoin.Add(new UpdateJoin()
+            {
+                TableAsName = tableAsName,
+                And = and,
+                JoinOption = JoinOption.RightJoin,
+                On = on
+            });
+
+            return this;
+        }
+
         /// <summary>
         /// 入口
         /// </summary>
@@ -115,23 +222,23 @@ namespace Never.EasySql.Linq
             this.tableName = this.Format(this.tableName);
             this.formatAppendCount = this.tableName.Length - length;
 
-            if (this.asTableName.IsNullOrEmpty())
-            {
-                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, "\r", "set") };
-                this.textLength += label.SqlText.Length;
-                this.labels.Add(label);
-            }
-            else
-            {
-                var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, " ", asTableName, "\r", "set") };
-                this.textLength += label.SqlText.Length;
-                this.labels.Add(label);
-            }
-
             this.tableNamePoint = string.Concat(this.tableName, ".");
             this.asTableNamePoint = this.asTableName.IsNullOrEmpty() ? string.Empty : string.Concat(this.asTableName, ".");
+
+            var label = this.GetFirstLabelOnEntrance();
+            this.textLength += label.SqlText.Length;
+            this.labels.Add(label);
             this.equalAndPrefix = string.Concat(" = ", this.dao.SqlExecuter.GetParameterPrefix());
             return this;
+        }
+
+        /// <summary>
+        /// 获取入口的标签
+        /// </summary>
+        /// <returns></returns>
+        protected virtual TextLabel GetFirstLabelOnEntrance()
+        {
+            return new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, "\r", "set") };
         }
 
         /// <summary>
@@ -144,14 +251,16 @@ namespace Never.EasySql.Linq
                 TagId = NewId.GenerateNumber(),
             };
 
+            var selectTableName = this.SelectTableNameOnSetolunm() ?? this.tableNamePoint;
+
             if (setTimes == 0)
             {
                 setTimes++;
-                label.SqlText = string.Concat(" ", asTableNamePoint, this.Format(columnName), equalAndPrefix, columnName, "\r");
+                label.SqlText = string.Concat(" ", selectTableName, this.Format(columnName), equalAndPrefix, columnName, "\r");
             }
             else
             {
-                label.SqlText = string.Concat(",", asTableNamePoint, this.Format(columnName), equalAndPrefix, columnName, "\r");
+                label.SqlText = string.Concat(",", selectTableName, this.Format(columnName), equalAndPrefix, columnName, "\r");
             }
 
             label.Add(new SqlTagParameterPosition()
@@ -160,9 +269,9 @@ namespace Never.EasySql.Linq
                 SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 Name = columnName,
                 PositionLength = this.formatAppendCount + columnName.Length,
-                PrefixStart = 1 + asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                StartPosition = 1 + asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                StopPosition = 1 + asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                PrefixStart = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                StartPosition = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                StopPosition = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
                 TextParameter = textParameter,
             });
 
@@ -263,9 +372,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// int
         /// </summary>
-        public override UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
         {
-            return this.InOrNotIn(option, expression, where, 'i');
+            return this.InOrNotIn(option, expression, and, 'i');
         }
 
         /// <summary>
@@ -286,9 +395,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// not in
         /// </summary>
-        public override UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
         {
-            return this.InOrNotIn(option, expression, where, 'n');
+            return this.InOrNotIn(option, expression, and, 'n');
         }
 
         /// <summary>
@@ -297,10 +406,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table"></typeparam>
         /// <param name="option"></param>
         /// <param name="expression"></param>
-        /// <param name="where"></param>
+        /// <param name="and"></param>
         /// <param name="flag"></param>
         /// <returns></returns>
-        protected UpdateContext<Parameter> InOrNotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where, char flag)
+        protected UpdateContext<Parameter> InOrNotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and, char flag)
         {
             var collection = new List<BinaryExp>(10);
             var leftTableInfo = this.tableInfo;
@@ -352,10 +461,10 @@ namespace Never.EasySql.Linq
                 sb.Append(rightTableName);
             }
 
-            if (where != null)
+            if (and != null)
             {
                 var temp = new List<BinaryExp>(10);
-                this.Analyze(where, GetTableInfo<Table>(), temp);
+                this.Analyze(and, GetTableInfo<Table>(), temp);
                 if (collection.Any())
                 {
                     sb.Append(" where ");
@@ -396,9 +505,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// exists
         /// </summary>
-        public override UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
         {
-            return this.ExistsNotExists(option, expression, where, 'e');
+            return this.ExistsNotExists(option, expression, and, 'e');
         }
 
         /// <summary>
@@ -419,15 +528,15 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// not exists
         /// </summary>
-        public override UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
         {
-            return this.ExistsNotExists(option, expression, where, 'n');
+            return this.ExistsNotExists(option, expression, and, 'n');
         }
 
         /// <summary>
         /// exists or not exists
         /// </summary>
-        protected UpdateContext<Parameter> ExistsNotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where, char flag)
+        protected UpdateContext<Parameter> ExistsNotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and, char flag)
         {
             var collection = new List<BinaryExp>(10);
             var leftTableInfo = this.tableInfo;
@@ -457,10 +566,10 @@ namespace Never.EasySql.Linq
             {
                 if (i == collection.Count - 1)
                 {
-                    if (where != null)
+                    if (and != null)
                     {
                         var temp = new List<BinaryExp>(10);
-                        this.Analyze(where, GetTableInfo<Table>(), temp);
+                        this.Analyze(and, GetTableInfo<Table>(), temp);
                         if (collection.Any())
                         {
                             sb.Append(" and ");

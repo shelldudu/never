@@ -107,10 +107,10 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression">expression</param>
             /// <typeparam name="Table">另外的表中</typeparam>
-            /// <param name="where">另外一张表的where语句</param>
-            public NWhere<NParameter> AndExists<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+            /// <param name="and">另外一张表的where语句</param>
+            public NWhere<NParameter> AndExists<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
             {
-                this.crud.Context.Exists(AndOrOption.and, expression, where);
+                this.crud.Context.Exists(AndOrOption.and, expression, and);
                 return this;
             }
 
@@ -140,10 +140,10 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression">expression</param>
             /// <typeparam name="Table">另外的表中</typeparam>
-            /// <param name="where">另外一张表的where语句</param>
-            public NWhere<NParameter> AndNotExists<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+            /// <param name="and">另外一张表的where语句</param>
+            public NWhere<NParameter> AndNotExists<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
             {
-                this.crud.Context.NotExists(AndOrOption.and, expression, where);
+                this.crud.Context.NotExists(AndOrOption.and, expression, and);
                 return this;
             }
 
@@ -173,10 +173,10 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression">expression</param>
             /// <typeparam name="Table">另外的表中</typeparam>
-            /// <param name="where">另外一张表的where语句</param>
-            public NWhere<NParameter> OrExists<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+            /// <param name="and">另外一张表的where语句</param>
+            public NWhere<NParameter> OrExists<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
             {
-                this.crud.Context.Exists(AndOrOption.or, expression, where);
+                this.crud.Context.Exists(AndOrOption.or, expression, and);
                 return this;
             }
 
@@ -206,10 +206,10 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression">expression</param>
             /// <typeparam name="Table">另外的表中</typeparam>
-            /// <param name="where">另外一张表的where语句</param>
-            public NWhere<NParameter> OrNotExists<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+            /// <param name="and">另外一张表的where语句</param>
+            public NWhere<NParameter> OrNotExists<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
             {
-                this.crud.Context.NotExists(AndOrOption.or, expression, where);
+                this.crud.Context.NotExists(AndOrOption.or, expression, and);
                 return this;
             }
 
@@ -239,10 +239,10 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression">expression</param>
             /// <typeparam name="Table">另外的表中</typeparam>
-            /// <param name="where">where条件</param>
-            public NWhere<NParameter> AndIn<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+            /// <param name="and">where条件</param>
+            public NWhere<NParameter> AndIn<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
             {
-                this.crud.Context.In(AndOrOption.and, expression, where);
+                this.crud.Context.In(AndOrOption.and, expression, and);
                 return this;
             }
 
@@ -272,10 +272,10 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression">expression</param>
             /// <typeparam name="Table">另外的表中</typeparam>
-            /// <param name="where">where条件</param>
-            public NWhere<NParameter> AndNotIn<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+            /// <param name="and">where条件</param>
+            public NWhere<NParameter> AndNotIn<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
             {
-                this.crud.Context.NotIn(AndOrOption.and, expression, where);
+                this.crud.Context.NotIn(AndOrOption.and, expression, and);
                 return this;
             }
 
@@ -304,11 +304,11 @@ namespace Never.EasySql.Linq
             /// 存在
             /// </summary>
             /// <param name="expression">expression</param>
-            /// <param name="where">where</param>
+            /// <param name="and">where</param>
             /// <typeparam name="Table">另外的表中</typeparam>
-            public NWhere<NParameter> OrIn<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+            public NWhere<NParameter> OrIn<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
             {
-                this.crud.Context.In(AndOrOption.or, expression, where);
+                this.crud.Context.In(AndOrOption.or, expression, and);
                 return this;
             }
 
@@ -337,11 +337,11 @@ namespace Never.EasySql.Linq
             /// 不存在
             /// </summary>
             /// <param name="expression">expression</param>
-            /// <param name="where"></param>
+            /// <param name="and"></param>
             /// <typeparam name="Table">另外的表中</typeparam>
-            public NWhere<NParameter> OrNotIn<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+            public NWhere<NParameter> OrNotIn<Table>(Expression<Func<NParameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
             {
-                this.crud.Context.NotIn(AndOrOption.or, expression, where);
+                this.crud.Context.NotIn(AndOrOption.or, expression, and);
                 return this;
             }
 

@@ -26,6 +26,27 @@ namespace Never.EasySql.Linq.MySql
         }
 
         /// <summary>
+        /// 获取入口的标签
+        /// </summary>
+        /// <returns></returns>
+        protected override TextLabel GetFirstLabelOnEntrance()
+        {
+            if (this.asTableName.IsNullOrEmpty())
+                return new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, "\r", "set") };
+
+            return new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, " as ", asTableName, "\r", "set") };
+        }
+
+        /// <summary>
+        /// 在update的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint
+        /// </summary>
+        /// <returns></returns>
+        protected override string SelectTableNameOnSetolunm()
+        {
+            return base.asTableNamePoint;
+        }
+
+        /// <summary>
         /// 对字段格式化
         /// </summary>
         /// <param name="text"></param>
