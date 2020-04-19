@@ -130,7 +130,7 @@ namespace Never.EasySql
             {
                 return new Update<Parameter>()
                 {
-                    Context = new UpdatedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new UpdatedContext<Parameter>(tag, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -138,7 +138,7 @@ namespace Never.EasySql
             {
                 return new Update<Parameter>()
                 {
-                    Context = new Linq.MySql.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.MySql.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -146,7 +146,7 @@ namespace Never.EasySql
             {
                 return new Update<Parameter>()
                 {
-                    Context = new Linq.Odbc.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Odbc.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -154,7 +154,7 @@ namespace Never.EasySql
             {
                 return new Update<Parameter>()
                 {
-                    Context = new Linq.OleDb.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.OleDb.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -162,7 +162,7 @@ namespace Never.EasySql
             {
                 return new Update<Parameter>()
                 {
-                    Context = new Linq.Oracle.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -171,7 +171,7 @@ namespace Never.EasySql
             {
                 return new Update<Parameter>()
                 {
-                    Context = new Linq.Oracle.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -179,7 +179,7 @@ namespace Never.EasySql
             {
                 return new Update<Parameter>()
                 {
-                    Context = new Linq.Postgre.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Postgre.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -187,7 +187,7 @@ namespace Never.EasySql
             {
                 return new Update<Parameter>()
                 {
-                    Context = new Linq.Sqlite.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Sqlite.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -195,13 +195,13 @@ namespace Never.EasySql
             {
                 return new Update<Parameter>()
                 {
-                    Context = new Linq.SqlServer.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.SqlServer.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
             return new Update<Parameter>()
             {
-                Context = new UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                Context = new UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -219,7 +219,7 @@ namespace Never.EasySql
             {
                 return new Delete<Parameter>()
                 {
-                    Context = new DeletedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new DeletedContext<Parameter>(tag, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -227,7 +227,7 @@ namespace Never.EasySql
             {
                 return new Delete<Parameter>()
                 {
-                    Context = new Linq.MySql.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.MySql.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -235,7 +235,7 @@ namespace Never.EasySql
             {
                 return new Delete<Parameter>()
                 {
-                    Context = new Linq.Odbc.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Odbc.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -243,7 +243,7 @@ namespace Never.EasySql
             {
                 return new Delete<Parameter>()
                 {
-                    Context = new Linq.OleDb.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.OleDb.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -251,7 +251,7 @@ namespace Never.EasySql
             {
                 return new Delete<Parameter>()
                 {
-                    Context = new Linq.Oracle.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -260,7 +260,7 @@ namespace Never.EasySql
             {
                 return new Delete<Parameter>()
                 {
-                    Context = new Linq.Oracle.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -268,7 +268,7 @@ namespace Never.EasySql
             {
                 return new Delete<Parameter>()
                 {
-                    Context = new Linq.Postgre.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Postgre.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -276,7 +276,7 @@ namespace Never.EasySql
             {
                 return new Delete<Parameter>()
                 {
-                    Context = new Linq.Sqlite.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Sqlite.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -284,13 +284,13 @@ namespace Never.EasySql
             {
                 return new Delete<Parameter>()
                 {
-                    Context = new Linq.SqlServer.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.SqlServer.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
             return new Delete<Parameter>()
             {
-                Context = new DeletingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                Context = new DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -308,7 +308,7 @@ namespace Never.EasySql
             {
                 return new Insert<Parameter>()
                 {
-                    Context = new InsertedContext<Parameter>(tag, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new InsertedContext<Parameter>(tag, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -316,7 +316,7 @@ namespace Never.EasySql
             {
                 return new Insert<Parameter>()
                 {
-                    Context = new Linq.MySql.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.MySql.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -324,7 +324,7 @@ namespace Never.EasySql
             {
                 return new Insert<Parameter>()
                 {
-                    Context = new Linq.Odbc.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Odbc.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -332,7 +332,7 @@ namespace Never.EasySql
             {
                 return new Insert<Parameter>()
                 {
-                    Context = new Linq.OleDb.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.OleDb.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -340,7 +340,7 @@ namespace Never.EasySql
             {
                 return new Insert<Parameter>()
                 {
-                    Context = new Linq.Oracle.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -348,7 +348,7 @@ namespace Never.EasySql
             {
                 return new Insert<Parameter>()
                 {
-                    Context = new Linq.Oracle.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -356,7 +356,7 @@ namespace Never.EasySql
             {
                 return new Insert<Parameter>()
                 {
-                    Context = new Linq.Postgre.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Postgre.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -364,7 +364,7 @@ namespace Never.EasySql
             {
                 return new Insert<Parameter>()
                 {
-                    Context = new Linq.Sqlite.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Sqlite.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -372,13 +372,13 @@ namespace Never.EasySql
             {
                 return new Insert<Parameter>()
                 {
-                    Context = new Linq.SqlServer.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.SqlServer.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
             return new Insert<Parameter>()
             {
-                Context = new InsertingContext<Parameter>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                Context = new InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
             };
         }
 
@@ -397,7 +397,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new SelectedContext<Parameter, Table>(tag, this, Context.GetTableInfo<Table>(), this.parameter)
+                    Context = new SelectedContext<Parameter, Table>(tag, this, Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
@@ -405,7 +405,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.MySql.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.MySql.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -413,7 +413,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Odbc.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Odbc.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -421,7 +421,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.OleDb.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.OleDb.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -429,7 +429,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -438,7 +438,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -446,7 +446,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Postgre.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Postgre.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -454,7 +454,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Sqlite.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Sqlite.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
@@ -462,13 +462,13 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.SqlServer.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.SqlServer.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
                 };
             }
 
             return new Select<Parameter, Table>()
             {
-                Context = new SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.GetTableInfo<Parameter>(), this.parameter)
+                Context = new SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
             };
         }
 

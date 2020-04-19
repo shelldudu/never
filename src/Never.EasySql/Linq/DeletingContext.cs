@@ -223,27 +223,27 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table"></typeparam>
         /// <param name="option"></param>
         /// <param name="expression"></param>
-        /// <param name="where"></param>
+        /// <param name="and"></param>
         /// <param name="flag"></param>
         /// <returns></returns>
-        protected DeleteContext<Parameter> InOrNotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where, char flag)
+        protected DeleteContext<Parameter> InOrNotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and, char flag)
         {
-            var collection = new List<BinaryExp>(10);
+            var collection = new List<BinaryBlock>(10);
             var leftTableInfo = this.tableInfo;
-            var rightTableInfo = GetTableInfo<Table>();
-            this.Analyze(expression, leftTableInfo, rightTableInfo, this.templateParameter, collection);
+            var rightTableInfo = FindTableInfo<Table>();
+            this.Analyze(expression, leftTableInfo, rightTableInfo, collection);
             if (collection.Any() == false)
                 return this;
 
             if (collection.Count > 1)
             {
-                collection.RemoveAll(p => p.Left.IsEquals("(") || p.Right.IsEquals(")"));
+                collection.RemoveAll(p => p.Join.IsEquals("(") || p.Join.IsEquals(")"));
             }
 
             if (collection.Any() == false)
                 return this;
 
-            if (collection.Count > 1 || collection[0].Join.IsNotEquals(" = ") || collection[0].LeftIsConstant || collection[0].RightIsConstant)
+            if (collection.Count > 1 || collection[0].Join.IsNotEquals(" = ") || collection[0].Left.IsConstant || collection[0].Right.IsConstant)
             {
                 throw new Exception("in expression must like this (p,t)=>p.Id == t.Id");
             }
@@ -259,7 +259,7 @@ namespace Never.EasySql.Linq
                 rightAs = string.Concat(leftAs, leftAs);
                 sb.Append(leftAs);
                 sb.Append(".");
-                sb.Append(collection[0].Left);
+                sb.Append(collection[0].Join);
                 sb.Append(flag == 'n' ? " not in (select " : " in (select ");
                 sb.Append(collection[0].Right);
                 sb.Append(" from ");
@@ -271,23 +271,24 @@ namespace Never.EasySql.Linq
             {
                 sb.Append(leftTableName);
                 sb.Append(".");
-                sb.Append(collection[0].Left);
+                sb.Append(collection[0].Join);
                 sb.Append(flag == 'n' ? " not in (select " : " in (select ");
                 sb.Append(collection[0].Right);
                 sb.Append(" from ");
                 sb.Append(rightTableName);
             }
 
-            if (where != null)
+            if (and != null)
             {
-                var temp = new List<BinaryExp>(10);
-                this.Analyze(where, GetTableInfo<Table>(), temp);
+                var temp = new List<BinaryBlock>(10);
+                this.Analyze(and, FindTableInfo<Table>(), temp);
                 if (collection.Any())
                 {
                     sb.Append(" where ");
+                    var ppp = new[] { rightAs, rightAs };
                     foreach (var c in temp)
                     {
-                        sb.Append(c.ToString(rightAs, rightAs));
+                        sb.Append(c.ToString(ppp));
                     }
                 }
             }
@@ -355,10 +356,10 @@ namespace Never.EasySql.Linq
         /// </summary>
         protected DeleteContext<Parameter> ExistsNotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where, char flag)
         {
-            var collection = new List<BinaryExp>(10);
+            var collection = new List<BinaryBlock>(10);
             var leftTableInfo = this.tableInfo;
-            var rightTableInfo = GetTableInfo<Table>();
-            this.Analyze(expression, leftTableInfo, rightTableInfo, this.templateParameter, collection);
+            var rightTableInfo = FindTableInfo<Table>();
+            this.Analyze(expression, leftTableInfo, rightTableInfo, collection);
             if (collection.Any() == false)
                 return this;
 
@@ -379,31 +380,32 @@ namespace Never.EasySql.Linq
             }
 
             sb.Append(" where ");
+            var ppp = new[] { rightAs, rightAs };
             for (var i = 0; i < collection.Count; i++)
             {
                 if (i == collection.Count - 1)
                 {
                     if (where != null)
                     {
-                        var temp = new List<BinaryExp>(10);
-                        this.Analyze(where, GetTableInfo<Table>(), temp);
+                        var temp = new List<BinaryBlock>(10);
+                        this.Analyze(where, FindTableInfo<Table>(), temp);
                         if (collection.Any())
                         {
                             sb.Append(" and ");
                             foreach (var c in temp)
                             {
-                                sb.Append(c.ToString(leftAs, rightAs));
+                                sb.Append(c.ToString(ppp));
                             }
                         }
                     }
                     else
                     {
-                        sb.Append(collection[i].ToString(leftAs, rightAs));
+                        sb.Append(collection[i].ToString(ppp));
                     }
                 }
                 else
                 {
-                    sb.Append(collection[i].ToString(leftAs, rightAs));
+                    sb.Append(collection[i].ToString(ppp));
                 }
             }
 

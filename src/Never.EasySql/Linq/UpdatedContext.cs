@@ -46,7 +46,7 @@ namespace Never.EasySql.Linq
 
         public override int GetResult()
         {
-            return this.Execute(this.sqlTag, this.dao, this.sqlParameter);
+            return this.Update(this.sqlTag, this.dao, this.sqlParameter);
         }
 
         public override Linq.UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)

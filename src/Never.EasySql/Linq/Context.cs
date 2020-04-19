@@ -20,14 +20,30 @@ namespace Never.EasySql.Linq
         protected class BinaryExp
         {
             /// <summary>
-            /// 左边
+            /// 表达式
             /// </summary>
-            public string Left;
+            public string Exp;
 
             /// <summary>
-            /// 左边是否常量
+            /// 是否常量
             /// </summary>
-            public bool LeftIsConstant;
+            public bool IsConstant;
+
+            /// <summary>
+            /// 顺序,从0开始
+            /// </summary>
+            public int Index;
+        }
+
+        /// <summary>
+        /// 二进制运算
+        /// </summary>
+        protected class BinaryBlock
+        {
+            /// <summary>
+            /// 左边
+            /// </summary>
+            public BinaryExp Left;
 
             /// <summary>
             /// 连接符
@@ -37,34 +53,80 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 右边
             /// </summary>
-            public string Right;
+            public BinaryExp Right;
 
             /// <summary>
-            /// 右边是否常量
+            /// 
             /// </summary>
-            public bool RightIsConstant;
-
-            /// <summary>
-            /// 返回字符串
-            /// </summary>
-            /// <returns></returns>
-            public override string ToString()
+            public BinaryBlock()
             {
-                return string.Concat(this.Left ?? "", this.Join ?? "", this.Right ?? "");
+                this.Join = string.Empty;
             }
 
             /// <summary>
             /// 返回字符串
             /// </summary>
-            /// <param name="leftPlaceholder"></param>
-            /// <param name="rightPlaceholder"></param>
+            /// <param name="leftPlaceholders"></param>
             /// <returns></returns>
-            public string ToString(string leftPlaceholder, string rightPlaceholder)
+            public string ToString(string[] leftPlaceholders)
             {
-                return string.Concat(this.Left == null ? "" : (this.LeftIsConstant ? string.Concat("'", this.Left, "'") : string.Concat(leftPlaceholder, ".", Left)),
-                    this.Join ?? "",
-                    this.Right == null ? "" : (this.RightIsConstant ? string.Concat("'", this.Right, "'") : string.Concat(rightPlaceholder, ".", Right)));
+                var sb = new StringBuilder(30);
+                if (this.Left != null)
+                {
+                    if (this.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(this.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[this.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(this.Left.Exp);
+                    }
+                }
+
+                sb.Append(this.Join);
+                if (this.Right != null)
+                {
+                    if (this.Right.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(this.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[this.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(this.Right.Exp);
+                    }
+                }
+
+                return sb.ToString();
             }
+        }
+
+        /// <summary>
+        /// 分析参数
+        /// </summary>
+        protected struct AnalyzeParameter
+        {
+            /// <summary>
+            /// 参数类型
+            /// </summary>
+            public Type Type;
+
+            /// <summary>
+            /// 占位符
+            /// </summary>
+            public string Placeholder;
+
+            /// <summary>
+            /// 表信息
+            /// </summary>
+            public TableInfo TableInfo;
         }
 
         /// <summary>
@@ -79,7 +141,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <typeparam name="Table"></typeparam>
         /// <returns></returns>
-        public static TableInfo GetTableInfo<Table>()
+        public static TableInfo FindTableInfo<Table>()
         {
             if (TableInfoProvider.TryUpdateTableInfo(typeof(Table), out var tableInfo))
                 return tableInfo;
@@ -188,75 +250,71 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="tableInfo"></param>
         /// <returns></returns>
-        protected virtual string FindTableName<Parameter>(TableInfo tableInfo)
+        protected virtual string FindTableName<Table>(TableInfo tableInfo)
         {
             if (tableInfo.TableName != null)
                 return tableInfo.TableName.Name;
 
-            return typeof(Parameter).Name;
+            return typeof(Table).Name;
         }
 
         /// <summary>
-        /// 分析语句
+        /// 查询tableName
         /// </summary>
-        /// <typeparam name="Parameter"></typeparam>
-        /// <typeparam name="Table"></typeparam>
-        /// <param name="expression"></param>
-        /// <param name="parameterTableInfo"></param>
         /// <param name="tableInfo"></param>
-        /// <param name="templateParameter"></param>
-        /// <param name="whereCollection"></param>
-        protected virtual void Analyze<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, IDictionary<string, object> templateParameter, List<BinaryExp> whereCollection)
+        /// <param name="type"></param>
+        /// <returns></returns>
+        protected virtual string FindTableName(TableInfo tableInfo, Type type)
         {
-            var binary = expression.Body as BinaryExpression;
-            if (binary == null)
-                return;
+            if (tableInfo.TableName != null)
+                return tableInfo.TableName.Name;
 
-            this.Analyze(expression.Parameters[0].Name, typeof(Parameter), expression.Parameters[1].Name, typeof(Table), expression.Body, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+            return type.Name;
         }
 
         /// <summary>
         /// 分析表达式
         /// </summary>
-        /// <param name="leftPlaceholder"></param>
-        /// <param name="leftType"></param>
-        /// <param name="rightPlaceholder"></param>
-        /// <param name="rightType"></param>
+        /// <param name="analyzeParameters"></param>
         /// <param name="expression"></param>
-        /// <param name="parameterTableInfo"></param>
-        /// <param name="tableInfo"></param>
-        /// <param name="templateParameter"></param>
         /// <param name="whereCollection"></param>
-        protected void Analyze(string leftPlaceholder, Type leftType, string rightPlaceholder, Type rightType, Expression expression, TableInfo parameterTableInfo, TableInfo tableInfo, IDictionary<string, object> templateParameter, List<BinaryExp> whereCollection)
+        protected bool Analyze(Expression expression, List<AnalyzeParameter> analyzeParameters, List<BinaryBlock> whereCollection)
         {
             var binary = expression as BinaryExpression;
             if (binary == null)
-                return;
+                return false;
 
-            //是左边还是右边
-            int leftOrRight(Expression expression1)
+            //是第一个还是第二个还是第三个，返回值当作索引
+            int leftOrRight(Expression exp)
             {
-                if (expression1.Type == leftType || (expression1 is ParameterExpression && ((ParameterExpression)expression1).Name == leftPlaceholder))
-                    return 1;
-
-                if (expression1.Type == rightType || (expression1 is ParameterExpression && ((ParameterExpression)expression1).Name == rightPlaceholder))
-                    return -1;
+                for (int i = 0, j = analyzeParameters.Count; i < j; i++)
+                {
+                    var item = analyzeParameters[i];
+                    if (exp.Type == item.Type || (exp is ParameterExpression && ((ParameterExpression)exp).Name == item.Placeholder))
+                        return i;
+                }
 
                 return 0;
             }
 
-            BinaryExp current = null;
+            //匹配TableInfo
+            TableInfo matchTable(int index)
+            {
+                return analyzeParameters[index].TableInfo;
+            }
+
+            BinaryBlock current = null;
             if (binary.Left is BinaryExpression)
             {
                 if (((BinaryExpression)binary.Left).Left is BinaryExpression)
                 {
-                    whereCollection.Add(new BinaryExp() { Join = "(" });
-                    Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Left, parameterTableInfo, tableInfo, templateParameter, whereCollection);
-                    whereCollection.Add(new BinaryExp() { Join = ")" });
+                    whereCollection.Add(new BinaryBlock() { Join = "(" });
+                    Analyze(binary.Left, analyzeParameters, whereCollection);
+                    whereCollection.Add(new BinaryBlock() { Join = ")" });
                 }
                 else
                 {
-                    Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Left, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+                    Analyze(binary.Left, analyzeParameters, whereCollection);
                 }
             }
             else
@@ -265,24 +323,16 @@ namespace Never.EasySql.Linq
                 var leftConfirm = false;
                 if (memberExpress != null)
                 {
-                    /*永远将第一个参数放到左侧，第二个参数放右侧，如果是常量的，则放到右侧*/
-                    int isleftOrRight = leftOrRight(memberExpress.Expression);
-                    if (isleftOrRight == 1)
+                    int index = leftOrRight(memberExpress.Expression);
+                    current = new BinaryBlock()
                     {
-                        current = new BinaryExp()
+                        Left = new BinaryExp()
                         {
-                            Left = this.FindColumnName(memberExpress.Member, parameterTableInfo),
-                            LeftIsConstant = false,
-                        };
-                    }
-                    else if (isleftOrRight == -1)
-                    {
-                        current = new BinaryExp()
-                        {
-                            Right = this.FindColumnName(memberExpress.Member, tableInfo),
-                            RightIsConstant = false,
-                        };
-                    }
+                            Exp = this.FindColumnName(memberExpress.Member, matchTable(index)),
+                            IsConstant = false,
+                            Index = index,
+                        }
+                    };
 
                     leftConfirm = true;
                 }
@@ -292,10 +342,14 @@ namespace Never.EasySql.Linq
                     var constantExpress = binary.Left as ConstantExpression;
                     if (constantExpress != null)
                     {
-                        current = new BinaryExp()
+                        current = new BinaryBlock()
                         {
-                            Right = constantExpress.Value.ToString(),
-                            RightIsConstant = true,
+                            Left = new BinaryExp()
+                            {
+                                Exp = constantExpress.Value.ToString(),
+                                IsConstant = true,
+                                Index = 0,
+                            }
                         };
 
                         leftConfirm = true;
@@ -314,44 +368,32 @@ namespace Never.EasySql.Linq
             {
                 case ExpressionType.AndAlso:
                     {
-                        whereCollection.Add(new BinaryExp() { Join = " and " });
+                        whereCollection.Add(new BinaryBlock() { Join = " and " });
                     }
                     break;
                 case ExpressionType.OrElse:
                     {
-                        whereCollection.Add(new BinaryExp() { Join = " or " });
+                        whereCollection.Add(new BinaryBlock() { Join = " or " });
                     }
                     break;
                 case ExpressionType.LessThan:
                     {
-                        if (current.Left != null)
-                            current.Join = " < ";
-                        else
-                            current.Join = " >= ";
+                        current.Join = " < ";
                     }
                     break;
                 case ExpressionType.LessThanOrEqual:
                     {
-                        if (current.Left != null)
-                            current.Join = " <= ";
-                        else
-                            current.Join = " > ";
+                        current.Join = " <= ";
                     }
                     break;
                 case ExpressionType.GreaterThanOrEqual:
                     {
-                        if (current.Left != null)
-                            current.Join = " >= ";
-                        else
-                            current.Join = " < ";
+                        current.Join = " >= ";
                     }
                     break;
                 case ExpressionType.GreaterThan:
                     {
-                        if (current.Left != null)
-                            current.Join = " > ";
-                        else
-                            current.Join = " <= ";
+                        current.Join = " > ";
                     }
                     break;
                 case ExpressionType.Equal:
@@ -370,13 +412,13 @@ namespace Never.EasySql.Linq
             {
                 if (((BinaryExpression)binary.Right).Right is BinaryExpression)
                 {
-                    whereCollection.Add(new BinaryExp() { Join = "(" });
-                    Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Right, parameterTableInfo, tableInfo, templateParameter, whereCollection);
-                    whereCollection.Add(new BinaryExp() { Join = ")" });
+                    whereCollection.Add(new BinaryBlock() { Join = "(" });
+                    Analyze(binary.Right, analyzeParameters, whereCollection);
+                    whereCollection.Add(new BinaryBlock() { Join = ")" });
                 }
                 else
                 {
-                    Analyze(leftPlaceholder, leftType, rightPlaceholder, rightType, binary.Right, parameterTableInfo, tableInfo, templateParameter, whereCollection);
+                    Analyze(binary.Right, analyzeParameters, whereCollection);
                 }
             }
             else
@@ -385,34 +427,28 @@ namespace Never.EasySql.Linq
                 var rightConfirm = false;
                 if (memberExpress != null)
                 {
-                    if (current.Left != null)
+                    int index = leftOrRight(memberExpress.Expression);
+                    current.Right = new BinaryExp()
                     {
-                        current.Right = this.FindColumnName(memberExpress.Member, tableInfo);
-                        current.RightIsConstant = false;
-                    }
-                    else
-                    {
-                        current.Left = this.FindColumnName(memberExpress.Member, parameterTableInfo);
-                        current.LeftIsConstant = false;
-                    }
+                        Exp = this.FindColumnName(memberExpress.Member, matchTable(index)),
+                        IsConstant = false,
+                        Index = index,
+                    };
 
                     rightConfirm = true;
                 }
+
                 if (rightConfirm == false)
                 {
                     var constantExpress = binary.Right as ConstantExpression;
                     if (constantExpress != null)
                     {
-                        if (current.Left != null)
+                        current.Right = new BinaryExp()
                         {
-                            current.Right = constantExpress.Value.ToString();
-                            current.RightIsConstant = true;
-                        }
-                        else
-                        {
-                            current.Left = constantExpress.Value.ToString();
-                            current.LeftIsConstant = true;
-                        }
+                            Exp = constantExpress.Value.ToString(),
+                            IsConstant = true,
+                            Index = 0,
+                        };
 
                         rightConfirm = true;
                     }
@@ -427,7 +463,349 @@ namespace Never.EasySql.Linq
             }
 
             if (current != null)
+            {
                 whereCollection.Add(current);
+
+                return true;
+            }
+
+            throw new Exception("current is null");
+        }
+
+        /// <summary>
+        /// 分析语句
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <typeparam name="Table1"></typeparam>
+        /// <typeparam name="Table2"></typeparam>
+        /// <typeparam name="Table3"></typeparam>
+        /// <typeparam name="Table4"></typeparam>
+        /// <typeparam name="Table5"></typeparam>
+        /// <typeparam name="Table6"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="parameterTableInfo"></param>
+        /// <param name="analyzeParameters"></param>
+        /// <param name="tableInfo1"></param>
+        /// <param name="tableInfo2"></param>
+        /// <param name="tableInfo3"></param>
+        /// <param name="tableInfo4"></param>
+        /// <param name="tableInfo5"></param>
+        /// <param name="tableInfo6"></param>
+        /// <param name="whereCollection"></param>
+        protected virtual bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5, Table6>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, Table6, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, TableInfo tableInfo6, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        {
+            analyzeParameters = null;
+            var binary = expression.Body as BinaryExpression;
+            if (binary == null)
+                return false;
+
+            analyzeParameters = new List<AnalyzeParameter>(7)
+            {
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[0].Name,
+                    Type =  typeof(Parameter),
+                    TableInfo = parameterTableInfo
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[1].Name,
+                    Type =  typeof(Table1),
+                    TableInfo = tableInfo1
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[2].Name,
+                    Type =  typeof(Table2),
+                    TableInfo = tableInfo2
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[3].Name,
+                    Type =  typeof(Table3),
+                    TableInfo = tableInfo3
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[4].Name,
+                    Type =  typeof(Table4),
+                    TableInfo = tableInfo4
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[5].Name,
+                    Type =  typeof(Table5),
+                    TableInfo = tableInfo5
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[6].Name,
+                    Type =  typeof(Table6),
+                    TableInfo = tableInfo6
+                }
+            };
+
+            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+        }
+
+        /// <summary>
+        /// 分析语句
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <typeparam name="Table1"></typeparam>
+        /// <typeparam name="Table2"></typeparam>
+        /// <typeparam name="Table3"></typeparam>
+        /// <typeparam name="Table4"></typeparam>
+        /// <typeparam name="Table5"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="parameterTableInfo"></param>
+        /// <param name="analyzeParameters"></param>
+        /// <param name="tableInfo1"></param>
+        /// <param name="tableInfo2"></param>
+        /// <param name="tableInfo3"></param>
+        /// <param name="tableInfo4"></param>
+        /// <param name="tableInfo5"></param>
+        /// <param name="whereCollection"></param>
+        protected virtual bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        {
+            analyzeParameters = null;
+            var binary = expression.Body as BinaryExpression;
+            if (binary == null)
+                return false;
+
+            analyzeParameters = new List<AnalyzeParameter>(6)
+            {
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[0].Name,
+                    Type =  typeof(Parameter),
+                    TableInfo = parameterTableInfo
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[1].Name,
+                    Type =  typeof(Table1),
+                    TableInfo = tableInfo1
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[2].Name,
+                    Type =  typeof(Table2),
+                    TableInfo = tableInfo2
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[3].Name,
+                    Type =  typeof(Table3),
+                    TableInfo = tableInfo3
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[4].Name,
+                    Type =  typeof(Table4),
+                    TableInfo = tableInfo4
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[5].Name,
+                    Type =  typeof(Table5),
+                    TableInfo = tableInfo5
+                }
+            };
+
+            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+        }
+
+        /// <summary>
+        /// 分析语句
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <typeparam name="Table1"></typeparam>
+        /// <typeparam name="Table2"></typeparam>
+        /// <typeparam name="Table3"></typeparam>
+        /// <typeparam name="Table4"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="parameterTableInfo"></param>
+        /// <param name="analyzeParameters"></param>
+        /// <param name="tableInfo1"></param>
+        /// <param name="tableInfo2"></param>
+        /// <param name="tableInfo3"></param>
+        /// <param name="tableInfo4"></param>
+        /// <param name="whereCollection"></param>
+        protected virtual bool Analyze<Parameter, Table1, Table2, Table3, Table4>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        {
+            analyzeParameters = null;
+            var binary = expression.Body as BinaryExpression;
+            if (binary == null)
+                return false;
+
+            analyzeParameters = new List<AnalyzeParameter>(5)
+            {
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[0].Name,
+                    Type =  typeof(Parameter),
+                    TableInfo = parameterTableInfo
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[1].Name,
+                    Type =  typeof(Table1),
+                    TableInfo = tableInfo1
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[2].Name,
+                    Type =  typeof(Table2),
+                    TableInfo = tableInfo2
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[3].Name,
+                    Type =  typeof(Table3),
+                    TableInfo = tableInfo3
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[4].Name,
+                    Type =  typeof(Table4),
+                    TableInfo = tableInfo4
+                }
+            };
+
+            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+        }
+
+        /// <summary>
+        /// 分析语句
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <typeparam name="Table1"></typeparam>
+        /// <typeparam name="Table2"></typeparam>
+        /// <typeparam name="Table3"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="parameterTableInfo"></param>
+        /// <param name="analyzeParameters"></param>
+        /// <param name="tableInfo1"></param>
+        /// <param name="tableInfo2"></param>
+        /// <param name="tableInfo3"></param>
+        /// <param name="whereCollection"></param>
+        protected virtual bool Analyze<Parameter, Table1, Table2, Table3>(Expression<Func<Parameter, Table1, Table2, Table3, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        {
+            analyzeParameters = null;
+            var binary = expression.Body as BinaryExpression;
+            if (binary == null)
+                return false;
+
+            analyzeParameters = new List<AnalyzeParameter>(4)
+            {
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[0].Name,
+                    Type =  typeof(Parameter),
+                    TableInfo = parameterTableInfo
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[1].Name,
+                    Type =  typeof(Table1),
+                    TableInfo = tableInfo1
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[2].Name,
+                    Type =  typeof(Table2),
+                    TableInfo = tableInfo2
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[3].Name,
+                    Type =  typeof(Table3),
+                    TableInfo = tableInfo3
+                }
+            };
+
+            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+        }
+
+        /// <summary>
+        /// 分析语句
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <typeparam name="Table1"></typeparam>
+        /// <typeparam name="Table2"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="parameterTableInfo"></param>
+        /// <param name="analyzeParameters"></param>
+        /// <param name="tableInfo1"></param>
+        /// <param name="tableInfo2"></param>
+        /// <param name="whereCollection"></param>
+        protected virtual bool Analyze<Parameter, Table1, Table2>(Expression<Func<Parameter, Table1, Table2, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        {
+            analyzeParameters = null;
+            var binary = expression.Body as BinaryExpression;
+            if (binary == null)
+                return false;
+
+            analyzeParameters = new List<AnalyzeParameter>(3)
+            {
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[0].Name,
+                    Type =  typeof(Parameter),
+                    TableInfo = parameterTableInfo
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[1].Name,
+                    Type =  typeof(Table1),
+                    TableInfo = tableInfo1
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[2].Name,
+                    Type =  typeof(Table2),
+                    TableInfo = tableInfo2
+                }
+            };
+
+            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+        }
+
+        /// <summary>
+        /// 分析语句
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="parameterTableInfo"></param>
+        /// <param name="analyzeParameters"></param>
+        /// <param name="tableInfo"></param>
+        /// <param name="whereCollection"></param>
+        protected virtual bool Analyze<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        {
+            analyzeParameters = null;
+            var binary = expression.Body as BinaryExpression;
+            if (binary == null)
+                return false;
+
+            analyzeParameters = new List<AnalyzeParameter>(2)
+            {
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[0].Name,
+                    Type =  typeof(Parameter),
+                    TableInfo = parameterTableInfo
+                },
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[1].Name,
+                    Type =  typeof(Table),
+                    TableInfo = tableInfo
+                }
+            };
+
+            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
         }
 
         /// <summary>
@@ -435,180 +813,27 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <typeparam name="Parameter"></typeparam>
         /// <param name="expression"></param>
-        /// <param name="tableInfo"></param>
+        /// <param name="parameterTableInfo"></param>
+        /// <param name="analyzeParameters"></param>
         /// <param name="whereCollection"></param>
-        protected virtual void Analyze<Parameter>(Expression<Func<Parameter, bool>> expression, TableInfo tableInfo, List<BinaryExp> whereCollection)
+        protected virtual bool Analyze<Parameter>(Expression<Func<Parameter, bool>> expression, TableInfo parameterTableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
+            analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
             if (binary == null)
-                return;
+                return false;
 
-            this.Analyze(expression.Parameters[0].Name, typeof(Parameter), expression.Body, tableInfo, whereCollection);
+            analyzeParameters = new List<AnalyzeParameter>(2)
+            {
+                new AnalyzeParameter
+                {
+                    Placeholder = expression.Parameters[0].Name,
+                    Type =  typeof(Parameter),
+                    TableInfo = parameterTableInfo
+                }
+            };
+
+            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
         }
-
-        /// <summary>
-        /// 分析表达式
-        /// </summary>
-        /// <param name="leftPlaceholder"></param>
-        /// <param name="leftType"></param>
-        /// <param name="expression"></param>
-        /// <param name="tableInfo"></param>
-        /// <param name="whereCollection"></param>
-        protected void Analyze(string leftPlaceholder, Type leftType, Expression expression, TableInfo tableInfo, List<BinaryExp> whereCollection)
-        {
-            var binary = expression as BinaryExpression;
-            if (binary == null)
-                return;
-
-            BinaryExp current = null;
-            if (binary.Left is BinaryExpression)
-            {
-                if (((BinaryExpression)binary.Left).Left is BinaryExpression)
-                {
-                    whereCollection.Add(new BinaryExp() { Join = "(" });
-                    Analyze(leftPlaceholder, leftType, binary.Left, tableInfo, whereCollection);
-                    whereCollection.Add(new BinaryExp() { Join = ")" });
-                }
-                else
-                {
-                    Analyze(leftPlaceholder, leftType, binary.Left, tableInfo, whereCollection);
-                }
-            }
-            else
-            {
-                var memberExpress = binary.Left as MemberExpression;
-                var leftConfirm = false;
-                if (memberExpress != null)
-                {
-                    /*永远将第一个参数放到左侧，第二个参数放右侧，如果是常量的，则放到右侧*/
-                    current = new BinaryExp()
-                    {
-                        Left = this.FindColumnName(memberExpress.Member, tableInfo),
-                        LeftIsConstant = false,
-                    };
-
-                    leftConfirm = true;
-                }
-
-                var constantExpress = binary.Left as ConstantExpression;
-                if (constantExpress != null)
-                {
-                    current = new BinaryExp()
-                    {
-                        Right = constantExpress.Value.ToString(),
-                        RightIsConstant = true,
-                    };
-
-                    leftConfirm = true;
-                }
-
-                if (leftConfirm == false)
-                {
-                    throw new Exception("");
-                }
-            }
-
-            /*.Left不为空，则说明第一个参数是在左侧*/
-            switch (binary.NodeType)
-            {
-                case ExpressionType.AndAlso:
-                    {
-                        whereCollection.Add(new BinaryExp() { Join = "and" });
-                    }
-                    break;
-                case ExpressionType.OrElse:
-                    {
-                        whereCollection.Add(new BinaryExp() { Join = "or" });
-                    }
-                    break;
-                case ExpressionType.LessThan:
-                    {
-                        if (current.Left != null)
-                            current.Join = " < ";
-                        else
-                            current.Join = " >= ";
-                    }
-                    break;
-                case ExpressionType.LessThanOrEqual:
-                    {
-                        if (current.Left != null)
-                            current.Join = " <= ";
-                        else
-                            current.Join = " > ";
-                    }
-                    break;
-                case ExpressionType.GreaterThanOrEqual:
-                    {
-                        if (current.Left != null)
-                            current.Join = " >= ";
-                        else
-                            current.Join = " < ";
-                    }
-                    break;
-                case ExpressionType.GreaterThan:
-                    {
-                        if (current.Left != null)
-                            current.Join = " > ";
-                        else
-                            current.Join = " <= ";
-                    }
-                    break;
-                case ExpressionType.Equal:
-                    {
-                        current.Join = " = ";
-                    }
-                    break;
-                case ExpressionType.NotEqual:
-                    {
-                        current.Join = " != ";
-                    }
-                    break;
-            }
-
-            if (binary.Right is BinaryExpression)
-            {
-                if (((BinaryExpression)binary.Right).Right is BinaryExpression)
-                {
-                    whereCollection.Add(new BinaryExp() { Join = "(" });
-                    Analyze(leftPlaceholder, leftType, binary.Right, tableInfo, whereCollection);
-                    whereCollection.Add(new BinaryExp() { Join = ")" });
-                }
-                else
-                {
-                    Analyze(leftPlaceholder, leftType, binary.Right, tableInfo, whereCollection);
-                }
-            }
-            else
-            {
-                var memberExpress = binary.Right as MemberExpression;
-                var rightConfirm = false;
-                if (memberExpress != null)
-                {
-                    current.Left = this.FindColumnName(memberExpress.Member, tableInfo);
-                    current.LeftIsConstant = false;
-
-                    rightConfirm = true;
-                }
-
-                var constantExpress = binary.Right as ConstantExpression;
-                if (constantExpress != null)
-                {
-                    current.Right = constantExpress.Value.ToString();
-                    current.RightIsConstant = true;
-
-                    rightConfirm = true;
-                }
-
-                if (rightConfirm == false)
-                {
-                    throw new Exception("");
-                }
-            }
-
-
-            if (current != null)
-                whereCollection.Add(current);
-        }
-
     }
 }
