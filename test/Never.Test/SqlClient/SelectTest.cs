@@ -43,15 +43,30 @@ namespace Never.Test
             //     .Where(null).ToList(1, 5).GetResult();
 
             //更新
-            var update = dao.ToEasyLinqDao(new MyTable()).Cached("AAA").Update().From("user").As("t")
-                .SetColum(m => m.Name)
+            var update = dao.ToEasyLinqDao(new MyTable()).Cached("AAA").Update()
+                .From("user").As("t")
+                .Join<MyTable2>("t2").On((p, t) => p.Id == t.Id).And((t) => t.Name == "3")
+                .NextJoin<MyTable2>("t2").On((p, t1, t2) => p.Id == t1.Id).And((t1, t2) => t2.Name == "3")
+                .NextJoin<MyTable2>("t3")
+                .NextJoin<MyTable2>("t3").ToUpdate()
+                .SetColumn(m => m.Name)
                 .SetColumnWithFunc(m => m.CreateTime, "now()")
                 .SetColumnWithValue(m => m.Name, "abc")
                 .Where(p => p.Id)
-                //.AndNotExists<MyTable2>((p, t) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2)
-                .AndNotExists<MyTable2>((p, t) => t.Id != 2)
-                .AndNotExists<MyTable2>((p, t) => p.Id > 0)
-                .AndNotIn<MyTable2>((p, t) => p.Id == t.Id, t => t.Name == "ee")
+                .AndNotExists<MyTable2>("t2").Where((p, t) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2).And((t) => t.Id != 2)
+                .Join<MyTable2>("t2").On((p, t1, t2) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2) => t1.Id != 2)
+                .Join<MyTable2>("t3").On((p, t1, t2, t3) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2, t3) => t1.Id != 2).ToWhere()
+                .AndExists<MyTable2>("t2").Where((p, t) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2).And((t) => t.Id != 2)
+                .Join<MyTable2>("t2").On((p, t1, t2) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2) => t1.Id != 2)
+                .Join<MyTable2>("t3").On((p, t1, t2, t3) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2, t3) => t1.Id != 2).ToWhere()
+                .OrNotExists<MyTable2>("t2").Where((p, t1) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((t1) => t1.Id != 2).ToWhere()
+                .OrExists<MyTable2>("t2").Where((p, t) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2).And((t) => t.Id != 2)
+                .Join<MyTable2>("t2").On((p, t1, t2) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2) => t1.Id != 2)
+                .Join<MyTable2>("t3").On((p, t1, t2, t3) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2, t3) => t1.Id != 2).ToWhere()
+                .AndNotIn<MyTable2>("t3").Field((p, t) => p.Id == t.Id).Where((p, t) => t.Name == "ee").ToWhere()
+                .AndIn<MyTable2>("t3").Field((p, t) => p.Id == t.Id).Where((p, t) => t.Name == "ee").ToWhere()
+                .OrNotIn<MyTable2>("t3").Field((p, t) => p.Id == t.Id).Where((p, t) => t.Name == "ee").ToWhere()
+                .OrIn<MyTable2>("t3").Field((p, t) => p.Id == t.Id).Where((p, t) => t.Name == "ee").ToWhere()
                 .GetResult();
 
             return;
@@ -77,7 +92,7 @@ namespace Never.Test
             var list2 = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyXmlDao(new { Id = 1, UserId = 2, UserName = "".ToNullableParameter() }).QueryForEnumerable<User>("qryUser");
         }
 
-        [Never.SqlClient.TableName(Name ="user")]
+        [Never.SqlClient.TableName(Name = "user")]
         public class MyTable
         {
             public int Id;

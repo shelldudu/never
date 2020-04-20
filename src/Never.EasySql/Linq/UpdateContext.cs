@@ -38,46 +38,25 @@ namespace Never.EasySql.Linq
         /// </summary>
         protected readonly Dictionary<string, object> templateParameter;
 
+        /// <summary>
+        /// update要joijion东西
+        /// </summary>
+        protected List<JoinStruct> updateJoin;
 
         /// <summary>
-        /// update的jion东西
+        /// exists要joijion东西
         /// </summary>
-        protected List<UpdateJoin> updateJoin;
-
-        #region 
+        protected List<JoinStruct> existsJoin;
 
         /// <summary>
-        /// update的jion东西
+        /// in要joijion东西
         /// </summary>
-        protected struct UpdateJoin
-        {
-            /// <summary>
-            /// join的类型
-            /// </summary>
-            public JoinOption JoinOption;
+        protected List<JoinStruct> inJoin;
 
-            /// <summary>
-            /// join后第二张表的别名
-            /// </summary>
-            public string TableAsName;
-
-            /// <summary>
-            /// join的on
-            /// </summary>
-            public Expression On;
-
-            /// <summary>
-            /// join的and
-            /// </summary>
-            public Expression And;
-
-            /// <summary>
-            /// 参数type
-            /// </summary>
-            public Type[] Types;
-        }
-
-        #endregion
+        /// <summary>
+        /// where的exists或者in要join的东西
+        /// </summary>
+        protected List<ExistsStruct> existsOrInJoin;
 
         /// <summary>
         /// 
@@ -144,95 +123,21 @@ namespace Never.EasySql.Linq
         /// join
         /// </summary>
         /// <typeparam name="Table1"></typeparam>
-        /// <param name="tableAsName"></param>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
         /// <param name="on"></param>
         /// <param name="and"></param>
         /// <returns></returns>
-        public virtual UpdateContext<Parameter> Join<Table1>(string tableAsName, Expression<Func<Parameter, Table1, bool>> on, Expression<Func<Table1, bool>> and)
+        public UpdateContext<Parameter> JoinOnUpdate<Table1>(string @as, JoinOption option, Expression<Func<Parameter, Table1, bool>> on, Expression<Func<Table1, bool>> and)
         {
             if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
+                this.updateJoin = new List<JoinStruct>(2);
 
-            this.updateJoin.Add(new UpdateJoin()
+            this.updateJoin.Add(new JoinStruct()
             {
-                TableAsName = tableAsName,
+                AsName = @as,
                 And = and,
-                JoinOption = JoinOption.Join,
-                On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1) }
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// inner join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="on"></param>
-        /// <param name="and"></param>
-        /// <returns></returns>
-        public virtual UpdateContext<Parameter> InnerJoin<Table1>(string tableAsName, Expression<Func<Parameter, Table1, bool>> on, Expression<Func<Table1, bool>> and)
-        {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
-            {
-                TableAsName = tableAsName,
-                And = and,
-                JoinOption = JoinOption.InnerJoin,
-                On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1) }
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// left join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="on"></param>
-        /// <param name="and"></param>
-        /// <returns></returns>
-        public virtual UpdateContext<Parameter> LeftJoin<Table1>(string tableAsName, Expression<Func<Parameter, Table1, bool>> on, Expression<Func<Table1, bool>> and)
-        {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
-            {
-                TableAsName = tableAsName,
-                And = and,
-                JoinOption = JoinOption.LeftJoin,
-                On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1) }
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// right join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="on"></param>
-        /// <param name="and"></param>
-        /// <returns></returns>
-        public virtual UpdateContext<Parameter> RightJoin<Table1>(string tableAsName, Expression<Func<Parameter, Table1, bool>> on, Expression<Func<Table1, bool>> and)
-        {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
-            {
-                TableAsName = tableAsName,
-                And = and,
-                JoinOption = JoinOption.RightJoin,
+                JoinOption = option,
                 On = on,
                 Types = new[] { typeof(Parameter), typeof(Table1) }
             });
@@ -245,98 +150,18 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <typeparam name="Table1"></typeparam>
         /// <typeparam name="Table2"></typeparam>
-        /// <param name="tableAsName"></param>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
         /// <param name="on"></param>
         /// <param name="and"></param>
         /// <returns></returns>
-        public virtual UpdateContext<Parameter> Join<Table1, Table2>(string tableAsName, Expression<Func<Parameter, Table1, Table2, bool>> on, Expression<Func<Table1, Table2, bool>> and)
+        public UpdateContext<Parameter> JoinOnUpdate<Table1, Table2>(string @as, JoinOption option, Expression<Func<Parameter, Table1, Table2, bool>> on, Expression<Func<Table1, Table2, bool>> and)
         {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
+            this.updateJoin.Add(new JoinStruct()
             {
-                TableAsName = tableAsName,
+                AsName = @as,
                 And = and,
-                JoinOption = JoinOption.Join,
-                On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2) }
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// inner join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <typeparam name="Table2"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="on"></param>
-        /// <param name="and"></param>
-        /// <returns></returns>
-        public virtual UpdateContext<Parameter> InnerJoin<Table1, Table2>(string tableAsName, Expression<Func<Parameter, Table1, Table2, bool>> on, Expression<Func<Table1, Table2, bool>> and)
-        {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
-            {
-                TableAsName = tableAsName,
-                And = and,
-                JoinOption = JoinOption.InnerJoin,
-                On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2) }
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// left join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <typeparam name="Table2"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="on"></param>
-        /// <param name="and"></param>
-        /// <returns></returns>
-        public virtual UpdateContext<Parameter> LeftJoin<Table1, Table2>(string tableAsName, Expression<Func<Parameter, Table1, Table2, bool>> on, Expression<Func<Table1, Table2, bool>> and)
-        {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
-            {
-                TableAsName = tableAsName,
-                And = and,
-                JoinOption = JoinOption.LeftJoin,
-                On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2) }
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// right join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <typeparam name="Table2"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="on"></param>
-        /// <param name="and"></param>
-        /// <returns></returns>
-        public virtual UpdateContext<Parameter> RightJoin<Table1, Table2>(string tableAsName, Expression<Func<Parameter, Table1, Table2, bool>> on, Expression<Func<Table1, Table2, bool>> and)
-        {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
-            {
-                TableAsName = tableAsName,
-                And = and,
-                JoinOption = JoinOption.RightJoin,
+                JoinOption = option,
                 On = on,
                 Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2) }
             });
@@ -350,101 +175,18 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <typeparam name="Table2"></typeparam>
         /// <typeparam name="Table3"></typeparam>
-        /// <param name="tableAsName"></param>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
         /// <param name="on"></param>
         /// <param name="and"></param>
         /// <returns></returns>
-        public virtual UpdateContext<Parameter> Join<Table1, Table2, Table3>(string tableAsName, Expression<Func<Parameter, Table1, Table2, Table3, bool>> on, Expression<Func<Table1, Table2, Table3, bool>> and)
+        public UpdateContext<Parameter> JoinOnUpdate<Table1, Table2, Table3>(string @as, JoinOption option, Expression<Func<Parameter, Table1, Table2, Table3, bool>> on, Expression<Func<Table1, Table2, Table3, bool>> and)
         {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
+            this.updateJoin.Add(new JoinStruct()
             {
-                TableAsName = tableAsName,
+                AsName = @as,
                 And = and,
-                JoinOption = JoinOption.Join,
-                On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3) }
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// inner join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <typeparam name="Table2"></typeparam>
-        /// <typeparam name="Table3"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="on"></param>
-        /// <param name="and"></param>
-        /// <returns></returns>
-        public virtual UpdateContext<Parameter> InnerJoin<Table1, Table2, Table3>(string tableAsName, Expression<Func<Parameter, Table1, Table2, Table3, bool>> on, Expression<Func<Table1, Table2, Table3, bool>> and)
-        {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
-            {
-                TableAsName = tableAsName,
-                And = and,
-                JoinOption = JoinOption.InnerJoin,
-                On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3) }
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// left join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <typeparam name="Table2"></typeparam>
-        /// <typeparam name="Table3"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="on"></param>
-        /// <param name="and"></param>
-        /// <returns></returns>
-        public virtual UpdateContext<Parameter> LeftJoin<Table1, Table2, Table3>(string tableAsName, Expression<Func<Parameter, Table1, Table2, Table3, bool>> on, Expression<Func<Table1, Table2, Table3, bool>> and)
-        {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
-            {
-                TableAsName = tableAsName,
-                And = and,
-                JoinOption = JoinOption.LeftJoin,
-                On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3) }
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// right join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <typeparam name="Table2"></typeparam>
-        /// <typeparam name="Table3"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="on"></param>
-        /// <param name="and"></param>
-        /// <returns></returns>
-        public virtual UpdateContext<Parameter> RightJoin<Table1, Table2, Table3>(string tableAsName, Expression<Func<Parameter, Table1, Table2, Table3, bool>> on, Expression<Func<Table1, Table2, Table3, bool>> and)
-        {
-            if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
-
-            this.updateJoin.Add(new UpdateJoin()
-            {
-                TableAsName = tableAsName,
-                And = and,
-                JoinOption = JoinOption.RightJoin,
+                JoinOption = option,
                 On = on,
                 Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3) }
             });
@@ -459,20 +201,21 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <typeparam name="Table3"></typeparam>
         /// <typeparam name="Table4"></typeparam>
-        /// <param name="tableAsName"></param>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
         /// <param name="on"></param>
         /// <param name="and"></param>
         /// <returns></returns>
-        public virtual UpdateContext<Parameter> Join<Table1, Table2, Table3, Table4>(string tableAsName, Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> on, Expression<Func<Table1, Table2, Table3, Table4, bool>> and)
+        public UpdateContext<Parameter> JoinOnUpdate<Table1, Table2, Table3, Table4>(string @as, JoinOption option, Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> on, Expression<Func<Table1, Table2, Table3, Table4, bool>> and)
         {
             if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
+                this.updateJoin = new List<JoinStruct>(1);
 
-            this.updateJoin.Add(new UpdateJoin()
+            this.updateJoin.Add(new JoinStruct()
             {
-                TableAsName = tableAsName,
+                AsName = @as,
                 And = and,
-                JoinOption = JoinOption.Join,
+                JoinOption = option,
                 On = on,
                 Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) }
             });
@@ -481,26 +224,102 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// inner join
+        /// join
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public UpdateContext<Parameter> JoinOnExists<Table1>(string @as, JoinOption option, Expression<Func<Parameter, Table1, bool>> on, Expression<Func<Table1, bool>> and)
+        {
+            if (this.updateJoin == null)
+                this.updateJoin = new List<JoinStruct>(2);
+
+            this.updateJoin.Add(new JoinStruct()
+            {
+                AsName = @as,
+                And = and,
+                JoinOption = option,
+                On = on,
+                Types = new[] { typeof(Parameter), typeof(Table1) }
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// join
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <typeparam name="Table2"></typeparam>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public UpdateContext<Parameter> JoinOnExists<Table1, Table2>(string @as, JoinOption option, Expression<Func<Parameter, Table1, Table2, bool>> on, Expression<Func<Table1, Table2, bool>> and)
+        {
+            this.updateJoin.Add(new JoinStruct()
+            {
+                AsName = @as,
+                And = and,
+                JoinOption = option,
+                On = on,
+                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2) }
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// join
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <typeparam name="Table2"></typeparam>
+        /// <typeparam name="Table3"></typeparam>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public UpdateContext<Parameter> JoinOnExists<Table1, Table2, Table3>(string @as, JoinOption option, Expression<Func<Parameter, Table1, Table2, Table3, bool>> on, Expression<Func<Table1, Table2, Table3, bool>> and)
+        {
+            this.updateJoin.Add(new JoinStruct()
+            {
+                AsName = @as,
+                And = and,
+                JoinOption = option,
+                On = on,
+                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3) }
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// join
         /// </summary>
         /// <typeparam name="Table1"></typeparam>
         /// <typeparam name="Table2"></typeparam>
         /// <typeparam name="Table3"></typeparam>
         /// <typeparam name="Table4"></typeparam>
-        /// <param name="tableAsName"></param>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
         /// <param name="on"></param>
         /// <param name="and"></param>
         /// <returns></returns>
-        public virtual UpdateContext<Parameter> InnerJoin<Table1, Table2, Table3, Table4>(string tableAsName, Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> on, Expression<Func<Table1, Table2, Table3, Table4, bool>> and)
+        public UpdateContext<Parameter> JoinOnExists<Table1, Table2, Table3, Table4>(string @as, JoinOption option, Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> on, Expression<Func<Table1, Table2, Table3, Table4, bool>> and)
         {
             if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
+                this.updateJoin = new List<JoinStruct>(1);
 
-            this.updateJoin.Add(new UpdateJoin()
+            this.updateJoin.Add(new JoinStruct()
             {
-                TableAsName = tableAsName,
+                AsName = @as,
                 And = and,
-                JoinOption = JoinOption.InnerJoin,
+                JoinOption = option,
                 On = on,
                 Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) }
             });
@@ -508,55 +327,104 @@ namespace Never.EasySql.Linq
             return this;
         }
 
+
         /// <summary>
-        /// left join
+        /// join
         /// </summary>
         /// <typeparam name="Table1"></typeparam>
-        /// <typeparam name="Table2"></typeparam>
-        /// <typeparam name="Table3"></typeparam>
-        /// <typeparam name="Table4"></typeparam>
-        /// <param name="tableAsName"></param>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
         /// <param name="on"></param>
         /// <param name="and"></param>
         /// <returns></returns>
-        public virtual UpdateContext<Parameter> LeftJoin<Table1, Table2, Table3, Table4>(string tableAsName, Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> on, Expression<Func<Table1, Table2, Table3, Table4, bool>> and)
+        public UpdateContext<Parameter> JoinOnIn<Table1>(string @as, JoinOption option, Expression<Func<Parameter, Table1, bool>> on, Expression<Func<Table1, bool>> and)
         {
             if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
+                this.updateJoin = new List<JoinStruct>(2);
 
-            this.updateJoin.Add(new UpdateJoin()
+            this.updateJoin.Add(new JoinStruct()
             {
-                TableAsName = tableAsName,
+                AsName = @as,
                 And = and,
-                JoinOption = JoinOption.LeftJoin,
+                JoinOption = option,
                 On = on,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) }
+                Types = new[] { typeof(Parameter), typeof(Table1) }
             });
 
             return this;
         }
 
         /// <summary>
-        /// right join
+        /// join
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <typeparam name="Table2"></typeparam>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public UpdateContext<Parameter> JoinOnIn<Table1, Table2>(string @as, JoinOption option, Expression<Func<Parameter, Table1, Table2, bool>> on, Expression<Func<Table1, Table2, bool>> and)
+        {
+            this.updateJoin.Add(new JoinStruct()
+            {
+                AsName = @as,
+                And = and,
+                JoinOption = option,
+                On = on,
+                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2) }
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// join
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <typeparam name="Table2"></typeparam>
+        /// <typeparam name="Table3"></typeparam>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
+        /// <param name="on"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
+        public UpdateContext<Parameter> JoinOnIn<Table1, Table2, Table3>(string @as, JoinOption option, Expression<Func<Parameter, Table1, Table2, Table3, bool>> on, Expression<Func<Table1, Table2, Table3, bool>> and)
+        {
+            this.updateJoin.Add(new JoinStruct()
+            {
+                AsName = @as,
+                And = and,
+                JoinOption = option,
+                On = on,
+                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3) }
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// join
         /// </summary>
         /// <typeparam name="Table1"></typeparam>
         /// <typeparam name="Table2"></typeparam>
         /// <typeparam name="Table3"></typeparam>
         /// <typeparam name="Table4"></typeparam>
-        /// <param name="tableAsName"></param>
+        /// <param name="as"></param>
+        /// <param name="option"></param>
         /// <param name="on"></param>
         /// <param name="and"></param>
         /// <returns></returns>
-        public virtual UpdateContext<Parameter> RightJoin<Table1, Table2, Table3, Table4>(string tableAsName, Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> on, Expression<Func<Table1, Table2, Table3, Table4, bool>> and)
+        public UpdateContext<Parameter> JoinOnIn<Table1, Table2, Table3, Table4>(string @as, JoinOption option, Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> on, Expression<Func<Table1, Table2, Table3, Table4, bool>> and)
         {
             if (this.updateJoin == null)
-                this.updateJoin = new List<UpdateJoin>(1);
+                this.updateJoin = new List<JoinStruct>(1);
 
-            this.updateJoin.Add(new UpdateJoin()
+            this.updateJoin.Add(new JoinStruct()
             {
-                TableAsName = tableAsName,
+                AsName = @as,
                 And = and,
-                JoinOption = JoinOption.RightJoin,
+                JoinOption = option,
                 On = on,
                 Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) }
             });
@@ -574,7 +442,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public abstract UpdateContext<Parameter> Entrance();
+        public abstract UpdateContext<Parameter> StartSetColumn();
 
         /// <summary>
         /// 在update的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint
@@ -610,72 +478,104 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract UpdateContext<Parameter> Exists<Table1>(AndOrOption option, Expression<Func<Parameter, Table1, bool>> where, Expression<Func<Table1, bool>> and);
+        public virtual UpdateContext<Parameter> Exists<Table1>(AndOrOption andOrOption, string @as, Expression<Func<Parameter, Table1, bool>> where, Expression<Func<Table1, bool>> and)
+        {
+            if (this.existsOrInJoin == null)
+                this.existsOrInJoin = new List<ExistsStruct>(1);
 
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> NotExists<Table1>(AndOrOption option, Expression<Func<Parameter, Table1, bool>> where, Expression<Func<Table1, bool>> and);
+            this.existsOrInJoin.Add(new ExistsStruct()
+            {
+                AsName = @as,
+                And = and,
+                Joins = new List<JoinStruct>(1),
+                Where = where,
+                Flag = string.Concat(andOrOption == AndOrOption.and ? "and exists " : "or exists "),
+                Types = new[] { typeof(Parameter), typeof(Table1) }
+            });
 
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> Exists<Table1,Table2>(AndOrOption option, Expression<Func<Parameter, Table1, Table2, bool>> where, Expression<Func<Table1, Table2, bool>> and);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> NotExists<Table1, Table2>(AndOrOption option, Expression<Func<Parameter, Table1, Table2, bool>> where, Expression<Func<Table1, Table2, bool>> and);
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> Exists<Table1, Table2, Table3>(AndOrOption option, Expression<Func<Parameter, Table1, Table2, Table3, bool>> where, Expression<Func<Table1, Table2, Table3, bool>> and);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> NotExists<Table1, Table2, Table3>(AndOrOption option, Expression<Func<Parameter, Table1, Table2, Table3, bool>> where, Expression<Func<Table1, Table2, Table3, bool>> and);
-
+            return this;
+        }
 
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract UpdateContext<Parameter> Exists<Table1, Table2, Table3, Table4>(AndOrOption option, Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> where, Expression<Func<Table1, Table2, Table3, Table4, bool>> and);
+        public virtual UpdateContext<Parameter> NotExists<Table1>(AndOrOption andOrOption, string @as, Expression<Func<Parameter, Table1, bool>> where, Expression<Func<Table1, bool>> and)
+        {
+            if (this.existsOrInJoin == null)
+                this.existsOrInJoin = new List<ExistsStruct>(1);
 
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> NotExists<Table1, Table2, Table3, Table4>(AndOrOption option, Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> where, Expression<Func<Table1, Table2, Table3, Table4, bool>> and);
+            this.existsOrInJoin.Add(new ExistsStruct()
+            {
+                AsName = @as,
+                And = and,
+                Joins = new List<JoinStruct>(1),
+                Where = where,
+                Flag = string.Concat(andOrOption == AndOrOption.and ? "and not exists " : "or not exists "),
+                Types = new[] { typeof(Parameter), typeof(Table1) }
+            });
 
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> In<Table1>(AndOrOption option, Expression<Func<Parameter, Table1, bool>> expression, Expression<Func<Table1, bool>> where);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> NotIn<Table1>(AndOrOption option, Expression<Func<Parameter, Table1, bool>> expression, Expression<Func<Table1, bool>> where);
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> Exists(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract UpdateContext<Parameter> NotExists(AndOrOption option, string expression);
+            return this;
+        }
 
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract UpdateContext<Parameter> In(AndOrOption option, string expression);
+        public virtual UpdateContext<Parameter> In<Table1>(AndOrOption andOrOption, string @as, Expression<Func<Parameter, Table1, bool>> field, Expression<Func<Table1, bool>> where)
+        {
+            return this;
+        }
 
         /// <summary>
         /// 不存在
         /// </summary>
-        public abstract UpdateContext<Parameter> NotIn(AndOrOption option, string expression);
+        public virtual UpdateContext<Parameter> NotIn<Table1>(AndOrOption andOrOption, string @as, Expression<Func<Parameter, Table1, bool>> field, Expression<Func<Table1, bool>> where)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public virtual UpdateContext<Parameter> Exists(AndOrOption andOrOption, string sql)
+        {
+            if (this.existsOrInJoin == null)
+                this.existsOrInJoin = new List<ExistsStruct>(1);
+
+            this.existsOrInJoin.Add(new ExistsStruct()
+            {
+                AsName = string.Empty,
+                And = null,
+                Joins = new List<JoinStruct>(1),
+                Where = null,
+                Flag = string.Concat(andOrOption == AndOrOption.and ? "and " : "or ", sql),
+                Types = new[] { typeof(Parameter) }
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public virtual UpdateContext<Parameter> NotExists(AndOrOption andOrOption, string sql)
+        {
+            return this.Exists(andOrOption, sql);
+        }
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        public virtual UpdateContext<Parameter> In(AndOrOption andOrOption, string sql)
+        {
+            return this.Exists(andOrOption, sql);
+        }
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        public virtual UpdateContext<Parameter> NotIn(AndOrOption andOrOption, string sql)
+        {
+            return this.Exists(andOrOption, sql);
+        }
     }
 }

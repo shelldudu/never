@@ -40,61 +40,52 @@ namespace Never.EasySql.Linq
         /// join
         /// </summary>
         /// <typeparam name="Table"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="expression"></param>
-        /// <param name="and"></param>
+        /// <param name="as"></param>
         /// <returns></returns>
-        public Update<Parameter> Join<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
+        public UpdateJoinGrammar<Parameter, Table> Join<Table>(string @as)
         {
-
-            return this;
+            return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.Join) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
         }
 
         /// <summary>
         /// inner join
         /// </summary>
         /// <typeparam name="Table"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="expression"></param>
-        /// <param name="and"></param>
+        /// <param name="as"></param>
         /// <returns></returns>
-        public Update<Parameter> InnerJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
+        public UpdateJoinGrammar<Parameter, Table> InnerJoin<Table>(string @as)
         {
-            return this;
+            return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.InnerJoin) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
         }
 
         /// <summary>
         /// left join
         /// </summary>
         /// <typeparam name="Table"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="expression"></param>
-        /// <param name="and"></param>
+        /// <param name="as"></param>
         /// <returns></returns>
-        public Update<Parameter> LeftJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and)
+        public UpdateJoinGrammar<Parameter, Table> LeftJoin<Table>(string @as)
         {
-            return this;
+            return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.LeftJoin) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
         }
 
         /// <summary>
-        /// right join
+        /// left join
         /// </summary>
         /// <typeparam name="Table"></typeparam>
-        /// <param name="tableAsName"></param>
-        /// <param name="expression"></param>
-        /// <param name="where"></param>
+        /// <param name="as"></param>
         /// <returns></returns>
-        public Update<Parameter> RightJoin<Table>(string tableAsName, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public UpdateJoinGrammar<Parameter, Table> RightJoin<Table>(string @as)
         {
-            return this;
+            return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.RightJoin) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
         }
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Parameter> SetColum<TMember>(Expression<Func<Parameter, TMember>> expression)
+        public UpdateGrammar<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
         {
-            return new UpdateGrammar<Parameter>() { Context = this.Context }.Entrance().SetColumn(expression);
+            return new UpdateGrammar<Parameter>() { Context = this.Context }.StartSetColumn().SetColumn(expression);
         }
 
         /// <summary>
@@ -102,7 +93,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public UpdateGrammar<Parameter> SetColumWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
         {
-            return new UpdateGrammar<Parameter>() { Context = this.Context }.Entrance().SetColumnWithFunc(expression, value);
+            return new UpdateGrammar<Parameter>() { Context = this.Context }.StartSetColumn().SetColumnWithFunc(expression, value);
         }
 
         /// <summary>
@@ -110,7 +101,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public UpdateGrammar<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
-            return new UpdateGrammar<Parameter>() { Context = this.Context }.Entrance().SetColumnWithValue(expression, value);
+            return new UpdateGrammar<Parameter>() { Context = this.Context }.StartSetColumn().SetColumnWithValue(expression, value);
         }
     }
 }

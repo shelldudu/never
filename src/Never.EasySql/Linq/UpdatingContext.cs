@@ -72,7 +72,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override int GetResult()
         {
-            var sqlTag = new LinqSqlTag(this.cacheId)
+            var sqlTag = new LinqSqlTag(this.cacheId, "update")
             {
                 Labels = this.labels.AsEnumerable(),
                 TextLength = this.textLength,
@@ -111,7 +111,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public override UpdateContext<Parameter> Entrance()
+        public override UpdateContext<Parameter> StartSetColumn()
         {
             this.tableName = this.tableName.IsNullOrEmpty() ? this.FindTableName<Parameter>(tableInfo) : this.tableName;
             int length = this.tableName.Length;
@@ -310,7 +310,7 @@ namespace Never.EasySql.Linq
             var collection = new List<BinaryBlock>(10);
             var leftTableInfo = this.tableInfo;
             var rightTableInfo = FindTableInfo<Table>();
-            this.Analyze(where, leftTableInfo, rightTableInfo, collection,out var analyzeParameters);
+            this.Analyze(where, leftTableInfo, rightTableInfo, collection, out var analyzeParameters);
             if (collection.Any() == false)
                 return this;
 
@@ -360,7 +360,7 @@ namespace Never.EasySql.Linq
             if (and != null)
             {
                 var temp = new List<BinaryBlock>(10);
-                this.Analyze(and, FindTableInfo<Table>(), temp,out _);
+                this.Analyze(and, FindTableInfo<Table>(), temp, out _);
                 if (collection.Any())
                 {
                     sb.Append(" where ");
@@ -500,26 +500,26 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        protected UpdateContext<Parameter> ExistsNotExists(List<BinaryBlock> onCollection, List<AnalyzeParameter> onAnalyzeParameters, List<BinaryBlock> andCollection, List<AnalyzeParameter> andAnalyzeParameters, char flag) 
+        protected UpdateContext<Parameter> ExistsNotExists(List<BinaryBlock> onCollection, List<AnalyzeParameter> onAnalyzeParameters, List<BinaryBlock> andCollection, List<AnalyzeParameter> andAnalyzeParameters, char flag)
         {
             var leftTableName = this.tableName;
             var leftAs = leftTableName;
             var sb = new StringBuilder(onCollection.Count * 10);
             sb.Append(flag == 'n' ? "not exists(select 0 from " : " exists(select 0 from ");
-            for (int i = 0, j = onCollection.Count; i < j; i++) 
+            for (int i = 0, j = onCollection.Count; i < j; i++)
             {
                 if (onAnalyzeParameters[i].Type == typeof(Parameter))
                     continue;
 
-                sb.Append(FindTableName(onAnalyzeParameters[i].TableInfo,andAnalyzeParameters[i].Type));
+                sb.Append(FindTableName(onAnalyzeParameters[i].TableInfo, andAnalyzeParameters[i].Type));
                 //sb.Append(onCollection[i].ToString())
             }
             var rightTableName = this.Format(this.FindTableName<Table>(rightTableInfo));
-           
-            
+
+
             sb.Append(rightTableName);
 
-            
+
             var rightAs = rightTableName;
             if (this.asTableName.IsNotNullOrEmpty())
             {

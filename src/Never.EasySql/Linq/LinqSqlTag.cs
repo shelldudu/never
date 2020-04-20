@@ -12,14 +12,22 @@ namespace Never.EasySql.Linq
     /// </summary>
     public sealed class LinqSqlTag : SqlTag
     {
+        /// <summary>
+        /// 临时参数
+        /// </summary>
         private readonly Dictionary<string, object> templateParameter;
-
+        /// <summary>
+        /// 属于delete,update,insert,select哪一种
+        /// </summary>
+        public readonly string Owner;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="cacheId"></param>
-        public LinqSqlTag(string cacheId)
+        /// <param name="owner"></param>
+        public LinqSqlTag(string cacheId, string owner)
         {
+            this.Owner = owner;
             this.Id = cacheId ?? NewId.GenerateGuid().ToString();
             this.Labels = new List<ILabel>();
         }

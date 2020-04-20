@@ -86,7 +86,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override int GetResult()
         {
-            var sqlTag = new LinqSqlTag(this.cacheId)
+            var sqlTag = new LinqSqlTag(this.cacheId, "delete")
             {
                 Labels = this.labels.AsEnumerable(),
                 TextLength = this.textLength,

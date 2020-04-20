@@ -130,6 +130,73 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// jion
+        /// </summary>
+        protected struct JoinStruct
+        {
+            /// <summary>
+            /// join的类型
+            /// </summary>
+            public JoinOption JoinOption;
+
+            /// <summary>
+            /// join后第二张表的别名
+            /// </summary>
+            public string AsName;
+
+            /// <summary>
+            /// join的on
+            /// </summary>
+            public Expression On;
+
+            /// <summary>
+            /// join的and
+            /// </summary>
+            public Expression And;
+
+            /// <summary>
+            /// 参数type
+            /// </summary>
+            public Type[] Types;
+        }
+
+        /// <summary>
+        /// exists
+        /// </summary>
+        protected struct ExistsStruct
+        {
+            /// <summary>
+            /// 区分是not还是没有not，比如and not 或者and 
+            /// </summary>
+            public string Flag;
+
+            /// <summary>
+            /// 第二张表的别名
+            /// </summary>
+            public string AsName;
+
+            /// <summary>
+            /// and
+            /// </summary>
+            public Expression And;
+
+            /// <summary>
+            /// where
+            /// </summary>
+            public Expression Where;
+
+            /// <summary>
+            /// 参数type
+            /// </summary>
+            public Type[] Types;
+
+            /// <summary>
+            /// join
+            /// </summary>
+            public List<JoinStruct> Joins;
+        }
+
+        /// <summary>
         /// 对字段格式化
         /// </summary>
         /// <param name="text"></param>

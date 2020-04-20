@@ -24,7 +24,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> Entrance()
+        public override Linq.UpdateContext<Parameter> StartSetColumn()
         {
             return this;
         }

@@ -23,6 +23,7 @@ namespace Never.EasySql
         private readonly IDao dao = null;
         private readonly EasySqlParameter<Parameter> parameter = null;
         private string cacheId = null;
+        private LinqSqlTag tag;
         #endregion field
 
         #region ctor
@@ -117,17 +118,33 @@ namespace Never.EasySql
         }
 
         /// <summary>
+        /// 是否已经构建了
+        /// </summary>
+        public bool Builded
+        {
+            get
+            {
+                if (this.cacheId.IsNullOrEmpty())
+                    return true;
+
+                return LinqSqlTagProvider.Get(this.cacheId, out tag);
+            }
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <returns></returns>
         public Update<Parameter> Update()
         {
-            LinqSqlTag tag = null;
-            if (this.cacheId.IsNotNullOrEmpty())
+            if (tag == null && this.cacheId.IsNotNullOrEmpty())
                 LinqSqlTagProvider.Get(this.cacheId, out tag);
 
             if (tag != null)
             {
+                if (tag.Owner.Equals("update") == false)
+                    throw new Exception(string.Format("the cachedid {0} owner is {1}", this.cacheId, tag.Owner));
+
                 return new Update<Parameter>()
                 {
                     Context = new UpdatedContext<Parameter>(tag, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
@@ -211,12 +228,14 @@ namespace Never.EasySql
         /// <returns></returns>
         public Delete<Parameter> Delete()
         {
-            LinqSqlTag tag = null;
-            if (this.cacheId.IsNotNullOrEmpty())
+            if (tag == null && this.cacheId.IsNotNullOrEmpty())
                 LinqSqlTagProvider.Get(this.cacheId, out tag);
 
             if (tag != null)
             {
+                if (tag.Owner.Equals("delete") == false)
+                    throw new Exception(string.Format("the cachedid {0} owner is {1}", this.cacheId, tag.Owner));
+
                 return new Delete<Parameter>()
                 {
                     Context = new DeletedContext<Parameter>(tag, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
@@ -300,12 +319,14 @@ namespace Never.EasySql
         /// <returns></returns>
         public Insert<Parameter> Insert()
         {
-            LinqSqlTag tag = null;
-            if (this.cacheId.IsNotNullOrEmpty())
+            if (tag == null && this.cacheId.IsNotNullOrEmpty())
                 LinqSqlTagProvider.Get(this.cacheId, out tag);
 
             if (tag != null)
             {
+                if (tag.Owner.Equals("insert") == false)
+                    throw new Exception(string.Format("the cachedid {0} owner is {1}", this.cacheId, tag.Owner));
+
                 return new Insert<Parameter>()
                 {
                     Context = new InsertedContext<Parameter>(tag, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
@@ -389,12 +410,14 @@ namespace Never.EasySql
         /// <returns></returns>
         public Select<Parameter, Table> Select<Table>()
         {
-            LinqSqlTag tag = null;
-            if (this.cacheId.IsNotNullOrEmpty())
+            if (tag == null && this.cacheId.IsNotNullOrEmpty())
                 LinqSqlTagProvider.Get(this.cacheId, out tag);
 
             if (tag != null)
             {
+                if (tag.Owner.Equals("select") == false)
+                    throw new Exception(string.Format("the cachedid {0} owner is {1}", this.cacheId, tag.Owner));
+
                 return new Select<Parameter, Table>()
                 {
                     Context = new SelectedContext<Parameter, Table>(tag, this, Context.FindTableInfo<Table>(), this.parameter)
