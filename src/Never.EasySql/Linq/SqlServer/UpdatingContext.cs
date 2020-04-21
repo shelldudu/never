@@ -15,6 +15,11 @@ namespace Never.EasySql.Linq.SqlServer
     public sealed class UpdatingContext<Parameter> : Linq.UpdatingContext<Parameter>
     {
         /// <summary>
+        /// update join
+        /// </summary>
+        private List<JoinInfo> updateJoin;
+
+        /// <summary>
         /// ctor
         /// </summary>
         /// <param name="cacheId"></param>
@@ -26,13 +31,21 @@ namespace Never.EasySql.Linq.SqlServer
         }
 
         /// <summary>
-        /// 获取入口的标签
+        /// 入口
         /// </summary>
-        /// <returns></returns>
-        protected override TextLabel GetFirstLabelOnEntrance()
+        public override UpdateContext<Parameter> StartSetColumn()
         {
-            return new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, "\r", "set") };
+            this.formatAppendCount = this.Format("a").Length - 1;
+            this.tableNamePoint = string.Concat(this.FromTable, ".");
+            this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
+
+            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, "\r", "set") };
+            this.textLength += label.SqlText.Length;
+            this.labels.Add(label);
+            this.equalAndPrefix = string.Concat(" = ", this.dao.SqlExecuter.GetParameterPrefix());
+            return this;
         }
+
 
         /// <summary>
         /// where 条件
@@ -43,18 +56,14 @@ namespace Never.EasySql.Linq.SqlServer
             {
                 var label = new TextLabel()
                 {
-                    SqlText = string.Concat(" from ", this.tableName),
+                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
                     TagId = NewId.GenerateNumber(),
                 };
-
-                if (this.asTableName.IsNotNullOrEmpty()) 
-                {
-                
-                }
 
                 this.labels.Add(label);
                 this.textLength += label.SqlText.Length;
             }
+
             return base.Where();
         }
 
@@ -67,9 +76,10 @@ namespace Never.EasySql.Linq.SqlServer
             {
                 var label = new TextLabel()
                 {
-                    SqlText = "where 1 = 1 \r",
+                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
                     TagId = NewId.GenerateNumber(),
                 };
+
                 this.labels.Add(label);
                 this.textLength += label.SqlText.Length;
             }
@@ -84,6 +94,17 @@ namespace Never.EasySql.Linq.SqlServer
         protected override string SelectTableNamePointOnSetolunm()
         {
             return base.tableNamePoint;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joins"></param>
+        /// <returns></returns>
+        public override UpdateContext<Parameter> JoinOnUpdate(List<JoinInfo> joins)
+        {
+            this.updateJoin = joins;
+            return this;
         }
 
         /// <summary>

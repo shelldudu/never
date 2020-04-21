@@ -17,7 +17,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 二进制运算
         /// </summary>
-        protected class BinaryExp
+        public class BinaryExp
         {
             /// <summary>
             /// 表达式
@@ -38,7 +38,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 二进制运算
         /// </summary>
-        protected class BinaryBlock
+        public class BinaryBlock
         {
             /// <summary>
             /// 左边
@@ -111,7 +111,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 分析参数
         /// </summary>
-        protected struct AnalyzeParameter
+        public struct AnalyzeParameter
         {
             /// <summary>
             /// 参数类型
@@ -132,7 +132,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// jion
         /// </summary>
-        protected struct JoinStruct
+        public class JoinInfo
         {
             /// <summary>
             /// join的类型
@@ -147,12 +147,12 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// join的on
             /// </summary>
-            public Expression On;
+            public LambdaExpression On;
 
             /// <summary>
             /// join的and
             /// </summary>
-            public Expression And;
+            public LambdaExpression And;
 
             /// <summary>
             /// 参数type
@@ -163,12 +163,17 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// exists
         /// </summary>
-        protected struct ExistsStruct
+        public class WhereExists
         {
             /// <summary>
-            /// 区分是not还是没有not，比如and not 或者and 
+            /// 是否为not exits
             /// </summary>
-            public string Flag;
+            public bool NotExists;
+
+            /// <summary>
+            /// 当前是用and还是or进来的
+            /// </summary>
+            public AndOrOption AndOrOption;
 
             /// <summary>
             /// 第二张表的别名
@@ -178,12 +183,12 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// and
             /// </summary>
-            public Expression And;
+            public LambdaExpression And;
 
             /// <summary>
             /// where
             /// </summary>
-            public Expression Where;
+            public LambdaExpression Where;
 
             /// <summary>
             /// 参数type
@@ -193,7 +198,48 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// join
             /// </summary>
-            public List<JoinStruct> Joins;
+            public List<JoinInfo> Joins;
+        }
+
+        /// <summary>
+        /// in
+        /// </summary>
+        public class WhereIn
+        {
+            /// <summary>
+            /// 是否为not in
+            /// </summary>
+            public bool NotIn;
+
+            /// <summary>
+            /// 当前是用and还是or进来的
+            /// </summary>
+            public AndOrOption AndOrOption;
+
+            /// <summary>
+            /// 第二张表的别名
+            /// </summary>
+            public string AsName;
+
+            /// <summary>
+            /// where
+            /// </summary>
+            public LambdaExpression Where;
+
+            /// <summary>
+            /// field
+            /// </summary>
+            public LambdaExpression Field;
+
+            /// <summary>
+            /// 参数type
+            /// </summary>
+            public Type[] Types;
+
+            /// <summary>
+            /// join
+            /// </summary>
+            public List<JoinInfo> Joins;
         }
 
         /// <summary>
@@ -211,6 +257,19 @@ namespace Never.EasySql.Linq
         public static TableInfo FindTableInfo<Table>()
         {
             if (TableInfoProvider.TryUpdateTableInfo(typeof(Table), out var tableInfo))
+                return tableInfo;
+
+            throw new KeyNotExistedException("table", "table info not found");
+        }
+
+        /// <summary>
+        /// 查询table信息
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static TableInfo FindTableInfo(Type type)
+        {
+            if (TableInfoProvider.TryUpdateTableInfo(type, out var tableInfo))
                 return tableInfo;
 
             throw new KeyNotExistedException("table", "table info not found");
@@ -296,7 +355,7 @@ namespace Never.EasySql.Linq
         /// <param name="memberInfo"></param>
         /// <param name="tableInfo"></param>
         /// <returns></returns>
-        protected virtual string FindColumnName(MemberInfo memberInfo, TableInfo tableInfo)
+        protected virtual string FindColumnName(TableInfo tableInfo, MemberInfo memberInfo)
         {
             IEnumerable<TableInfo.ColumnInfo> column = tableInfo.Columns.Where(ta => ta.Member == memberInfo);
             if (column.Any())
@@ -317,7 +376,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="tableInfo"></param>
         /// <returns></returns>
-        protected virtual string FindTableName<Table>(TableInfo tableInfo)
+        protected string FindTableName<Table>(TableInfo tableInfo)
         {
             if (tableInfo.TableName != null)
                 return tableInfo.TableName.Name;
@@ -331,12 +390,30 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        protected virtual string FindTableName(TableInfo tableInfo, Type type)
+        protected string FindTableName(TableInfo tableInfo, Type type)
         {
             if (tableInfo.TableName != null)
                 return tableInfo.TableName.Name;
 
             return type.Name;
+        }
+
+        /// <summary>
+        /// 返回Join对应的字符串
+        /// </summary>
+        /// <param name="joinOption"></param>
+        /// <returns></returns>
+        protected string FindJoinOptionString(JoinOption joinOption)
+        {
+            switch (joinOption)
+            {
+                case JoinOption.Join: return "join";
+                case JoinOption.InnerJoin: return "inner join";
+                case JoinOption.LeftJoin: return "left join";
+                case JoinOption.RightJoin: return "right join";
+            }
+
+            return joinOption.ToString();
         }
 
         /// <summary>
@@ -357,7 +434,7 @@ namespace Never.EasySql.Linq
                 for (int i = 0, j = analyzeParameters.Count; i < j; i++)
                 {
                     var item = analyzeParameters[i];
-                    if (exp.Type == item.Type || (exp is ParameterExpression && ((ParameterExpression)exp).Name == item.Placeholder))
+                    if (exp.Type == item.Type && (exp is ParameterExpression && ((ParameterExpression)exp).Name == item.Placeholder))
                         return i;
                 }
 
@@ -395,7 +472,7 @@ namespace Never.EasySql.Linq
                     {
                         Left = new BinaryExp()
                         {
-                            Exp = this.FindColumnName(memberExpress.Member, matchTable(index)),
+                            Exp = this.FindColumnName(matchTable(index), memberExpress.Member),
                             IsConstant = false,
                             Index = index,
                         }
@@ -497,7 +574,7 @@ namespace Never.EasySql.Linq
                     int index = leftOrRight(memberExpress.Expression);
                     current.Right = new BinaryExp()
                     {
-                        Exp = this.FindColumnName(memberExpress.Member, matchTable(index)),
+                        Exp = this.FindColumnName(matchTable(index), memberExpress.Member),
                         IsConstant = false,
                         Index = index,
                     };
@@ -530,13 +607,9 @@ namespace Never.EasySql.Linq
             }
 
             if (current != null)
-            {
                 whereCollection.Add(current);
 
-                return true;
-            }
-
-            throw new Exception("current is null");
+            return true;
         }
 
         /// <summary>
@@ -559,7 +632,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo5"></param>
         /// <param name="tableInfo6"></param>
         /// <param name="whereCollection"></param>
-        protected virtual bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5, Table6>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, Table6, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, TableInfo tableInfo6, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5, Table6>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, Table6, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, TableInfo tableInfo6, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -633,7 +706,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo4"></param>
         /// <param name="tableInfo5"></param>
         /// <param name="whereCollection"></param>
-        protected virtual bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -699,7 +772,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo3"></param>
         /// <param name="tableInfo4"></param>
         /// <param name="whereCollection"></param>
-        protected virtual bool Analyze<Parameter, Table1, Table2, Table3, Table4>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2, Table3, Table4>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -757,7 +830,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo2"></param>
         /// <param name="tableInfo3"></param>
         /// <param name="whereCollection"></param>
-        protected virtual bool Analyze<Parameter, Table1, Table2, Table3>(Expression<Func<Parameter, Table1, Table2, Table3, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2, Table3>(Expression<Func<Parameter, Table1, Table2, Table3, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -807,7 +880,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo1"></param>
         /// <param name="tableInfo2"></param>
         /// <param name="whereCollection"></param>
-        protected virtual bool Analyze<Parameter, Table1, Table2>(Expression<Func<Parameter, Table1, Table2, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2>(Expression<Func<Parameter, Table1, Table2, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -849,7 +922,7 @@ namespace Never.EasySql.Linq
         /// <param name="analyzeParameters"></param>
         /// <param name="tableInfo"></param>
         /// <param name="whereCollection"></param>
-        protected virtual bool Analyze<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -883,7 +956,7 @@ namespace Never.EasySql.Linq
         /// <param name="parameterTableInfo"></param>
         /// <param name="analyzeParameters"></param>
         /// <param name="whereCollection"></param>
-        protected virtual bool Analyze<Parameter>(Expression<Func<Parameter, bool>> expression, TableInfo parameterTableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter>(Expression<Func<Parameter, bool>> expression, TableInfo parameterTableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -901,6 +974,497 @@ namespace Never.EasySql.Linq
             };
 
             return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameterTableName"></param>
+        /// <param name="parameterAsTableName"></param>
+        /// <param name="joins"></param>
+        /// <returns></returns>
+        protected StringBuilder LoadUpdateJoin(string parameterTableName, string parameterAsTableName, List<JoinInfo> joins)
+        {
+            var builder = new StringBuilder(joins.Count * 20);
+            var pp = new[] { "" }.Concat(joins.Select(ta => ta.AsName)).ToArray();
+            pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
+
+            var whereCollection = new List<BinaryBlock>();
+            var analyzeParameters = new List<AnalyzeParameter>();
+            for (int i = 0, j = joins.Count; i < j; i++)
+            {
+                var item = joins[i];
+                //join是从第二张表开始的
+                if (item.Types.Length != (i + 2))
+                    throw new Exception(string.Format("parameter typs not padding,the left length is {0}, and the right length is {1}", joins[i].Types.Length, i + 2));
+
+                whereCollection.Clear();
+                analyzeParameters.Clear();
+                LambdaExpression lambda = item.On;
+                for (var k = 0; k < item.Types.Length; k++)
+                {
+                    analyzeParameters.Add(new AnalyzeParameter()
+                    {
+                        Placeholder = lambda.Parameters[k].Name,
+                        TableInfo = FindTableInfo(item.Types[k]),
+                        Type = item.Types[k],
+                    });
+                }
+
+                if (this.Analyze(item.On.Body, analyzeParameters, whereCollection) == false)
+                    continue;
+
+                builder.Append(this.FindJoinOptionString(item.JoinOption));
+                var tableInfo = analyzeParameters.Last().TableInfo;
+                builder.Append(" ");
+                builder.Append(this.FindTableName(tableInfo, item.Types.Last()));
+                builder.Append(" as ");
+                builder.Append(item.AsName);
+                if (whereCollection.Count >= 2)
+                {
+                    builder.Append(" on (");
+                    foreach (var where in whereCollection)
+                    {
+                        builder.Append(where.ToString(pp));
+                    }
+                    builder.Append(")");
+                }
+                else
+                {
+                    builder.Append(" on ");
+                    foreach (var where in whereCollection)
+                    {
+                        builder.Append(where.ToString(pp));
+                    }
+                }
+
+                if (item.And != null)
+                {
+                    builder.Append(" ");
+                    whereCollection.Clear();
+                    analyzeParameters.Clear();
+                    lambda = item.And;
+                    for (var k = 0; k < item.Types.Length; k++)
+                    {
+                        analyzeParameters.Add(new AnalyzeParameter()
+                        {
+                            Placeholder = lambda.Parameters[k].Name,
+                            TableInfo = FindTableInfo(item.Types[k]),
+                            Type = item.Types[k],
+                        });
+                    }
+
+                    if (this.Analyze(item.And.Body, analyzeParameters, whereCollection) == false)
+                        continue;
+
+                    if (whereCollection.Count >= 2)
+                    {
+                        builder.Append("and( ");
+                        foreach (var where in whereCollection)
+                        {
+                            builder.Append(where.ToString(pp));
+                        }
+                        builder.Append(")");
+                    }
+                    else
+                    {
+                        builder.Append(" and ");
+                        foreach (var where in whereCollection)
+                        {
+                            builder.Append(where.ToString(pp));
+                        }
+                    }
+
+                }
+            }
+
+            builder.Append("\r");
+            return builder;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameterTableName"></param>
+        /// <param name="parameterAsTableName"></param>
+        /// <param name="whereExists"></param>
+        /// <returns></returns>
+        protected StringBuilder LoadWhereExists(string parameterTableName, string parameterAsTableName, WhereExists whereExists)
+        {
+            var builder = new StringBuilder((1 + 1 + whereExists.Joins.Count) * 20);
+            var pp = new[] { whereExists.AsName }.Concat(whereExists.Joins.Select(ta => ta.AsName)).ToArray();
+            pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
+
+            var whereCollection = new List<BinaryBlock>();
+            var analyzeParameters = new List<AnalyzeParameter>();
+            LambdaExpression lambda = whereExists.Where;
+            if (whereExists.Types.Length != 2)
+                throw new Exception(string.Format("parameter typs not padding,the left length is {0}, and the right length is {1}", whereExists.Types.Length, 2));
+
+            for (var k = 0; k < 2; k++)
+            {
+                analyzeParameters.Add(new AnalyzeParameter()
+                {
+                    Placeholder = lambda.Parameters[k].Name,
+                    TableInfo = FindTableInfo(whereExists.Types[k]),
+                    Type = whereExists.Types[k],
+                });
+            }
+
+            if (this.Analyze(whereExists.Where.Body, analyzeParameters, whereCollection) == false)
+                return builder;
+
+            builder.Append(whereExists.AndOrOption == AndOrOption.and ? "and " : "or ");
+            builder.Append(whereExists.NotExists ? "not exists (select 0 from " : "exists (select 0 from ");
+            var tableInfo = analyzeParameters[0 + 1].TableInfo;
+            builder.Append(this.FindTableName(tableInfo, whereExists.Types[0 + 1]));
+            builder.Append(" as ");
+            builder.Append(whereExists.AsName);
+
+            if (whereExists.Joins.Any())
+            {
+                builder.Append(" ");
+                var joinCollection = new List<BinaryBlock>();
+                var joinAnalyzeParameters = new List<AnalyzeParameter>();
+                for (int i = 0, j = whereExists.Joins.Count; i < j; i++)
+                {
+                    var item = whereExists.Joins[i];
+                    //join是从第三张表开始的，第二张表是用于selet 0 from T2
+                    if (item.Types.Length != (i + 3))
+                        throw new Exception(string.Format("parameter typs not padding,the left length is {0}, and the right length is {1}", whereExists.Joins[i].Types.Length, i + 3));
+
+                    joinCollection.Clear();
+                    joinAnalyzeParameters.Clear();
+                    lambda = item.On;
+                    for (var k = 0; k < item.Types.Length; k++)
+                    {
+                        joinAnalyzeParameters.Add(new AnalyzeParameter()
+                        {
+                            Placeholder = lambda.Parameters[k].Name,
+                            TableInfo = FindTableInfo(item.Types[k]),
+                            Type = item.Types[k],
+                        });
+                    }
+
+                    if (this.Analyze(item.On.Body, joinAnalyzeParameters, joinCollection) == false)
+                        continue;
+
+                    builder.Append(this.FindJoinOptionString(item.JoinOption));
+                    builder.Append(" ");
+                    var joinTableInfo = analyzeParameters.Last().TableInfo;
+                    builder.Append(this.FindTableName(joinTableInfo, item.Types.Last()));
+                    builder.Append(" as ");
+                    builder.Append(item.AsName);
+                    if (whereCollection.Count >= 2)
+                    {
+                        builder.Append(" on (");
+                        foreach (var where in whereCollection)
+                        {
+                            builder.Append(where.ToString(pp));
+                        }
+                        builder.Append(")");
+                    }
+                    else
+                    {
+                        builder.Append(" on ");
+                        foreach (var where in whereCollection)
+                        {
+                            builder.Append(where.ToString(pp));
+                        }
+                    }
+
+                    if (item.And != null)
+                    {
+                        builder.Append(" ");
+                        joinCollection.Clear();
+                        joinAnalyzeParameters.Clear();
+                        lambda = item.And;
+                        for (var k = 0; k < item.Types.Length; k++)
+                        {
+                            joinAnalyzeParameters.Add(new AnalyzeParameter()
+                            {
+                                Placeholder = lambda.Parameters[k].Name,
+                                TableInfo = FindTableInfo(item.Types[k]),
+                                Type = item.Types[k],
+                            });
+                        }
+
+                        if (this.Analyze(item.And.Body, joinAnalyzeParameters, joinCollection) == true)
+                        {
+                            if (whereCollection.Count >= 2)
+                            {
+                                builder.Append("and (");
+                                foreach (var where in whereCollection)
+                                {
+                                    builder.Append(where.ToString(pp));
+                                }
+
+                                builder.Append(")");
+                            }
+                            else
+                            {
+                                builder.Append("and ");
+                                foreach (var where in whereCollection)
+                                {
+                                    builder.Append(where.ToString(pp));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            builder.Append(" where ");
+            foreach (var where in whereCollection)
+            {
+                builder.Append(where.ToString(pp));
+            }
+
+            if (whereExists.And != null)
+            {
+                builder.Append(" ");
+                whereCollection.Clear();
+                analyzeParameters.Clear();
+                lambda = whereExists.And;
+                for (var k = 0; k < whereExists.Types.Length; k++)
+                {
+                    analyzeParameters.Add(new AnalyzeParameter()
+                    {
+                        Placeholder = lambda.Parameters[k].Name,
+                        TableInfo = FindTableInfo(whereExists.Types[k]),
+                        Type = whereExists.Types[k],
+                    });
+
+                    if (this.Analyze(whereExists.And.Body, analyzeParameters, whereCollection) == true)
+                    {
+                        if (whereCollection.Count >= 2)
+                        {
+                            builder.Append("and (");
+                            foreach (var where in whereCollection)
+                            {
+                                builder.Append(where.ToString(pp));
+                            }
+
+                            builder.Append(")");
+                        }
+                        else
+                        {
+                            builder.Append("and ");
+                            foreach (var where in whereCollection)
+                            {
+                                builder.Append(where.ToString(pp));
+                            }
+                        }
+                    }
+                }
+            }
+
+            builder.Append(")\r");
+            return builder;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameterTableName"></param>
+        /// <param name="parameterAsTableName"></param>
+        /// <param name="whereIn"></param>
+        /// <returns></returns>
+        protected StringBuilder LoadWhereIn(string parameterTableName, string parameterAsTableName, WhereIn whereIn)
+        {
+            var builder = new StringBuilder((1 + 1 + whereIn.Joins.Count) * 20);
+            var pp = new[] { whereIn.AsName }.Concat(whereIn.Joins.Select(ta => ta.AsName)).ToArray();
+            pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
+
+            var whereCollection = new List<BinaryBlock>();
+            var analyzeParameters = new List<AnalyzeParameter>();
+            LambdaExpression lambda = whereIn.Field;
+            if (whereIn.Types.Length != 2)
+                throw new Exception(string.Format("parameter typs not padding,the left length is {0}, and the right length is {1}", whereIn.Types.Length, 2));
+
+            for (var k = 0; k < 2; k++)
+            {
+                analyzeParameters.Add(new AnalyzeParameter()
+                {
+                    Placeholder = lambda.Parameters[k].Name,
+                    TableInfo = FindTableInfo(whereIn.Types[k]),
+                    Type = whereIn.Types[k],
+                });
+            }
+
+            if (this.Analyze(whereIn.Field.Body, analyzeParameters, whereCollection) == false)
+                return builder;
+
+            if (whereCollection.Count > 1)
+                whereCollection.RemoveAll(p => p.Join.IsEquals("(") || p.Join.IsEquals(")"));
+
+
+            if (whereCollection.Any() == false)
+                return builder;
+
+            if (whereCollection.Count > 1 || whereCollection[0].Join.IsNotEquals(" = ") || whereCollection[0].Left.IsConstant || whereCollection[0].Right.IsConstant)
+                throw new Exception("in expression must like this (p,t)=>p.Id == t.Id");
+
+            builder.Append(whereIn.AndOrOption == AndOrOption.and ? "and " : "or ");
+            if (parameterAsTableName.IsNotNullOrEmpty())
+            {
+                builder.Append(parameterTableName);
+                builder.Append(".");
+                builder.Append(whereCollection[0].Left);
+            }
+            else
+            {
+                builder.Append(parameterAsTableName);
+                builder.Append(".");
+                builder.Append(whereCollection[0].Left);
+            }
+
+            builder.Append(whereIn.NotIn ? " not in (select " : " in (select ");
+            builder.Append(whereIn.AsName);
+            builder.Append(".");
+            builder.Append(whereCollection[0].Right);
+            builder.Append(" from ");
+            builder.Append(FindTableName(analyzeParameters[1].TableInfo, analyzeParameters[1].Type));
+            builder.Append(" as ");
+            builder.Append(whereIn.AsName);
+            if (whereIn.Joins.Any())
+            {
+                builder.Append(" ");
+                for (int i = 0, j = whereIn.Joins.Count; i < j; i++)
+                {
+                    var item = whereIn.Joins[i];
+                    //in是从第三张表开始的，第二张表是用于selet T2.Id from T2
+                    if (item.Types.Length != (i + 3))
+                        throw new Exception(string.Format("parameter typs not padding,the left length is {0}, and the right length is {1}", whereIn.Joins[i].Types.Length, i + 3));
+
+                    var joinCollection = new List<BinaryBlock>();
+                    var joinAnalyzeParameters = new List<AnalyzeParameter>();
+                    lambda = item.On;
+                    for (var k = 0; k < item.Types.Length; k++)
+                    {
+                        joinAnalyzeParameters.Add(new AnalyzeParameter()
+                        {
+                            Placeholder = lambda.Parameters[k].Name,
+                            TableInfo = FindTableInfo(item.Types[k]),
+                            Type = item.Types[k],
+                        });
+                    }
+
+                    if (this.Analyze(item.On.Body, joinAnalyzeParameters, joinCollection) == false)
+                        continue;
+
+                    builder.Append(this.FindJoinOptionString(item.JoinOption));
+                    builder.Append(" ");
+                    var joinTableInfo = analyzeParameters.Last().TableInfo;
+                    builder.Append(this.FindTableName(joinTableInfo, item.Types.Last()));
+                    builder.Append(" as ");
+                    builder.Append(item.AsName);
+                    if (whereCollection.Count >= 2)
+                    {
+                        builder.Append(" on (");
+                        foreach (var where in whereCollection)
+                        {
+                            builder.Append(where.ToString(pp));
+                        }
+                        builder.Append(")");
+                    }
+                    else
+                    {
+                        builder.Append(" on ");
+                        foreach (var where in whereCollection)
+                        {
+                            builder.Append(where.ToString(pp));
+                        }
+                    }
+
+                    if (item.And != null)
+                    {
+                        builder.Append(" ");
+                        joinCollection.Clear();
+                        joinAnalyzeParameters.Clear();
+                        lambda = item.And;
+                        for (var k = 0; k < item.Types.Length; k++)
+                        {
+                            joinAnalyzeParameters.Add(new AnalyzeParameter()
+                            {
+                                Placeholder = lambda.Parameters[k].Name,
+                                TableInfo = FindTableInfo(item.Types[k]),
+                                Type = item.Types[k],
+                            });
+                        }
+
+                        if (this.Analyze(item.And.Body, joinAnalyzeParameters, joinCollection) == true) 
+                        {
+                            if (whereCollection.Count >= 2)
+                            {
+                                builder.Append("and (");
+                                foreach (var where in whereCollection)
+                                {
+                                    builder.Append(where.ToString(pp));
+                                }
+
+                                builder.Append(")");
+                            }
+                            else
+                            {
+                                builder.Append("and ");
+                                foreach (var where in whereCollection)
+                                {
+                                    builder.Append(where.ToString(pp));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            builder.Append(" where ");
+            foreach (var where in whereCollection)
+            {
+                builder.Append(where.ToString(pp));
+            }
+
+            if (whereIn.Where != null)
+            {
+                builder.Append(" ");
+                whereCollection.Clear();
+                analyzeParameters.Clear();
+                lambda = whereIn.Where;
+                for (var k = 0; k < whereIn.Types.Length; k++)
+                {
+                    analyzeParameters.Add(new AnalyzeParameter()
+                    {
+                        Placeholder = lambda.Parameters[k].Name,
+                        TableInfo = FindTableInfo(whereIn.Types[k]),
+                        Type = whereIn.Types[k],
+                    });
+
+                    if (this.Analyze(whereIn.Where.Body, analyzeParameters, whereCollection) == true)
+                    {
+                        if (whereCollection.Count >= 2)
+                        {
+                            builder.Append("and (");
+                            foreach (var where in whereCollection)
+                            {
+                                builder.Append(where.ToString(pp));
+                            }
+
+                            builder.Append(")");
+                        }
+                        else
+                        {
+                            builder.Append("and ");
+                            foreach (var where in whereCollection)
+                            {
+                                builder.Append(where.ToString(pp));
+                            }
+                        }
+                    }
+                }
+            }
+
+            builder.Append(")\r");
+            return builder;
         }
     }
 }

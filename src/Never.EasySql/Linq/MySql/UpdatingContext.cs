@@ -26,15 +26,22 @@ namespace Never.EasySql.Linq.MySql
         }
 
         /// <summary>
-        /// 获取入口的标签
+        /// 入口
         /// </summary>
-        /// <returns></returns>
-        protected override TextLabel GetFirstLabelOnEntrance()
+        public override UpdateContext<Parameter> StartSetColumn()
         {
-            if (this.asTableName.IsNullOrEmpty())
-                return new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, "\r", "set") };
+            this.formatAppendCount = this.Format("a").Length - 1;
+            this.tableNamePoint = string.Concat(this.FromTable, ".");
+            this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
 
-            return new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.tableName, " as ", asTableName, "\r", "set") };
+            var label = this.AsTable.IsNullOrEmpty() ?
+                new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, "\r", "set") }
+                : new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, " as ", AsTable, "\r", "set") };
+
+            this.textLength += label.SqlText.Length;
+            this.labels.Add(label);
+            this.equalAndPrefix = string.Concat(" = ", this.dao.SqlExecuter.GetParameterPrefix());
+            return this;
         }
 
         /// <summary>

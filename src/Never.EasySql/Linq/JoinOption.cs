@@ -29,6 +29,6 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// right join
         /// </summary>
-        RightJoin = 3,
+        RightJoin = 3
     }
 }

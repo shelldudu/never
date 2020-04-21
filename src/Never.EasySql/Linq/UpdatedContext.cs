@@ -19,22 +19,12 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override Linq.UpdateContext<Parameter> AsTable(string table)
+        public override Linq.UpdateContext<Parameter> As(string table)
         {
             return this;
         }
 
         public override Linq.UpdateContext<Parameter> StartSetColumn()
-        {
-            return this;
-        }
-
-        public override Linq.UpdateContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
-        {
-            return this;
-        }
-
-        public override Linq.UpdateContext<Parameter> Exists(AndOrOption option, string expression)
         {
             return this;
         }
@@ -47,36 +37,6 @@ namespace Never.EasySql.Linq
         public override int GetResult()
         {
             return this.Update(this.sqlTag, this.dao, this.sqlParameter);
-        }
-
-        public override Linq.UpdateContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
-        {
-            return this;
-        }
-
-        public override Linq.UpdateContext<Parameter> In(AndOrOption option, string expression)
-        {
-            return this;
-        }
-
-        public override Linq.UpdateContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
-        {
-            return this;
-        }
-
-        public override Linq.UpdateContext<Parameter> NotExists(AndOrOption option, string expression)
-        {
-            return this;
-        }
-
-        public override Linq.UpdateContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
-        {
-            return this;
-        }
-
-        public override Linq.UpdateContext<Parameter> NotIn(AndOrOption option, string expression)
-        {
-            return this;
         }
 
         public override Linq.UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
@@ -108,7 +68,32 @@ namespace Never.EasySql.Linq
 
         protected override string Format(string text)
         {
-            return text;
+            return string.Empty;
+        }
+
+        protected override string SelectTableNamePointOnSetolunm()
+        {
+            return string.Empty;
+        }
+
+        public override UpdateContext<Parameter> JoinOnUpdate(List<JoinInfo> joins)
+        {
+            return this;
+        }
+
+        public override UpdateContext<Parameter> JoinOnWhereExists(WhereExists whereExists)
+        {
+            return this;
+        }
+
+        public override UpdateContext<Parameter> JoinOnWhereIn(WhereIn whereIn)
+        {
+            return this;
+        }
+
+        public override UpdateContext<Parameter> Where(AndOrOption andOrOption, string sql)
+        {
+            return this;
         }
     }
 }

@@ -1132,6 +1132,10 @@ namespace Never.Serialization.Json.Serialize
         /// <param name="emit">emit构建</param>
         /// <param name="setting">配置</param>
         /// <param name="memberType">成员类型</param>
+        /// <param name="attributes"></param>
+        /// <param name="instanceLocal"></param>
+        /// <param name="member"></param>
+        /// <param name="sourceType"></param>
         protected virtual bool BuildForJsonObjectModule(EasyEmitBuilder<Action<ISerializerWriter, JsonSerializeSetting, T, byte>> emit, JsonSerializeSetting setting, ILocal instanceLocal, Type sourceType, MemberInfo member, Type memberType, Attribute[] attributes)
         {
             if (memberType != typeof(JsonObject))

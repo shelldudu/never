@@ -191,7 +191,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override DeleteContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            return this.InOrNotIn(option, expression, where, 'i');
+            return this;
         }
 
         /// <summary>
@@ -214,94 +214,6 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override DeleteContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            return this.InOrNotIn(option, expression, where, 'n');
-        }
-
-        /// <summary>
-        /// in or not in
-        /// </summary>
-        /// <typeparam name="Table"></typeparam>
-        /// <param name="option"></param>
-        /// <param name="expression"></param>
-        /// <param name="and"></param>
-        /// <param name="flag"></param>
-        /// <returns></returns>
-        protected DeleteContext<Parameter> InOrNotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> and, char flag)
-        {
-            var collection = new List<BinaryBlock>(10);
-            var leftTableInfo = this.tableInfo;
-            var rightTableInfo = FindTableInfo<Table>();
-            this.Analyze(expression, leftTableInfo, rightTableInfo, collection);
-            if (collection.Any() == false)
-                return this;
-
-            if (collection.Count > 1)
-            {
-                collection.RemoveAll(p => p.Join.IsEquals("(") || p.Join.IsEquals(")"));
-            }
-
-            if (collection.Any() == false)
-                return this;
-
-            if (collection.Count > 1 || collection[0].Join.IsNotEquals(" = ") || collection[0].Left.IsConstant || collection[0].Right.IsConstant)
-            {
-                throw new Exception("in expression must like this (p,t)=>p.Id == t.Id");
-            }
-
-            var leftTableName = this.tableName;
-            var rightTableName = this.Format(this.FindTableName<Table>(rightTableInfo));
-            var sb = new StringBuilder(collection.Count * 10);
-            var leftAs = leftTableName;
-            var rightAs = rightTableName;
-            if (this.asTableName.IsNotNullOrEmpty())
-            {
-                leftAs = this.asTableName;
-                rightAs = string.Concat(leftAs, leftAs);
-                sb.Append(leftAs);
-                sb.Append(".");
-                sb.Append(collection[0].Join);
-                sb.Append(flag == 'n' ? " not in (select " : " in (select ");
-                sb.Append(collection[0].Right);
-                sb.Append(" from ");
-                sb.Append(rightTableName);
-                sb.Append(" as ");
-                sb.Append(rightAs);
-            }
-            else
-            {
-                sb.Append(leftTableName);
-                sb.Append(".");
-                sb.Append(collection[0].Join);
-                sb.Append(flag == 'n' ? " not in (select " : " in (select ");
-                sb.Append(collection[0].Right);
-                sb.Append(" from ");
-                sb.Append(rightTableName);
-            }
-
-            if (and != null)
-            {
-                var temp = new List<BinaryBlock>(10);
-                this.Analyze(and, FindTableInfo<Table>(), temp);
-                if (collection.Any())
-                {
-                    sb.Append(" where ");
-                    var ppp = new[] { rightAs, rightAs };
-                    foreach (var c in temp)
-                    {
-                        sb.Append(c.ToString(ppp));
-                    }
-                }
-            }
-
-            sb.Append(") \r");
-
-            var label = new TextLabel()
-            {
-                TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? "and " : "or ", sb.ToString()),
-            };
-
-            this.labels.Add(label);
             return this;
         }
 
@@ -325,7 +237,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override DeleteContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            return this.ExistsNotExists(option, expression, where, 'e');
+            return this;
         }
 
         /// <summary>
@@ -348,76 +260,6 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override DeleteContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
         {
-            return this.ExistsNotExists(option, expression, where, 'n');
-        }
-
-        /// <summary>
-        /// exists or not exists
-        /// </summary>
-        protected DeleteContext<Parameter> ExistsNotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where, char flag)
-        {
-            var collection = new List<BinaryBlock>(10);
-            var leftTableInfo = this.tableInfo;
-            var rightTableInfo = FindTableInfo<Table>();
-            this.Analyze(expression, leftTableInfo, rightTableInfo, collection);
-            if (collection.Any() == false)
-                return this;
-
-            var leftTableName = this.tableName;
-            var rightTableName = this.Format(this.FindTableName<Table>(rightTableInfo));
-            var sb = new StringBuilder(collection.Count * 10);
-            sb.Append(flag == 'n' ? "not exists(select 0 from " : " exists(select 0 from ");
-            sb.Append(rightTableName);
-
-            var leftAs = leftTableName;
-            var rightAs = rightTableName;
-            if (this.asTableName.IsNotNullOrEmpty())
-            {
-                leftAs = this.asTableName;
-                rightAs = string.Concat(leftAs, leftAs);
-                sb.Append(" as ");
-                sb.Append(rightAs);
-            }
-
-            sb.Append(" where ");
-            var ppp = new[] { rightAs, rightAs };
-            for (var i = 0; i < collection.Count; i++)
-            {
-                if (i == collection.Count - 1)
-                {
-                    if (where != null)
-                    {
-                        var temp = new List<BinaryBlock>(10);
-                        this.Analyze(where, FindTableInfo<Table>(), temp);
-                        if (collection.Any())
-                        {
-                            sb.Append(" and ");
-                            foreach (var c in temp)
-                            {
-                                sb.Append(c.ToString(ppp));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        sb.Append(collection[i].ToString(ppp));
-                    }
-                }
-                else
-                {
-                    sb.Append(collection[i].ToString(ppp));
-                }
-            }
-
-            sb.Append(") \r");
-
-            var label = new TextLabel()
-            {
-                TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(option == AndOrOption.and ? "and " : "or ", sb.ToString()),
-            };
-
-            this.labels.Add(label);
             return this;
         }
 

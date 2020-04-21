@@ -105,18 +105,7 @@ namespace Never.Test
 
         private static void Main(string[] args)
          {
-            var a = new System.Text.StringBuilder("a");
-            ChangeBuilder( a);
-            if (a == null)
-            {
-
-                int ac = 0;
-            }
-            else 
-            {
-            
-            }
-            //new SelectTest().TestId_1();
+            new SelectTest().TestId_1();
             //var p = new Program();
             //p.Release();
 
