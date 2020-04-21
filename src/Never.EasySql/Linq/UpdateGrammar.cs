@@ -59,7 +59,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public int GetResult()
         {
-            return Context.GetResult();
+            return this.Context.GetResult();
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Never.EasySql.Linq
                 throw new Exception("please use On method first;");
 
             this.update.Context.JoinOnUpdate(this.joins);
-            return this.update.StartSetColumn();
+            return this.update;
         }
     }
 
@@ -360,7 +360,7 @@ namespace Never.EasySql.Linq
                 throw new Exception("please use On method first;");
 
             this.update.Context.JoinOnUpdate(this.joins);
-            return this.update.StartSetColumn();
+            return this.update;
         }
     }
 
@@ -506,7 +506,7 @@ namespace Never.EasySql.Linq
                 throw new Exception("please use On method first;");
 
             this.update.Context.JoinOnUpdate(this.joins);
-            return this.update.StartSetColumn();
+            return this.update;
         }
     }
 
@@ -580,7 +580,7 @@ namespace Never.EasySql.Linq
                 throw new Exception("please use On method first;");
 
             this.update.Context.JoinOnUpdate(this.joins);
-            return this.update.StartSetColumn();
+            return this.update;
         }
     }
 
@@ -1758,7 +1758,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public int GetResult()
         {
-            return this.GetResult();
+            return this.Context.GetResult();
         }
     }
 }

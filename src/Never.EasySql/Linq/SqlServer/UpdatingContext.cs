@@ -72,9 +72,17 @@ namespace Never.EasySql.Linq.SqlServer
         /// </summary>
         public override UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
         {
+            var label = new TextLabel()
+            {
+                SqlText = string.Concat("from ", this.FromTable, this.AsTable.IsNullOrEmpty() ? " " : " as ", this.AsTable, this.updateJoin.Any() ? " " : "\r"),
+                TagId = NewId.GenerateNumber(),
+            };
+
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
             if (this.updateJoin.Any())
             {
-                var label = new TextLabel()
+                label = new TextLabel()
                 {
                     SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
                     TagId = NewId.GenerateNumber(),
@@ -93,7 +101,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// <returns></returns>
         protected override string SelectTableNamePointOnSetolunm()
         {
-            return base.tableNamePoint;
+            return base.asTableNamePoint;
         }
 
         /// <summary>

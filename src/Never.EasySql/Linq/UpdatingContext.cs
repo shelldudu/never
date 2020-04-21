@@ -129,7 +129,7 @@ namespace Never.EasySql.Linq
                 PositionLength = this.formatAppendCount + columnName.Length,
                 PrefixStart = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
                 StartPosition = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                StopPosition = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                StopPosition = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length - 1,
                 TextParameter = textParameter,
             });
 

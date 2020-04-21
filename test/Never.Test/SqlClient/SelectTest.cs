@@ -28,7 +28,7 @@ namespace Never.Test
 
             int a = 0; int b = 0; var c = a == b;
 
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            var dao = ConstructibleDaoBuilder<MySqlBuilder>.Value.Build();
 
             //返回单条
             // var one = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>()
@@ -45,7 +45,7 @@ namespace Never.Test
             //更新
             var update = dao.ToEasyLinqDao(new MyTable()).Cached("AAA").Update()
                 .From("user").As("u")
-                .Join<MyTable2>("t1").On((p, t) => p.Id == t.Id).And((p, t) => t.Name == "3")
+                .Join<MyTable2>("t1").On((p, t) => p.Id >= 1).And((p, t) => t.Name == "3")
                 .Join<MyTable2>("t2").On((p, t1, t2) => p.Id == t1.Id).And((p, t1, t2) => t2.Name == "3")
                 //.Join<MyTable2>("t3")
                 //.Join<MyTable2>("t4")

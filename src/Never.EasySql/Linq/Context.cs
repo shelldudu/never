@@ -447,79 +447,67 @@ namespace Never.EasySql.Linq
                 return analyzeParameters[index].TableInfo;
             }
 
-            BinaryBlock current = null;
-            if (binary.Left is BinaryExpression)
+            /**/
+            switch (binary.NodeType)
             {
-                if (((BinaryExpression)binary.Left).Left is BinaryExpression)
-                {
-                    whereCollection.Add(new BinaryBlock() { Join = "(" });
-                    Analyze(binary.Left, analyzeParameters, whereCollection);
-                    whereCollection.Add(new BinaryBlock() { Join = ")" });
-                }
-                else
-                {
-                    Analyze(binary.Left, analyzeParameters, whereCollection);
-                }
+                case ExpressionType.AndAlso:
+                case ExpressionType.OrElse:
+                    {
+                        whereCollection.Add(new BinaryBlock() { Join = "(" });
+                        Analyze(binary.Left, analyzeParameters, whereCollection);
+                        whereCollection.Add(new BinaryBlock() { Join = binary.NodeType == ExpressionType.AndAlso ? " and " : " or " });
+                        Analyze(binary.Right, analyzeParameters, whereCollection);
+                        whereCollection.Add(new BinaryBlock() { Join = ")" });
+                        return true;
+                    }
             }
-            else
+
+            BinaryBlock current = null;
+            var memberExpress = binary.Left as MemberExpression;
+            var leftConfirm = false;
+            if (memberExpress != null)
             {
-                var memberExpress = binary.Left as MemberExpression;
-                var leftConfirm = false;
-                if (memberExpress != null)
+                int index = leftOrRight(memberExpress.Expression);
+                current = new BinaryBlock()
                 {
-                    int index = leftOrRight(memberExpress.Expression);
+                    Left = new BinaryExp()
+                    {
+                        Exp = this.FindColumnName(matchTable(index), memberExpress.Member),
+                        IsConstant = false,
+                        Index = index,
+                    }
+                };
+
+                leftConfirm = true;
+            }
+
+            if (leftConfirm == false)
+            {
+                var constantExpress = binary.Left as ConstantExpression;
+                if (constantExpress != null)
+                {
                     current = new BinaryBlock()
                     {
                         Left = new BinaryExp()
                         {
-                            Exp = this.FindColumnName(matchTable(index), memberExpress.Member),
-                            IsConstant = false,
-                            Index = index,
+                            Exp = constantExpress.Value.ToString(),
+                            IsConstant = true,
+                            Index = 0,
                         }
                     };
 
                     leftConfirm = true;
                 }
+            }
 
-                if (leftConfirm == false)
-                {
-                    var constantExpress = binary.Left as ConstantExpression;
-                    if (constantExpress != null)
-                    {
-                        current = new BinaryBlock()
-                        {
-                            Left = new BinaryExp()
-                            {
-                                Exp = constantExpress.Value.ToString(),
-                                IsConstant = true,
-                                Index = 0,
-                            }
-                        };
-
-                        leftConfirm = true;
-                    }
-                }
-
-
-                if (leftConfirm == false)
-                {
-                    throw new Exception("");
-                }
+            if (leftConfirm == false)
+            {
+                throw new Exception("");
             }
 
             /*.Left不为空，则说明第一个参数是在左侧*/
             switch (binary.NodeType)
             {
-                case ExpressionType.AndAlso:
-                    {
-                        whereCollection.Add(new BinaryBlock() { Join = " and " });
-                    }
-                    break;
-                case ExpressionType.OrElse:
-                    {
-                        whereCollection.Add(new BinaryBlock() { Join = " or " });
-                    }
-                    break;
                 case ExpressionType.LessThan:
                     {
                         current.Join = " < ";
@@ -552,63 +540,49 @@ namespace Never.EasySql.Linq
                     break;
             }
 
-            if (binary.Right is BinaryExpression)
+            memberExpress = binary.Right as MemberExpression;
+            var rightConfirm = false;
+            if (memberExpress != null)
             {
-                if (((BinaryExpression)binary.Right).Right is BinaryExpression)
+                int index = leftOrRight(memberExpress.Expression);
+                current.Right = new BinaryExp()
                 {
-                    whereCollection.Add(new BinaryBlock() { Join = "(" });
-                    Analyze(binary.Right, analyzeParameters, whereCollection);
-                    whereCollection.Add(new BinaryBlock() { Join = ")" });
-                }
-                else
-                {
-                    Analyze(binary.Right, analyzeParameters, whereCollection);
-                }
+                    Exp = this.FindColumnName(matchTable(index), memberExpress.Member),
+                    IsConstant = false,
+                    Index = index,
+                };
+
+                rightConfirm = true;
             }
-            else
+
+            if (rightConfirm == false)
             {
-                var memberExpress = binary.Right as MemberExpression;
-                var rightConfirm = false;
-                if (memberExpress != null)
+                var constantExpress = binary.Right as ConstantExpression;
+                if (constantExpress != null)
                 {
-                    int index = leftOrRight(memberExpress.Expression);
                     current.Right = new BinaryExp()
                     {
-                        Exp = this.FindColumnName(matchTable(index), memberExpress.Member),
-                        IsConstant = false,
-                        Index = index,
+                        Exp = constantExpress.Value.ToString(),
+                        IsConstant = true,
+                        Index = 0,
                     };
 
                     rightConfirm = true;
                 }
 
-                if (rightConfirm == false)
-                {
-                    var constantExpress = binary.Right as ConstantExpression;
-                    if (constantExpress != null)
-                    {
-                        current.Right = new BinaryExp()
-                        {
-                            Exp = constantExpress.Value.ToString(),
-                            IsConstant = true,
-                            Index = 0,
-                        };
-
-                        rightConfirm = true;
-                    }
-
-                }
-
-
-                if (rightConfirm == false)
-                {
-                    throw new Exception("");
-                }
             }
 
-            if (current != null)
-                whereCollection.Add(current);
 
+            if (rightConfirm == false)
+            {
+                throw new Exception("");
+            }
+
+
+            if (current == null)
+                throw new Exception("current is null");
+
+            whereCollection.Add(current);
             return true;
         }
 
@@ -986,7 +960,7 @@ namespace Never.EasySql.Linq
         protected StringBuilder LoadUpdateJoin(string parameterTableName, string parameterAsTableName, List<JoinInfo> joins)
         {
             var builder = new StringBuilder(joins.Count * 20);
-            var pp = new[] { "" }.Concat(joins.Select(ta => ta.AsName)).ToArray();
+            var pp = new[] { "" }.Concat(joins.Select(ta => this.Format(ta.AsName))).ToArray();
             pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
 
             var whereCollection = new List<BinaryBlock>();
@@ -1017,25 +991,13 @@ namespace Never.EasySql.Linq
                 builder.Append(this.FindJoinOptionString(item.JoinOption));
                 var tableInfo = analyzeParameters.Last().TableInfo;
                 builder.Append(" ");
-                builder.Append(this.FindTableName(tableInfo, item.Types.Last()));
+                builder.Append(this.Format(this.FindTableName(tableInfo, item.Types.Last())));
                 builder.Append(" as ");
                 builder.Append(item.AsName);
-                if (whereCollection.Count >= 2)
+                builder.Append(" on ");
+                foreach (var where in whereCollection)
                 {
-                    builder.Append(" on (");
-                    foreach (var where in whereCollection)
-                    {
-                        builder.Append(where.ToString(pp));
-                    }
-                    builder.Append(")");
-                }
-                else
-                {
-                    builder.Append(" on ");
-                    foreach (var where in whereCollection)
-                    {
-                        builder.Append(where.ToString(pp));
-                    }
+                    builder.Append(where.ToString(pp));
                 }
 
                 if (item.And != null)
@@ -1054,19 +1016,7 @@ namespace Never.EasySql.Linq
                         });
                     }
 
-                    if (this.Analyze(item.And.Body, analyzeParameters, whereCollection) == false)
-                        continue;
-
-                    if (whereCollection.Count >= 2)
-                    {
-                        builder.Append("and( ");
-                        foreach (var where in whereCollection)
-                        {
-                            builder.Append(where.ToString(pp));
-                        }
-                        builder.Append(")");
-                    }
-                    else
+                    if (this.Analyze(item.And.Body, analyzeParameters, whereCollection) == true)
                     {
                         builder.Append(" and ");
                         foreach (var where in whereCollection)
@@ -1074,8 +1024,10 @@ namespace Never.EasySql.Linq
                             builder.Append(where.ToString(pp));
                         }
                     }
-
                 }
+
+                if (i < j - 1)
+                    builder.Append("\r");
             }
 
             builder.Append("\r");
@@ -1092,7 +1044,7 @@ namespace Never.EasySql.Linq
         protected StringBuilder LoadWhereExists(string parameterTableName, string parameterAsTableName, WhereExists whereExists)
         {
             var builder = new StringBuilder((1 + 1 + whereExists.Joins.Count) * 20);
-            var pp = new[] { whereExists.AsName }.Concat(whereExists.Joins.Select(ta => ta.AsName)).ToArray();
+            var pp = new[] { "", this.Format(whereExists.AsName) }.Concat(whereExists.Joins.Select(ta => this.Format(ta.AsName))).ToArray();
             pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
 
             var whereCollection = new List<BinaryBlock>();
@@ -1117,13 +1069,12 @@ namespace Never.EasySql.Linq
             builder.Append(whereExists.AndOrOption == AndOrOption.and ? "and " : "or ");
             builder.Append(whereExists.NotExists ? "not exists (select 0 from " : "exists (select 0 from ");
             var tableInfo = analyzeParameters[0 + 1].TableInfo;
-            builder.Append(this.FindTableName(tableInfo, whereExists.Types[0 + 1]));
+            builder.Append(this.Format(this.FindTableName(tableInfo, whereExists.Types[0 + 1])));
             builder.Append(" as ");
             builder.Append(whereExists.AsName);
-
+            builder.Append(" ");
             if (whereExists.Joins.Any())
             {
-                builder.Append(" ");
                 var joinCollection = new List<BinaryBlock>();
                 var joinAnalyzeParameters = new List<AnalyzeParameter>();
                 for (int i = 0, j = whereExists.Joins.Count; i < j; i++)
@@ -1152,25 +1103,13 @@ namespace Never.EasySql.Linq
                     builder.Append(this.FindJoinOptionString(item.JoinOption));
                     builder.Append(" ");
                     var joinTableInfo = analyzeParameters.Last().TableInfo;
-                    builder.Append(this.FindTableName(joinTableInfo, item.Types.Last()));
+                    builder.Append(this.Format(this.FindTableName(joinTableInfo, item.Types.Last())));
                     builder.Append(" as ");
                     builder.Append(item.AsName);
-                    if (whereCollection.Count >= 2)
+                    builder.Append(" on ");
+                    foreach (var where in joinCollection)
                     {
-                        builder.Append(" on (");
-                        foreach (var where in whereCollection)
-                        {
-                            builder.Append(where.ToString(pp));
-                        }
-                        builder.Append(")");
-                    }
-                    else
-                    {
-                        builder.Append(" on ");
-                        foreach (var where in whereCollection)
-                        {
-                            builder.Append(where.ToString(pp));
-                        }
+                        builder.Append(where.ToString(pp));
                     }
 
                     if (item.And != null)
@@ -1191,30 +1130,19 @@ namespace Never.EasySql.Linq
 
                         if (this.Analyze(item.And.Body, joinAnalyzeParameters, joinCollection) == true)
                         {
-                            if (whereCollection.Count >= 2)
+                            builder.Append("and ");
+                            foreach (var where in whereCollection)
                             {
-                                builder.Append("and (");
-                                foreach (var where in whereCollection)
-                                {
-                                    builder.Append(where.ToString(pp));
-                                }
-
-                                builder.Append(")");
-                            }
-                            else
-                            {
-                                builder.Append("and ");
-                                foreach (var where in whereCollection)
-                                {
-                                    builder.Append(where.ToString(pp));
-                                }
+                                builder.Append(where.ToString(pp));
                             }
                         }
                     }
+
+                    if (i < j - 1)
+                        builder.Append("\r");
                 }
             }
-
-            builder.Append(" where ");
+            builder.Append("where ");
             foreach (var where in whereCollection)
             {
                 builder.Append(where.ToString(pp));
@@ -1234,27 +1162,14 @@ namespace Never.EasySql.Linq
                         TableInfo = FindTableInfo(whereExists.Types[k]),
                         Type = whereExists.Types[k],
                     });
+                }
 
-                    if (this.Analyze(whereExists.And.Body, analyzeParameters, whereCollection) == true)
+                if (this.Analyze(whereExists.And.Body, analyzeParameters, whereCollection) == true)
+                {
+                    builder.Append("and ");
+                    foreach (var where in whereCollection)
                     {
-                        if (whereCollection.Count >= 2)
-                        {
-                            builder.Append("and (");
-                            foreach (var where in whereCollection)
-                            {
-                                builder.Append(where.ToString(pp));
-                            }
-
-                            builder.Append(")");
-                        }
-                        else
-                        {
-                            builder.Append("and ");
-                            foreach (var where in whereCollection)
-                            {
-                                builder.Append(where.ToString(pp));
-                            }
-                        }
+                        builder.Append(where.ToString(pp));
                     }
                 }
             }
@@ -1273,7 +1188,7 @@ namespace Never.EasySql.Linq
         protected StringBuilder LoadWhereIn(string parameterTableName, string parameterAsTableName, WhereIn whereIn)
         {
             var builder = new StringBuilder((1 + 1 + whereIn.Joins.Count) * 20);
-            var pp = new[] { whereIn.AsName }.Concat(whereIn.Joins.Select(ta => ta.AsName)).ToArray();
+            var pp = new[] { "", this.Format(whereIn.AsName) }.Concat(whereIn.Joins.Select(ta => this.Format(ta.AsName))).ToArray();
             pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
 
             var whereCollection = new List<BinaryBlock>();
@@ -1306,30 +1221,30 @@ namespace Never.EasySql.Linq
                 throw new Exception("in expression must like this (p,t)=>p.Id == t.Id");
 
             builder.Append(whereIn.AndOrOption == AndOrOption.and ? "and " : "or ");
-            if (parameterAsTableName.IsNotNullOrEmpty())
+            if (parameterAsTableName.IsNullOrEmpty())
             {
                 builder.Append(parameterTableName);
                 builder.Append(".");
-                builder.Append(whereCollection[0].Left);
+                builder.Append(whereCollection[0].Left.Exp);
             }
             else
             {
                 builder.Append(parameterAsTableName);
                 builder.Append(".");
-                builder.Append(whereCollection[0].Left);
+                builder.Append(whereCollection[0].Left.Exp);
             }
 
             builder.Append(whereIn.NotIn ? " not in (select " : " in (select ");
             builder.Append(whereIn.AsName);
             builder.Append(".");
-            builder.Append(whereCollection[0].Right);
+            builder.Append(whereCollection[0].Right.Exp);
             builder.Append(" from ");
-            builder.Append(FindTableName(analyzeParameters[1].TableInfo, analyzeParameters[1].Type));
+            builder.Append(this.Format(FindTableName(analyzeParameters[1].TableInfo, analyzeParameters[1].Type)));
             builder.Append(" as ");
             builder.Append(whereIn.AsName);
+            builder.Append(" ");
             if (whereIn.Joins.Any())
             {
-                builder.Append(" ");
                 for (int i = 0, j = whereIn.Joins.Count; i < j; i++)
                 {
                     var item = whereIn.Joins[i];
@@ -1356,25 +1271,13 @@ namespace Never.EasySql.Linq
                     builder.Append(this.FindJoinOptionString(item.JoinOption));
                     builder.Append(" ");
                     var joinTableInfo = analyzeParameters.Last().TableInfo;
-                    builder.Append(this.FindTableName(joinTableInfo, item.Types.Last()));
+                    builder.Append(this.Format(this.FindTableName(joinTableInfo, item.Types.Last())));
                     builder.Append(" as ");
                     builder.Append(item.AsName);
-                    if (whereCollection.Count >= 2)
+                    builder.Append(" on ");
+                    foreach (var where in joinCollection)
                     {
-                        builder.Append(" on (");
-                        foreach (var where in whereCollection)
-                        {
-                            builder.Append(where.ToString(pp));
-                        }
-                        builder.Append(")");
-                    }
-                    else
-                    {
-                        builder.Append(" on ");
-                        foreach (var where in whereCollection)
-                        {
-                            builder.Append(where.ToString(pp));
-                        }
+                        builder.Append(where.ToString(pp));
                     }
 
                     if (item.And != null)
@@ -1393,32 +1296,21 @@ namespace Never.EasySql.Linq
                             });
                         }
 
-                        if (this.Analyze(item.And.Body, joinAnalyzeParameters, joinCollection) == true) 
+                        if (this.Analyze(item.And.Body, joinAnalyzeParameters, joinCollection) == true)
                         {
-                            if (whereCollection.Count >= 2)
+                            builder.Append("and ");
+                            foreach (var where in whereCollection)
                             {
-                                builder.Append("and (");
-                                foreach (var where in whereCollection)
-                                {
-                                    builder.Append(where.ToString(pp));
-                                }
-
-                                builder.Append(")");
-                            }
-                            else
-                            {
-                                builder.Append("and ");
-                                foreach (var where in whereCollection)
-                                {
-                                    builder.Append(where.ToString(pp));
-                                }
+                                builder.Append(where.ToString(pp));
                             }
                         }
                     }
+                    if (i < j - 1)
+                        builder.Append("\r");
                 }
             }
 
-            builder.Append(" where ");
+            builder.Append("where ");
             foreach (var where in whereCollection)
             {
                 builder.Append(where.ToString(pp));
@@ -1438,27 +1330,14 @@ namespace Never.EasySql.Linq
                         TableInfo = FindTableInfo(whereIn.Types[k]),
                         Type = whereIn.Types[k],
                     });
+                }
 
-                    if (this.Analyze(whereIn.Where.Body, analyzeParameters, whereCollection) == true)
+                if (this.Analyze(whereIn.Where.Body, analyzeParameters, whereCollection) == true)
+                {
+                    builder.Append("and ");
+                    foreach (var where in whereCollection)
                     {
-                        if (whereCollection.Count >= 2)
-                        {
-                            builder.Append("and (");
-                            foreach (var where in whereCollection)
-                            {
-                                builder.Append(where.ToString(pp));
-                            }
-
-                            builder.Append(")");
-                        }
-                        else
-                        {
-                            builder.Append("and ");
-                            foreach (var where in whereCollection)
-                            {
-                                builder.Append(where.ToString(pp));
-                            }
-                        }
+                        builder.Append(where.ToString(pp));
                     }
                 }
             }

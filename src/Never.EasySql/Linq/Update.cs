@@ -45,6 +45,7 @@ namespace Never.EasySql.Linq
         public UpdateJoinGrammar<Parameter, Table> Join<Table>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
+            this.Context.StartSetColumn();
             return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.Join) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
         }
 
@@ -57,6 +58,7 @@ namespace Never.EasySql.Linq
         public UpdateJoinGrammar<Parameter, Table> InnerJoin<Table>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
+            this.Context.StartSetColumn();
             return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.InnerJoin) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
         }
 
@@ -69,6 +71,7 @@ namespace Never.EasySql.Linq
         public UpdateJoinGrammar<Parameter, Table> LeftJoin<Table>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
+            this.Context.StartSetColumn();
             return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.LeftJoin) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
         }
 
@@ -81,6 +84,7 @@ namespace Never.EasySql.Linq
         public UpdateJoinGrammar<Parameter, Table> RightJoin<Table>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
+            this.Context.StartSetColumn();
             return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.RightJoin) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
         }
 
