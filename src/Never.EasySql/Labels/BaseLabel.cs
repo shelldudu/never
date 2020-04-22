@@ -58,7 +58,7 @@ namespace Never.EasySql.Labels
             SqlTagParameterPosition found = null;
             for (var i = 0; i < parameters.Count; i++)
             {
-                if (parameters[i].PrefixStart == start)
+                if (parameters[i].PrefixStartIndex == start)
                 {
                     found = parameters[i];
                     parameters.Remove(found);

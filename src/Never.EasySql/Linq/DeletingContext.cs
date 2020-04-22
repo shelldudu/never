@@ -159,10 +159,10 @@ namespace Never.EasySql.Linq
                 ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 Name = columnName,
-                PositionLength = this.formatAppendCount + columnName.Length,
-                PrefixStart = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                StartPosition = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                StopPosition = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                OccupanLength = this.formatAppendCount + columnName.Length,
+                PrefixStartIndex = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                ParameterStartIndex = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                ParameterStopIndex = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
                 TextParameter = false,
             });
 

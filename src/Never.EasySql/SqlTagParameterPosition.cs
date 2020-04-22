@@ -17,14 +17,14 @@ namespace Never.EasySql
         public string Name { get; set; }
 
         /// <summary>
-        /// 原来前辍的名字
-        /// </summary>
-        public string SourcePrefix { get; set; }
-
-        /// <summary>
         /// 实际前辍的名字
         /// </summary>
         public string ActualPrefix { get; set; }
+
+        /// <summary>
+        /// 原来前辍的名字
+        /// </summary>
+        public string SourcePrefix { get; set; }
 
         /// <summary>
         /// 是否text参数
@@ -32,23 +32,24 @@ namespace Never.EasySql
         public bool TextParameter { get; set; }
 
         /// <summary>
-        /// 前辍的开始位置
+        /// 前辍的开始位置PrefixStart
         /// </summary>
-        public int PrefixStart { get; set; }
+        public int PrefixStartIndex { get; set; }
 
         /// <summary>
-        /// 参数的开始位置
+        /// 参数的开始位置(字符串的索引位置）
         /// </summary>
-        public int StartPosition { get; set; }
-        /// <summary>
-        /// 参数的结束位置
-        /// </summary>
-        public int StopPosition { get; set; }
+        public int ParameterStartIndex { get; set; }
 
         /// <summary>
-        /// 参数的长度
+        /// 参数的结束位置(字符串的索引位置）
         /// </summary>
-        public int PositionLength { get; set; }
+        public int ParameterStopIndex { get; set; }
+
+        /// <summary>
+        /// 占地长度（如果是文本参数，则包含了$$，如果是常规参数，则不包含@）
+        /// </summary>
+        public int OccupanLength { get; set; }
 
         /// <summary>
         /// 指示当前对象是否等于同一类型的另一个对象。

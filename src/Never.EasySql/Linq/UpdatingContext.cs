@@ -92,7 +92,7 @@ namespace Never.EasySql.Linq
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
 
-            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, "\r", "set") };
+            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, "\r") };
             this.textLength += label.SqlText.Length;
             this.labels.Add(label);
             this.equalAndPrefix = string.Concat(" = ", this.dao.SqlExecuter.GetParameterPrefix());
@@ -114,24 +114,34 @@ namespace Never.EasySql.Linq
             if (setTimes == 0)
             {
                 setTimes++;
-                label.SqlText = string.Concat(" ", selectTableName, this.Format(columnName), equalAndPrefix, columnName, "\r");
+                label.SqlText = string.Concat("set ", selectTableName, this.Format(columnName), equalAndPrefix, columnName, " \r");
+                label.Add(new SqlTagParameterPosition()
+                {
+                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    Name = columnName,
+                    OccupanLength = this.formatAppendCount + columnName.Length,
+                    PrefixStartIndex = 4 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                    ParameterStartIndex = 4 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                    ParameterStopIndex = 4 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                    TextParameter = textParameter,
+                });
             }
             else
             {
-                label.SqlText = string.Concat(",", selectTableName, this.Format(columnName), equalAndPrefix, columnName, "\r");
+                label.SqlText = string.Concat(",", selectTableName, this.Format(columnName), equalAndPrefix, columnName, " \r");
+                label.Add(new SqlTagParameterPosition()
+                {
+                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    Name = columnName,
+                    OccupanLength = this.formatAppendCount + columnName.Length,
+                    PrefixStartIndex = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                    ParameterStartIndex = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                    ParameterStopIndex = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                    TextParameter = textParameter,
+                });
             }
-
-            label.Add(new SqlTagParameterPosition()
-            {
-                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                Name = columnName,
-                PositionLength = this.formatAppendCount + columnName.Length,
-                PrefixStart = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                StartPosition = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                StopPosition = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length - 1,
-                TextParameter = textParameter,
-            });
 
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
@@ -184,6 +194,26 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 结束
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public override UpdateContext<Parameter> End(string sql)
+        {
+            if (sql.IsNullOrEmpty())
+                return this;
+
+            var label = new TextLabel()
+            {
+                SqlText = sql,
+                TagId = NewId.GenerateNumber(),
+            };
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
+        }
+
+        /// <summary>
         /// where 条件
         /// </summary>
         public override UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
@@ -200,10 +230,10 @@ namespace Never.EasySql.Linq
                 ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 Name = columnName,
-                PositionLength = this.formatAppendCount + columnName.Length,
-                PrefixStart = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                StartPosition = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                StopPosition = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                OccupanLength = this.formatAppendCount + columnName.Length,
+                PrefixStartIndex = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                ParameterStartIndex = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
+                ParameterStopIndex = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
                 TextParameter = false,
             });
 

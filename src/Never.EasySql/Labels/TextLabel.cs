@@ -123,10 +123,10 @@ namespace Never.EasySql.Labels
                 {
                     if (format.IfTextParameter(this.parameterPositions[0]))
                     {
-                        format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStart);
+                        format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStartIndex);
                         //format.WriteOnTextMode("\'null\'");
                         //format.WriteOnTextMode("null");
-                        format.WriteOnTextMode(this.SqlText, this.parameterPositions[0].StopPosition + 1, this.SqlText.Length - this.parameterPositions[0].StopPosition - 1);
+                        format.WriteOnTextMode(this.SqlText, this.parameterPositions[0].ParameterStopIndex + 1, this.SqlText.Length - (this.parameterPositions[0].ParameterStopIndex + 1));
                     }
                     else
                     {
@@ -138,10 +138,10 @@ namespace Never.EasySql.Labels
                 {
                     if (format.IfTextParameter(this.parameterPositions[0]))
                     {
-                        format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStart);
+                        format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStartIndex);
                         //format.WriteOnTextMode("\'null\'");
                         format.WriteOnTextMode("null");
-                        format.WriteOnTextMode(this.SqlText, this.parameterPositions[0].StopPosition + 1, this.SqlText.Length - this.parameterPositions[0].StopPosition - 1);
+                        format.WriteOnTextMode(this.SqlText, this.parameterPositions[0].ParameterStopIndex + 1, this.SqlText.Length - (this.parameterPositions[0].ParameterStopIndex + 1));
                     }
                     else
                     {
@@ -153,11 +153,11 @@ namespace Never.EasySql.Labels
                 {
                     if (format.IfTextParameter(this.parameterPositions[0]))
                     {
-                        format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStart);
+                        format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStartIndex);
                         //format.WriteOnTextMode('\'');
                         format.WriteOnTextMode(value.ToString());
                         //format.WriteOnTextMode('\'');
-                        format.WriteOnTextMode(this.SqlText, this.parameterPositions[0].StopPosition + 1, this.SqlText.Length - this.parameterPositions[0].StopPosition - 1);
+                        format.WriteOnTextMode(this.SqlText, this.parameterPositions[0].ParameterStopIndex + 1, this.SqlText.Length - (this.parameterPositions[0].ParameterStopIndex + 1));
                     }
                     else
                     {
@@ -206,7 +206,7 @@ namespace Never.EasySql.Labels
                         //format.WriteOnTextMode('\'');
                     }
 
-                    i += para.PositionLength + 1;
+                    i += para.OccupanLength + 1;
                     if (i < this.SqlText.Length)
                         format.WriteOnTextMode(this.SqlText[i]);
                 }
@@ -216,9 +216,9 @@ namespace Never.EasySql.Labels
                     if (item == null)
                         throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, para.Name);
 
-                    format.Write(this.SqlText, para.PrefixStart, para.PositionLength + 1);
+                    format.Write(this.SqlText, para.PrefixStartIndex, para.OccupanLength + 1);
                     format.AddParameter(item);
-                    i += para.PositionLength + 1;
+                    i += para.OccupanLength + 1;
                     if (i < this.SqlText.Length)
                         format.Write(this.SqlText[i]);
                 }
@@ -278,7 +278,7 @@ namespace Never.EasySql.Labels
                         hadA = true;
                     }
 
-                    i += para.PositionLength + 1;
+                    i += para.OccupanLength + 1;
                     if (i < this.SqlText.Length)
                         format.WriteOnTextMode(this.SqlText[i]);
                 }
@@ -306,7 +306,7 @@ namespace Never.EasySql.Labels
                         hadA = true;
                     }
 
-                    i += para.PositionLength + 1;
+                    i += para.OccupanLength + 1;
                     if (i < this.SqlText.Length)
                         format.Write(this.SqlText[i]);
                 }
@@ -357,14 +357,14 @@ namespace Never.EasySql.Labels
                     if (value == null || value == DBNull.Value)
                     {
                         format.WriteOnTextMode("null");
-                        i += para.PositionLength + 1;
+                        i += para.OccupanLength + 1;
                     }
                     else
                     {
                         //format.WriteOnTextMode('\'');
                         format.WriteOnTextMode(value.ToString());
                         //format.WriteOnTextMode('\'');
-                        i += para.PositionLength + 1;
+                        i += para.OccupanLength + 1;
                         if (i < this.SqlText.Length)
                             format.WriteOnTextMode(this.SqlText[i]);
                     }
@@ -384,7 +384,7 @@ namespace Never.EasySql.Labels
                     var newkey = string.Format("{0}x{1}z", para.Name, arrayLevel);
                     format.Write(newkey);
                     format.AddParameter(newkey, newvalue);
-                    i += para.PositionLength + 1;
+                    i += para.OccupanLength + 1;
                     if (i < this.SqlText.Length)
                         format.Write(this.SqlText[i]);
                 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Never.EasySql.Labels;
+using Never.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -186,6 +188,11 @@ namespace Never.EasySql.Linq
         /// where
         /// </summary>
         public abstract UpdateContext<Parameter> Where(AndOrOption andOrOption, string sql);
+
+        /// <summary>
+        /// end
+        /// </summary>
+        public abstract UpdateContext<Parameter> End(string sql);
 
         /// <summary>
         /// join

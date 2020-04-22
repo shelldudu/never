@@ -39,7 +39,7 @@ namespace Never.EasySql.Linq.SqlServer
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
 
-            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, "\r", "set") };
+            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, "\r") };
             this.textLength += label.SqlText.Length;
             this.labels.Add(label);
             this.equalAndPrefix = string.Concat(" = ", this.dao.SqlExecuter.GetParameterPrefix());
@@ -52,7 +52,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// </summary>
         public override UpdateContext<Parameter> Where()
         {
-            if (this.updateJoin.Any())
+            if (this.updateJoin.IsNotNullOrEmpty())
             {
                 var label = new TextLabel()
                 {
@@ -72,17 +72,21 @@ namespace Never.EasySql.Linq.SqlServer
         /// </summary>
         public override UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
         {
-            var label = new TextLabel()
+            if (this.AsTable.IsNotNullOrEmpty())
             {
-                SqlText = string.Concat("from ", this.FromTable, this.AsTable.IsNullOrEmpty() ? " " : " as ", this.AsTable, this.updateJoin.Any() ? " " : "\r"),
-                TagId = NewId.GenerateNumber(),
-            };
+                var label = new TextLabel()
+                {
+                    SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.updateJoin.IsNotNullOrEmpty() ? " " : "\r"),
+                    TagId = NewId.GenerateNumber(),
+                };
 
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
-            if (this.updateJoin.Any())
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
+            if (this.updateJoin.IsNotNullOrEmpty())
             {
-                label = new TextLabel()
+                var label = new TextLabel()
                 {
                     SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
                     TagId = NewId.GenerateNumber(),

@@ -1026,11 +1026,12 @@ namespace Never.EasySql.Linq
                     }
                 }
 
-                if (i < j - 1)
-                    builder.Append("\r");
+                builder.Append("\r");
             }
 
-            builder.Append("\r");
+            if (joins.Count == 0)
+                builder.Append("\r");
+
             return builder;
         }
 
@@ -1077,6 +1078,7 @@ namespace Never.EasySql.Linq
             {
                 var joinCollection = new List<BinaryBlock>();
                 var joinAnalyzeParameters = new List<AnalyzeParameter>();
+                bool firstJoin = true;
                 for (int i = 0, j = whereExists.Joins.Count; i < j; i++)
                 {
                     var item = whereExists.Joins[i];
@@ -1099,6 +1101,12 @@ namespace Never.EasySql.Linq
 
                     if (this.Analyze(item.On.Body, joinAnalyzeParameters, joinCollection) == false)
                         continue;
+
+                    if (firstJoin)
+                    {
+                        builder.Append("\r");
+                        firstJoin = false;
+                    }
 
                     builder.Append(this.FindJoinOptionString(item.JoinOption));
                     builder.Append(" ");
@@ -1138,8 +1146,7 @@ namespace Never.EasySql.Linq
                         }
                     }
 
-                    if (i < j - 1)
-                        builder.Append("\r");
+                    builder.Append("\r");
                 }
             }
             builder.Append("where ");
@@ -1245,6 +1252,7 @@ namespace Never.EasySql.Linq
             builder.Append(" ");
             if (whereIn.Joins.Any())
             {
+                bool firstJoin = true;
                 for (int i = 0, j = whereIn.Joins.Count; i < j; i++)
                 {
                     var item = whereIn.Joins[i];
@@ -1268,6 +1276,11 @@ namespace Never.EasySql.Linq
                     if (this.Analyze(item.On.Body, joinAnalyzeParameters, joinCollection) == false)
                         continue;
 
+                    if (firstJoin)
+                    {
+                        builder.Append("\r");
+                        firstJoin = false;
+                    }
                     builder.Append(this.FindJoinOptionString(item.JoinOption));
                     builder.Append(" ");
                     var joinTableInfo = analyzeParameters.Last().TableInfo;
@@ -1305,8 +1318,8 @@ namespace Never.EasySql.Linq
                             }
                         }
                     }
-                    if (i < j - 1)
-                        builder.Append("\r");
+
+                    builder.Append("\r");
                 }
             }
 

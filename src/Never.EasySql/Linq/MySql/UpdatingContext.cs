@@ -35,8 +35,8 @@ namespace Never.EasySql.Linq.MySql
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
 
             var label = this.AsTable.IsNullOrEmpty() ?
-                new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, "\r", "set") }
-                : new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, " as ", AsTable, "\r", "set") };
+                new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, "\r") }
+                : new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, " as ", AsTable, "\r") };
 
             this.textLength += label.SqlText.Length;
             this.labels.Add(label);

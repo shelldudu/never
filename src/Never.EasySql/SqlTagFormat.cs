@@ -97,7 +97,7 @@ namespace Never.EasySql
         }
 
         /// <summary>
-        /// 是否格式化参数
+        /// 是否文本参数
         /// </summary>
         /// <param name="parameterPosition"></param>
         /// <returns></returns>

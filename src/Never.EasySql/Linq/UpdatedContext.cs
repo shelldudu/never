@@ -66,6 +66,11 @@ namespace Never.EasySql.Linq
             return this;
         }
 
+        public override UpdateContext<Parameter> End(string sql)
+        {
+            return this;
+        }
+
         protected override string Format(string text)
         {
             return string.Empty;

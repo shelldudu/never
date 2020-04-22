@@ -164,16 +164,16 @@ namespace Never.EasySql
                                         Name = name,
                                         SourcePrefix = new string(text[start], 1),
                                         ActualPrefix = parameterPrefix,
-                                        StartPosition = start + 1,
-                                        PrefixStart = start,
-                                        StopPosition = end2,
-                                        PositionLength = end2 - start,
+                                        ParameterStartIndex = start + 1,
+                                        PrefixStartIndex = start,
+                                        ParameterStopIndex = end2,
+                                        OccupanLength = end2 - start,
                                     };
 
                                     if (cuted)
                                     {
-                                        parameter.StopPosition += 1;
-                                        parameter.PositionLength += 1;
+                                        parameter.ParameterStopIndex += 1;
+                                        parameter.OccupanLength += 1;
                                         cuted = false;
                                     }
 
@@ -233,16 +233,16 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                StartPosition = i + 1,
-                                PrefixStart = i,
-                                StopPosition = 1 + end,
-                                PositionLength = end - i,
+                                ParameterStartIndex = i + 1,
+                                PrefixStartIndex = i,
+                                ParameterStopIndex = 1 + end,
+                                OccupanLength = end - i,
                             };
 
                             if (cuted)
                             {
-                                parameter.StopPosition += 1;
-                                parameter.PositionLength += 1;
+                                parameter.ParameterStopIndex += 1;
+                                parameter.OccupanLength += 1;
                                 cuted = false;
                             }
 
@@ -280,10 +280,10 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                StartPosition = i + 1,
-                                PrefixStart = i,
-                                StopPosition = (i + 1) + end - i,
-                                PositionLength = end - i,
+                                ParameterStartIndex = i + 1,
+                                PrefixStartIndex = i,
+                                ParameterStopIndex = (i + 1) + end - i,
+                                OccupanLength = end - i,
                             };
 
                             parameter.TextParameter = parameter.SourcePrefix == "$";
@@ -291,8 +291,8 @@ namespace Never.EasySql
                             /*前缀为@@这样的长度*/
                             if (parameterPrefix.Length > 1)
                             {
-                                parameter.StopPosition += parameterPrefix.Length - 1;
-                                parameter.PositionLength += parameterPrefix.Length - 1;
+                                parameter.ParameterStopIndex += parameterPrefix.Length - 1;
+                                parameter.OccupanLength += parameterPrefix.Length - 1;
                             }
 
                             label.Add(parameter);
@@ -457,16 +457,16 @@ namespace Never.EasySql
                                         Name = name,
                                         SourcePrefix = new string(text[start], 1),
                                         ActualPrefix = parameterPrefix,
-                                        StartPosition = start + 1 - hack,
-                                        PrefixStart = start - hack,
-                                        StopPosition = end2 - hack,
-                                        PositionLength = end2 - start,
+                                        ParameterStartIndex = start + 1 - hack,
+                                        PrefixStartIndex = start - hack,
+                                        ParameterStopIndex = end2 - hack,
+                                        OccupanLength = end2 - start,
                                     };
 
                                     if (cuted)
                                     {
-                                        parameter.StopPosition += 1;
-                                        parameter.PositionLength += 1;
+                                        parameter.ParameterStopIndex += 1;
+                                        parameter.OccupanLength += 1;
                                         cuted = false;
                                     }
 
@@ -529,16 +529,16 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                StartPosition = (i + 1) - hack,
-                                PrefixStart = i - hack,
-                                StopPosition = end - hack,
-                                PositionLength = (end - i),
+                                ParameterStartIndex = (i + 1) - hack,
+                                PrefixStartIndex = i - hack,
+                                ParameterStopIndex = end - hack,
+                                OccupanLength = (end - i),
                             };
 
                             if (cuted)
                             {
-                                parameter.StopPosition += 1;
-                                parameter.PositionLength += 1;
+                                parameter.ParameterStopIndex += 1;
+                                parameter.OccupanLength += 1;
                                 cuted = false;
                             }
 
@@ -578,10 +578,10 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                StartPosition = (i + 1) - hack,
-                                PrefixStart = i - hack,
-                                StopPosition = (i + end - i) - hack,
-                                PositionLength = (end - i),
+                                ParameterStartIndex = (i + 1) - hack,
+                                PrefixStartIndex = i - hack,
+                                ParameterStopIndex = (i + end - i) - hack,
+                                OccupanLength = (end - i),
                             };
 
                             parameter.TextParameter = parameter.SourcePrefix == "$";
@@ -589,8 +589,8 @@ namespace Never.EasySql
                             /*前缀为@@这样的长度*/
                             if (parameterPrefix.Length > 1)
                             {
-                                parameter.StopPosition += parameterPrefix.Length - 1;
-                                parameter.PositionLength += parameterPrefix.Length - 1;
+                                parameter.ParameterStopIndex += parameterPrefix.Length - 1;
+                                parameter.OccupanLength += parameterPrefix.Length - 1;
                             }
 
                             label.Add(parameter);

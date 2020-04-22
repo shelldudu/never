@@ -89,7 +89,7 @@ namespace Never.EasySql.Text
                             //format.WriteOnTextMode('\'');
                         }
 
-                        i += para.PositionLength + 1;
+                        i += para.OccupanLength + 1;
                         format.WriteOnTextMode(this.lable.SqlText[i]);
                     }
                     else
@@ -100,9 +100,9 @@ namespace Never.EasySql.Text
                             throw new Exception(string.Format("当前在sql语句中参数为{0}的值在所提供的参数列表中找不到", para.Name));
                         }
 
-                        format.Write(this.lable.SqlText, para.PrefixStart, para.PositionLength + 1);
+                        format.Write(this.lable.SqlText, para.PrefixStartIndex, para.OccupanLength + 1);
                         format.AddParameter(item);
-                        i += para.PositionLength + 1;
+                        i += para.OccupanLength + 1;
                         format.Write(this.lable.SqlText[i]);
                     }
                 }
@@ -132,7 +132,7 @@ namespace Never.EasySql.Text
                             hadA = true;
                         }
 
-                        i += para.PositionLength + 1;
+                        i += para.OccupanLength + 1;
                         format.WriteOnTextMode(this.lable.SqlText[i]);
                     }
                     else
@@ -161,7 +161,7 @@ namespace Never.EasySql.Text
                             hadA = true;
                         }
 
-                        i += para.PositionLength + 1;
+                        i += para.OccupanLength + 1;
                         format.Write(this.lable.SqlText[i]);
                     }
                 }

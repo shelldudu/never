@@ -1754,6 +1754,16 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 字符串
+        /// </summary>
+        /// <param name="sql">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+        public UpdateWhereGrammar<Parameter> End(string sql)
+        {
+            this.Context.End(sql);
+            return this;
+        }
+
+        /// <summary>
         /// 获取结果
         /// </summary>
         public int GetResult()
