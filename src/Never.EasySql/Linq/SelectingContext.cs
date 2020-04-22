@@ -106,13 +106,21 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 对字段格式化
+        /// 对表名格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string Format(string text)
+        protected override string FormatTable(string text)
         {
-            return string.Concat("`", text, "`");
+            return text;
+        }
+
+        /// <summary>
+        /// 对字段格式化
+        /// </summary>
+        protected override string FormatColumn(string text)
+        {
+            return text;
         }
     }
 }

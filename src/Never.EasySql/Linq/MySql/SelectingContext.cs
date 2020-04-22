@@ -26,11 +26,21 @@ namespace Never.EasySql.Linq.MySql
         }
 
         /// <summary>
+        /// 对表名格式化
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        protected override string FormatTable(string text)
+        {
+            return string.Concat("`", text, "`");
+        }
+
+        /// <summary>
         /// 对字段格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string Format(string text)
+        protected override string FormatColumn(string text)
         {
             return string.Concat("`", text, "`");
         }

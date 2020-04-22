@@ -103,7 +103,7 @@ namespace Never.EasySql.Linq
         {
             this.tableName = this.tableName.IsNullOrEmpty() ? this.FindTableName<Parameter>(tableInfo) : this.tableName;
             int length = this.tableName.Length;
-            this.tableName = this.Format(this.tableName);
+            this.tableName = this.FormatTable(this.tableName);
             this.formatAppendCount = this.tableName.Length - length;
 
             if (this.asTableName.IsNullOrEmpty())
@@ -151,7 +151,7 @@ namespace Never.EasySql.Linq
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat("where ", this.asTableNamePoint, this.Format(columnName), this.equalAndPrefix, columnName, "\r"),
+                SqlText = string.Concat("where ", this.asTableNamePoint, this.FormatColumn(columnName), this.equalAndPrefix, columnName, "\r"),
             };
 
             label.Add(new SqlTagParameterPosition()
@@ -264,11 +264,19 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 对字段格式化
+        /// 对表名格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string Format(string text)
+        protected override string FormatTable(string text)
+        {
+            return text;
+        }
+
+        /// <summary>
+        /// 对字段格式化
+        /// </summary>
+        protected override string FormatColumn(string text)
         {
             return text;
         }

@@ -32,14 +32,16 @@ namespace Never.EasySql.Linq
         /// tableName.
         /// </summary>
         protected string tableNamePoint;
+
         /// <summary>
         /// asTable.
         /// </summary>
         protected string asTableNamePoint;
+
         /// <summary>
         /// format格式化后增加的长度
         /// </summary>
-        protected int formatAppendCount;
+        protected int formatColumnAppendCount;
 
         /// <summary>
         /// 等于的前缀
@@ -76,9 +78,19 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 对表名格式化
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        protected override string FormatTable(string text) 
+        {
+            return text;
+        }
+
+        /// <summary>
         /// 对字段格式化
         /// </summary>
-        protected override string Format(string text)
+        protected override string FormatColumn(string text)
         {
             return text;
         }
@@ -88,7 +100,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter> StartSetColumn()
         {
-            this.formatAppendCount = this.Format("a").Length - 1;
+            this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
 
@@ -114,31 +126,31 @@ namespace Never.EasySql.Linq
             if (setTimes == 0)
             {
                 setTimes++;
-                label.SqlText = string.Concat("set ", selectTableName, this.Format(columnName), equalAndPrefix, columnName, " \r");
+                label.SqlText = string.Concat("set ", selectTableName, this.FormatColumn(columnName), equalAndPrefix, columnName, " \r");
                 label.Add(new SqlTagParameterPosition()
                 {
                     ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     Name = columnName,
-                    OccupanLength = this.formatAppendCount + columnName.Length,
-                    PrefixStartIndex = 4 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                    ParameterStartIndex = 4 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                    ParameterStopIndex = 4 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                    OccupanLength = this.formatColumnAppendCount + columnName.Length,
+                    PrefixStartIndex = 4 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
+                    ParameterStartIndex = 4 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
+                    ParameterStopIndex = 4 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
                     TextParameter = textParameter,
                 });
             }
             else
             {
-                label.SqlText = string.Concat(",", selectTableName, this.Format(columnName), equalAndPrefix, columnName, " \r");
+                label.SqlText = string.Concat(",", selectTableName, this.FormatColumn(columnName), equalAndPrefix, columnName, " \r");
                 label.Add(new SqlTagParameterPosition()
                 {
                     ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     Name = columnName,
-                    OccupanLength = this.formatAppendCount + columnName.Length,
-                    PrefixStartIndex = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                    ParameterStartIndex = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                    ParameterStopIndex = 1 + selectTableName.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                    OccupanLength = this.formatColumnAppendCount + columnName.Length,
+                    PrefixStartIndex = 1 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
+                    ParameterStartIndex = 1 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
+                    ParameterStopIndex = 1 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
                     TextParameter = textParameter,
                 });
             }
@@ -222,7 +234,7 @@ namespace Never.EasySql.Linq
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat("where ", this.asTableNamePoint, this.Format(columnName), this.equalAndPrefix, columnName, "\r"),
+                SqlText = string.Concat("where ", this.asTableNamePoint, this.FormatColumn(columnName), this.equalAndPrefix, columnName, "\r"),
             };
 
             label.Add(new SqlTagParameterPosition()
@@ -230,10 +242,10 @@ namespace Never.EasySql.Linq
                 ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 Name = columnName,
-                OccupanLength = this.formatAppendCount + columnName.Length,
-                PrefixStartIndex = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                ParameterStartIndex = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length,
-                ParameterStopIndex = 6 + this.asTableNamePoint.Length + this.formatAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                OccupanLength = this.formatColumnAppendCount + columnName.Length,
+                PrefixStartIndex = 6 + this.asTableNamePoint.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
+                ParameterStartIndex = 6 + this.asTableNamePoint.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
+                ParameterStopIndex = 6 + this.asTableNamePoint.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
                 TextParameter = false,
             });
 

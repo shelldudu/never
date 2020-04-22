@@ -35,7 +35,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// </summary>
         public override UpdateContext<Parameter> StartSetColumn()
         {
-            this.formatAppendCount = this.Format("a").Length - 1;
+            this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
 
@@ -120,11 +120,21 @@ namespace Never.EasySql.Linq.SqlServer
         }
 
         /// <summary>
+        /// 对表名格式化
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        protected override string FormatTable(string text)
+        {
+            return string.Concat("[", text, "]");
+        }
+
+        /// <summary>
         /// 对字段格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string Format(string text)
+        protected override string FormatColumn(string text)
         {
             return string.Concat("[", text, "]");
         }

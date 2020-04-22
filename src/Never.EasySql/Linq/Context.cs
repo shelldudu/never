@@ -243,11 +243,18 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 对表名格式化
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        protected abstract string FormatTable(string text);
+
+        /// <summary>
         /// 对字段格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected abstract string Format(string text);
+        protected abstract string FormatColumn(string text);
 
         /// <summary>
         /// 查询table信息
@@ -960,7 +967,7 @@ namespace Never.EasySql.Linq
         protected StringBuilder LoadUpdateJoin(string parameterTableName, string parameterAsTableName, List<JoinInfo> joins)
         {
             var builder = new StringBuilder(joins.Count * 20);
-            var pp = new[] { "" }.Concat(joins.Select(ta => this.Format(ta.AsName))).ToArray();
+            var pp = new[] { "" }.Concat(joins.Select(ta => ta.AsName)).ToArray();
             pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
 
             var whereCollection = new List<BinaryBlock>();
@@ -991,7 +998,7 @@ namespace Never.EasySql.Linq
                 builder.Append(this.FindJoinOptionString(item.JoinOption));
                 var tableInfo = analyzeParameters.Last().TableInfo;
                 builder.Append(" ");
-                builder.Append(this.Format(this.FindTableName(tableInfo, item.Types.Last())));
+                builder.Append(this.FormatTable(this.FindTableName(tableInfo, item.Types.Last())));
                 builder.Append(" as ");
                 builder.Append(item.AsName);
                 builder.Append(" on ");
@@ -1045,7 +1052,7 @@ namespace Never.EasySql.Linq
         protected StringBuilder LoadWhereExists(string parameterTableName, string parameterAsTableName, WhereExists whereExists)
         {
             var builder = new StringBuilder((1 + 1 + whereExists.Joins.Count) * 20);
-            var pp = new[] { "", this.Format(whereExists.AsName) }.Concat(whereExists.Joins.Select(ta => this.Format(ta.AsName))).ToArray();
+            var pp = new[] { "", whereExists.AsName }.Concat(whereExists.Joins.Select(ta => this.FormatColumn(ta.AsName))).ToArray();
             pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
 
             var whereCollection = new List<BinaryBlock>();
@@ -1070,7 +1077,7 @@ namespace Never.EasySql.Linq
             builder.Append(whereExists.AndOrOption == AndOrOption.and ? "and " : "or ");
             builder.Append(whereExists.NotExists ? "not exists (select 0 from " : "exists (select 0 from ");
             var tableInfo = analyzeParameters[0 + 1].TableInfo;
-            builder.Append(this.Format(this.FindTableName(tableInfo, whereExists.Types[0 + 1])));
+            builder.Append(this.FormatTable(this.FindTableName(tableInfo, whereExists.Types[0 + 1])));
             builder.Append(" as ");
             builder.Append(whereExists.AsName);
             builder.Append(" ");
@@ -1111,7 +1118,7 @@ namespace Never.EasySql.Linq
                     builder.Append(this.FindJoinOptionString(item.JoinOption));
                     builder.Append(" ");
                     var joinTableInfo = analyzeParameters.Last().TableInfo;
-                    builder.Append(this.Format(this.FindTableName(joinTableInfo, item.Types.Last())));
+                    builder.Append(this.FormatTable(this.FindTableName(joinTableInfo, item.Types.Last())));
                     builder.Append(" as ");
                     builder.Append(item.AsName);
                     builder.Append(" on ");
@@ -1195,7 +1202,7 @@ namespace Never.EasySql.Linq
         protected StringBuilder LoadWhereIn(string parameterTableName, string parameterAsTableName, WhereIn whereIn)
         {
             var builder = new StringBuilder((1 + 1 + whereIn.Joins.Count) * 20);
-            var pp = new[] { "", this.Format(whereIn.AsName) }.Concat(whereIn.Joins.Select(ta => this.Format(ta.AsName))).ToArray();
+            var pp = new[] { "", whereIn.AsName }.Concat(whereIn.Joins.Select(ta => ta.AsName)).ToArray();
             pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
 
             var whereCollection = new List<BinaryBlock>();
@@ -1246,7 +1253,7 @@ namespace Never.EasySql.Linq
             builder.Append(".");
             builder.Append(whereCollection[0].Right.Exp);
             builder.Append(" from ");
-            builder.Append(this.Format(FindTableName(analyzeParameters[1].TableInfo, analyzeParameters[1].Type)));
+            builder.Append(this.FormatTable(FindTableName(analyzeParameters[1].TableInfo, analyzeParameters[1].Type)));
             builder.Append(" as ");
             builder.Append(whereIn.AsName);
             builder.Append(" ");
@@ -1284,7 +1291,7 @@ namespace Never.EasySql.Linq
                     builder.Append(this.FindJoinOptionString(item.JoinOption));
                     builder.Append(" ");
                     var joinTableInfo = analyzeParameters.Last().TableInfo;
-                    builder.Append(this.Format(this.FindTableName(joinTableInfo, item.Types.Last())));
+                    builder.Append(this.FormatTable(this.FindTableName(joinTableInfo, item.Types.Last())));
                     builder.Append(" as ");
                     builder.Append(item.AsName);
                     builder.Append(" on ");

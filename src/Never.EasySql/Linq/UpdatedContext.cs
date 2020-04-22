@@ -71,7 +71,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        protected override string Format(string text)
+        protected override string FormatColumn(string text)
         {
             return string.Empty;
         }
@@ -99,6 +99,11 @@ namespace Never.EasySql.Linq
         public override UpdateContext<Parameter> Where(AndOrOption andOrOption, string sql)
         {
             return this;
+        }
+
+        protected override string FormatTable(string text)
+        {
+            return text;
         }
     }
 }

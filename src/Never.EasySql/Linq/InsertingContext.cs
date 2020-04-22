@@ -33,15 +33,22 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 对字段格式化
+        /// 对表名格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string Format(string text)
+        protected override string FormatTable(string text)
         {
-            return string.Concat("`", text, "`");
+            return text;
         }
 
+        /// <summary>
+        /// 对字段格式化
+        /// </summary>
+        protected override string FormatColumn(string text)
+        {
+            return text;
+        }
         /// <summary>
         /// 表名
         /// </summary>
@@ -59,7 +66,7 @@ namespace Never.EasySql.Linq
         public override Linq.InsertContext<Parameter> Entrance(char flag)
         {
             this.tableName = this.tableName.IsNullOrEmpty() ? this.FindTableName<Parameter>(tableInfo) : this.tableName;
-            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("insert into ", this.Format(this.tableName)) };
+            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("insert into ", this.FormatTable(this.tableName)) };
             this.textLength += label.SqlText.Length;
             this.labels.Add(label);
 

@@ -86,7 +86,12 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        protected override string Format(string text)
+        protected override string FormatColumn(string text)
+        {
+            return text;
+        }
+
+        protected override string FormatTable(string text)
         {
             return text;
         }
