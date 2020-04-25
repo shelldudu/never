@@ -40,14 +40,30 @@ namespace Never.EasySql.Linq
         protected readonly Dictionary<string, object> templateParameter;
 
         /// <summary>
+        /// order by
+        /// </summary>
+        protected List<OrderByInfo> orderBies;
+
+        /// <summary>
+        /// 从哪个表
+        /// </summary>
+        public string FromTable
+        {
+            get; protected set;
+        }
+
+        /// <summary>
+        /// 别名
+        /// </summary>
+        public string AsTable
+        {
+            get; protected set;
+        }
+
+        /// <summary>
         /// 是否单条记录
         /// </summary>
         protected bool isSingle;
-
-        /// <summary>
-        /// 分页
-        /// </summary>
-        protected PagedSearch paged;
 
         /// <summary>
         /// 
@@ -63,23 +79,39 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// from table
+        /// 表名
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public abstract SelectContext<Parameter, Table> From(string table);
+        public virtual SelectContext<Parameter, Table> From(string table)
+        {
+            this.FromTable = this.FormatTable(table);
+            return this;
+        }
 
         /// <summary>
         /// as新表名
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public abstract SelectContext<Parameter, Table> AsTable(string table);
+        public virtual SelectContext<Parameter, Table> As(string table)
+        {
+            this.AsTable = table;
+            return this;
+        }
 
         /// <summary>
-        /// 入口
+        /// 检查名称是否合格
         /// </summary>
-        public abstract SelectContext<Parameter, Table> Entrance();
+        /// <param name="tableName"></param>
+        public void CheckTableNameIsExists(string tableName)
+        {
+            if (this.FromTable.IsEquals(tableName))
+                throw new Exception(string.Format("the table name {0} is equal alias Name {1}", this.FromTable, tableName));
+
+            if (this.AsTable.IsEquals(tableName))
+                throw new Exception(string.Format("the table alias name {0} is equal alias Name {1}", this.AsTable, tableName));
+        }
 
         /// <summary>
         /// 设为单条
@@ -88,7 +120,6 @@ namespace Never.EasySql.Linq
         public SelectContext<Parameter, Table> SetSingle()
         {
             this.isSingle = true;
-            this.paged = null;
             return this;
         }
 
@@ -96,83 +127,59 @@ namespace Never.EasySql.Linq
         /// 设为单条
         /// </summary>
         /// <returns></returns>
-        public SelectContext<Parameter, Table> SetPage(PagedSearch paged)
+        public SelectContext<Parameter, Table> SetPage()
         {
             this.isSingle = false;
-            this.paged = paged;
             return this;
         }
 
         /// <summary>
-        /// 执行查询
+        /// 入口
         /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
+        public abstract SelectContext<Parameter, Table> StartSelectColumn();
+
+
+        /// <summary>
+        /// 在select的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint
+        /// </summary>
         /// <returns></returns>
-        protected Table Execute(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected abstract string SelectTableNamePointOnSelectColunm();
+
+        /// <summary>
+        /// 更新字段名
+        /// </summary>
+        protected abstract SelectContext<Parameter, Table> Select<TMember>(string columnName, string @as);
+
+        /// <summary>
+        /// 查询所有
+        /// </summary>
+        /// <returns></returns>
+        public abstract SelectContext<Parameter, Table> SelectAll();
+
+        /// <summary>
+        /// 字段名
+        /// </summary>
+        public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression) 
         {
-            return dao.QueryForObject<Table, Parameter>(sqlTag, sqlParameter);
+            string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
+            return this.Select<TMember>(columnName, string.Empty);
         }
 
         /// <summary>
-        /// 执行查询（事务）
+        /// 字段名
         /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="isolationLevel"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
-        /// <returns></returns>
-        protected Table Execute(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as) 
         {
-            dao.BeginTransaction(isolationLevel);
-            try
-            {
-                var row = dao.QueryForObject<Table, Parameter>(sqlTag, sqlParameter);
-                dao.CommitTransaction();
-                return row;
-            }
-            catch
-            {
-                dao.RollBackTransaction();
-                return default(Table);
-            }
+            string columnName = this.FindColumnName(expression, this.tableInfo, out _);
+            return this.Select<TMember>(columnName, @as);
         }
 
         /// <summary>
-        /// 执行查询
+        /// 字段名
         /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
-        /// <returns></returns>
-        protected IEnumerable<Table> Execute2(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        public virtual SelectContext<Parameter, Table> Select(string func, string @as) 
         {
-            return dao.QueryForEnumerable<Table, Parameter>(sqlTag, sqlParameter);
-        }
-
-        /// <summary>
-        /// 执行查询（事务）
-        /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="isolationLevel"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
-        /// <returns></returns>
-        protected IEnumerable<Table> Execute2(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
-        {
-            dao.BeginTransaction(isolationLevel);
-            try
-            {
-                var row = dao.QueryForEnumerable<Table, Parameter>(sqlTag, sqlParameter);
-                dao.CommitTransaction();
-                return row;
-            }
-            catch
-            {
-                dao.RollBackTransaction();
-                return default(IEnumerable<Table>);
-            }
+            
         }
 
         /// <summary>
@@ -185,7 +192,72 @@ namespace Never.EasySql.Linq
         /// 获取数组结果
         /// </summary>
         /// <returns></returns>
-        public abstract IEnumerable<Table> GetResults();
+        public abstract IEnumerable<Table> GetResults(PagedSearch paged);
+
+        /// <summary>
+        /// order by
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public SelectContext<Parameter, Table> OrderBy(Expression<Func<Table, object>> expression)
+        {
+            return this.OrderBy<Table>(expression, this.AsTable);
+        }
+
+        /// <summary>
+        /// order by
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public SelectContext<Parameter, Table> OrderByDescending(Expression<Func<Table, object>> expression)
+        {
+            return this.OrderByDescending<Table>(expression, this.AsTable);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="Table2"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        internal SelectContext<Parameter, Table> OrderBy<Table2>(Expression<Func<Table2, object>> expression, string @as)
+        {
+            if (this.orderBies == null)
+                this.orderBies = new List<OrderByInfo>(1);
+
+            this.orderBies.Add(new OrderByInfo()
+            {
+                OrderBy = expression,
+                Placeholders = new[] { @as },
+                Types = new[] { typeof(Table2) },
+                Flag = "asc"
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        internal SelectContext<Parameter, Table> OrderByDescending<Table2>(Expression<Func<Table2, object>> expression, string @as)
+        {
+            if (this.orderBies == null)
+                this.orderBies = new List<OrderByInfo>(1);
+
+            this.orderBies.Add(new OrderByInfo()
+            {
+                OrderBy = expression,
+                Placeholders = new[] { @as },
+                Types = new[] { typeof(Table2) },
+                Flag = "desc"
+            });
+
+            return this;
+        }
 
         /// <summary>
         /// where
@@ -198,43 +270,34 @@ namespace Never.EasySql.Linq
         public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression);
 
         /// <summary>
-        /// 存在
+        /// where
         /// </summary>
-        public abstract SelectContext<Parameter, Table> Exists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
+        public abstract SelectContext<Parameter, Table> Where(AndOrOption andOrOption, string sql);
 
         /// <summary>
-        /// 不存在
+        /// append
         /// </summary>
-        public abstract SelectContext<Parameter, Table> NotExists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
+        public abstract SelectContext<Parameter, Table> Append(string sql);
 
         /// <summary>
-        /// 存在
+        /// join
         /// </summary>
-        public abstract SelectContext<Parameter, Table> In<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
+        /// <param name="joins"></param>
+        /// <returns></returns>
+        public abstract SelectContext<Parameter, Table> JoinOnSelect(List<JoinInfo> joins);
 
         /// <summary>
-        /// 不存在
+        /// exists
         /// </summary>
-        public abstract SelectContext<Parameter, Table> NotIn<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where);
+        /// <param name="whereExists"></param>
+        /// <returns></returns>
+        public abstract SelectContext<Parameter, Table> JoinOnWhereExists(WhereExists whereExists);
 
         /// <summary>
-        /// 存在
+        /// in
         /// </summary>
-        public abstract SelectContext<Parameter, Table> Exists(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> NotExists(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> In(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> NotIn(AndOrOption option, string expression);
+        /// <param name="whereIn"></param>
+        /// <returns></returns>
+        public abstract SelectContext<Parameter, Table> JoinOnWhereIn(WhereIn whereIn);
     }
 }

@@ -49,6 +49,7 @@ namespace Never.EasySql.Linq
         {
             return text;
         }
+
         /// <summary>
         /// 表名
         /// </summary>

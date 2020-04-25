@@ -103,7 +103,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// 在update的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint
         /// </summary>
         /// <returns></returns>
-        protected override string SelectTableNamePointOnSetolunm()
+        protected override string SelectTableNamePointOnSetColunm()
         {
             return base.asTableNamePoint;
         }

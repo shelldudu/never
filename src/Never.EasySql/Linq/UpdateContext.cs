@@ -73,42 +73,6 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 执行更新
-        /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
-        /// <returns></returns>
-        protected int Update(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
-        {
-            return dao.Update(sqlTag, sqlParameter);
-        }
-
-        /// <summary>
-        /// 执行更新（事务）
-        /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="isolationLevel"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
-        /// <returns></returns>
-        protected int Update(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
-        {
-            dao.BeginTransaction(isolationLevel);
-            try
-            {
-                var row = dao.Update(sqlTag, sqlParameter);
-                dao.CommitTransaction();
-                return row;
-            }
-            catch
-            {
-                dao.RollBackTransaction();
-                return -1;
-            }
-        }
-
-        /// <summary>
         /// 获取结果
         /// </summary>
         public abstract int GetResult();
@@ -134,12 +98,12 @@ namespace Never.EasySql.Linq
             this.AsTable = table;
             return this;
         }
-        
+
         /// <summary>
         /// 检查名称是否合格
         /// </summary>
         /// <param name="tableName"></param>
-        public void CheckTableNameIsExists(string tableName) 
+        public void CheckTableNameIsExists(string tableName)
         {
             if (this.FromTable.IsEquals(tableName))
                 throw new Exception(string.Format("the table name {0} is equal alias Name {1}", this.FromTable, tableName));
@@ -157,22 +121,41 @@ namespace Never.EasySql.Linq
         /// 在update的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint
         /// </summary>
         /// <returns></returns>
-        protected abstract string SelectTableNamePointOnSetolunm();
+        protected abstract string SelectTableNamePointOnSetColunm();
 
         /// <summary>
-        /// 更新的字段名
+        /// 更新字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression);
+        protected abstract UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter);
 
         /// <summary>
-        /// 更新的字段名
+        /// 更新字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value);
+        public virtual UpdateContext<Parameter> Set<TMember>(Expression<Func<Parameter, TMember>> expression)
+        {
+            string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
+            return this.SetColum<TMember>(columnName, false);
+        }
 
         /// <summary>
-        /// 更新的字段名
+        /// 更新字段名
         /// </summary>
-        public abstract UpdateContext<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value);
+        public virtual UpdateContext<Parameter> SetFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
+        {
+            string columnName = this.FindColumnName(expression, this.tableInfo, out _);
+            this.templateParameter[columnName] = value;
+            return this.SetColum<TMember>(columnName, true);
+        }
+
+        /// <summary>
+        /// 更新字段名
+        /// </summary>
+        public virtual UpdateContext<Parameter> SetValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        {
+            string columnName = this.FindColumnName(expression, this.tableInfo, out _);
+            this.templateParameter[columnName] = value;
+            return this.SetColum<TMember>(columnName, false);
+        }
 
         /// <summary>
         /// where
@@ -190,9 +173,9 @@ namespace Never.EasySql.Linq
         public abstract UpdateContext<Parameter> Where(AndOrOption andOrOption, string sql);
 
         /// <summary>
-        /// end
+        /// append
         /// </summary>
-        public abstract UpdateContext<Parameter> End(string sql);
+        public abstract UpdateContext<Parameter> Append(string sql);
 
         /// <summary>
         /// join

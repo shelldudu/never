@@ -32,7 +32,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public UpdateGrammar<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
         {
-            this.Context.SetColumn<TMember>(expression);
+            this.Context.Set<TMember>(expression);
             return this;
         }
 
@@ -41,7 +41,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public UpdateGrammar<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
         {
-            this.Context.SetColumnWithFunc<TMember>(expression, value);
+            this.Context.SetFunc<TMember>(expression, value);
             return this;
         }
 
@@ -50,7 +50,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public UpdateGrammar<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
-            this.Context.SetColumnWithValue<TMember>(expression, value);
+            this.Context.SetValue<TMember>(expression, value);
             return this;
         }
 
@@ -214,6 +214,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
+            this.update.StartSetColumn();
             this.update.Context.JoinOnUpdate(this.joins);
             return this.update;
         }
@@ -359,6 +360,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
+            this.update.StartSetColumn();
             this.update.Context.JoinOnUpdate(this.joins);
             return this.update;
         }
@@ -505,6 +507,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
+            this.update.StartSetColumn();
             this.update.Context.JoinOnUpdate(this.joins);
             return this.update;
         }
@@ -579,6 +582,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
+            this.update.StartSetColumn();
             this.update.Context.JoinOnUpdate(this.joins);
             return this.update;
         }
@@ -1757,9 +1761,9 @@ namespace Never.EasySql.Linq
         /// 字符串
         /// </summary>
         /// <param name="sql">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public UpdateWhereGrammar<Parameter> End(string sql)
+        public UpdateWhereGrammar<Parameter> Append(string sql)
         {
-            this.Context.End(sql);
+            this.Context.Append(sql);
             return this;
         }
 

@@ -16,67 +16,73 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override SelectContext<Parameter, Table> AsTable(string table)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> Entrance()
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> Exists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> Exists(AndOrOption option, string expression)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> From(string table)
+        public override SelectContext<Parameter, Table> Append(string sql)
         {
             return this;
         }
 
         public override Table GetResult()
         {
-            return this.Execute(this.sqlTag, this.dao, this.sqlParameter);
+            return this.Select<Parameter, Table>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
-        public override IEnumerable<Table> GetResults()
+        public override IEnumerable<Table> GetResults(PagedSearch paged)
         {
-            return this.Execute2(this.sqlTag, this.dao, this.sqlParameter);
+            if ((this.sqlParameter.Object is PagedSearch) == false)
+            {
+                if (paged == null)
+                    paged = new PagedSearch();
+
+                this.templateParameter["PageNow"] = paged.PageNow;
+                this.templateParameter["PageSize"] = paged.PageSize;
+                this.templateParameter["StartIndex"] = paged.StartIndex;
+                this.templateParameter["EndIndex"] = paged.EndIndex;
+                if (paged.BeginTime.HasValue)
+                    this.templateParameter["BeginTime"] = paged.BeginTime.Value;
+                if (paged.EndTime.HasValue)
+                    this.templateParameter["EndTime"] = paged.EndTime.Value;
+
+            }
+
+            return this.SelectMany<Parameter, Table>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
-        public override SelectContext<Parameter, Table> In<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> In(AndOrOption option, string expression)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> NotExists<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> NotExists(AndOrOption option, string expression)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> NotIn<Table2>(AndOrOption option, Expression<Func<Parameter, Table2, bool>> expression, Expression<Func<Table2, bool>> where)
+        public override SelectContext<Parameter, Table> JoinOnSelect(List<JoinInfo> joins)
         {
             return this;
         }
 
-        public override SelectContext<Parameter, Table> NotIn(AndOrOption option, string expression)
+        public override SelectContext<Parameter, Table> JoinOnWhereExists(WhereExists whereExists)
+        {
+            return this;
+        }
+
+        public override SelectContext<Parameter, Table> JoinOnWhereIn(WhereIn whereIn)
+        {
+            return this;
+        }
+
+        public override SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        {
+            return this;
+        }
+
+        public override SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        {
+            return this;
+        }
+
+        public override SelectContext<Parameter, Table> Select(string func, string @as)
+        {
+            return this;
+        }
+
+        public override SelectContext<Parameter, Table> SelectAll()
+        {
+            return this;
+        }
+
+        public override SelectContext<Parameter, Table> StartSelectColumn()
         {
             return this;
         }
@@ -91,6 +97,11 @@ namespace Never.EasySql.Linq
             return this;
         }
 
+        public override SelectContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
+        {
+            return this;
+        }
+
         protected override string FormatColumn(string text)
         {
             return text;
@@ -99,6 +110,11 @@ namespace Never.EasySql.Linq
         protected override string FormatTable(string text)
         {
             return text;
+        }
+
+        protected override string SelectTableNamePointOnSelectColunm()
+        {
+            return string.Empty;
         }
     }
 }

@@ -161,6 +161,32 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 获取一个OrderBy
+        /// </summary>
+        public struct OrderByInfo 
+        {
+            /// <summary>
+            /// asc,desc
+            /// </summary>
+            public string Flag;
+
+            /// <summary>
+            /// orderby
+            /// </summary>
+            public LambdaExpression OrderBy;
+
+            /// <summary>
+            /// 参数type
+            /// </summary>
+            public Type[] Types;
+
+            /// <summary>
+            /// 占位符
+            /// </summary>
+            public string[] Placeholders;
+        }
+
+        /// <summary>
         /// exists
         /// </summary>
         public class WhereExists
@@ -241,6 +267,225 @@ namespace Never.EasySql.Linq
             /// </summary>
             public List<JoinInfo> Joins;
         }
+
+        #region execute
+
+        /// <summary>
+        /// 执行查询
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected Table Select<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        {
+            return dao.QueryForObject<Table, Parameter>(sqlTag, sqlParameter);
+        }
+
+        /// <summary>
+        /// 执行查询（事务）
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="isolationLevel"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected Table Select<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        {
+            dao.BeginTransaction(isolationLevel);
+            try
+            {
+                var row = dao.QueryForObject<Table, Parameter>(sqlTag, sqlParameter);
+                dao.CommitTransaction();
+                return row;
+            }
+            catch
+            {
+                dao.RollBackTransaction();
+                return default(Table);
+            }
+        }
+
+        /// <summary>
+        /// 执行查询
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected IEnumerable<Table> SelectMany<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        {
+            return dao.QueryForEnumerable<Table, Parameter>(sqlTag, sqlParameter);
+        }
+
+        /// <summary>
+        /// 执行查询（事务）
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="isolationLevel"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected IEnumerable<Table> SelectMany<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        {
+            dao.BeginTransaction(isolationLevel);
+            try
+            {
+                var row = dao.QueryForEnumerable<Table, Parameter>(sqlTag, sqlParameter);
+                dao.CommitTransaction();
+                return row;
+            }
+            catch
+            {
+                dao.RollBackTransaction();
+                return default(IEnumerable<Table>);
+            }
+        }
+
+        /// <summary>
+        /// 执行更新
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected int Update<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        {
+            return dao.Update(sqlTag, sqlParameter);
+        }
+
+        /// <summary>
+        /// 执行更新（事务）
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="isolationLevel"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected int Update<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        {
+            dao.BeginTransaction(isolationLevel);
+            try
+            {
+                var row = dao.Update(sqlTag, sqlParameter);
+                dao.CommitTransaction();
+                return row;
+            }
+            catch
+            {
+                dao.RollBackTransaction();
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// 执行删除
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected int Delete<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        {
+            return dao.Delete(sqlTag, sqlParameter);
+        }
+
+        /// <summary>
+        /// 执行删除（事务）
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="isolationLevel"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected int Delete<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        {
+            dao.BeginTransaction(isolationLevel);
+            try
+            {
+                var row = dao.Delete(sqlTag, sqlParameter);
+                dao.CommitTransaction();
+                return row;
+            }
+            catch
+            {
+                dao.RollBackTransaction();
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// 执行插入
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected int Insert<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        {
+            return (int)dao.Insert(sqlTag, sqlParameter);
+        }
+
+        /// <summary>
+        /// 执行插入（事务）
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="isolationLevel"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected int Insert<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        {
+            dao.BeginTransaction(isolationLevel);
+            try
+            {
+                var row = (int)dao.Insert(sqlTag, sqlParameter);
+                dao.CommitTransaction();
+                return row;
+            }
+            catch
+            {
+                dao.RollBackTransaction();
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// 执行插入
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected void InsertMany<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        {
+            dao.Insert(sqlTag, sqlParameter);
+        }
+
+        /// <summary>
+        /// 执行插入（事务）
+        /// </summary>
+        /// <param name="dao"></param>
+        /// <param name="isolationLevel"></param>
+        /// <param name="sqlTag"></param>
+        /// <param name="sqlParameter"></param>
+        /// <returns></returns>
+        protected void InsertMany<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        {
+            dao.BeginTransaction(isolationLevel);
+            try
+            {
+                dao.Insert(sqlTag, sqlParameter);
+                dao.CommitTransaction();
+            }
+            catch
+            {
+                dao.RollBackTransaction();
+                return;
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// 对表名格式化

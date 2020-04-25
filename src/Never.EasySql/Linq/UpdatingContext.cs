@@ -19,10 +19,12 @@ namespace Never.EasySql.Linq
         /// 缓存Id
         /// </summary>
         protected readonly string cacheId;
+
         /// <summary>
         /// 总字符串长度
         /// </summary>
         protected int textLength;
+
         /// <summary>
         /// set出现的的次数
         /// </summary>
@@ -82,7 +84,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string FormatTable(string text) 
+        protected override string FormatTable(string text)
         {
             return text;
         }
@@ -114,14 +116,14 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected virtual UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter)
+        protected override UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter)
         {
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
             };
 
-            var selectTableName = this.SelectTableNamePointOnSetolunm() ?? this.tableNamePoint;
+            var selectTableName = this.SelectTableNamePointOnSetColunm() ?? this.tableNamePoint;
 
             if (setTimes == 0)
             {
@@ -162,35 +164,6 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 更新字段名
-        /// </summary>
-        public override UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
-        {
-            string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
-            return this.SetColum<TMember>(columnName, false);
-        }
-
-        /// <summary>
-        /// 更新字段名
-        /// </summary>
-        public override UpdateContext<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
-        {
-            string columnName = this.FindColumnName(expression, this.tableInfo, out _);
-            this.templateParameter[columnName] = value;
-            return this.SetColum<TMember>(columnName, true);
-        }
-
-        /// <summary>
-        /// 更新字段名
-        /// </summary>
-        public override UpdateContext<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
-        {
-            string columnName = this.FindColumnName(expression, this.tableInfo, out _);
-            this.templateParameter[columnName] = value;
-            return this.SetColum<TMember>(columnName, false);
-        }
-
-        /// <summary>
         /// where 条件
         /// </summary>
         public override UpdateContext<Parameter> Where()
@@ -205,25 +178,6 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        /// <summary>
-        /// 结束
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <returns></returns>
-        public override UpdateContext<Parameter> End(string sql)
-        {
-            if (sql.IsNullOrEmpty())
-                return this;
-
-            var label = new TextLabel()
-            {
-                SqlText = sql,
-                TagId = NewId.GenerateNumber(),
-            };
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
-            return this;
-        }
 
         /// <summary>
         /// where 条件
@@ -255,12 +209,32 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 结束
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public override UpdateContext<Parameter> Append(string sql)
+        {
+            if (sql.IsNullOrEmpty())
+                return this;
+
+            var label = new TextLabel()
+            {
+                SqlText = sql,
+                TagId = NewId.GenerateNumber(),
+            };
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        protected override string SelectTableNamePointOnSetolunm()
+        protected override string SelectTableNamePointOnSetColunm()
         {
-            return this.asTableNamePoint;
+            return this.asTableNamePoint.IsNullOrEmpty() ? this.tableNamePoint : this.asTableNamePoint;
         }
 
         /// <summary>

@@ -36,21 +36,21 @@ namespace Never.EasySql.Linq
 
         public override int GetResult()
         {
-            return this.Update(this.sqlTag, this.dao, this.sqlParameter);
+            return this.Update(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
-        public override Linq.UpdateContext<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
+        public override Linq.UpdateContext<Parameter> Set<TMember>(Expression<Func<Parameter, TMember>> expression)
         {
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> SetColumnWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
+        public override Linq.UpdateContext<Parameter> SetFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
         {
             this.templateParameter[this.FindColumnName(expression, this.tableInfo, out _)] = value;
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter> SetColumnWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        public override Linq.UpdateContext<Parameter> SetValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
         {
             this.templateParameter[this.FindColumnName(expression, this.tableInfo, out _)] = value;
             return this;
@@ -66,17 +66,8 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override UpdateContext<Parameter> End(string sql)
-        {
-            return this;
-        }
 
-        protected override string FormatColumn(string text)
-        {
-            return string.Empty;
-        }
-
-        protected override string SelectTableNamePointOnSetolunm()
+        protected override string SelectTableNamePointOnSetColunm()
         {
             return string.Empty;
         }
@@ -101,9 +92,24 @@ namespace Never.EasySql.Linq
             return this;
         }
 
+        protected override UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter)
+        {
+            return this;
+        }
+
+        public override UpdateContext<Parameter> Append(string sql)
+        {
+            return this;
+        }
+
         protected override string FormatTable(string text)
         {
-            return text;
+            return string.Empty;
+        }
+
+        protected override string FormatColumn(string text)
+        {
+            return string.Empty;
         }
     }
 }
