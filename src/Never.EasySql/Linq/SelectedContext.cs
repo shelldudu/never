@@ -72,7 +72,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override SelectContext<Parameter, Table> Select(string func, string @as)
+        protected override SelectContext<Parameter, Table> SelectColumn(string column, string originalColunmName, string @as)
         {
             return this;
         }

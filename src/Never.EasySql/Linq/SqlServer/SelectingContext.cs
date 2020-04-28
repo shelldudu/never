@@ -25,6 +25,36 @@ namespace Never.EasySql.Linq.SqlServer
         {
         }
 
+        /// <summary>
+        /// 入口
+        /// </summary>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> StartSelectColumn()
+        {
+            if (this.isSingle) 
+            {
+            
+            }
+            return base.StartSelectColumn();
+        }
+
+        /// <summary>
+        /// 查询结果
+        /// </summary>
+        public override Table GetResult()
+        {
+            return base.GetResult();
+        }
+
+        /// <summary>
+        /// 查询结果
+        /// </summary>
+        /// <param name="paged"></param>
+        /// <returns></returns>
+        public override IEnumerable<Table> GetResults(PagedSearch paged)
+        {
+            return base.GetResults(paged);
+        }
 
         /// <summary>
         /// 对表名格式化

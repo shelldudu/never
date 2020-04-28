@@ -34,6 +34,15 @@ namespace Never.EasySql.Linq
             return this;
         }
 
+        public override void CheckTableNameIsExists(string tableName)
+        {
+        }
+
+        protected override string ClearThenFormatColumn(string text)
+        {
+            return text;
+        }
+
         public override int GetResult()
         {
             return this.Update(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
@@ -92,7 +101,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        protected override UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter)
+        protected override UpdateContext<Parameter> SetColumn(string columnName, string originalColumnName, bool textParameter)
         {
             return this;
         }

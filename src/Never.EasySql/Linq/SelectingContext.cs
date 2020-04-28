@@ -53,9 +53,10 @@ namespace Never.EasySql.Linq
         protected string equalAndPrefix;
 
         /// <summary>
-        /// update join
+        /// select join
         /// </summary>
-        private List<JoinInfo> updateJoin;
+        protected List<JoinInfo> selectJoin;
+
         #endregion
 
         /// <summary>
@@ -120,46 +121,97 @@ namespace Never.EasySql.Linq
             return this.SelectMany<Parameter, Table>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
+        /// <summary>
+        /// 检查名字
+        /// </summary>
+        /// <param name="tableName"></param>
+        public override void CheckTableNameIsExists(string tableName)
+        {
+            base.CheckTableNameIsExists(tableName);
+            if (this.selectJoin != null && this.selectJoin.Any())
+            {
+                foreach (var a in this.selectJoin)
+                {
+                    if (a.AsName.IsEquals(tableName, StringComparison.OrdinalIgnoreCase))
+                        throw new Exception(string.Format("the table alias name {0} is equal alias Name {1}", a.AsName, tableName));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joins"></param>
+        /// <returns></returns>
         public override SelectContext<Parameter, Table> JoinOnSelect(List<JoinInfo> joins)
         {
-            throw new NotImplementedException();
+            this.selectJoin = joins;
+            return this;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExists"></param>
+        /// <returns></returns>
         public override SelectContext<Parameter, Table> JoinOnWhereExists(WhereExists whereExists)
         {
-            throw new NotImplementedException();
+            var label = new TextLabel()
+            {
+                SqlText = this.LoadWhereExists(this.FromTable, this.AsTable, whereExists).ToString(),
+                TagId = NewId.GenerateNumber(),
+            };
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereIn"></param>
+        /// <returns></returns>
         public override SelectContext<Parameter, Table> JoinOnWhereIn(WhereIn whereIn)
         {
-            throw new NotImplementedException();
+            var label = new TextLabel()
+            {
+                SqlText = this.LoadWhereIn(this.FromTable, this.AsTable, whereIn).ToString(),
+                TagId = NewId.GenerateNumber(),
+            };
+
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
         }
 
-        public override SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        /// <summary>
+        /// 查询字段
+        /// </summary>
+        /// <param name="memberName"></param>
+        /// <param name="originalColunmName"></param>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        protected override SelectContext<Parameter, Table> SelectColumn(string memberName, string originalColunmName, string @as)
         {
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
             };
-            var selectTableName = this.SelectTableNamePointOnSelectColunm() ?? this.tableNamePoint;
 
-            throw new NotImplementedException();
-        }
-
-        public override SelectContext<Parameter, Table> Select(string func, string @as)
-        {
-            var label = new TextLabel()
+            if (selectTimes == 0)
             {
-                TagId = NewId.GenerateNumber(),
-            };
-            var selectTableName = this.SelectTableNamePointOnSelectColunm() ?? this.tableNamePoint;
+                selectTimes++;
+                label.SqlText = string.Concat(" ", memberName, @as.IsNullOrEmpty() ? "" : " as ", @as, "\r");
+            }
+            else
+            {
+                label.SqlText = string.Concat(",", memberName, @as.IsNullOrEmpty() ? "" : " as ", @as, "\r");
+            }
 
-            throw new NotImplementedException();
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+
+            return this;
         }
 
         /// <summary>
@@ -168,26 +220,10 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override SelectContext<Parameter, Table> SelectAll()
         {
-            var label = new TextLabel()
-            {
-                TagId = NewId.GenerateNumber(),
-            };
-
-            var selectTableName = this.SelectTableNamePointOnSelectColunm() ?? this.tableNamePoint;
-            if (selectTimes == 0)
-            {
-                selectTimes++;
-                label.SqlText = string.Concat(" ", selectTableName, "* \r");
-            }
-            else
-            {
+            if (this.selectTimes > 0)
                 throw new Exception("select * just use one time");
-            }
 
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
-
-            return this;
+            return base.SelectAll();
         }
 
         /// <summary>
@@ -221,11 +257,11 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override SelectContext<Parameter, Table> Where()
         {
-            if (this.updateJoin.IsNotNullOrEmpty())
+            if (this.selectJoin.IsNotNullOrEmpty())
             {
                 var label = new TextLabel()
                 {
-                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
+                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
                     TagId = NewId.GenerateNumber(),
                 };
 
@@ -254,7 +290,7 @@ namespace Never.EasySql.Linq
             {
                 var label = new TextLabel()
                 {
-                    SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.updateJoin.IsNotNullOrEmpty() ? " " : "\r"),
+                    SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
                     TagId = NewId.GenerateNumber(),
                 };
 
@@ -262,11 +298,11 @@ namespace Never.EasySql.Linq
                 this.textLength += label.SqlText.Length;
             }
 
-            if (this.updateJoin.IsNotNullOrEmpty())
+            if (this.selectJoin.IsNotNullOrEmpty())
             {
                 var label = new TextLabel()
                 {
-                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
+                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
                     TagId = NewId.GenerateNumber(),
                 };
 
@@ -315,7 +351,6 @@ namespace Never.EasySql.Linq
             this.textLength += label.SqlText.Length;
             return this;
         }
-
 
         /// <summary>
         /// 对表名格式化

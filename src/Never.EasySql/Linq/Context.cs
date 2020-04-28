@@ -67,8 +67,9 @@ namespace Never.EasySql.Linq
             /// 返回字符串
             /// </summary>
             /// <param name="leftPlaceholders"></param>
+            /// <param name="context"></param>
             /// <returns></returns>
-            public string ToString(string[] leftPlaceholders)
+            public string ToString(string[] leftPlaceholders, Context context)
             {
                 var sb = new StringBuilder(30);
                 if (this.Left != null)
@@ -83,7 +84,7 @@ namespace Never.EasySql.Linq
                     {
                         sb.Append(leftPlaceholders[this.Left.Index]);
                         sb.Append(".");
-                        sb.Append(this.Left.Exp);
+                        sb.Append(context.FormatColumn(this.Left.Exp));
                     }
                 }
 
@@ -100,7 +101,7 @@ namespace Never.EasySql.Linq
                     {
                         sb.Append(leftPlaceholders[this.Right.Index]);
                         sb.Append(".");
-                        sb.Append(this.Right.Exp);
+                        sb.Append(context.FormatColumn(this.Right.Exp));
                     }
                 }
 
@@ -163,7 +164,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 获取一个OrderBy
         /// </summary>
-        public struct OrderByInfo 
+        public struct OrderByInfo
         {
             /// <summary>
             /// asc,desc
@@ -178,12 +179,12 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 参数type
             /// </summary>
-            public Type[] Types;
+            public Type Type;
 
             /// <summary>
             /// 占位符
             /// </summary>
-            public string[] Placeholders;
+            public string Placeholder;
         }
 
         /// <summary>
@@ -487,6 +488,8 @@ namespace Never.EasySql.Linq
 
         #endregion
 
+        #region format
+
         /// <summary>
         /// 对表名格式化
         /// </summary>
@@ -500,6 +503,32 @@ namespace Never.EasySql.Linq
         /// <param name="text"></param>
         /// <returns></returns>
         protected abstract string FormatColumn(string text);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        protected virtual string ClearThenFormatColumn(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var split = text.Split('.');
+            if (split.Length <= 0)
+                return text;
+
+            if (split.Length == 1)
+                return this.FormatColumn(text);
+
+            var array = new[] { this.FormatTable(split[0]), ".", this.FormatColumn(split[1]) };
+            return string.Join("", split.Length <= 2 ? array : array.Union(split.Skip(2)));
+
+        }
+
+        #endregion
+
+        #region table member
 
         /// <summary>
         /// 查询table信息
@@ -530,13 +559,11 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 对表达式的字段提取其名称
         /// </summary>
-        /// <typeparam name="Parameter"></typeparam>
-        /// <typeparam name="TMember"></typeparam>
         /// <param name="tableInfo"></param>
         /// <param name="expression"></param>
         /// <param name="memberInfo"></param>
         /// <returns></returns>
-        protected virtual string FindColumnName<Parameter, TMember>(Expression<Func<Parameter, TMember>> expression, TableInfo tableInfo, out MemberInfo memberInfo)
+        protected virtual string FindColumnName(LambdaExpression expression, TableInfo tableInfo, out MemberInfo memberInfo)
         {
             var body = expression.Body;
             var model = body as ParameterExpression;
@@ -667,6 +694,10 @@ namespace Never.EasySql.Linq
 
             return joinOption.ToString();
         }
+
+        #endregion
+
+        #region analyze
 
         /// <summary>
         /// 分析表达式
@@ -1202,6 +1233,10 @@ namespace Never.EasySql.Linq
             return this.Analyze(expression.Body, analyzeParameters, whereCollection);
         }
 
+        #endregion
+
+        #region join exits in
+
         /// <summary>
         /// 
         /// </summary>
@@ -1249,7 +1284,7 @@ namespace Never.EasySql.Linq
                 builder.Append(" on ");
                 foreach (var where in whereCollection)
                 {
-                    builder.Append(where.ToString(pp));
+                    builder.Append(where.ToString(pp, this));
                 }
 
                 if (item.And != null)
@@ -1273,7 +1308,7 @@ namespace Never.EasySql.Linq
                         builder.Append(" and ");
                         foreach (var where in whereCollection)
                         {
-                            builder.Append(where.ToString(pp));
+                            builder.Append(where.ToString(pp, this));
                         }
                     }
                 }
@@ -1369,7 +1404,7 @@ namespace Never.EasySql.Linq
                     builder.Append(" on ");
                     foreach (var where in joinCollection)
                     {
-                        builder.Append(where.ToString(pp));
+                        builder.Append(where.ToString(pp, this));
                     }
 
                     if (item.And != null)
@@ -1393,7 +1428,7 @@ namespace Never.EasySql.Linq
                             builder.Append("and ");
                             foreach (var where in whereCollection)
                             {
-                                builder.Append(where.ToString(pp));
+                                builder.Append(where.ToString(pp, this));
                             }
                         }
                     }
@@ -1404,7 +1439,7 @@ namespace Never.EasySql.Linq
             builder.Append("where ");
             foreach (var where in whereCollection)
             {
-                builder.Append(where.ToString(pp));
+                builder.Append(where.ToString(pp, this));
             }
 
             if (whereExists.And != null)
@@ -1428,7 +1463,7 @@ namespace Never.EasySql.Linq
                     builder.Append("and ");
                     foreach (var where in whereCollection)
                     {
-                        builder.Append(where.ToString(pp));
+                        builder.Append(where.ToString(pp, this));
                     }
                 }
             }
@@ -1542,7 +1577,7 @@ namespace Never.EasySql.Linq
                     builder.Append(" on ");
                     foreach (var where in joinCollection)
                     {
-                        builder.Append(where.ToString(pp));
+                        builder.Append(where.ToString(pp, this));
                     }
 
                     if (item.And != null)
@@ -1566,7 +1601,7 @@ namespace Never.EasySql.Linq
                             builder.Append("and ");
                             foreach (var where in whereCollection)
                             {
-                                builder.Append(where.ToString(pp));
+                                builder.Append(where.ToString(pp, this));
                             }
                         }
                     }
@@ -1578,7 +1613,7 @@ namespace Never.EasySql.Linq
             builder.Append("where ");
             foreach (var where in whereCollection)
             {
-                builder.Append(where.ToString(pp));
+                builder.Append(where.ToString(pp, this));
             }
 
             if (whereIn.Where != null)
@@ -1602,7 +1637,7 @@ namespace Never.EasySql.Linq
                     builder.Append("and ");
                     foreach (var where in whereCollection)
                     {
-                        builder.Append(where.ToString(pp));
+                        builder.Append(where.ToString(pp, this));
                     }
                 }
             }
@@ -1610,5 +1645,36 @@ namespace Never.EasySql.Linq
             builder.Append(")\r");
             return builder;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderBies"></param>
+        /// <returns></returns>
+        protected StringBuilder LoadOrderBy(List<OrderByInfo> orderBies)
+        {
+            var builder = new StringBuilder(orderBies.Count * 20);
+            if (orderBies.IsNullOrEmpty())
+                return builder;
+
+            builder.Append("order by ");
+            for (int i = 0, j = orderBies.Count; i < j; i++)
+            {
+                var item = orderBies[i];
+                var tableInfo = FindTableInfo(item.Type);
+                var columnName = this.FindColumnName(item.OrderBy, tableInfo, out var memberInfo);
+
+                if (i > 0)
+                    builder.Append(",");
+                builder.Append(item.Placeholder);
+                builder.Append(".");
+                builder.Append(this.FormatColumn(columnName));
+                builder.Append(" ");
+                builder.Append(item.Flag);
+            }
+
+            return builder;
+        }
+        #endregion
     }
 }

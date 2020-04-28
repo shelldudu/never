@@ -104,7 +104,7 @@ namespace Never.EasySql.Linq
         /// 检查名称是否合格
         /// </summary>
         /// <param name="tableName"></param>
-        public void CheckTableNameIsExists(string tableName)
+        public virtual void CheckTableNameIsExists(string tableName)
         {
             if (this.FromTable.IsEquals(tableName))
                 throw new Exception(string.Format("the table name {0} is equal alias Name {1}", this.FromTable, tableName));
@@ -138,7 +138,6 @@ namespace Never.EasySql.Linq
         /// </summary>
         public abstract SelectContext<Parameter, Table> StartSelectColumn();
 
-
         /// <summary>
         /// 在select的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint
         /// </summary>
@@ -148,38 +147,41 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected abstract SelectContext<Parameter, Table> Select<TMember>(string columnName, string @as);
+        protected abstract SelectContext<Parameter, Table> SelectColumn(string columnName, string originalColunmName, string @as);
 
         /// <summary>
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public abstract SelectContext<Parameter, Table> SelectAll();
+        public virtual SelectContext<Parameter, Table> SelectAll()
+        {
+            return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), "*"), "*", string.Empty);
+        }
 
         /// <summary>
         /// 字段名
         /// </summary>
-        public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression) 
+        public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
-            return this.Select<TMember>(columnName, string.Empty);
+            return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), this.FormatColumn(columnName)), columnName, string.Empty);
         }
 
         /// <summary>
         /// 字段名
         /// </summary>
-        public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as) 
+        public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out _);
-            return this.Select<TMember>(columnName, @as);
+            return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), this.FormatColumn(columnName)), columnName, @as);
         }
 
         /// <summary>
         /// 字段名
         /// </summary>
-        public virtual SelectContext<Parameter, Table> Select(string func, string @as) 
+        public virtual SelectContext<Parameter, Table> Select(string func, string @as)
         {
-            
+            return this.SelectColumn(func, func, @as);
         }
 
         /// <summary>
@@ -201,7 +203,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SelectContext<Parameter, Table> OrderBy(Expression<Func<Table, object>> expression)
         {
-            return this.OrderBy<Table>(expression, this.AsTable);
+            return this.OrderBy<Table>(expression, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable);
         }
 
         /// <summary>
@@ -211,7 +213,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SelectContext<Parameter, Table> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            return this.OrderByDescending<Table>(expression, this.AsTable);
+            return this.OrderByDescending<Table>(expression, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable);
         }
 
         /// <summary>
@@ -229,8 +231,8 @@ namespace Never.EasySql.Linq
             this.orderBies.Add(new OrderByInfo()
             {
                 OrderBy = expression,
-                Placeholders = new[] { @as },
-                Types = new[] { typeof(Table2) },
+                Placeholder = @as,
+                Type = typeof(Table2),
                 Flag = "asc"
             });
 
@@ -251,8 +253,8 @@ namespace Never.EasySql.Linq
             this.orderBies.Add(new OrderByInfo()
             {
                 OrderBy = expression,
-                Placeholders = new[] { @as },
-                Types = new[] { typeof(Table2) },
+                Placeholder = @as,
+                Type = typeof(Table2),
                 Flag = "desc"
             });
 

@@ -15,11 +15,6 @@ namespace Never.EasySql.Linq.SqlServer
     public sealed class UpdatingContext<Parameter> : Linq.UpdatingContext<Parameter>
     {
         /// <summary>
-        /// update join
-        /// </summary>
-        private List<JoinInfo> updateJoin;
-
-        /// <summary>
         /// ctor
         /// </summary>
         /// <param name="cacheId"></param>
@@ -106,17 +101,6 @@ namespace Never.EasySql.Linq.SqlServer
         protected override string SelectTableNamePointOnSetColunm()
         {
             return base.asTableNamePoint;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="joins"></param>
-        /// <returns></returns>
-        public override UpdateContext<Parameter> JoinOnUpdate(List<JoinInfo> joins)
-        {
-            this.updateJoin = joins;
-            return this;
         }
 
         /// <summary>

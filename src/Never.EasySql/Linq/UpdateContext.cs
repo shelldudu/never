@@ -103,7 +103,7 @@ namespace Never.EasySql.Linq
         /// 检查名称是否合格
         /// </summary>
         /// <param name="tableName"></param>
-        public void CheckTableNameIsExists(string tableName)
+        public virtual void CheckTableNameIsExists(string tableName)
         {
             if (this.FromTable.IsEquals(tableName))
                 throw new Exception(string.Format("the table name {0} is equal alias Name {1}", this.FromTable, tableName));
@@ -126,7 +126,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected abstract UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter);
+        protected abstract UpdateContext<Parameter> SetColumn(string columnName, string originalColumnName, bool textParameter);
 
         /// <summary>
         /// 更新字段名
@@ -134,7 +134,7 @@ namespace Never.EasySql.Linq
         public virtual UpdateContext<Parameter> Set<TMember>(Expression<Func<Parameter, TMember>> expression)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
-            return this.SetColum<TMember>(columnName, false);
+            return this.SetColumn(string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), columnName, false);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
-            return this.SetColum<TMember>(columnName, true);
+            return this.SetColumn(string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), columnName, true);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
-            return this.SetColum<TMember>(columnName, false);
+            return this.SetColumn(string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), columnName, false);
         }
 
         /// <summary>

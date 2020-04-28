@@ -50,6 +50,10 @@ namespace Never.EasySql.Linq
         /// </summary>
         protected string equalAndPrefix;
 
+        /// <summary>
+        /// update join
+        /// </summary>
+        protected List<JoinInfo> updateJoin;
         #endregion
 
         /// <summary>
@@ -98,6 +102,23 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 检查名字
+        /// </summary>
+        /// <param name="tableName"></param>
+        public override void CheckTableNameIsExists(string tableName)
+        {
+            base.CheckTableNameIsExists(tableName);
+            if (this.updateJoin != null && this.updateJoin.Any())
+            {
+                foreach (var a in this.updateJoin)
+                {
+                    if (a.AsName.IsEquals(tableName, StringComparison.OrdinalIgnoreCase))
+                        throw new Exception(string.Format("the table alias name {0} is equal alias Name {1}", a.AsName, tableName));
+                }
+            }
+        }
+
+        /// <summary>
         /// 入口
         /// </summary>
         public override UpdateContext<Parameter> StartSetColumn()
@@ -116,43 +137,41 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected override UpdateContext<Parameter> SetColum<TMember>(string columnName, bool textParameter)
+        protected override UpdateContext<Parameter> SetColumn(string columnName, string originalColumnName, bool textParameter)
         {
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
             };
 
-            var selectTableName = this.SelectTableNamePointOnSetColunm() ?? this.tableNamePoint;
-
             if (setTimes == 0)
             {
                 setTimes++;
-                label.SqlText = string.Concat("set ", selectTableName, this.FormatColumn(columnName), equalAndPrefix, columnName, " \r");
+                label.SqlText = string.Concat("set ", columnName, equalAndPrefix, originalColumnName, " \r");
                 label.Add(new SqlTagParameterPosition()
                 {
                     ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     Name = columnName,
-                    OccupanLength = this.formatColumnAppendCount + columnName.Length,
-                    PrefixStartIndex = 4 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
-                    ParameterStartIndex = 4 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
-                    ParameterStopIndex = 4 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                    OccupanLength = columnName.Length,
+                    PrefixStartIndex = 4 + columnName.Length + equalAndPrefix.Length,
+                    ParameterStartIndex = 4 + columnName.Length + equalAndPrefix.Length,
+                    ParameterStopIndex = 4 + columnName.Length + equalAndPrefix.Length + originalColumnName.Length,
                     TextParameter = textParameter,
                 });
             }
             else
             {
-                label.SqlText = string.Concat(",", selectTableName, this.FormatColumn(columnName), equalAndPrefix, columnName, " \r");
+                label.SqlText = string.Concat(",", columnName, equalAndPrefix, originalColumnName, " \r");
                 label.Add(new SqlTagParameterPosition()
                 {
                     ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                     Name = columnName,
-                    OccupanLength = this.formatColumnAppendCount + columnName.Length,
-                    PrefixStartIndex = 1 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
-                    ParameterStartIndex = 1 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
-                    ParameterStopIndex = 1 + selectTableName.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
+                    OccupanLength = columnName.Length,
+                    PrefixStartIndex = 1 + columnName.Length + equalAndPrefix.Length,
+                    ParameterStartIndex = 1 + columnName.Length + equalAndPrefix.Length,
+                    ParameterStopIndex = 1 + columnName.Length + equalAndPrefix.Length + originalColumnName.Length,
                     TextParameter = textParameter,
                 });
             }
@@ -244,11 +263,13 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override UpdateContext<Parameter> JoinOnUpdate(List<JoinInfo> joins)
         {
+            this.updateJoin = joins;
             var label = new TextLabel()
             {
                 SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, joins).ToString(),
                 TagId = NewId.GenerateNumber(),
             };
+
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;
@@ -283,6 +304,7 @@ namespace Never.EasySql.Linq
                 SqlText = this.LoadWhereIn(this.FromTable, this.AsTable, whereIn).ToString(),
                 TagId = NewId.GenerateNumber(),
             };
+
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;
