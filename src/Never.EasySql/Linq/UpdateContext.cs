@@ -189,13 +189,13 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public abstract UpdateContext<Parameter> JoinOnWhereExists(WhereExists whereExists);
+        public abstract UpdateContext<Parameter> JoinOnWhereExists(WhereExistsInfo whereExists);
 
         /// <summary>
         /// in
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public abstract UpdateContext<Parameter> JoinOnWhereIn(WhereIn whereIn);
+        public abstract UpdateContext<Parameter> JoinOnWhereIn(WhereInInfo whereIn);
     }
 }

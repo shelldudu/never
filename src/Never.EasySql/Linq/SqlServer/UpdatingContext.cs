@@ -51,7 +51,7 @@ namespace Never.EasySql.Linq.SqlServer
             {
                 var label = new TextLabel()
                 {
-                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
+                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
                     TagId = NewId.GenerateNumber(),
                 };
 
@@ -83,7 +83,7 @@ namespace Never.EasySql.Linq.SqlServer
             {
                 var label = new TextLabel()
                 {
-                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
+                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
                     TagId = NewId.GenerateNumber(),
                 };
 

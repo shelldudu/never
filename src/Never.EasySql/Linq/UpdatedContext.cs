@@ -86,12 +86,12 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override UpdateContext<Parameter> JoinOnWhereExists(WhereExists whereExists)
+        public override UpdateContext<Parameter> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
             return this;
         }
 
-        public override UpdateContext<Parameter> JoinOnWhereIn(WhereIn whereIn)
+        public override UpdateContext<Parameter> JoinOnWhereIn(WhereInInfo whereIn)
         {
             return this;
         }

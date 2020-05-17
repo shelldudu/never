@@ -31,12 +31,60 @@ namespace Never.EasySql.Linq.SqlServer
         /// <returns></returns>
         public override SelectContext<Parameter, Table> StartSelectColumn()
         {
-            if (this.isSingle) 
+            if (this.isSingle)
+                return base.StartSelectColumn();
+
+            if (this.orderBies.IsNullOrEmpty())
             {
-            
+                var primary = this.tableInfo.Columns.Where(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.Primary);
+                if (primary.IsNullOrEmpty())
+                    primary = this.tableInfo.Columns.Where(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement);
+
+                if (this.tableInfo.Columns.Any(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.Primary))
+                {
+                    this.orderBies.Add(new OrderByInfo
+                    {
+                        Flag = string.Concat("order by ", primary.FirstOrDefault().Column.Alias.IsNullOrEmpty() ? primary.FirstOrDefault().Member.Name : primary.FirstOrDefault().Column.Alias, " desc"),
+                        Placeholder = this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable,
+                        Type = typeof(Table)
+                    });
+                }
             }
+
             return base.StartSelectColumn();
         }
+
+        /// <summary>
+        /// where
+        /// </summary>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> Where()
+        {
+            if (this.orderBies.IsNotNullOrEmpty() || this.selectJoin.IsNotNullOrEmpty())
+            {
+                var label = new TextLabel()
+                {
+                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
+                    TagId = NewId.GenerateNumber(),
+                };
+
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
+            return base.Where();
+        }
+
+        /// <summary>
+        /// wehre
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression)
+        {
+            return base.Where(expression);
+        }
+
 
         /// <summary>
         /// 查询结果

@@ -46,19 +46,7 @@ namespace Never.EasySql.Linq
         public SelectJoinGrammar<Parameter, Table, Table1> Join<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.Join) { select = new SingleSelectGrammar<Parameter, Table>() { Context = this.Context } };
-        }
-
-        /// <summary>
-        /// inner join
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="as"></param>
-        /// <returns></returns>
-        public SelectJoinGrammar<Parameter, Table, Table1> InnerJoin<Table1>(string @as)
-        {
-            this.Context.CheckTableNameIsExists(@as);
-            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.InnerJoin) { select = new SingleSelectGrammar<Parameter, Table>() { Context = this.Context } };
+            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.Join) { Context = this.Context };
         }
 
         /// <summary>
@@ -70,7 +58,19 @@ namespace Never.EasySql.Linq
         public SelectJoinGrammar<Parameter, Table, Table1> LeftJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.LeftJoin) { select = new SingleSelectGrammar<Parameter, Table>() { Context = this.Context } };
+            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.LeftJoin) { Context = this.Context };
+        }
+
+        /// <summary>
+        /// inner join
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        public SelectJoinGrammar<Parameter, Table, Table1> InnerJoin<Table1>(string @as)
+        {
+            this.Context.CheckTableNameIsExists(@as);
+            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.InnerJoin) { Context = this.Context };
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Never.EasySql.Linq
         public SelectJoinGrammar<Parameter, Table, Table1> RightJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.RightJoin) { select = new SingleSelectGrammar<Parameter, Table>() { Context = this.Context } };
+            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.RightJoin) { Context = this.Context };
         }
 
         /// <summary>

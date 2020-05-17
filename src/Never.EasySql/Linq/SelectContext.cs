@@ -53,6 +53,21 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// select join
+        /// </summary>
+        protected List<JoinInfo> selectJoin;
+
+        /// <summary>
+        /// where exists
+        /// </summary>
+        protected WhereExistsInfo whereExists;
+
+        /// <summary>
+        /// where in
+        /// </summary>
+        protected WhereInInfo whereIn;
+
+        /// <summary>
         /// 别名
         /// </summary>
         public string AsTable
@@ -203,7 +218,19 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SelectContext<Parameter, Table> OrderBy(Expression<Func<Table, object>> expression)
         {
-            return this.OrderBy<Table>(expression, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable);
+            string @as = this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable;
+            if (this.orderBies == null)
+                this.orderBies = new List<OrderByInfo>(1);
+
+            this.orderBies.Add(new OrderByInfo()
+            {
+                OrderBy = expression,
+                Placeholder = @as,
+                Type = typeof(Table),
+                Flag = "asc"
+            });
+
+            return this;
         }
 
         /// <summary>
@@ -213,18 +240,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SelectContext<Parameter, Table> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            return this.OrderByDescending<Table>(expression, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="Table2"></typeparam>
-        /// <param name="expression"></param>
-        /// <param name="as"></param>
-        /// <returns></returns>
-        internal SelectContext<Parameter, Table> OrderBy<Table2>(Expression<Func<Table2, object>> expression, string @as)
-        {
+            string @as = this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable;
             if (this.orderBies == null)
                 this.orderBies = new List<OrderByInfo>(1);
 
@@ -232,7 +248,30 @@ namespace Never.EasySql.Linq
             {
                 OrderBy = expression,
                 Placeholder = @as,
-                Type = typeof(Table2),
+                Type = typeof(Table),
+                Flag = "desc"
+            });
+
+            return this;
+        }
+
+        /// <summary>
+        /// order by
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        internal SelectContext<Parameter, Table> OrderBy<Table1>(Expression<Func<Table1, object>> expression, int index)
+        {
+            string @as = this.selectJoin[index].AsName;
+            if (this.orderBies == null)
+                this.orderBies = new List<OrderByInfo>(1);
+
+            this.orderBies.Add(new OrderByInfo()
+            {
+                OrderBy = expression,
+                Placeholder = @as,
+                Type = typeof(Table1),
                 Flag = "asc"
             });
 
@@ -240,13 +279,14 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 
+        /// order by
         /// </summary>
         /// <param name="expression"></param>
-        /// <param name="as"></param>
+        /// <param name="index"></param>
         /// <returns></returns>
-        internal SelectContext<Parameter, Table> OrderByDescending<Table2>(Expression<Func<Table2, object>> expression, string @as)
+        internal SelectContext<Parameter, Table> OrderByDescending<Table1>(Expression<Func<Table1, object>> expression, int index)
         {
+            string @as = this.selectJoin[index].AsName;
             if (this.orderBies == null)
                 this.orderBies = new List<OrderByInfo>(1);
 
@@ -254,7 +294,7 @@ namespace Never.EasySql.Linq
             {
                 OrderBy = expression,
                 Placeholder = @as,
-                Type = typeof(Table2),
+                Type = typeof(Table1),
                 Flag = "desc"
             });
 
@@ -272,11 +312,6 @@ namespace Never.EasySql.Linq
         public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression);
 
         /// <summary>
-        /// where
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> Where(AndOrOption andOrOption, string sql);
-
-        /// <summary>
         /// append
         /// </summary>
         public abstract SelectContext<Parameter, Table> Append(string sql);
@@ -286,20 +321,74 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="joins"></param>
         /// <returns></returns>
-        public abstract SelectContext<Parameter, Table> JoinOnSelect(List<JoinInfo> joins);
+        public SelectContext<Parameter, Table> JoinSelect(List<JoinInfo> joins)
+        {
+            this.selectJoin = joins;
+            return this.OnJoinSelect();
+        }
 
+        /// <summary>
+        /// join
+        /// </summary>
+        /// <returns></returns>
+        protected virtual SelectContext<Parameter, Table> OnJoinSelect()
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// where里面的exists
+        /// </summary>
+        /// <param name="whereExists"></param>
+        /// <returns></returns>
+        public abstract SelectContext<Parameter, Table> AppenInWhereExists(WhereExistsInfo whereExists);
+     
+        /// <summary>
+        /// where里面的in
+        /// </summary>
+        /// <param name="whereExists"></param>
+        /// <returns></returns>
+        public abstract SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereExists);
+        
         /// <summary>
         /// exists
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public abstract SelectContext<Parameter, Table> JoinOnWhereExists(WhereExists whereExists);
+        public SelectContext<Parameter, Table> WhereExists(WhereExistsInfo whereExists)
+        {
+            this.whereExists = whereExists;
+            return this.OnWhereExists();
+        }
+
+        /// <summary>
+        /// exists
+        /// </summary>
+        /// <returns></returns>
+        protected virtual SelectContext<Parameter, Table> OnWhereExists()
+        {
+            return this;
+        }
 
         /// <summary>
         /// in
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public abstract SelectContext<Parameter, Table> JoinOnWhereIn(WhereIn whereIn);
+        public SelectContext<Parameter, Table> WhereIn(WhereInInfo whereIn)
+        {
+            this.whereIn = whereIn;
+            return this.OnWhereIn();
+        }
+
+
+        /// <summary>
+        /// in
+        /// </summary>
+        /// <returns></returns>
+        protected virtual SelectContext<Parameter, Table> OnWhereIn()
+        {
+            return this;
+        }
     }
 }

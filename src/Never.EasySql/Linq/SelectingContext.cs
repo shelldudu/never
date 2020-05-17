@@ -52,11 +52,6 @@ namespace Never.EasySql.Linq
         /// </summary>
         protected string equalAndPrefix;
 
-        /// <summary>
-        /// select join
-        /// </summary>
-        protected List<JoinInfo> selectJoin;
-
         #endregion
 
         /// <summary>
@@ -116,7 +111,6 @@ namespace Never.EasySql.Linq
 
             }
 
-
             LinqSqlTagProvider.Set(sqlTag);
             return this.SelectMany<Parameter, Table>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
@@ -141,24 +135,12 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="joins"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> JoinOnSelect(List<JoinInfo> joins)
-        {
-            this.selectJoin = joins;
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="whereExists"></param>
-        /// <returns></returns>
-        public override SelectContext<Parameter, Table> JoinOnWhereExists(WhereExists whereExists)
+        protected override SelectContext<Parameter, Table> OnWhereExists()
         {
             var label = new TextLabel()
             {
-                SqlText = this.LoadWhereExists(this.FromTable, this.AsTable, whereExists).ToString(),
+                SqlText = this.LoadWhereExists(this.FromTable, this.AsTable, this.whereExists).ToString(),
                 TagId = NewId.GenerateNumber(),
             };
             this.labels.Add(label);
@@ -169,13 +151,12 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="whereIn"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> JoinOnWhereIn(WhereIn whereIn)
+        protected override SelectContext<Parameter, Table> OnWhereIn()
         {
             var label = new TextLabel()
             {
-                SqlText = this.LoadWhereIn(this.FromTable, this.AsTable, whereIn).ToString(),
+                SqlText = this.LoadWhereIn(this.FromTable, this.AsTable, this.whereIn).ToString(),
                 TagId = NewId.GenerateNumber(),
             };
 
@@ -261,7 +242,7 @@ namespace Never.EasySql.Linq
             {
                 var label = new TextLabel()
                 {
-                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
+                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
                     TagId = NewId.GenerateNumber(),
                 };
 
@@ -302,7 +283,7 @@ namespace Never.EasySql.Linq
             {
                 var label = new TextLabel()
                 {
-                    SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
+                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
                     TagId = NewId.GenerateNumber(),
                 };
 
@@ -331,24 +312,6 @@ namespace Never.EasySql.Linq
 
             this.labels.Add(label2);
             this.textLength += label2.SqlText.Length;
-            return this;
-        }
-
-        /// <summary>
-        /// where sql
-        /// </summary>
-        /// <param name="andOrOption"></param>
-        /// <param name="sql"></param>
-        /// <returns></returns>
-        public override SelectContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
-        {
-            var label = new TextLabel()
-            {
-                SqlText = string.Concat(andOrOption == AndOrOption.and ? "and " : "or ", sql),
-                TagId = NewId.GenerateNumber(),
-            };
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
             return this;
         }
 

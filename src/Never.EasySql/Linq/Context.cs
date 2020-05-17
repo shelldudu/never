@@ -190,7 +190,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// exists
         /// </summary>
-        public class WhereExists
+        public class WhereExistsInfo
         {
             /// <summary>
             /// 是否为not exits
@@ -231,7 +231,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// in
         /// </summary>
-        public class WhereIn
+        public class WhereInInfo
         {
             /// <summary>
             /// 是否为not in
@@ -1244,7 +1244,7 @@ namespace Never.EasySql.Linq
         /// <param name="parameterAsTableName"></param>
         /// <param name="joins"></param>
         /// <returns></returns>
-        protected StringBuilder LoadUpdateJoin(string parameterTableName, string parameterAsTableName, List<JoinInfo> joins)
+        protected StringBuilder LoadJoin(string parameterTableName, string parameterAsTableName, List<JoinInfo> joins)
         {
             var builder = new StringBuilder(joins.Count * 20);
             var pp = new[] { "" }.Concat(joins.Select(ta => ta.AsName)).ToArray();
@@ -1329,7 +1329,7 @@ namespace Never.EasySql.Linq
         /// <param name="parameterAsTableName"></param>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        protected StringBuilder LoadWhereExists(string parameterTableName, string parameterAsTableName, WhereExists whereExists)
+        protected StringBuilder LoadWhereExists(string parameterTableName, string parameterAsTableName, WhereExistsInfo whereExists)
         {
             var builder = new StringBuilder((1 + 1 + whereExists.Joins.Count) * 20);
             var pp = new[] { "", whereExists.AsName }.Concat(whereExists.Joins.Select(ta => this.FormatColumn(ta.AsName))).ToArray();
@@ -1479,7 +1479,7 @@ namespace Never.EasySql.Linq
         /// <param name="parameterAsTableName"></param>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        protected StringBuilder LoadWhereIn(string parameterTableName, string parameterAsTableName, WhereIn whereIn)
+        protected StringBuilder LoadWhereIn(string parameterTableName, string parameterAsTableName, WhereInInfo whereIn)
         {
             var builder = new StringBuilder((1 + 1 + whereIn.Joins.Count) * 20);
             var pp = new[] { "", whereIn.AsName }.Concat(whereIn.Joins.Select(ta => ta.AsName)).ToArray();

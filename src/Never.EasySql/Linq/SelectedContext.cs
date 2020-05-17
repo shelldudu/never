@@ -52,12 +52,12 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override SelectContext<Parameter, Table> JoinOnWhereExists(WhereExists whereExists)
+        public override SelectContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
             return this;
         }
 
-        public override SelectContext<Parameter, Table> JoinOnWhereIn(WhereIn whereIn)
+        public override SelectContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn)
         {
             return this;
         }
@@ -93,11 +93,6 @@ namespace Never.EasySql.Linq
         }
 
         public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
         {
             return this;
         }

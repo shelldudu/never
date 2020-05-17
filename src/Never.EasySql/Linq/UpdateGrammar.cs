@@ -597,7 +597,7 @@ namespace Never.EasySql.Linq
     {
         internal UpdateWhereGrammar<Parameter> where { get; set; }
         private readonly string @as;
-        private readonly Context.WhereExists exists;
+        private readonly Context.WhereExistsInfo exists;
         /// <summary>
         /// 
         /// </summary>
@@ -607,7 +607,7 @@ namespace Never.EasySql.Linq
         public UpdateWhereExistsGrammar(string @as, AndOrOption option, char flag) : this()
         {
             this.@as = @as;
-            this.exists = new Context.WhereExists()
+            this.exists = new Context.WhereExistsInfo()
             {
                 AsName = @as,
                 AndOrOption = option,
@@ -735,14 +735,14 @@ namespace Never.EasySql.Linq
     {
         internal UpdateWhereGrammar<Parameter> where { get; set; }
         private readonly List<string> @as;
-        private readonly Context.WhereExists exists;
+        private readonly Context.WhereExistsInfo exists;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="as"></param>
         /// <param name="joinOption"></param>
         /// <param name="exists"></param>
-        public UpdateWhereExistsGrammar(List<string> @as, JoinOption joinOption, Context.WhereExists exists) : this()
+        public UpdateWhereExistsGrammar(List<string> @as, JoinOption joinOption, Context.WhereExistsInfo exists) : this()
         {
             this.@as = @as;
             this.exists = exists;
@@ -893,14 +893,14 @@ namespace Never.EasySql.Linq
     {
         internal UpdateWhereGrammar<Parameter> where { get; set; }
         private readonly List<string> @as;
-        private readonly Context.WhereExists exists;
+        private readonly Context.WhereExistsInfo exists;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="as"></param>
         /// <param name="exists"></param>
         /// <param name="joinOption"></param>
-        public UpdateWhereExistsGrammar(List<string> @as, JoinOption joinOption, Context.WhereExists exists) : this()
+        public UpdateWhereExistsGrammar(List<string> @as, JoinOption joinOption, Context.WhereExistsInfo exists) : this()
         {
             this.@as = @as;
             this.exists = exists;
@@ -1052,14 +1052,14 @@ namespace Never.EasySql.Linq
     {
         internal UpdateWhereGrammar<Parameter> where { get; set; }
         private readonly List<string> @as;
-        private readonly Context.WhereExists exists;
+        private readonly Context.WhereExistsInfo exists;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="as"></param>
         /// <param name="exists"></param>
         /// <param name="joinOption"></param>
-        public UpdateWhereExistsGrammar(List<string> @as, JoinOption joinOption, Context.WhereExists exists) : this()
+        public UpdateWhereExistsGrammar(List<string> @as, JoinOption joinOption, Context.WhereExistsInfo exists) : this()
         {
             this.@as = @as;
             this.exists = exists;
@@ -1121,7 +1121,7 @@ namespace Never.EasySql.Linq
     {
         internal UpdateWhereGrammar<Parameter> where { get; set; }
         private readonly string @as;
-        private readonly Context.WhereIn @in;
+        private readonly Context.WhereInInfo @in;
 
         /// <summary>
         /// 
@@ -1132,7 +1132,7 @@ namespace Never.EasySql.Linq
         public UpdateWhereInGrammar(string @as, AndOrOption option, char flag) : this()
         {
             this.@as = @as;
-            this.@in = new Context.WhereIn()
+            this.@in = new Context.WhereInInfo()
             {
                 AsName = @as,
                 AndOrOption = option,
@@ -1248,14 +1248,14 @@ namespace Never.EasySql.Linq
     {
         internal UpdateWhereGrammar<Parameter> where { get; set; }
         private readonly List<string> @as;
-        private readonly Context.WhereIn @in;
+        private readonly Context.WhereInInfo @in;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="as"></param>
         /// <param name="joinOption"></param>
         /// <param name="in"></param>
-        public UpdateWhereInGrammar(List<string> @as, JoinOption joinOption, Context.WhereIn @in) : this()
+        public UpdateWhereInGrammar(List<string> @as, JoinOption joinOption, Context.WhereInInfo @in) : this()
         {
             this.@as = @as;
             this.@in = @in;
@@ -1391,14 +1391,14 @@ namespace Never.EasySql.Linq
     {
         internal UpdateWhereGrammar<Parameter> where { get; set; }
         private readonly List<string> @as;
-        private readonly Context.WhereIn @in;
+        private readonly Context.WhereInInfo @in;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="as"></param>
         /// <param name="joinOption"></param>
         /// <param name="in"></param>
-        public UpdateWhereInGrammar(List<string> @as, JoinOption joinOption, Context.WhereIn @in) : this()
+        public UpdateWhereInGrammar(List<string> @as, JoinOption joinOption, Context.WhereInInfo @in) : this()
         {
             this.@as = @as;
             this.@in = @in;
@@ -1535,14 +1535,14 @@ namespace Never.EasySql.Linq
     {
         internal UpdateWhereGrammar<Parameter> where { get; set; }
         private readonly List<string> @as;
-        private readonly Context.WhereIn @in;
+        private readonly Context.WhereInInfo @in;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="as"></param>
         /// <param name="joinOption"></param>
         /// <param name="in"></param>
-        public UpdateWhereInGrammar(List<string> @as, JoinOption joinOption, Context.WhereIn @in) : this()
+        public UpdateWhereInGrammar(List<string> @as, JoinOption joinOption, Context.WhereInInfo @in) : this()
         {
             this.@as = @as;
             this.@in = @in;

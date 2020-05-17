@@ -266,7 +266,7 @@ namespace Never.EasySql.Linq
             this.updateJoin = joins;
             var label = new TextLabel()
             {
-                SqlText = this.LoadUpdateJoin(this.FromTable, this.AsTable, joins).ToString(),
+                SqlText = this.LoadJoin(this.FromTable, this.AsTable, joins).ToString(),
                 TagId = NewId.GenerateNumber(),
             };
 
@@ -280,7 +280,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public override UpdateContext<Parameter> JoinOnWhereExists(WhereExists whereExists)
+        public override UpdateContext<Parameter> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
             var label = new TextLabel()
             {
@@ -297,7 +297,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public override UpdateContext<Parameter> JoinOnWhereIn(WhereIn whereIn)
+        public override UpdateContext<Parameter> JoinOnWhereIn(WhereInInfo whereIn)
         {
             var label = new TextLabel()
             {
