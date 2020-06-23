@@ -104,18 +104,25 @@ namespace Never.Test
         #endregion ctor
 
         private static void Main(string[] args)
-         {
-            new SelectTest().TestId_1();
-            //var p = new Program();
-            //p.Release();
+        {
+            var lines = System.IO.File.ReadAllLines("d:\\a.txt");
+            var list = new List<string>(30);
+            var reader = new Never.Serialization.Json.SequenceStringReader("a");
+            foreach (var line in lines)
+            {
+                if (line.IsNullOrEmpty())
+                    continue;
 
-            //var pro = new TypeProcessor();
-            // pro.Processing(null, typeof(ABC));
-            // var a = TypeProcessor.TryGetAttribute(typeof(ABC), out var attribute);
-            // var b = TypeProcessor.TryGetActivator(typeof(ABC), out var validator);
+                for (var k = 0; k < line.Length; k++) {
+                    if (reader.IsWhiteSpaceChangeLine(line[k])) {
+                        list.Add(line.Sub(0, k));
+                        break;
+                    }
+                }
+            }
         }
 
-        private static void ChangeBuilder(System.Text.StringBuilder builder) 
+        private static void ChangeBuilder(System.Text.StringBuilder builder)
         {
             builder = new System.Text.StringBuilder("bbb");
         }

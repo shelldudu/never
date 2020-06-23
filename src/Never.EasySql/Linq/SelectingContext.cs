@@ -52,6 +52,15 @@ namespace Never.EasySql.Linq
         /// </summary>
         protected string equalAndPrefix;
 
+        /// <summary>
+        /// where的调用方法第一次
+        /// </summary>
+        private bool onWhereInited;
+
+        /// <summary>
+        /// where的条数
+        /// </summary>
+        private int whereCount = 0;
         #endregion
 
         /// <summary>
@@ -72,6 +81,19 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override Table GetResult()
         {
+            if (this.orderBies.IsNotNullOrEmpty())
+            {
+                var label = new TextLabel()
+                {
+                    SqlText = this.LoadOrderBy(this.orderBies).ToString(),
+                    TagId = NewId.GenerateNumber(),
+                };
+
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
+
             var sqlTag = new LinqSqlTag(this.cacheId, "select")
             {
                 Labels = this.labels.AsEnumerable(),
@@ -85,31 +107,31 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 获取数据
         /// </summary>
-        /// <param name="paged"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
         /// <returns></returns>
-        public override IEnumerable<Table> GetResults(PagedSearch paged)
+        public override IEnumerable<Table> GetResults(int startIndex, int endIndex)
         {
+            if (this.orderBies.IsNotNullOrEmpty())
+            {
+                var label = new TextLabel()
+                {
+                    SqlText = this.LoadOrderBy(this.orderBies).ToString(),
+                    TagId = NewId.GenerateNumber(),
+                };
+
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
             var sqlTag = new LinqSqlTag(this.cacheId, "select")
             {
                 Labels = this.labels.AsEnumerable(),
                 TextLength = this.textLength,
             };
 
-            if ((this.sqlParameter.Object is PagedSearch) == false)
-            {
-                if (paged == null)
-                    paged = new PagedSearch();
-
-                this.templateParameter["PageNow"] = paged.PageNow;
-                this.templateParameter["PageSize"] = paged.PageSize;
-                this.templateParameter["StartIndex"] = paged.StartIndex;
-                this.templateParameter["EndIndex"] = paged.EndIndex;
-                if (paged.BeginTime.HasValue)
-                    this.templateParameter["BeginTime"] = paged.BeginTime.Value;
-                if (paged.EndTime.HasValue)
-                    this.templateParameter["EndTime"] = paged.EndTime.Value;
-
-            }
+            this.templateParameter["StartIndex"] = startIndex;
+            this.templateParameter["EndIndex"] = endIndex;
 
             LinqSqlTagProvider.Set(sqlTag);
             return this.SelectMany<Parameter, Table>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
@@ -212,6 +234,11 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override SelectContext<Parameter, Table> StartSelectColumn()
         {
+            if (this.FromTable.IsNullOrEmpty())
+            {
+                this.From(this.FindTableName(this.tableInfo, typeof(Table)));
+            }
+
             this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
@@ -238,25 +265,61 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override SelectContext<Parameter, Table> Where()
         {
-            if (this.selectJoin.IsNotNullOrEmpty())
+            if (this.onWhereInited == false)
             {
-                var label = new TextLabel()
-                {
-                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
-                    TagId = NewId.GenerateNumber(),
-                };
-
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
+                this.onWhereInited = true;
+                this.OnWhereInit();
             }
 
-            var label2 = new TextLabel()
+            if (whereCount == 0)
             {
-                SqlText = "where 1 = 1 \r",
-                TagId = NewId.GenerateNumber(),
-            };
-            this.labels.Add(label2);
-            this.textLength += label2.SqlText.Length;
+                whereCount++;
+                if (this.AsTable.IsNotNullOrEmpty())
+                {
+                    var label = new TextLabel()
+                    {
+                        SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
+                        TagId = NewId.GenerateNumber(),
+                    };
+
+                    this.labels.Add(label);
+                    this.textLength += label.SqlText.Length;
+                }
+
+                else
+                {
+                    var label = new TextLabel()
+                    {
+                        SqlText = string.Concat("from ", this.FromTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
+                        TagId = NewId.GenerateNumber(),
+                    };
+
+                    this.labels.Add(label);
+                    this.textLength += label.SqlText.Length;
+                }
+
+
+                if (this.selectJoin.IsNotNullOrEmpty())
+                {
+                    var label = new TextLabel()
+                    {
+                        SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
+                        TagId = NewId.GenerateNumber(),
+                    };
+
+                    this.labels.Add(label);
+                    this.textLength += label.SqlText.Length;
+                }
+
+                var label2 = new TextLabel()
+                {
+                    SqlText = "where 1 = 1 \r",
+                    TagId = NewId.GenerateNumber(),
+                };
+                this.labels.Add(label2);
+                this.textLength += label2.SqlText.Length;
+            }
+
             return this;
         }
 
@@ -265,54 +328,86 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression)
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, object>> expression)
         {
-            if (this.AsTable.IsNotNullOrEmpty())
+            if (this.onWhereInited == false)
             {
-                var label = new TextLabel()
-                {
-                    SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
-                    TagId = NewId.GenerateNumber(),
-                };
-
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
+                this.onWhereInited = true;
+                this.OnWhereInit();
             }
 
-            if (this.selectJoin.IsNotNullOrEmpty())
-            {
-                var label = new TextLabel()
-                {
-                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
-                    TagId = NewId.GenerateNumber(),
-                };
-
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
-            }
-
-            string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
-            var label2 = new TextLabel()
+            var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat("where ", this.asTableNamePoint, this.FormatColumn(columnName), this.equalAndPrefix, columnName, "\r"),
             };
 
-            label2.Add(new SqlTagParameterPosition()
+            if (whereCount == 0)
             {
-                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                Name = columnName,
-                OccupanLength = this.formatColumnAppendCount + columnName.Length,
-                PrefixStartIndex = 6 + this.asTableNamePoint.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
-                ParameterStartIndex = 6 + this.asTableNamePoint.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
-                ParameterStopIndex = 6 + this.asTableNamePoint.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
-                TextParameter = false,
-            });
+                whereCount++;
+                label.SqlText = string.Concat("where ");
 
-            this.labels.Add(label2);
-            this.textLength += label2.SqlText.Length;
+                if (this.AsTable.IsNotNullOrEmpty())
+                {
+                    var label2 = new TextLabel()
+                    {
+                        SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
+                        TagId = NewId.GenerateNumber(),
+                    };
+
+                    this.labels.Add(label2);
+                    this.textLength += label.SqlText.Length;
+                }
+                else
+                {
+                    var label2 = new TextLabel()
+                    {
+                        SqlText = string.Concat("from ", this.FromTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
+                        TagId = NewId.GenerateNumber(),
+                    };
+
+                    this.labels.Add(label2);
+                    this.textLength += label.SqlText.Length;
+                }
+
+                if (this.selectJoin.IsNotNullOrEmpty())
+                {
+                    var label2 = new TextLabel()
+                    {
+                        SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
+                        TagId = NewId.GenerateNumber(),
+                    };
+
+                    this.labels.Add(label2);
+                    this.textLength += label.SqlText.Length;
+                }
+            }
+            else
+            {
+                label.SqlText = string.Concat("and ");
+            }
+
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            int s = this.labels.Count;
+            if (base.AnalyzeWhereObjectExpression(expression, this.labels)) 
+            {
+                int e = this.labels.Count;
+                for (var i = s; i < e; i++)
+                {
+                    this.textLength += this.labels[i].SqlText.Length;
+                }
+            }
+
+
             return this;
+        }
+
+        /// <summary>
+        /// on where init
+        /// </summary>
+        protected virtual void OnWhereInit()
+        {
+
         }
 
         /// <summary>
@@ -348,6 +443,66 @@ namespace Never.EasySql.Linq
                 SqlText = sql,
                 TagId = NewId.GenerateNumber(),
             };
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> Last(string sql)
+        {
+            if (sql.IsNullOrEmpty())
+                return this;
+
+            if (this.lastLabels == null)
+            {
+                this.lastLabels = new List<ILabel>(1);
+            }
+
+            var label = new TextLabel()
+            {
+                SqlText = sql,
+                TagId = NewId.GenerateNumber(),
+            };
+            this.lastLabels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExists"></param>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> AppenInWhereExists(WhereExistsInfo whereExists)
+        {
+            var label = new TextLabel()
+            {
+                SqlText = this.LoadWhereExists(this.FromTable, this.AsTable, whereExists).ToString(),
+                TagId = NewId.GenerateNumber(),
+            };
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereIn"></param>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereIn)
+        {
+            var label = new TextLabel()
+            {
+                SqlText = this.LoadWhereIn(this.FromTable, this.AsTable, whereIn).ToString(),
+                TagId = NewId.GenerateNumber(),
+            };
+
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;

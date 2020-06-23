@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 更新操作
     /// </summary>
-    public sealed class UpdatingContext<Parameter> : Linq.UpdatingContext<Parameter>
+    public sealed class UpdatingContext<Parameter, Table> : Linq.UpdatingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor
@@ -28,7 +28,7 @@ namespace Never.EasySql.Linq.MySql
         /// <summary>
         /// 入口
         /// </summary>
-        public override UpdateContext<Parameter> StartSetColumn()
+        public override UpdateContext<Parameter, Table> StartSetColumn()
         {
             this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");

@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.SqlServer
     /// <summary>
     /// 更新操作
     /// </summary>
-    public sealed class UpdatingContext<Parameter> : Linq.UpdatingContext<Parameter>
+    public sealed class UpdatingContext<Parameter, Table> : Linq.UpdatingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor
@@ -28,7 +28,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// <summary>
         /// 入口
         /// </summary>
-        public override UpdateContext<Parameter> StartSetColumn()
+        public override UpdateContext<Parameter, Table> StartSetColumn()
         {
             this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");
@@ -45,7 +45,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// <summary>
         /// where 条件
         /// </summary>
-        public override UpdateContext<Parameter> Where()
+        public override UpdateContext<Parameter, Table> Where()
         {
             if (this.updateJoin.IsNotNullOrEmpty())
             {
@@ -65,7 +65,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// <summary>
         /// where 条件
         /// </summary>
-        public override UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
+        public override UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, object>> expression)
         {
             if (this.AsTable.IsNotNullOrEmpty())
             {

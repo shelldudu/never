@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.Postgre
     /// <summary>
     /// 插入操作
     /// </summary>
-    public sealed class InsertingContext<Parameter> : Linq.InsertingContext<Parameter>
+    public sealed class InsertingContext<Parameter, Table> : Linq.InsertingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor

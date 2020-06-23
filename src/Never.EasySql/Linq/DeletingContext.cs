@@ -13,7 +13,8 @@ namespace Never.EasySql.Linq
     /// 删除操作
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
-    public class DeletingContext<Parameter> : DeleteContext<Parameter>
+    /// <typeparam name="Table"></typeparam>
+    public class DeletingContext<Parameter, Table> : DeleteContext<Parameter, Table>
     {
         /// <summary>
         /// 缓存Id
@@ -66,7 +67,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 表名
         /// </summary>
-        public override Linq.DeleteContext<Parameter> From(string table)
+        public override Linq.DeleteContext<Parameter, Table> From(string table)
         {
             this.tableName = table;
             return this;
@@ -75,7 +76,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 别名
         /// </summary>
-        public override Linq.DeleteContext<Parameter> AsTable(string table)
+        public override Linq.DeleteContext<Parameter, Table> AsTable(string table)
         {
             this.asTableName = table;
             return this;
@@ -99,7 +100,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public override Linq.DeleteContext<Parameter> Entrance()
+        public override Linq.DeleteContext<Parameter, Table> Entrance()
         {
             this.tableName = this.tableName.IsNullOrEmpty() ? this.FindTableName<Parameter>(tableInfo) : this.tableName;
             int length = this.tableName.Length;
@@ -130,7 +131,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public override Linq.DeleteContext<Parameter> Where()
+        public override Linq.DeleteContext<Parameter, Table> Where()
         {
             var label = new TextLabel()
             {
@@ -145,7 +146,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public override Linq.DeleteContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
+        public override Linq.DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
             var label = new TextLabel()
@@ -174,7 +175,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// in
         /// </summary>
-        public override DeleteContext<Parameter> In(AndOrOption option, string expression)
+        public override DeleteContext<Parameter, Table> In(AndOrOption option, string expression)
         {
             var label = new TextLabel()
             {
@@ -189,7 +190,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// int
         /// </summary>
-        public override DeleteContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override DeleteContext<Parameter, Table> In<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where)
         {
             return this;
         }
@@ -197,7 +198,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// not in
         /// </summary>
-        public override DeleteContext<Parameter> NotIn(AndOrOption option, string expression)
+        public override DeleteContext<Parameter, Table> NotIn(AndOrOption option, string expression)
         {
             var label = new TextLabel()
             {
@@ -212,7 +213,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// not in
         /// </summary>
-        public override DeleteContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override DeleteContext<Parameter, Table> NotIn<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where)
         {
             return this;
         }
@@ -220,7 +221,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// exists
         /// </summary>
-        public override DeleteContext<Parameter> Exists(AndOrOption option, string expression)
+        public override DeleteContext<Parameter, Table> Exists(AndOrOption option, string expression)
         {
             var label = new TextLabel()
             {
@@ -235,7 +236,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// exists
         /// </summary>
-        public override DeleteContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override DeleteContext<Parameter, Table> Exists<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where)
         {
             return this;
         }
@@ -243,7 +244,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// not exists
         /// </summary>
-        public override DeleteContext<Parameter> NotExists(AndOrOption option, string expression)
+        public override DeleteContext<Parameter, Table> NotExists(AndOrOption option, string expression)
         {
             var label = new TextLabel()
             {
@@ -258,7 +259,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// not exists
         /// </summary>
-        public override DeleteContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override DeleteContext<Parameter, Table> NotExists<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where)
         {
             return this;
         }

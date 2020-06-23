@@ -134,8 +134,9 @@ namespace Never.EasySql
         /// <summary>
         /// 更新
         /// </summary>
+        /// <typeparam name="Table">对象</typeparam>
         /// <returns></returns>
-        public Update<Parameter> Update()
+        public Update<Parameter, Table> Update<Table>()
         {
             if (tag == null && this.cacheId.IsNotNullOrEmpty())
                 LinqSqlTagProvider.Get(this.cacheId, out tag);
@@ -145,88 +146,89 @@ namespace Never.EasySql
                 if (tag.Owner.Equals("update") == false)
                     throw new Exception(string.Format("the cachedid {0} owner is {1}", this.cacheId, tag.Owner));
 
-                return new Update<Parameter>()
+                return new Update<Parameter, Table>()
                 {
-                    Context = new UpdatedContext<Parameter>(tag, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new UpdatedContext<Parameter, Table>(tag, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is MySqlExecuter)
             {
-                return new Update<Parameter>()
+                return new Update<Parameter, Table>()
                 {
-                    Context = new Linq.MySql.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.MySql.UpdatingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OdbcServerExecuter)
             {
-                return new Update<Parameter>()
+                return new Update<Parameter, Table>()
                 {
-                    Context = new Linq.Odbc.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Odbc.UpdatingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OleDbServerExecuter)
             {
-                return new Update<Parameter>()
+                return new Update<Parameter, Table>()
                 {
-                    Context = new Linq.OleDb.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.OleDb.UpdatingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OracleServerExecuter)
             {
-                return new Update<Parameter>()
+                return new Update<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.UpdatingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
 
             if (this.SqlExecuter is OracleServerExecuter)
             {
-                return new Update<Parameter>()
+                return new Update<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.UpdatingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is PostgreSqlExecuter)
             {
-                return new Update<Parameter>()
+                return new Update<Parameter, Table>()
                 {
-                    Context = new Linq.Postgre.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Postgre.UpdatingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is SqliteExecuter)
             {
-                return new Update<Parameter>()
+                return new Update<Parameter, Table>()
                 {
-                    Context = new Linq.Sqlite.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Sqlite.UpdatingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is SqlServerExecuter)
             {
-                return new Update<Parameter>()
+                return new Update<Parameter, Table>()
                 {
-                    Context = new Linq.SqlServer.UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.SqlServer.UpdatingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
-            return new Update<Parameter>()
+            return new Update<Parameter, Table>()
             {
-                Context = new UpdatingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                Context = new UpdatingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
             };
         }
 
         /// <summary>
         /// 删除
         /// </summary>
+        /// <typeparam name="Table">对象</typeparam>
         /// <returns></returns>
-        public Delete<Parameter> Delete()
+        public Delete<Parameter, Table> Delete<Table>()
         {
             if (tag == null && this.cacheId.IsNotNullOrEmpty())
                 LinqSqlTagProvider.Get(this.cacheId, out tag);
@@ -236,88 +238,89 @@ namespace Never.EasySql
                 if (tag.Owner.Equals("delete") == false)
                     throw new Exception(string.Format("the cachedid {0} owner is {1}", this.cacheId, tag.Owner));
 
-                return new Delete<Parameter>()
+                return new Delete<Parameter, Table>()
                 {
-                    Context = new DeletedContext<Parameter>(tag, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new DeletedContext<Parameter, Table>(tag, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is MySqlExecuter)
             {
-                return new Delete<Parameter>()
+                return new Delete<Parameter, Table>()
                 {
-                    Context = new Linq.MySql.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.MySql.DeletingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OdbcServerExecuter)
             {
-                return new Delete<Parameter>()
+                return new Delete<Parameter, Table>()
                 {
-                    Context = new Linq.Odbc.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Odbc.DeletingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OleDbServerExecuter)
             {
-                return new Delete<Parameter>()
+                return new Delete<Parameter, Table>()
                 {
-                    Context = new Linq.OleDb.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.OleDb.DeletingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OracleServerExecuter)
             {
-                return new Delete<Parameter>()
+                return new Delete<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.DeletingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
 
             if (this.SqlExecuter is OracleServerExecuter)
             {
-                return new Delete<Parameter>()
+                return new Delete<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.DeletingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is PostgreSqlExecuter)
             {
-                return new Delete<Parameter>()
+                return new Delete<Parameter, Table>()
                 {
-                    Context = new Linq.Postgre.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Postgre.DeletingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is SqliteExecuter)
             {
-                return new Delete<Parameter>()
+                return new Delete<Parameter, Table>()
                 {
-                    Context = new Linq.Sqlite.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Sqlite.DeletingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is SqlServerExecuter)
             {
-                return new Delete<Parameter>()
+                return new Delete<Parameter, Table>()
                 {
-                    Context = new Linq.SqlServer.DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.SqlServer.DeletingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
-            return new Delete<Parameter>()
+            return new Delete<Parameter, Table>()
             {
-                Context = new DeletingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                Context = new DeletingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
             };
         }
 
         /// <summary>
         /// 插入
         /// </summary>
+        /// <typeparam name="Table">对象</typeparam>
         /// <returns></returns>
-        public Insert<Parameter> Insert()
+        public Insert<Parameter, Table> Insert<Table>()
         {
             if (tag == null && this.cacheId.IsNotNullOrEmpty())
                 LinqSqlTagProvider.Get(this.cacheId, out tag);
@@ -327,79 +330,79 @@ namespace Never.EasySql
                 if (tag.Owner.Equals("insert") == false)
                     throw new Exception(string.Format("the cachedid {0} owner is {1}", this.cacheId, tag.Owner));
 
-                return new Insert<Parameter>()
+                return new Insert<Parameter, Table>()
                 {
-                    Context = new InsertedContext<Parameter>(tag, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new InsertedContext<Parameter, Table>(tag, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is MySqlExecuter)
             {
-                return new Insert<Parameter>()
+                return new Insert<Parameter, Table>()
                 {
-                    Context = new Linq.MySql.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.MySql.InsertingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OdbcServerExecuter)
             {
-                return new Insert<Parameter>()
+                return new Insert<Parameter, Table>()
                 {
-                    Context = new Linq.Odbc.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Odbc.InsertingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OleDbServerExecuter)
             {
-                return new Insert<Parameter>()
+                return new Insert<Parameter, Table>()
                 {
-                    Context = new Linq.OleDb.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.OleDb.InsertingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OracleServerExecuter)
             {
-                return new Insert<Parameter>()
+                return new Insert<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.InsertingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is OracleServerExecuter)
             {
-                return new Insert<Parameter>()
+                return new Insert<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.InsertingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is PostgreSqlExecuter)
             {
-                return new Insert<Parameter>()
+                return new Insert<Parameter, Table>()
                 {
-                    Context = new Linq.Postgre.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Postgre.InsertingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is SqliteExecuter)
             {
-                return new Insert<Parameter>()
+                return new Insert<Parameter, Table>()
                 {
-                    Context = new Linq.Sqlite.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Sqlite.InsertingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             if (this.SqlExecuter is SqlServerExecuter)
             {
-                return new Insert<Parameter>()
+                return new Insert<Parameter, Table>()
                 {
-                    Context = new Linq.SqlServer.InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.SqlServer.InsertingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
-            return new Insert<Parameter>()
+            return new Insert<Parameter, Table>()
             {
-                Context = new InsertingContext<Parameter>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                Context = new InsertingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
             };
         }
 
@@ -428,7 +431,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.MySql.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.MySql.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
@@ -436,7 +439,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Odbc.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Odbc.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
@@ -444,7 +447,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.OleDb.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.OleDb.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
@@ -452,7 +455,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
@@ -461,7 +464,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Oracle.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Oracle.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
@@ -469,7 +472,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Postgre.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Postgre.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
@@ -477,7 +480,7 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.Sqlite.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.Sqlite.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
@@ -485,13 +488,13 @@ namespace Never.EasySql
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.SqlServer.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                    Context = new Linq.SqlServer.SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
                 };
             }
 
             return new Select<Parameter, Table>()
             {
-                Context = new SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Parameter>(), this.parameter)
+                Context = new SelectingContext<Parameter, Table>(this.cacheId, this, Linq.Context.FindTableInfo<Table>(), this.parameter)
             };
         }
 

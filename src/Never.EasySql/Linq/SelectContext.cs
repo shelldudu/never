@@ -35,6 +35,11 @@ namespace Never.EasySql.Linq
         protected readonly List<ILabel> labels;
 
         /// <summary>
+        /// last labes;
+        /// </summary>
+        protected List<ILabel> lastLabels;
+
+        /// <summary>
         /// 临时参数
         /// </summary>
         protected readonly Dictionary<string, object> templateParameter;
@@ -209,7 +214,7 @@ namespace Never.EasySql.Linq
         /// 获取数组结果
         /// </summary>
         /// <returns></returns>
-        public abstract IEnumerable<Table> GetResults(PagedSearch paged);
+        public abstract IEnumerable<Table> GetResults(int startIndex, int endIndex);
 
         /// <summary>
         /// order by
@@ -309,12 +314,17 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression);
+        public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, object>> expression);
 
         /// <summary>
         /// append
         /// </summary>
         public abstract SelectContext<Parameter, Table> Append(string sql);
+
+        /// <summary>
+        /// last
+        /// </summary>
+        public abstract SelectContext<Parameter, Table> Last(string sql);
 
         /// <summary>
         /// join
@@ -342,14 +352,14 @@ namespace Never.EasySql.Linq
         /// <param name="whereExists"></param>
         /// <returns></returns>
         public abstract SelectContext<Parameter, Table> AppenInWhereExists(WhereExistsInfo whereExists);
-     
+
         /// <summary>
         /// where里面的in
         /// </summary>
-        /// <param name="whereExists"></param>
+        /// <param name="whereIn"></param>
         /// <returns></returns>
-        public abstract SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereExists);
-        
+        public abstract SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereIn);
+
         /// <summary>
         /// exists
         /// </summary>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    internal sealed class DeletedContext<Parameter> : DeleteContext<Parameter>
+    internal sealed class DeletedContext<Parameter, Table> : DeleteContext<Parameter,Table>
     {
         private readonly LinqSqlTag sqlTag;
 
@@ -16,27 +16,27 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override Linq.DeleteContext<Parameter> AsTable(string table)
+        public override Linq.DeleteContext<Parameter, Table> AsTable(string table)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> Entrance()
+        public override Linq.DeleteContext<Parameter, Table> Entrance()
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> Exists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override Linq.DeleteContext<Parameter, Table> Exists<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> Exists(AndOrOption option, string expression)
+        public override Linq.DeleteContext<Parameter, Table> Exists(AndOrOption option, string expression)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> From(string table)
+        public override Linq.DeleteContext<Parameter, Table> From(string table)
         {
             return this;
         }
@@ -46,42 +46,42 @@ namespace Never.EasySql.Linq
             return this.Execute(this.sqlTag, this.dao, this.sqlParameter);
         }
 
-        public override Linq.DeleteContext<Parameter> In<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override Linq.DeleteContext<Parameter, Table> In<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> In(AndOrOption option, string expression)
+        public override Linq.DeleteContext<Parameter, Table> In(AndOrOption option, string expression)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> NotExists<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override Linq.DeleteContext<Parameter, Table> NotExists<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> NotExists(AndOrOption option, string expression)
+        public override Linq.DeleteContext<Parameter, Table> NotExists(AndOrOption option, string expression)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> NotIn<Table>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table, bool>> where)
+        public override Linq.DeleteContext<Parameter, Table> NotIn<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> NotIn(AndOrOption option, string expression)
+        public override Linq.DeleteContext<Parameter, Table> NotIn(AndOrOption option, string expression)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> Where()
+        public override Linq.DeleteContext<Parameter, Table> Where()
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
+        public override Linq.DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression)
         {
             return this;
         }

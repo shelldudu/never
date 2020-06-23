@@ -667,6 +667,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public SelectWhereGrammar Where()
         {
+            this.Context.Where();
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -678,6 +679,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         public SelectWhereGrammar Where(Expression<Func<Parameter, Table, object>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -2156,30 +2158,40 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// and 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar AndAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar AndAppend(string sql)
             {
-                this.Context.Append(string.Concat("and ", expression));
+                this.Context.Append(string.Concat("and ", sql));
                 return this;
             }
 
             /// <summary>
             /// or 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar OrAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar OrAppend(string sql)
             {
-                this.Context.Append(string.Concat("or ", expression));
+                this.Context.Append(string.Concat("or ", sql));
                 return this;
             }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar Append(string expression)
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Append(string sql)
             {
-                this.Context.Append(expression);
+                this.Context.Append(sql);
+                return this;
+            }
+
+            /// <summary>
+            /// sql
+            /// </summary>
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Last(string sql)
+            {
+                this.Context.Last(sql);
                 return this;
             }
 
@@ -3532,30 +3544,40 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// and 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar AndAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar AndAppend(string sql)
             {
-                this.Context.Append(string.Concat("and ", expression));
+                this.Context.Append(string.Concat("and ", sql));
                 return this;
             }
 
             /// <summary>
             /// or 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar OrAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar OrAppend(string sql)
             {
-                this.Context.Append(string.Concat("or ", expression));
+                this.Context.Append(string.Concat("or ", sql));
                 return this;
             }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar Append(string expression)
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Append(string sql)
             {
-                this.Context.Append(expression);
+                this.Context.Append(sql);
+                return this;
+            }
+
+            /// <summary>
+            /// sql
+            /// </summary>
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Last(string sql)
+            {
+                this.Context.Last(sql);
                 return this;
             }
 
@@ -4962,20 +4984,30 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// or 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar OrAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar OrAppend(string sql)
             {
-                this.Context.Append(string.Concat("or ", expression));
+                this.Context.Append(string.Concat("or ", sql));
                 return this;
             }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar Append(string expression)
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Append(string sql)
             {
-                this.Context.Append(expression);
+                this.Context.Append(sql);
+                return this;
+            }
+
+            /// <summary>
+            /// sql
+            /// </summary>
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Last(string sql)
+            {
+                this.Context.Last(sql);
                 return this;
             }
 
@@ -6395,30 +6427,41 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// and 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar AndAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar AndAppend(string sql)
             {
-                this.Context.Append(string.Concat("and ", expression));
+                this.Context.Append(string.Concat("and ", sql));
                 return this;
             }
 
             /// <summary>
             /// or 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar OrAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar OrAppend(string sql)
             {
-                this.Context.Append(string.Concat("or ", expression));
+                this.Context.Append(string.Concat("or ", sql));
                 return this;
             }
 
             /// <summary>
-            /// 存在
+            /// sql
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar Append(string expression)
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Append(string sql)
             {
-                this.Context.Append(expression);
+                this.Context.Append(sql);
+                return this;
+            }
+
+
+            /// <summary>
+            /// sql
+            /// </summary>
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Last(string sql)
+            {
+                this.Context.Last(sql);
                 return this;
             }
 
@@ -7542,9 +7585,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 返回执行结果
         /// </summary>
-        public IEnumerable<Table> GetResult(PagedSearch paged)
+        public IEnumerable<Table> GetResult(int startIndex, int endIndex)
         {
-            return this.Context.GetResults(paged);
+            return this.Context.GetResults(startIndex, endIndex);
         }
 
         #endregion
@@ -7681,22 +7724,34 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// and 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar AndAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar AndAppend(string sql)
             {
-                this.Context.Append(string.Concat("and ", expression));
+                this.Context.Append(string.Concat("and ", sql));
                 return this;
             }
 
             /// <summary>
             /// or 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar OrAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar OrAppend(string sql)
             {
-                this.Context.Append(string.Concat("or ", expression));
+                this.Context.Append(string.Concat("or ", sql));
                 return this;
             }
+
+
+            /// <summary>
+            /// sql
+            /// </summary>
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Last(string sql)
+            {
+                this.Context.Last(sql);
+                return this;
+            }
+
 
             /// <summary>
             /// 存在
@@ -7711,9 +7766,9 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 获取结果
             /// </summary>
-            public IEnumerable<Table> GetResult(PagedSearch paged)
+            public IEnumerable<Table> GetResult(int startIndex, int endIndex)
             {
-                return this.Context.GetResults(paged);
+                return this.Context.GetResults(startIndex, endIndex);
             }
         }
 
@@ -8851,9 +8906,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 返回执行结果
         /// </summary>
-        public IEnumerable<Table> GetResult(PagedSearch paged)
+        public IEnumerable<Table> GetResult(int startIndex, int endIndex)
         {
-            return this.Context.GetResults(paged);
+            return this.Context.GetResults(startIndex, endIndex);
         }
 
         #endregion
@@ -9011,39 +9066,50 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// and 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar AndAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar AndAppend(string sql)
             {
-                this.Context.Append(string.Concat("and ", expression));
+                this.Context.Append(string.Concat("and ", sql));
                 return this;
             }
 
             /// <summary>
             /// or 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar OrAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar OrAppend(string sql)
             {
-                this.Context.Append(string.Concat("or ", expression));
+                this.Context.Append(string.Concat("or ", sql));
                 return this;
             }
 
             /// <summary>
             /// 存在
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar Append(string expression)
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Append(string sql)
             {
-                this.Context.Append(expression);
+                this.Context.Append(sql);
+                return this;
+            }
+
+
+            /// <summary>
+            /// sql
+            /// </summary>
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Last(string sql)
+            {
+                this.Context.Last(sql);
                 return this;
             }
 
             /// <summary>
             /// 返回执行结果
             /// </summary>
-            public IEnumerable<Table> GetResult(PagedSearch paged)
+            public IEnumerable<Table> GetResult(int startIndex, int endIndex)
             {
-                return this.Context.GetResults(paged);
+                return this.Context.GetResults(startIndex, endIndex);
             }
         }
 
@@ -10204,9 +10270,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 返回执行结果
         /// </summary>
-        public IEnumerable<Table> GetResult(PagedSearch paged)
+        public IEnumerable<Table> GetResult(int startIndex, int endIndex)
         {
-            return this.Context.GetResults(paged);
+            return this.Context.GetResults(startIndex, endIndex);
         }
 
         #endregion
@@ -10387,39 +10453,49 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// and 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar AndAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar AndAppend(string sql)
             {
-                this.Context.Append(string.Concat("and ", expression));
+                this.Context.Append(string.Concat("and ", sql));
                 return this;
             }
 
             /// <summary>
             /// or 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar OrAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar OrAppend(string sql)
             {
-                this.Context.Append(string.Concat("or ", expression));
+                this.Context.Append(string.Concat("or ", sql));
                 return this;
             }
 
             /// <summary>
-            /// 存在
+            /// sql
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar Append(string expression)
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Append(string sql)
             {
-                this.Context.Append(expression);
+                this.Context.Append(sql);
+                return this;
+            }
+
+            /// <summary>
+            /// sql
+            /// </summary>
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Last(string sql)
+            {
+                this.Context.Last(sql);
                 return this;
             }
 
             /// <summary>
             /// 返回执行结果
             /// </summary>
-            public IEnumerable<Table> GetResult(PagedSearch paged)
+            public IEnumerable<Table> GetResult(int startIndex, int endIndex)
             {
-                return this.Context.GetResults(paged);
+                return this.Context.GetResults(startIndex, endIndex);
             }
         }
 
@@ -11602,9 +11678,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 返回执行结果
         /// </summary>
-        public IEnumerable<Table> GetResult(PagedSearch paged)
+        public IEnumerable<Table> GetResult(int startIndex, int endIndex)
         {
-            return this.Context.GetResults(paged);
+            return this.Context.GetResults(startIndex, endIndex);
         }
 
         #endregion
@@ -11807,39 +11883,49 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// and 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar AndAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar AndAppend(string sql)
             {
-                this.Context.Append(string.Concat("and ", expression));
+                this.Context.Append(string.Concat("and ", sql));
                 return this;
             }
 
             /// <summary>
             /// or 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar OrAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar OrAppend(string sql)
             {
-                this.Context.Append(string.Concat("or ", expression));
+                this.Context.Append(string.Concat("or ", sql));
                 return this;
             }
 
             /// <summary>
-            /// 存在
+            /// sql
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar Append(string expression)
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Append(string sql)
             {
-                this.Context.Append(expression);
+                this.Context.Append(sql);
+                return this;
+            }
+
+            /// <summary>
+            /// sql
+            /// </summary>
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Last(string sql)
+            {
+                this.Context.Last(sql);
                 return this;
             }
 
             /// <summary>
             /// 返回执行结果
             /// </summary>
-            public IEnumerable<Table> GetResult(PagedSearch paged)
+            public IEnumerable<Table> GetResult(int startIndex, int endIndex)
             {
-                return this.Context.GetResults(paged);
+                return this.Context.GetResults(startIndex, endIndex);
             }
         }
 
@@ -13022,9 +13108,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 返回执行结果
         /// </summary>
-        public IEnumerable<Table> GetResult(PagedSearch paged)
+        public IEnumerable<Table> GetResult(int startIndex, int endIndex)
         {
-            return this.Context.GetResults(paged);
+            return this.Context.GetResults(startIndex, endIndex);
         }
 
         #endregion
@@ -13250,39 +13336,49 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// and 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar AndAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar AndAppend(string sql)
             {
-                this.Context.Append(string.Concat("and ", expression));
+                this.Context.Append(string.Concat("and ", sql));
                 return this;
             }
 
             /// <summary>
             /// or 拼字符串
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar OrAppend(string expression)
+            /// <param name="sql">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar OrAppend(string sql)
             {
-                this.Context.Append(string.Concat("or ", expression));
+                this.Context.Append(string.Concat("or ", sql));
                 return this;
             }
 
             /// <summary>
-            /// 存在
+            /// sql
             /// </summary>
-            /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-            public SelectWhereGrammar Append(string expression)
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Append(string sql)
             {
-                this.Context.Append(expression);
+                this.Context.Append(sql);
+                return this;
+            }
+
+            /// <summary>
+            /// sql
+            /// </summary>
+            /// <param name="sql">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
+            public SelectWhereGrammar Last(string sql)
+            {
+                this.Context.Last(sql);
                 return this;
             }
 
             /// <summary>
             /// 返回执行结果
             /// </summary>
-            public IEnumerable<Table> GetResult(PagedSearch paged)
+            public IEnumerable<Table> GetResult(int startIndex, int endIndex)
             {
-                return this.Context.GetResults(paged);
+                return this.Context.GetResults(startIndex, endIndex);
             }
         }
 

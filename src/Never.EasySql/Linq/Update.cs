@@ -11,17 +11,18 @@ namespace Never.EasySql.Linq
     /// 更新操作
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
-    public struct Update<Parameter>
+    /// <typeparam name="Table"></typeparam>
+    public struct Update<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal UpdateContext<Parameter> Context { get; set; }
+        internal UpdateContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public Update<Parameter> As(string table)
+        public Update<Parameter, Table> As(string table)
         {
             this.Context.As(table);
             return this;
@@ -30,7 +31,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 从哪一张表更新
         /// </summary>
-        public Update<Parameter> From(string table)
+        public Update<Parameter, Table> From(string table)
         {
             this.Context.From(table);
             return this;
@@ -39,73 +40,73 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// join
         /// </summary>
-        /// <typeparam name="Table"></typeparam>
+        /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Parameter, Table> Join<Table>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1> Join<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.Join) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
+            return new UpdateJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.Join) { update = new UpdateGrammar<Parameter, Table>() { Context = this.Context } };
         }
 
         /// <summary>
         /// inner join
         /// </summary>
-        /// <typeparam name="Table"></typeparam>
+        /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Parameter, Table> InnerJoin<Table>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1> InnerJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.InnerJoin) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
+            return new UpdateJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.InnerJoin) { update = new UpdateGrammar<Parameter, Table>() { Context = this.Context } };
         }
 
         /// <summary>
         /// left join
         /// </summary>
-        /// <typeparam name="Table"></typeparam>
+        /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Parameter, Table> LeftJoin<Table>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1> LeftJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.LeftJoin) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
+            return new UpdateJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.LeftJoin) { update = new UpdateGrammar<Parameter, Table>() { Context = this.Context } };
         }
 
         /// <summary>
         /// left join
         /// </summary>
-        /// <typeparam name="Table"></typeparam>
+        /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Parameter, Table> RightJoin<Table>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1> RightJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new UpdateJoinGrammar<Parameter, Table>(@as, JoinOption.RightJoin) { update = new UpdateGrammar<Parameter>() { Context = this.Context } };
+            return new UpdateJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.RightJoin) { update = new UpdateGrammar<Parameter, Table>() { Context = this.Context } };
         }
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Parameter> SetColumn<TMember>(Expression<Func<Parameter, TMember>> expression)
+        public UpdateGrammar<Parameter, Table> SetColumn<TMember>(Expression<Func<Table, TMember>> expression)
         {
-            return new UpdateGrammar<Parameter>() { Context = this.Context }.StartSetColumn().SetColumn(expression);
+            return new UpdateGrammar<Parameter, Table>() { Context = this.Context }.StartSetColumn().SetColumn(expression);
         }
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Parameter> SetColumWithFunc<TMember>(Expression<Func<Parameter, TMember>> expression, string value)
+        public UpdateGrammar<Parameter, Table> SetColumWithFunc<TMember>(Expression<Func<Table, TMember>> expression, string value)
         {
-            return new UpdateGrammar<Parameter>() { Context = this.Context }.StartSetColumn().SetColumnWithFunc(expression, value);
+            return new UpdateGrammar<Parameter, Table>() { Context = this.Context }.StartSetColumn().SetColumnWithFunc(expression, value);
         }
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Parameter> SetColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value)
+        public UpdateGrammar<Parameter, Table> SetColumWithValue<TMember>(Expression<Func<Table, TMember>> expression, TMember value)
         {
-            return new UpdateGrammar<Parameter>() { Context = this.Context }.StartSetColumn().SetColumnWithValue(expression, value);
+            return new UpdateGrammar<Parameter, Table>() { Context = this.Context }.StartSetColumn().SetColumnWithValue(expression, value);
         }
     }
 }

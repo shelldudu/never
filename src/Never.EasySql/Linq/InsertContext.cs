@@ -11,7 +11,8 @@ namespace Never.EasySql.Linq
     /// 插入上下文
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
-    public abstract class InsertContext<Parameter> : Context
+    /// <typeparam name="Table"></typeparam>
+    public abstract class InsertContext<Parameter, Table> : Context
     {
         /// <summary>
         /// dao
@@ -56,14 +57,14 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public abstract InsertContext<Parameter> Into(string table);
+        public abstract InsertContext<Parameter, Table> Into(string table);
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <param name="flag"></param>
         /// <returns></returns>
-        public abstract InsertContext<Parameter> Entrance(char flag);
+        public abstract InsertContext<Parameter, Table> Entrance(char flag);
 
         /// <summary>
         /// 执行插入
@@ -150,14 +151,14 @@ namespace Never.EasySql.Linq
         /// 最后自增字符串
         /// </summary>
         /// <returns></returns>
-        public abstract InsertContext<Parameter> InsertLastInsertId();
+        public abstract InsertContext<Parameter, Table> InsertLastInsertId();
 
         /// <summary>
         /// 插入的字段
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public abstract InsertContext<Parameter> Colum(Expression<Func<Parameter, object>> expression);
+        public abstract InsertContext<Parameter, Table> Colum(Expression<Func<Table, object>> expression);
 
         /// <summary>
         /// 插入的字段
@@ -165,7 +166,7 @@ namespace Never.EasySql.Linq
         /// <param name="expression"></param>
         /// <param name="function"></param>
         /// <returns></returns>
-        public abstract InsertContext<Parameter> ColumWithFunc(Expression<Func<Parameter, object>> expression, string function);
+        public abstract InsertContext<Parameter, Table> ColumWithFunc(Expression<Func<Table, object>> expression, string function);
 
         /// <summary>
         /// 插入的字段
@@ -173,7 +174,7 @@ namespace Never.EasySql.Linq
         /// <param name="expression"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public abstract InsertContext<Parameter> ColumWithValue<TMember>(Expression<Func<Parameter, TMember>> expression, TMember value);
+        public abstract InsertContext<Parameter, Table> ColumWithValue<TMember>(Expression<Func<Table, TMember>> expression, TMember value);
 
     }
 

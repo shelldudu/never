@@ -31,26 +31,6 @@ namespace Never.EasySql.Linq.SqlServer
         /// <returns></returns>
         public override SelectContext<Parameter, Table> StartSelectColumn()
         {
-            if (this.isSingle)
-                return base.StartSelectColumn();
-
-            if (this.orderBies.IsNullOrEmpty())
-            {
-                var primary = this.tableInfo.Columns.Where(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.Primary);
-                if (primary.IsNullOrEmpty())
-                    primary = this.tableInfo.Columns.Where(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement);
-
-                if (this.tableInfo.Columns.Any(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.Primary))
-                {
-                    this.orderBies.Add(new OrderByInfo
-                    {
-                        Flag = string.Concat("order by ", primary.FirstOrDefault().Column.Alias.IsNullOrEmpty() ? primary.FirstOrDefault().Member.Name : primary.FirstOrDefault().Column.Alias, " desc"),
-                        Placeholder = this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable,
-                        Type = typeof(Table)
-                    });
-                }
-            }
-
             return base.StartSelectColumn();
         }
 
@@ -60,18 +40,6 @@ namespace Never.EasySql.Linq.SqlServer
         /// <returns></returns>
         public override SelectContext<Parameter, Table> Where()
         {
-            if (this.orderBies.IsNotNullOrEmpty() || this.selectJoin.IsNotNullOrEmpty())
-            {
-                var label = new TextLabel()
-                {
-                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
-                    TagId = NewId.GenerateNumber(),
-                };
-
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
-            }
-
             return base.Where();
         }
 
@@ -80,11 +48,10 @@ namespace Never.EasySql.Linq.SqlServer
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression)
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, object>> expression)
         {
             return base.Where(expression);
         }
-
 
         /// <summary>
         /// 查询结果
@@ -97,11 +64,78 @@ namespace Never.EasySql.Linq.SqlServer
         /// <summary>
         /// 查询结果
         /// </summary>
-        /// <param name="paged"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
         /// <returns></returns>
-        public override IEnumerable<Table> GetResults(PagedSearch paged)
+        public override IEnumerable<Table> GetResults(int startIndex, int endIndex)
         {
-            return base.GetResults(paged);
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = "select qwertyuiop.* from (",
+            };
+            this.labels.Insert(0, label);
+
+            label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = ") as qwertyuiop",
+            };
+            this.labels.Add(label);
+
+            label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat("where", " qwertyuiop._ >= ", this.dao.SqlExecuter.GetParameterPrefix(), "StartIndex", " and qwertyuiop._ < ", this.dao.SqlExecuter.GetParameterPrefix(), "EndIndex"),
+            };
+            this.labels.Add(label);
+
+            return base.GetResults(startIndex, endIndex);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected override void OnWhereInit()
+        {
+            if (this.isSingle)
+            {
+                base.OnWhereInit();
+                return;
+            }
+
+            if (this.orderBies.IsNullOrEmpty())
+            {
+                var primary = this.tableInfo.Columns.Where(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.Primary);
+                if (primary.IsNullOrEmpty())
+                {
+                    primary = this.tableInfo.Columns.Where(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement);
+                }
+                if (primary.IsNullOrEmpty())
+                {
+                    primary = this.tableInfo.Columns;
+
+                }
+
+                if (primary.Any())
+                {
+                    this.orderBies.Add(new OrderByInfo
+                    {
+                        Flag = string.Concat("order by ", primary.FirstOrDefault().Column.Alias.IsNullOrEmpty() ? primary.FirstOrDefault().Member.Name : primary.FirstOrDefault().Column.Alias, " desc"),
+                        Placeholder = this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable,
+                        Type = typeof(Table)
+                    });
+                }
+            }
+
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat(", ", (this.LoadOrderBy(this.orderBies).ToString()), " as _"),
+            };
+
+            this.labels.Add(label);
+            this.orderBies.Clear();
         }
 
         /// <summary>

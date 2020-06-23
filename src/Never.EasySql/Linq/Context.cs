@@ -350,7 +350,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Update<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Update<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.Update(sqlTag, sqlParameter);
         }
@@ -363,7 +363,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Update<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Update<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -386,7 +386,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Delete<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Delete<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.Delete(sqlTag, sqlParameter);
         }
@@ -399,7 +399,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Delete<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Delete<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -422,7 +422,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Insert<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Insert<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return (int)dao.Insert(sqlTag, sqlParameter);
         }
@@ -435,7 +435,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Insert<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Insert<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -700,12 +700,25 @@ namespace Never.EasySql.Linq
         #region analyze
 
         /// <summary>
-        /// 分析表达式
+        /// 分析where的表达式
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="collection"></param>
+        /// <returns></returns>
+        protected bool AnalyzeWhereObjectExpression<Parameter, Table>(Expression<Func<Parameter, Table, object>> expression, List<ILabel> collection)
+        {
+
+        }
+
+        /// <summary>
+        /// 分析bool的表达式
         /// </summary>
         /// <param name="analyzeParameters"></param>
         /// <param name="expression"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze(Expression expression, List<AnalyzeParameter> analyzeParameters, List<BinaryBlock> whereCollection)
+        protected bool AnalyzeBooleanExpression(Expression expression, List<AnalyzeParameter> analyzeParameters, List<BinaryBlock> whereCollection)
         {
             var binary = expression as BinaryExpression;
             if (binary == null)
@@ -737,9 +750,9 @@ namespace Never.EasySql.Linq
                 case ExpressionType.OrElse:
                     {
                         whereCollection.Add(new BinaryBlock() { Join = "(" });
-                        Analyze(binary.Left, analyzeParameters, whereCollection);
+                        AnalyzeBooleanExpression(binary.Left, analyzeParameters, whereCollection);
                         whereCollection.Add(new BinaryBlock() { Join = binary.NodeType == ExpressionType.AndAlso ? " and " : " or " });
-                        Analyze(binary.Right, analyzeParameters, whereCollection);
+                        AnalyzeBooleanExpression(binary.Right, analyzeParameters, whereCollection);
                         whereCollection.Add(new BinaryBlock() { Join = ")" });
                         return true;
                     }
@@ -942,7 +955,7 @@ namespace Never.EasySql.Linq
                 }
             };
 
-            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+            return this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection);
         }
 
         /// <summary>
@@ -1010,7 +1023,7 @@ namespace Never.EasySql.Linq
                 }
             };
 
-            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+            return this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection);
         }
 
         /// <summary>
@@ -1070,7 +1083,7 @@ namespace Never.EasySql.Linq
                 }
             };
 
-            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+            return this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection);
         }
 
         /// <summary>
@@ -1122,7 +1135,7 @@ namespace Never.EasySql.Linq
                 }
             };
 
-            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+            return this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection);
         }
 
         /// <summary>
@@ -1166,7 +1179,7 @@ namespace Never.EasySql.Linq
                 }
             };
 
-            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+            return this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection);
         }
 
         /// <summary>
@@ -1202,7 +1215,7 @@ namespace Never.EasySql.Linq
                 }
             };
 
-            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+            return this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection);
         }
 
         /// <summary>
@@ -1230,7 +1243,7 @@ namespace Never.EasySql.Linq
                 }
             };
 
-            return this.Analyze(expression.Body, analyzeParameters, whereCollection);
+            return this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection);
         }
 
         #endregion
@@ -1272,7 +1285,7 @@ namespace Never.EasySql.Linq
                     });
                 }
 
-                if (this.Analyze(item.On.Body, analyzeParameters, whereCollection) == false)
+                if (this.AnalyzeBooleanExpression(item.On.Body, analyzeParameters, whereCollection) == false)
                     continue;
 
                 builder.Append(this.FindJoinOptionString(item.JoinOption));
@@ -1303,7 +1316,7 @@ namespace Never.EasySql.Linq
                         });
                     }
 
-                    if (this.Analyze(item.And.Body, analyzeParameters, whereCollection) == true)
+                    if (this.AnalyzeBooleanExpression(item.And.Body, analyzeParameters, whereCollection) == true)
                     {
                         builder.Append(" and ");
                         foreach (var where in whereCollection)
@@ -1351,7 +1364,7 @@ namespace Never.EasySql.Linq
                 });
             }
 
-            if (this.Analyze(whereExists.Where.Body, analyzeParameters, whereCollection) == false)
+            if (this.AnalyzeBooleanExpression(whereExists.Where.Body, analyzeParameters, whereCollection) == false)
                 return builder;
 
             builder.Append(whereExists.AndOrOption == AndOrOption.and ? "and " : "or ");
@@ -1386,7 +1399,7 @@ namespace Never.EasySql.Linq
                         });
                     }
 
-                    if (this.Analyze(item.On.Body, joinAnalyzeParameters, joinCollection) == false)
+                    if (this.AnalyzeBooleanExpression(item.On.Body, joinAnalyzeParameters, joinCollection) == false)
                         continue;
 
                     if (firstJoin)
@@ -1423,7 +1436,7 @@ namespace Never.EasySql.Linq
                             });
                         }
 
-                        if (this.Analyze(item.And.Body, joinAnalyzeParameters, joinCollection) == true)
+                        if (this.AnalyzeBooleanExpression(item.And.Body, joinAnalyzeParameters, joinCollection) == true)
                         {
                             builder.Append("and ");
                             foreach (var where in whereCollection)
@@ -1458,7 +1471,7 @@ namespace Never.EasySql.Linq
                     });
                 }
 
-                if (this.Analyze(whereExists.And.Body, analyzeParameters, whereCollection) == true)
+                if (this.AnalyzeBooleanExpression(whereExists.And.Body, analyzeParameters, whereCollection) == true)
                 {
                     builder.Append("and ");
                     foreach (var where in whereCollection)
@@ -1501,7 +1514,7 @@ namespace Never.EasySql.Linq
                 });
             }
 
-            if (this.Analyze(whereIn.Field.Body, analyzeParameters, whereCollection) == false)
+            if (this.AnalyzeBooleanExpression(whereIn.Field.Body, analyzeParameters, whereCollection) == false)
                 return builder;
 
             if (whereCollection.Count > 1)
@@ -1560,7 +1573,7 @@ namespace Never.EasySql.Linq
                         });
                     }
 
-                    if (this.Analyze(item.On.Body, joinAnalyzeParameters, joinCollection) == false)
+                    if (this.AnalyzeBooleanExpression(item.On.Body, joinAnalyzeParameters, joinCollection) == false)
                         continue;
 
                     if (firstJoin)
@@ -1596,7 +1609,7 @@ namespace Never.EasySql.Linq
                             });
                         }
 
-                        if (this.Analyze(item.And.Body, joinAnalyzeParameters, joinCollection) == true)
+                        if (this.AnalyzeBooleanExpression(item.And.Body, joinAnalyzeParameters, joinCollection) == true)
                         {
                             builder.Append("and ");
                             foreach (var where in whereCollection)
@@ -1632,7 +1645,7 @@ namespace Never.EasySql.Linq
                     });
                 }
 
-                if (this.Analyze(whereIn.Where.Body, analyzeParameters, whereCollection) == true)
+                if (this.AnalyzeBooleanExpression(whereIn.Where.Body, analyzeParameters, whereCollection) == true)
                 {
                     builder.Append("and ");
                     foreach (var where in whereCollection)

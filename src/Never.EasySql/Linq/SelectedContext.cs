@@ -20,47 +20,22 @@ namespace Never.EasySql.Linq
         {
             return this;
         }
-
+        public override SelectContext<Parameter, Table> Last(string sql)
+        {
+            return this;
+        }
         public override Table GetResult()
         {
             return this.Select<Parameter, Table>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
-        public override IEnumerable<Table> GetResults(PagedSearch paged)
+        public override IEnumerable<Table> GetResults(int startIndex, int endIndex)
         {
-            if ((this.sqlParameter.Object is PagedSearch) == false)
-            {
-                if (paged == null)
-                    paged = new PagedSearch();
-
-                this.templateParameter["PageNow"] = paged.PageNow;
-                this.templateParameter["PageSize"] = paged.PageSize;
-                this.templateParameter["StartIndex"] = paged.StartIndex;
-                this.templateParameter["EndIndex"] = paged.EndIndex;
-                if (paged.BeginTime.HasValue)
-                    this.templateParameter["BeginTime"] = paged.BeginTime.Value;
-                if (paged.EndTime.HasValue)
-                    this.templateParameter["EndTime"] = paged.EndTime.Value;
-
-            }
-
+            this.templateParameter["StartIndex"] = startIndex;
+            this.templateParameter["EndIndex"] = endIndex;
             return this.SelectMany<Parameter, Table>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
-        public override SelectContext<Parameter, Table> JoinOnSelect(List<JoinInfo> joins)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists)
-        {
-            return this;
-        }
-
-        public override SelectContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn)
-        {
-            return this;
-        }
 
         public override SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
@@ -92,7 +67,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression)
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, object>> expression)
         {
             return this;
         }
@@ -110,6 +85,16 @@ namespace Never.EasySql.Linq
         protected override string SelectTableNamePointOnSelectColunm()
         {
             return string.Empty;
+        }
+
+        public override SelectContext<Parameter, Table> AppenInWhereExists(WhereExistsInfo whereExists)
+        {
+            return this;
+        }
+
+        public override SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereExists)
+        {
+            return this;
         }
     }
 }

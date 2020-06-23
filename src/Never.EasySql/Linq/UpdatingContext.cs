@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// 更新语法
     /// </summary>
-    public class UpdatingContext<Parameter> : UpdateContext<Parameter>
+    public class UpdatingContext<Parameter, Table> : UpdateContext<Parameter, Table>
     {
         #region prop
         /// <summary>
@@ -54,6 +54,11 @@ namespace Never.EasySql.Linq
         /// update join
         /// </summary>
         protected List<JoinInfo> updateJoin;
+
+        /// <summary>
+        /// where的条数
+        /// </summary>
+        private int whereCount = 0;
         #endregion
 
         /// <summary>
@@ -80,7 +85,7 @@ namespace Never.EasySql.Linq
             };
 
             LinqSqlTagProvider.Set(sqlTag);
-            return this.Update(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            return this.Update<Parameter, Table>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         /// <summary>
@@ -121,8 +126,13 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public override UpdateContext<Parameter> StartSetColumn()
+        public override UpdateContext<Parameter, Table> StartSetColumn()
         {
+            if (this.FromTable.IsNullOrEmpty())
+            {
+                this.From(this.FindTableName(this.tableInfo, typeof(Table)));
+            }
+
             this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
@@ -137,7 +147,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected override UpdateContext<Parameter> SetColumn(string columnName, string originalColumnName, bool textParameter)
+        protected override UpdateContext<Parameter, Table> SetColumn(string columnName, string originalColumnName, bool textParameter)
         {
             var label = new TextLabel()
             {
@@ -185,15 +195,20 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public override UpdateContext<Parameter> Where()
+        public override UpdateContext<Parameter, Table> Where()
         {
-            var label = new TextLabel()
+            if (whereCount == 0)
             {
-                SqlText = "where 1 = 1 \r",
-                TagId = NewId.GenerateNumber(),
-            };
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
+                whereCount++;
+                var label = new TextLabel()
+                {
+                    SqlText = "where 1 = 1 \r",
+                    TagId = NewId.GenerateNumber(),
+                };
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
             return this;
         }
 
@@ -201,29 +216,35 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public override UpdateContext<Parameter> Where(Expression<Func<Parameter, object>> expression)
+        public override UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, object>> expression)
         {
-            string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat("where ", this.asTableNamePoint, this.FormatColumn(columnName), this.equalAndPrefix, columnName, "\r"),
             };
 
-            label.Add(new SqlTagParameterPosition()
+            if (whereCount == 0)
             {
-                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                Name = columnName,
-                OccupanLength = this.formatColumnAppendCount + columnName.Length,
-                PrefixStartIndex = 6 + this.asTableNamePoint.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
-                ParameterStartIndex = 6 + this.asTableNamePoint.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length,
-                ParameterStopIndex = 6 + this.asTableNamePoint.Length + this.formatColumnAppendCount + columnName.Length + equalAndPrefix.Length + columnName.Length,
-                TextParameter = false,
-            });
+                whereCount++;
+                label.SqlText = string.Concat("where ");
+            }
+            else
+            {
+                label.SqlText = string.Concat("and ");
+            }
 
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
+            int s = this.labels.Count;
+            if (base.AnalyzeWhereObjectExpression(expression, this.labels))
+            {
+                int e = this.labels.Count;
+                for (var i = s; i < e; i++)
+                {
+                    this.textLength += this.labels[i].SqlText.Length;
+                }
+            }
+
             return this;
         }
 
@@ -232,7 +253,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override UpdateContext<Parameter> Append(string sql)
+        public override UpdateContext<Parameter, Table> Append(string sql)
         {
             if (sql.IsNullOrEmpty())
                 return this;
@@ -261,7 +282,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="joins"></param>
         /// <returns></returns>
-        public override UpdateContext<Parameter> JoinOnUpdate(List<JoinInfo> joins)
+        public override UpdateContext<Parameter, Table> JoinOnUpdate(List<JoinInfo> joins)
         {
             this.updateJoin = joins;
             var label = new TextLabel()
@@ -280,7 +301,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public override UpdateContext<Parameter> JoinOnWhereExists(WhereExistsInfo whereExists)
+        public override UpdateContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
             var label = new TextLabel()
             {
@@ -297,7 +318,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public override UpdateContext<Parameter> JoinOnWhereIn(WhereInInfo whereIn)
+        public override UpdateContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn)
         {
             var label = new TextLabel()
             {
@@ -316,7 +337,7 @@ namespace Never.EasySql.Linq
         /// <param name="andOrOption"></param>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override UpdateContext<Parameter> Where(AndOrOption andOrOption, string sql)
+        public override UpdateContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
         {
             var label = new TextLabel()
             {
