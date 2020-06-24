@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,11 +54,11 @@ namespace Never.Web.WebApi.Results
             var contentType = new MediaTypeHeaderValue(this.ContentType);
             this.WriteFile(response);
             response.Content.Headers.ContentType = contentType;
-            response.RequestMessage = new HttpRequestMessage(this.ApiController.Request.Method, this.ApiController.Request.RequestUri);
             if (!string.IsNullOrEmpty(this.FileDownloadName))
-                response.Headers.Add("Content-Disposition", this.FileDownloadName);
+                response.Content.Headers.Add("Content-Disposition", new ContentDisposition { FileName = this.FileDownloadName }.ToString());
 
-            return base.Execute(cancellationToken);
+            response.RequestMessage = new HttpRequestMessage(this.ApiController.Request.Method, this.ApiController.Request.RequestUri);
+            return response;
         }
 
         /// <summary>

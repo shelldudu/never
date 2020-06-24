@@ -1,7 +1,7 @@
 ﻿using Never.Attributes;
 using Never.Commands;
 using Never.EasySql;
-using Never.EasySql.SqlClient;
+using Never.EasySql.Client;
 using Never.EventStreams;
 using Never.IoC;
 using Never.IoC.Providers;

@@ -75,14 +75,11 @@ namespace Never.Web.WebApi.Results
         public override Task ExecuteResultAsync(ActionContext context)
         {
             this.FileDownloadName = TrimExtension(!string.IsNullOrEmpty(FileDownloadName) ? FileDownloadName : DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss"));
-            return base.ExecuteResultAsync(context).ContinueWith(t =>
-            {
-                if (this.Stream == null)
-                    this.Stream = new MemoryStream();
+            if (this.Stream == null)
+                this.Stream = new MemoryStream();
 
-                this.Stream.Position = 0;
-                this.Stream.CopyTo(context.HttpContext.Response.Body);
-            });
+            this.Stream.Position = 0;
+            return this.Stream.CopyToAsync(context.HttpContext.Response.Body);
         }
 #else
 

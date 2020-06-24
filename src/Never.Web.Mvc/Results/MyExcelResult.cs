@@ -56,6 +56,7 @@ namespace Never.Web.Mvc.Results
 
                 this.Stream.Position = 0;
                 this.Stream.CopyTo(context.HttpContext.Response.Body);
+                this.Stream.Dispose();
             });
         }
 #else
@@ -81,6 +82,7 @@ namespace Never.Web.Mvc.Results
 
             this.Stream.Position = 0;
             this.Stream.CopyTo(response.OutputStream);
+            this.Stream.Dispose();
         }
 
 #endif

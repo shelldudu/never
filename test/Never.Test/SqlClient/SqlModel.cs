@@ -29,7 +29,7 @@ namespace Never.Test
 
     #region builder
 
-    public class SqlServerBuilder : EmbeddedDaoBuilder
+    public class SqlServerBuilder : XmlContentDaoBuilder.XmlEmbeddedDaoBuilder
     {
         public override string[] EmbeddedSqlMaps
         {

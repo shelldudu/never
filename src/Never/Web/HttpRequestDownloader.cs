@@ -396,6 +396,8 @@ namespace Never.Web
             var request = WebRequest.Create(uri) as HttpWebRequest;
             request.Method = "POST";
             request.ContentType = contentType;
+            request.AllowAutoRedirect = false;
+
 
             if (timeout > 0)
             {

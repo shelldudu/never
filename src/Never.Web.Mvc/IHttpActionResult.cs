@@ -22,7 +22,7 @@ namespace Never.Web.Mvc
     /// <summary>
     /// 方法结果
     /// </summary>
-    public interface IHttpActionResult
+    internal interface IHttpActionResult
     {
         /// <summary>
         /// 启用对操作方法结果的处理

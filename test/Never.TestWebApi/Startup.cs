@@ -61,6 +61,7 @@ namespace Never.TestWebApi
             app.UseStaticFiles();
             app.UseMvc(t =>
             {
+                t.MapRoute("validationspp", "/api/fund_accounts/validations/{id}",new { controller = "ValuesController", action = "fund_accounts_validations" });
             });
 
             app.UseMiddleware<ApiServiceScopeClearMiddleware>();
