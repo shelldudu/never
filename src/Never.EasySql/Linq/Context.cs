@@ -278,7 +278,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected Table Select<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected Table Select<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.QueryForObject<Table, Parameter>(sqlTag, sqlParameter);
         }
@@ -291,7 +291,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected Table Select<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected Table Select<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -314,7 +314,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected IEnumerable<Table> SelectMany<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected IEnumerable<Table> SelectMany<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.QueryForEnumerable<Table, Parameter>(sqlTag, sqlParameter);
         }
@@ -327,7 +327,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected IEnumerable<Table> SelectMany<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected IEnumerable<Table> SelectMany<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -350,7 +350,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Update<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Update<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.Update(sqlTag, sqlParameter);
         }
@@ -363,7 +363,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Update<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Update<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -386,7 +386,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Delete<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Delete<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.Delete(sqlTag, sqlParameter);
         }
@@ -399,7 +399,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Delete<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Delete<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -422,7 +422,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Insert<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Insert<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return (int)dao.Insert(sqlTag, sqlParameter);
         }
@@ -435,7 +435,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Insert<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Insert<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -698,19 +698,6 @@ namespace Never.EasySql.Linq
         #endregion
 
         #region analyze
-
-        /// <summary>
-        /// 分析where的表达式
-        /// </summary>
-        /// <typeparam name="Parameter"></typeparam>
-        /// <typeparam name="Table"></typeparam>
-        /// <param name="expression"></param>
-        /// <param name="collection"></param>
-        /// <returns></returns>
-        protected bool AnalyzeWhereObjectExpression<Parameter, Table>(Expression<Func<Parameter, Table, object>> expression, List<ILabel> collection)
-        {
-
-        }
 
         /// <summary>
         /// 分析bool的表达式
@@ -1192,7 +1179,7 @@ namespace Never.EasySql.Linq
         /// <param name="analyzeParameters"></param>
         /// <param name="tableInfo"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Table,Parameter>(Expression<Func<Table,Parameter, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -1249,6 +1236,19 @@ namespace Never.EasySql.Linq
         #endregion
 
         #region join exits in
+
+        /// <summary>
+        /// 分析where的表达式
+        /// </summary>
+        /// <typeparam name="Parameter"></typeparam>
+        /// <typeparam name="Table"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="collection"></param>
+        /// <returns></returns>
+        protected bool AnalyzeWhereExpress<Table, Parameter>(Expression<Func<Table, Parameter, bool>> expression, List<ILabel> collection)
+        {
+
+        }
 
         /// <summary>
         /// 

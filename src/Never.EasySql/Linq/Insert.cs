@@ -12,17 +12,17 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public struct Insert<Parameter, Table>
+    public struct Insert<Table,Parameter>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal InsertContext<Parameter, Table> Context { get; set; }
+        internal InsertContext<Table,Parameter> Context { get; set; }
 
         /// <summary>
         /// 从哪一张表插入
         /// </summary>
-        public Insert<Parameter, Table> Into(string table)
+        public Insert<Table,Parameter> Into(string table)
         {
             this.Context.Into(table);
             return this;

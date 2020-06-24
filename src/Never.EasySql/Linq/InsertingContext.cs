@@ -14,7 +14,7 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public class InsertingContext<Parameter, Table> : InsertContext<Parameter, Table>
+    public class InsertingContext<Table,Parameter> : InsertContext<Table,Parameter>
     {
         private readonly string cacheId;
         private int textLength;
@@ -55,7 +55,7 @@ namespace Never.EasySql.Linq
         /// 表名
         /// </summary>
         /// <param name="table"></param>
-        public override Linq.InsertContext<Parameter, Table> Into(string table)
+        public override Linq.InsertContext<Table,Parameter> Into(string table)
         {
             this.tableName = table;
             return this;
@@ -65,7 +65,7 @@ namespace Never.EasySql.Linq
         /// 入口
         /// </summary>
         /// <returns></returns>
-        public override Linq.InsertContext<Parameter, Table> Entrance(char flag)
+        public override Linq.InsertContext<Table,Parameter> Entrance(char flag)
         {
             this.tableName = this.tableName.IsNullOrEmpty() ? this.FindTableName<Parameter>(tableInfo) : this.tableName;
             var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("insert into ", this.FormatTable(this.tableName)) };
@@ -85,22 +85,22 @@ namespace Never.EasySql.Linq
             throw new NotImplementedException();
         }
 
-        public override Linq.InsertContext<Parameter, Table> InsertLastInsertId()
+        public override Linq.InsertContext<Table,Parameter> InsertLastInsertId()
         {
             throw new NotImplementedException();
         }
 
-        public override Linq.InsertContext<Parameter, Table> Colum(Expression<Func<Table, object>> expression)
+        public override Linq.InsertContext<Table,Parameter> Colum(Expression<Func<Table, object>> expression)
         {
             throw new NotImplementedException();
         }
 
-        public override Linq.InsertContext<Parameter, Table> ColumWithFunc(Expression<Func<Table, object>> expression, string function)
+        public override Linq.InsertContext<Table,Parameter> ColumWithFunc(Expression<Func<Table, object>> expression, string function)
         {
             throw new NotImplementedException();
         }
 
-        public override Linq.InsertContext<Parameter, Table> ColumWithValue<TMember>(Expression<Func<Table, TMember>> expression, TMember value)
+        public override Linq.InsertContext<Table,Parameter> ColumWithValue<TMember>(Expression<Func<Table, TMember>> expression, TMember value)
         {
             throw new NotImplementedException();
         }

@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.Postgre
     /// <summary>
     /// 查询操作
     /// </summary>
-    public sealed class SelectingContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
+    public sealed class SelectingContext<Table,Parameter> : Linq.SelectingContext<Table,Parameter>
     {
         /// <summary>
         /// ctor

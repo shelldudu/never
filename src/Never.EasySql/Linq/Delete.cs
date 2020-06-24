@@ -12,17 +12,17 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public struct Delete<Parameter, Table>
+    public struct Delete<Table,Parameter>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal DeleteContext<Parameter, Table> Context { get; set; }
+        internal DeleteContext<Table,Parameter> Context { get; set; }
 
         /// <summary>
         /// 删除的表名
         /// </summary>
-        public Delete<Parameter, Table> As(string table)
+        public Delete<Table,Parameter> As(string table)
         {
             this.Context.AsTable(table);
             return this;
@@ -31,28 +31,28 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 从哪一张表删除
         /// </summary>
-        public DeleteGrammar<Parameter, Table> From(string table)
+        public DeleteGrammar<Table,Parameter> From(string table)
         {
             this.Context.From(table);
-            return new DeleteGrammar<Parameter, Table>() { Context = this.Context };
+            return new DeleteGrammar<Table,Parameter>() { Context = this.Context };
         }
 
         /// <summary>
         /// where
         /// </summary>
-        public DeleteGrammar<Parameter, Table>.NWhere<Parameter> Where()
+        public DeleteGrammar<Table,Parameter>.NWhere<Parameter> Where()
         {
             this.Context.Entrance();
-            return new DeleteGrammar<Parameter, Table>() { Context = this.Context }.Where();
+            return new DeleteGrammar<Table,Parameter>() { Context = this.Context }.Where();
         }
 
         /// <summary>
         /// where
         /// </summary>
-        public DeleteGrammar<Parameter, Table>.NWhere<Parameter> Where(Expression<Func<Parameter, object>> expression)
+        public DeleteGrammar<Table,Parameter>.NWhere<Parameter> Where(Expression<Func<Parameter, object>> expression)
         {
             this.Context.Entrance();
-            return new DeleteGrammar<Parameter, Table>() { Context = this.Context }.Where(expression);
+            return new DeleteGrammar<Table,Parameter>() { Context = this.Context }.Where(expression);
         }
     }
 }

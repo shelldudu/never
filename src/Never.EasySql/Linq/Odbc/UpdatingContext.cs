@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.Odbc
     /// <summary>
     /// 更新操作
     /// </summary>
-    public sealed class UpdatingContext<Parameter, Table> : Linq.UpdatingContext<Parameter, Table>
+    public sealed class UpdatingContext<Table,Parameter> : Linq.UpdatingContext<Table,Parameter>
     {
         /// <summary>
         /// ctor

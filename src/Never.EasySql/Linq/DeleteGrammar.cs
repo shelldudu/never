@@ -10,12 +10,12 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// delete语法
     /// </summary>
-    public struct DeleteGrammar<Parameter, Table>
+    public struct DeleteGrammar<Table,Parameter>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal DeleteContext<Parameter, Table> Context { get; set; }
+        internal DeleteContext<Table,Parameter> Context { get; set; }
 
         /// <summary>
         /// 获取结果

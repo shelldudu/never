@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.SqlServer
     /// <summary>
     /// 查询操作
     /// </summary>
-    public sealed class SelectingContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
+    public sealed class SelectingContext<Table,Parameter> : Linq.SelectingContext<Table,Parameter>
     {
         /// <summary>
         /// ctor
@@ -29,7 +29,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// 入口
         /// </summary>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> StartSelectColumn()
+        public override SelectContext<Table,Parameter> StartSelectColumn()
         {
             return base.StartSelectColumn();
         }
@@ -38,7 +38,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// where
         /// </summary>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> Where()
+        public override SelectContext<Table,Parameter> Where()
         {
             return base.Where();
         }
@@ -48,7 +48,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, object>> expression)
+        public override SelectContext<Table,Parameter> Where(Expression<Func<Table,Parameter, object>> expression)
         {
             return base.Where(expression);
         }

@@ -12,17 +12,17 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">查询结果对象</typeparam>
-    public struct Select<Parameter, Table>
+    public struct Select<Table,Parameter>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Parameter, Table> Context { get; set; }
+        internal SelectContext<Table,Parameter> Context { get; set; }
 
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public Select<Parameter, Table> As(string table)
+        public Select<Table,Parameter> As(string table)
         {
             this.Context.As(table);
             return this;
@@ -31,7 +31,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 从哪一张表更新
         /// </summary>
-        public Select<Parameter, Table> From(string table)
+        public Select<Table,Parameter> From(string table)
         {
             this.Context.From(table);
             return this;
@@ -43,10 +43,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Parameter, Table, Table1> Join<Table1>(string @as)
+        public SelectJoinGrammar<Table,Parameter, Table1> Join<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.Join) { Context = this.Context };
+            return new SelectJoinGrammar<Table,Parameter, Table1>(@as, JoinOption.Join) { Context = this.Context };
         }
 
         /// <summary>
@@ -55,10 +55,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Parameter, Table, Table1> LeftJoin<Table1>(string @as)
+        public SelectJoinGrammar<Table,Parameter, Table1> LeftJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.LeftJoin) { Context = this.Context };
+            return new SelectJoinGrammar<Table,Parameter, Table1>(@as, JoinOption.LeftJoin) { Context = this.Context };
         }
 
         /// <summary>
@@ -67,10 +67,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Parameter, Table, Table1> InnerJoin<Table1>(string @as)
+        public SelectJoinGrammar<Table,Parameter, Table1> InnerJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.InnerJoin) { Context = this.Context };
+            return new SelectJoinGrammar<Table,Parameter, Table1>(@as, JoinOption.InnerJoin) { Context = this.Context };
         }
 
         /// <summary>
@@ -79,27 +79,27 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Parameter, Table, Table1> RightJoin<Table1>(string @as)
+        public SelectJoinGrammar<Table,Parameter, Table1> RightJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new SelectJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.RightJoin) { Context = this.Context };
+            return new SelectJoinGrammar<Table,Parameter, Table1>(@as, JoinOption.RightJoin) { Context = this.Context };
         }
 
         /// <summary>
         /// 查询单条
         /// </summary>
         /// <returns></returns>
-        public SingleSelectGrammar<Parameter, Table> ToSingle()
+        public SingleSelectGrammar<Table,Parameter> ToSingle()
         {
-            return new SingleSelectGrammar<Parameter, Table>() { Context = this.Context }.StartSelectColumn();
+            return new SingleSelectGrammar<Table,Parameter>() { Context = this.Context }.StartSelectColumn();
         }
 
         /// <summary>
         /// 查询分页
         /// </summary>
-        public EnumerableSelectGrammar<Parameter, Table> ToEnumerable()
+        public EnumerableSelectGrammar<Table,Parameter> ToEnumerable()
         {
-            return new EnumerableSelectGrammar<Parameter, Table>() { Context = this.Context }.StartSelectColumn();
+            return new EnumerableSelectGrammar<Table,Parameter>() { Context = this.Context }.StartSelectColumn();
         }
 
     }

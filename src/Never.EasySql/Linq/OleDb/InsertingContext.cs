@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.OleDb
     /// <summary>
     /// 插入操作
     /// </summary>
-    public sealed class InsertingContext<Parameter, Table> : Linq.InsertingContext<Parameter, Table>
+    public sealed class InsertingContext<Table,Parameter> : Linq.InsertingContext<Table,Parameter>
     {
         /// <summary>
         /// ctor

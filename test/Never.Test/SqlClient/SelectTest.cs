@@ -44,7 +44,7 @@ namespace Never.Test
             //     .Where(null).ToList(1, 5).GetResult();
 
             //更新
-            var update = dao.ToEasyLinqDao(new MyTable()).Cached("AAA").Update<MyTable>()
+            var update = dao.ToEasyLinqDao(new MyTable()).Cached("AAA").Update()
                 .From("user")
                 //.As("u")
                 //.Join<MyTable2>("t1").On((p, t) => p.Id >= 1).And((p, t) => t.Name == "3")

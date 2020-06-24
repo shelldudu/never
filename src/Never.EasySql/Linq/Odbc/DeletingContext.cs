@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.Odbc
     /// <summary>
     /// 删除操作
     /// </summary>
-    public sealed class DeletingContext<Parameter, Table> : Linq.DeletingContext<Parameter, Table>
+    public sealed class DeletingContext<Table,Parameter> : Linq.DeletingContext<Table,Parameter>
     {
         /// <summary>
         /// ctor

@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public abstract class DeleteContext<Parameter, Table> : Context
+    public abstract class DeleteContext<Table,Parameter> : Context
     {
         /// <summary>
         /// dao
@@ -62,19 +62,19 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public abstract DeleteContext<Parameter, Table> From(string table);
+        public abstract DeleteContext<Table,Parameter> From(string table);
 
         /// <summary>
         /// as新表名
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public abstract DeleteContext<Parameter, Table> AsTable(string table);
+        public abstract DeleteContext<Table,Parameter> AsTable(string table);
 
         /// <summary>
         /// 入口
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> Entrance();
+        public abstract DeleteContext<Table,Parameter> Entrance();
 
         /// <summary>
         /// 执行更新
@@ -115,51 +115,51 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> Where();
+        public abstract DeleteContext<Table,Parameter> Where();
 
         /// <summary>
         /// where
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, object>> expression);
+        public abstract DeleteContext<Table,Parameter> Where(Expression<Func<Parameter, object>> expression);
 
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> Exists<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where);
+        public abstract DeleteContext<Table,Parameter> Exists<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where);
 
         /// <summary>
         /// 不存在
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> NotExists<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where);
+        public abstract DeleteContext<Table,Parameter> NotExists<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where);
 
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> In<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where);
+        public abstract DeleteContext<Table,Parameter> In<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where);
 
         /// <summary>
         /// 不存在
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> NotIn<Table1>(AndOrOption option, Expression<Func<Parameter, Table, bool>> expression, Expression<Func<Table1, bool>> where);
+        public abstract DeleteContext<Table,Parameter> NotIn<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where);
 
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> Exists(AndOrOption option, string expression);
+        public abstract DeleteContext<Table,Parameter> Exists(AndOrOption option, string expression);
 
         /// <summary>
         /// 不存在
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> NotExists(AndOrOption option, string expression);
+        public abstract DeleteContext<Table,Parameter> NotExists(AndOrOption option, string expression);
 
         /// <summary>
         /// 存在
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> In(AndOrOption option, string expression);
+        public abstract DeleteContext<Table,Parameter> In(AndOrOption option, string expression);
 
         /// <summary>
         /// 不存在
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> NotIn(AndOrOption option, string expression);
+        public abstract DeleteContext<Table,Parameter> NotIn(AndOrOption option, string expression);
     }
 }
