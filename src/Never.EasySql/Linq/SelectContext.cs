@@ -156,7 +156,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public abstract SelectContext<Table,Parameter> StartSelectColumn();
+        public abstract SelectContext<Table,Parameter> StartEntrance();
 
         /// <summary>
         /// 在select的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint

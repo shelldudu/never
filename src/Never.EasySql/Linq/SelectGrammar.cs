@@ -141,7 +141,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
             return new SingleSelectGrammar<Table,Parameter, Table1>() { Context = this.Context };
         }
@@ -154,7 +154,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
-            this.Context.SetPage().StartSelectColumn();
+            this.Context.SetPage().StartEntrance();
             this.Context.JoinSelect(this.joins);
             return new EnumerableSelectGrammar<Table,Parameter, Table1>() { Context = this.Context };
         }
@@ -301,7 +301,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
             return new SingleSelectGrammar<Table,Parameter, Table1, Table2>() { Context = this.Context };
         }
@@ -317,7 +317,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
             return new EnumerableSelectGrammar<Table,Parameter, Table1, Table2>() { Context = this.Context };
         }
@@ -465,7 +465,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
             return new SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3>() { Context = this.Context };
         }
@@ -481,7 +481,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
             return new EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3>() { Context = this.Context };
         }
@@ -557,7 +557,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
             return new SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4>() { Context = this.Context };
         }
@@ -573,7 +573,7 @@ namespace Never.EasySql.Linq
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
             return new EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4>() { Context = this.Context };
         }
@@ -597,7 +597,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal SingleSelectGrammar<Table,Parameter> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 
@@ -1886,7 +1886,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal SingleSelectGrammar<Table,Parameter, Table1> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 
@@ -3228,7 +3228,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal SingleSelectGrammar<Table,Parameter, Table1, Table2> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 
@@ -4616,7 +4616,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 
@@ -6047,7 +6047,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 
@@ -7499,7 +7499,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal EnumerableSelectGrammar<Table,Parameter> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 
@@ -8799,7 +8799,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal EnumerableSelectGrammar<Table,Parameter, Table1> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 
@@ -10142,7 +10142,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal EnumerableSelectGrammar<Table,Parameter, Table1, Table2> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 
@@ -11530,7 +11530,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 
@@ -12961,7 +12961,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> StartSelectColumn()
         {
-            this.Context.SetSingle().StartSelectColumn();
+            this.Context.SetSingle().StartEntrance();
             return this;
         }
 

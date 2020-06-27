@@ -101,6 +101,5 @@ namespace Never.EasySql.Linq
         {
             return new EnumerableSelectGrammar<Table,Parameter>() { Context = this.Context }.StartSelectColumn();
         }
-
     }
 }

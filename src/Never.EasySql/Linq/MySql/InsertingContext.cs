@@ -35,7 +35,7 @@ namespace Never.EasySql.Linq.MySql
             this.labels.Add(new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = this.useBulk ? ";select last_insert_id() as id;" : "select last_insert_id() as id;",
+                SqlText = this.UseBulk ? ";select last_insert_id() as id;" : "select last_insert_id() as id;",
             });
 
             return this;

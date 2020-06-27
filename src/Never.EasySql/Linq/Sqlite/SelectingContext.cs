@@ -32,7 +32,7 @@ namespace Never.EasySql.Linq.Sqlite
         /// <returns></returns>
         protected override string FormatTable(string text)
         {
-            return string.Concat("'", text, "'");
+            return string.Concat("`", text, "`");
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Never.EasySql.Linq.Sqlite
         /// <returns></returns>
         protected override string FormatColumn(string text)
         {
-            return string.Concat("'", text, "'");
+            return string.Concat("`", text, "`");
         }
     }
 }

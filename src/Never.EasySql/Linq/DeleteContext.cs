@@ -40,6 +40,22 @@ namespace Never.EasySql.Linq
         protected readonly Dictionary<string, object> templateParameter;
 
         /// <summary>
+        /// 从哪个表
+        /// </summary>
+        public string FromTable
+        {
+            get; protected set;
+        }
+
+        /// <summary>
+        /// 别名
+        /// </summary>
+        public string AsTable
+        {
+            get; protected set;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="dao"></param>
@@ -62,104 +78,80 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public abstract DeleteContext<Table,Parameter> From(string table);
+        public virtual DeleteContext<Table, Parameter> From(string table)
+        {
+            this.FromTable = this.FormatTable(table);
+            return this;
+        }
 
         /// <summary>
         /// as新表名
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public abstract DeleteContext<Table,Parameter> AsTable(string table);
+        public virtual DeleteContext<Table, Parameter> As(string table)
+        {
+            this.AsTable = table;
+            return this;
+        }
+
+        /// <summary>
+        /// 检查名称是否合格
+        /// </summary>
+        /// <param name="tableName"></param>
+        public virtual void CheckTableNameIsExists(string tableName)
+        {
+            if (this.FromTable.IsEquals(tableName))
+                throw new Exception(string.Format("the table name {0} is equal alias Name {1}", this.FromTable, tableName));
+
+            if (this.AsTable.IsEquals(tableName))
+                throw new Exception(string.Format("the table alias name {0} is equal alias Name {1}", this.AsTable, tableName));
+        }
 
         /// <summary>
         /// 入口
         /// </summary>
-        public abstract DeleteContext<Table,Parameter> Entrance();
-
-        /// <summary>
-        /// 执行更新
-        /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
-        /// <returns></returns>
-        protected int Execute(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
-        {
-            return dao.Delete(sqlTag, sqlParameter);
-        }
-
-        /// <summary>
-        /// 执行更新（事务）
-        /// </summary>
-        /// <param name="dao"></param>
-        /// <param name="isolationLevel"></param>
-        /// <param name="sqlTag"></param>
-        /// <param name="sqlParameter"></param>
-        /// <returns></returns>
-        protected int Execute(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
-        {
-            dao.BeginTransaction(isolationLevel);
-            try
-            {
-                var row = dao.Delete(sqlTag, sqlParameter);
-                dao.CommitTransaction();
-                return row;
-            }
-            catch
-            {
-                dao.RollBackTransaction();
-                return -1;
-            }
-        }
+        public abstract DeleteContext<Table, Parameter> StartEntrance();
 
         /// <summary>
         /// where
         /// </summary>
-        public abstract DeleteContext<Table,Parameter> Where();
+        public abstract DeleteContext<Table, Parameter> Where();
 
         /// <summary>
         /// where
         /// </summary>
-        public abstract DeleteContext<Table,Parameter> Where(Expression<Func<Parameter, object>> expression);
+        public abstract DeleteContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression);
 
         /// <summary>
-        /// 存在
+        /// where
         /// </summary>
-        public abstract DeleteContext<Table,Parameter> Exists<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where);
+        public abstract DeleteContext<Table, Parameter> Where(AndOrOption andOrOption, string sql);
 
         /// <summary>
-        /// 不存在
+        /// append
         /// </summary>
-        public abstract DeleteContext<Table,Parameter> NotExists<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where);
+        public abstract DeleteContext<Table, Parameter> Append(string sql);
 
         /// <summary>
-        /// 存在
+        /// join
         /// </summary>
-        public abstract DeleteContext<Table,Parameter> In<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where);
+        /// <param name="joins"></param>
+        /// <returns></returns>
+        public abstract DeleteContext<Table, Parameter> JoinOnDelete(List<JoinInfo> joins);
 
         /// <summary>
-        /// 不存在
+        /// exists
         /// </summary>
-        public abstract DeleteContext<Table,Parameter> NotIn<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where);
+        /// <param name="whereExists"></param>
+        /// <returns></returns>
+        public abstract DeleteContext<Table, Parameter> JoinOnWhereExists(WhereExistsInfo whereExists);
 
         /// <summary>
-        /// 存在
+        /// in
         /// </summary>
-        public abstract DeleteContext<Table,Parameter> Exists(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract DeleteContext<Table,Parameter> NotExists(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        public abstract DeleteContext<Table,Parameter> In(AndOrOption option, string expression);
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        public abstract DeleteContext<Table,Parameter> NotIn(AndOrOption option, string expression);
+        /// <param name="whereIn"></param>
+        /// <returns></returns>
+        public abstract DeleteContext<Table, Parameter> JoinOnWhereIn(WhereInInfo whereIn);
     }
 }

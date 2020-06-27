@@ -36,7 +36,7 @@ namespace Never.EasySql.Linq.Postgre
             this.labels.Add(new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = this.useBulk ? ";select @@Ideneity;" : "select @@Ideneity;",
+                SqlText = this.UseBulk ? ";select @@Ideneity;" : "select @@Ideneity;",
             });
 
             return this;
@@ -49,7 +49,7 @@ namespace Never.EasySql.Linq.Postgre
         /// <returns></returns>
         protected override string FormatTable(string text)
         {
-            return string.Concat("\"", text, "\"");
+            return string.Concat("`", text, "`");
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Never.EasySql.Linq.Postgre
         /// <returns></returns>
         protected override string FormatColumn(string text)
         {
-            return string.Concat("\"", text, "\"");
+            return string.Concat("`", text, "`");
         }
     }
 }

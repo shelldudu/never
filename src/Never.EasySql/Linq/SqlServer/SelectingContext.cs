@@ -29,9 +29,9 @@ namespace Never.EasySql.Linq.SqlServer
         /// 入口
         /// </summary>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> StartSelectColumn()
+        public override SelectContext<Table,Parameter> StartEntrance()
         {
-            return base.StartSelectColumn();
+            return base.StartEntrance();
         }
 
         /// <summary>

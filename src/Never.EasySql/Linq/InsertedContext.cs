@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    internal sealed class InsertedContext<Table,Parameter> : Linq.InsertContext<Table,Parameter>
+    internal sealed class InsertedContext<Table, Parameter> : Linq.InsertContext<Table, Parameter>
     {
         private readonly LinqSqlTag sqlTag;
 
@@ -16,7 +16,7 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override Linq.InsertContext<Table,Parameter> Colum(Expression<Func<Table, object>> keyValue)
+        public override Linq.InsertContext<Table, Parameter> Colum(Expression<Func<Table, object>> keyValue)
         {
             return this;
         }
@@ -26,38 +26,38 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override Linq.InsertContext<Table,Parameter> ColumWithFunc(Expression<Func<Table, object>> key, string value)
+        public override Linq.InsertContext<Table, Parameter> ColumWithFunc(Expression<Func<Table, object>> key, string value)
         {
             this.templateParameter[this.FindColumnName(key, this.tableInfo, out _)] = value;
             return this;
         }
 
-        public override Linq.InsertContext<Table,Parameter> ColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
+        public override Linq.InsertContext<Table, Parameter> ColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
         {
             return this;
         }
 
-        public override Linq.InsertContext<Table,Parameter> StartInsertColumn(char flag)
+        public override Linq.InsertContext<Table, Parameter> StartEntrance()
         {
             return this;
         }
 
         public override Result GetResult<Result>()
         {
-            return this.Insert<Table, Parameter,Result>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            return this.Insert<Table, Parameter, Result>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         public override void GetResult()
         {
-            this.InsertMany<Table, Parameter>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            this.Insert<Table, Parameter>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
-        public override Linq.InsertContext<Table,Parameter> InsertLastInsertId()
+        public override Linq.InsertContext<Table, Parameter> InsertLastInsertId()
         {
             return this;
         }
 
-        public override Linq.InsertContext<Table,Parameter> Into(string table)
+        public override Linq.InsertContext<Table, Parameter> Into(string table)
         {
             return this;
         }
@@ -70,6 +70,11 @@ namespace Never.EasySql.Linq
         protected override string FormatTable(string text)
         {
             return text;
+        }
+
+        public override InsertContext<Table, Parameter> InsertColumn(string columnName, string parameterName, bool textParameter)
+        {
+            return this;
         }
     }
 }

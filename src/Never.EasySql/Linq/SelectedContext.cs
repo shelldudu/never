@@ -57,7 +57,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override SelectContext<Table,Parameter> StartSelectColumn()
+        public override SelectContext<Table,Parameter> StartEntrance()
         {
             return this;
         }

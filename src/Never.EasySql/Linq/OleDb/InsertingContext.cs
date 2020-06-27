@@ -36,7 +36,7 @@ namespace Never.EasySql.Linq.OleDb
             this.labels.Add(new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = this.useBulk ? ";select @@Ideneity;" : "select @@Ideneity;",
+                SqlText = this.UseBulk ? ";select @@Ideneity;" : "select @@Ideneity;",
             });
 
             return this;

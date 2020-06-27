@@ -115,7 +115,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public abstract UpdateContext<Table, Parameter> StartSetColumn();
+        public abstract UpdateContext<Table, Parameter> StartEntrance();
 
         /// <summary>
         /// 更新字段名

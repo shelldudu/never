@@ -127,7 +127,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public override UpdateContext<Table, Parameter> StartSetColumn()
+        public override UpdateContext<Table, Parameter> StartEntrance()
         {
             if (this.FromTable.IsNullOrEmpty())
             {
@@ -250,6 +250,24 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// where sql
+        /// </summary>
+        /// <param name="andOrOption"></param>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public override UpdateContext<Table, Parameter> Where(AndOrOption andOrOption, string sql)
+        {
+            var label = new TextLabel()
+            {
+                SqlText = string.Concat(andOrOption == AndOrOption.and ? "and " : "or ", sql),
+                TagId = NewId.GenerateNumber(),
+            };
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+            return this;
+        }
+
+        /// <summary>
         /// 结束
         /// </summary>
         /// <param name="sql"></param>
@@ -327,24 +345,6 @@ namespace Never.EasySql.Linq
                 TagId = NewId.GenerateNumber(),
             };
 
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
-            return this;
-        }
-
-        /// <summary>
-        /// where sql
-        /// </summary>
-        /// <param name="andOrOption"></param>
-        /// <param name="sql"></param>
-        /// <returns></returns>
-        public override UpdateContext<Table, Parameter> Where(AndOrOption andOrOption, string sql)
-        {
-            var label = new TextLabel()
-            {
-                SqlText = string.Concat(andOrOption == AndOrOption.and ? "and " : "or ", sql),
-                TagId = NewId.GenerateNumber(),
-            };
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;

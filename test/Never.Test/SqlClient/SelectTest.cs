@@ -34,7 +34,7 @@ namespace Never.Test
             var one = dao.ToEasyLinqDao(new { Id = 1 })
                .Select<SqlServerBuilder>()
                .ToSingle()
-               .Where((p, t) => t.EmbeddedSqlMaps.Count() >= p.Id)
+               .Where((t, p) => t.EmbeddedSqlMaps.Count() >= p.Id)
                .GetResult();
 
             //返回列表
@@ -55,7 +55,7 @@ namespace Never.Test
                 .SetColumn(m => m.Name)
                 .SetColumnWithFunc(m => m.CreateTime, "now()")
                 .SetColumnWithValue(m => m.Name, "abc")
-                .Where((p, t) => p.Id == t.Id)
+                .Where((t, p) => p.Id == t.Id)
                 .AndNotExists<MyTable2>("t1").Where((p, t, t1) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2).And((p, t, t1) => t1.Id != 2).ToWhere()
                 //.Join<MyTable2>("t2").On((p, t1, t2) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2) => t1.Id != 2)
                 //.Join<MyTable2>("t3").On((p, t1, t2, t3) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2, t3) => t1.Id != 2).ToWhere()
@@ -76,16 +76,17 @@ namespace Never.Test
 
             return;
             //删除
+
             var delete = dao.ToEasyLinqDao(new SqlServerBuilder()).Delete<MyTable>()
-                .Where(p => p.ConnectionString == "abc")
-                .AndNotExists<SqlServerBuilder>((p, t1) => t1.ConnectionString == p.ConnectionString)
+                .Where((t, p) => p.ConnectionString == "abc")
+                .AndNotExists<SqlServerBuilder>("t1").And((t, p, t1) => t1.ConnectionString == p.ConnectionString).ToWhere()
                 .GetResult();
 
             //推入
             var insert = dao.ToEasyLinqDao(new SqlServerBuilder()).Insert<MyTable>()
                 .UseSingle()
-                .Colum(m => m.EmbeddedSqlMaps)
-                .ColumWithFunc(m => m.ConnectionString, "uuid()")
+                .Colum(m => m.Id)
+                .ColumWithFunc(m => m.Id, "uuid()")
                 .LastInsertId()
                 .GetResult<int>();
         }

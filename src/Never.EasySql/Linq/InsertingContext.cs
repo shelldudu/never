@@ -53,11 +53,6 @@ namespace Never.EasySql.Linq
         protected string equalAndPrefix;
 
         /// <summary>
-        /// 是否使用批量推入
-        /// </summary>
-        protected bool useBulk;
-
-        /// <summary>
         /// 插入字段的模板
         /// </summary>
         protected StringBuilder templateBuilder;
@@ -103,9 +98,8 @@ namespace Never.EasySql.Linq
         /// 入口
         /// </summary>
         /// <returns></returns>
-        public override Linq.InsertContext<Table, Parameter> StartInsertColumn(char flag)
+        public override Linq.InsertContext<Table, Parameter> StartEntrance()
         {
-            this.useBulk = flag == 'b';
             if (this.InsertTable.IsNullOrEmpty())
             {
                 this.Into(this.FindTableName(this.tableInfo, typeof(Table)));
@@ -156,7 +150,7 @@ namespace Never.EasySql.Linq
             };
 
             LinqSqlTagProvider.Set(sqlTag);
-            this.InsertMany<Table, Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            this.Insert<Table, Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         /// <summary>
@@ -171,7 +165,7 @@ namespace Never.EasySql.Linq
             this.templateBuilder.Insert(0, this.labels[0].SqlText);
             ((BaseLabel)this.labels[0]).SqlText = this.templateBuilder.ToString();
             this.textLength += this.labels[0].SqlText.Length;
-            if (this.useBulk)
+            if (this.UseBulk)
             {
                 var arrayLabel = new ArrayLabel()
                 {

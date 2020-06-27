@@ -23,7 +23,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         internal UpdateGrammar<Table, Parameter> StartSetColumn()
         {
-            this.Context.StartSetColumn();
+            this.Context.StartEntrance();
             return this;
         }
 

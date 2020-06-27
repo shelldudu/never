@@ -34,8 +34,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SingleInsertGrammar<Table, Parameter> UseSingle()
         {
-            this.Context.StartInsertColumn('s');
-            return new SingleInsertGrammar<Table, Parameter>() { Context = this.Context };
+            return new SingleInsertGrammar<Table, Parameter>() { Context = this.Context }.StartInsertRecord();
         }
 
         /// <summary>
@@ -44,8 +43,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public BulkInsertGrammar<Table, Parameter> UseBulk()
         {
-            this.Context.StartInsertColumn('b');
-            return new BulkInsertGrammar<Table, Parameter>() { Context = this.Context };
+            return new BulkInsertGrammar<Table, Parameter>() { Context = this.Context }.StartInsertRecord();
         }
     }
 }

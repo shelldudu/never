@@ -16,72 +16,47 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override DeleteContext<Table,Parameter> AsTable(string table)
-        {
-            return this;
-        }
-
-        public override Linq.DeleteContext<Table,Parameter> Entrance()
-        {
-            return this;
-        }
-
-        public override Linq.DeleteContext<Table,Parameter> Exists<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where)
-        {
-            return this;
-        }
-
-        public override Linq.DeleteContext<Table,Parameter> Exists(AndOrOption option, string expression)
-        {
-            return this;
-        }
-
-        public override Linq.DeleteContext<Table,Parameter> From(string table)
+        public override DeleteContext<Table, Parameter> Append(string sql)
         {
             return this;
         }
 
         public override int GetResult()
         {
-            return this.Execute(this.sqlTag, this.dao, this.sqlParameter);
+            return this.Delete<Table, Parameter>(this.sqlTag, this.dao, this.sqlParameter);
         }
 
-        public override Linq.DeleteContext<Table,Parameter> In<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where)
+        public override DeleteContext<Table, Parameter> JoinOnDelete(List<JoinInfo> joins)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Table,Parameter> In(AndOrOption option, string expression)
+        public override DeleteContext<Table, Parameter> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Table,Parameter> NotExists<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where)
+        public override DeleteContext<Table, Parameter> JoinOnWhereIn(WhereInInfo whereIn)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Table,Parameter> NotExists(AndOrOption option, string expression)
+        public override DeleteContext<Table, Parameter> StartEntrance()
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Table,Parameter> NotIn<Table1>(AndOrOption option, Expression<Func<Table,Parameter, bool>> expression, Expression<Func<Table1, bool>> where)
+        public override DeleteContext<Table, Parameter> Where()
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Table,Parameter> NotIn(AndOrOption option, string expression)
+        public override DeleteContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
         {
             return this;
         }
 
-        public override Linq.DeleteContext<Table,Parameter> Where()
-        {
-            return this;
-        }
-
-        public override Linq.DeleteContext<Table,Parameter> Where(Expression<Func<Parameter, object>> expression)
+        public override DeleteContext<Table, Parameter> Where(AndOrOption andOrOption, string sql)
         {
             return this;
         }

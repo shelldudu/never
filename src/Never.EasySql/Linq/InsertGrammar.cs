@@ -18,6 +18,15 @@ namespace Never.EasySql.Linq
         internal InsertContext<Table, Parameter> Context { get; set; }
 
         /// <summary>
+        /// 入口
+        /// </summary>
+        public SingleInsertGrammar<Table, Parameter> StartInsertRecord()
+        {
+            this.Context.SetSingle().StartEntrance();
+            return this;
+        }
+
+        /// <summary>
         /// 插入的所有字段名
         /// </summary>
         public SingleInsertGrammar<Table, Parameter> InsertAll()
@@ -98,6 +107,15 @@ namespace Never.EasySql.Linq
         /// 上下文
         /// </summary>
         internal InsertContext<Table, Parameter> Context { get; set; }
+
+        /// <summary>
+        /// 入口
+        /// </summary>
+        public BulkInsertGrammar<Table, Parameter> StartInsertRecord()
+        {
+            this.Context.SetBulk().StartEntrance();
+            return this;
+        }
 
         /// <summary>
         /// 插入的所有字段名

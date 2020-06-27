@@ -40,6 +40,14 @@ namespace Never.EasySql.Linq
         protected readonly Dictionary<string, object> templateParameter;
 
         /// <summary>
+        /// 是否使用批量推入
+        /// </summary>
+        public bool UseBulk
+        {
+            get; protected set;
+        }
+
+        /// <summary>
         /// 从哪个表
         /// </summary>
         public string InsertTable
@@ -85,9 +93,28 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        /// <param name="flag"></param>
         /// <returns></returns>
-        public abstract InsertContext<Table, Parameter> StartInsertColumn(char flag);
+        public abstract InsertContext<Table, Parameter> StartEntrance();
+
+        /// <summary>
+        /// 设为单条
+        /// </summary>
+        /// <returns></returns>
+        public InsertContext<Table, Parameter> SetSingle()
+        {
+            this.UseBulk = false;
+            return this;
+        }
+
+        /// <summary>
+        /// 设为多条
+        /// </summary>
+        /// <returns></returns>
+        public InsertContext<Table, Parameter> SetBulk()
+        {
+            this.UseBulk = true;
+            return this;
+        }
 
         /// <summary>
         /// 获取结果

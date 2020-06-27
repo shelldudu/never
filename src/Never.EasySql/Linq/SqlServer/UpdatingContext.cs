@@ -28,7 +28,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// <summary>
         /// 入口
         /// </summary>
-        public override UpdateContext<Table,Parameter> StartSetColumn()
+        public override UpdateContext<Table,Parameter> StartEntrance()
         {
             this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");

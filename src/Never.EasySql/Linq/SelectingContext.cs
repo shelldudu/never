@@ -232,7 +232,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public override SelectContext<Table, Parameter> StartSelectColumn()
+        public override SelectContext<Table, Parameter> StartEntrance()
         {
             if (this.FromTable.IsNullOrEmpty())
             {
