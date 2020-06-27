@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Linq
+namespace Never.EasySql
 {
     /// <summary>
     /// 表的信息

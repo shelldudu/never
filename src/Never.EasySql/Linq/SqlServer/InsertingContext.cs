@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.SqlServer
     /// <summary>
     /// 插入操作
     /// </summary>
-    public sealed class InsertingContext<Table,Parameter> : Linq.InsertingContext<Table,Parameter>
+    public sealed class InsertingContext<Table, Parameter> : Linq.InsertingContext<Table, Parameter>
     {
         /// <summary>
         /// ctor
@@ -25,6 +25,21 @@ namespace Never.EasySql.Linq.SqlServer
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override InsertContext<Table, Parameter> InsertLastInsertId()
+        {
+            this.LoadSqlOnGetResulting();
+            this.labels.Add(new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = this.useBulk ? ";select @@Ideneity;" : "select @@Ideneity;",
+            });
+
+            return this;
+        }
 
         /// <summary>
         /// 对表名格式化

@@ -26,6 +26,21 @@ namespace Never.EasySql.Linq.MySql
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override InsertContext<Table, Parameter> InsertLastInsertId()
+        {
+            this.LoadSqlOnGetResulting();
+            this.labels.Add(new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = this.useBulk ? ";select last_insert_id() as id;" : "select last_insert_id() as id;",
+            });
+
+            return this;
+        }
+        /// <summary>
         /// 对表名格式化
         /// </summary>
         /// <param name="text"></param>

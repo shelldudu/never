@@ -75,12 +75,6 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-
-        protected override string SelectTableNamePointOnSetColunm()
-        {
-            return string.Empty;
-        }
-
         public override UpdateContext<Table, Parameter> JoinOnUpdate(List<JoinInfo> joins)
         {
             return this;
@@ -101,7 +95,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        protected override UpdateContext<Table, Parameter> SetColumn(string columnName, string originalColumnName, string parameterName, bool textParameter)
+        public override UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter)
         {
             return this;
         }

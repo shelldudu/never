@@ -48,7 +48,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> Where(Expression<Func<Table,Parameter, object>> expression)
+        public override SelectContext<Table,Parameter> Where(Expression<Func<Table,Parameter, bool>> expression)
         {
             return base.Where(expression);
         }

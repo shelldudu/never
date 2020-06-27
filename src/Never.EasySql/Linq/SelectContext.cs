@@ -314,7 +314,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public abstract SelectContext<Table,Parameter> Where(Expression<Func<Table,Parameter, object>> expression);
+        public abstract SelectContext<Table,Parameter> Where(Expression<Func<Table,Parameter, bool>> expression);
 
         /// <summary>
         /// append

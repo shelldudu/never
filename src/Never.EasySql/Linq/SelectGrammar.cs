@@ -677,7 +677,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -1987,8 +1987,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -3350,8 +3351,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -4758,8 +4760,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -6188,8 +6191,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -7574,8 +7578,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -8895,8 +8900,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -10259,8 +10265,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -11667,8 +11674,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,
@@ -13097,8 +13105,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, object>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
         {
+            this.Context.Where(expression);
             return new SelectWhereGrammar()
             {
                 Context = this.Context,

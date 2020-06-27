@@ -16,34 +16,40 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override Linq.InsertContext<Table,Parameter> Colum(Expression<Func<Table, object>> expression)
+        public override Linq.InsertContext<Table,Parameter> Colum(Expression<Func<Table, object>> keyValue)
         {
             return this;
         }
 
-        public override Linq.InsertContext<Table,Parameter> ColumWithFunc(Expression<Func<Table, object>> expression, string function)
+        public override InsertContext<Table, Parameter> Colum(Expression<Func<Table, object>> key, Expression<Func<Parameter, object>> value)
         {
             return this;
         }
 
-        public override Linq.InsertContext<Table,Parameter> ColumWithValue<TMember>(Expression<Func<Table, TMember>> expression, TMember value)
+        public override Linq.InsertContext<Table,Parameter> ColumWithFunc(Expression<Func<Table, object>> key, string value)
+        {
+            this.templateParameter[this.FindColumnName(key, this.tableInfo, out _)] = value;
+            return this;
+        }
+
+        public override Linq.InsertContext<Table,Parameter> ColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
         {
             return this;
         }
 
-        public override Linq.InsertContext<Table,Parameter> Entrance(char flag)
+        public override Linq.InsertContext<Table,Parameter> StartInsertColumn(char flag)
         {
             return this;
         }
 
         public override Result GetResult<Result>()
         {
-            throw new NotImplementedException();
+            return this.Insert<Table, Parameter,Result>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         public override void GetResult()
         {
-            throw new NotImplementedException();
+            this.InsertMany<Table, Parameter>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         public override Linq.InsertContext<Table,Parameter> InsertLastInsertId()

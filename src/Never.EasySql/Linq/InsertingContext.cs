@@ -14,12 +14,60 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public class InsertingContext<Table,Parameter> : InsertContext<Table,Parameter>
+    public class InsertingContext<Table, Parameter> : InsertContext<Table, Parameter>
     {
-        private readonly string cacheId;
-        private int textLength;
-        private int setTimes;
-        private string tableName;
+        #region prop
+        /// <summary>
+        /// 缓存Id
+        /// </summary>
+        protected readonly string cacheId;
+
+        /// <summary>
+        /// 总字符串长度
+        /// </summary>
+        protected int textLength;
+
+        /// <summary>
+        /// 插入记录次数
+        /// </summary>
+        protected int insertTimes;
+
+        /// <summary>
+        /// tableName.
+        /// </summary>
+        protected string tableNamePoint;
+
+        /// <summary>
+        /// asTable.
+        /// </summary>
+        protected string asTableNamePoint;
+
+        /// <summary>
+        /// format格式化后增加的长度
+        /// </summary>
+        protected int formatColumnAppendCount;
+
+        /// <summary>
+        /// 等于的前缀
+        /// </summary>
+        protected string equalAndPrefix;
+
+        /// <summary>
+        /// 是否使用批量推入
+        /// </summary>
+        protected bool useBulk;
+
+        /// <summary>
+        /// 插入字段的模板
+        /// </summary>
+        protected StringBuilder templateBuilder;
+
+        /// <summary>
+        /// 插入字段值的参数
+        /// </summary>
+        protected List<ILabel> valueLabels;
+
+        #endregion
 
         /// <summary>
         /// 
@@ -52,57 +100,171 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 表名
+        /// 入口
         /// </summary>
-        /// <param name="table"></param>
-        public override Linq.InsertContext<Table,Parameter> Into(string table)
+        /// <returns></returns>
+        public override Linq.InsertContext<Table, Parameter> StartInsertColumn(char flag)
         {
-            this.tableName = table;
+            this.useBulk = flag == 'b';
+            if (this.InsertTable.IsNullOrEmpty())
+            {
+                this.Into(this.FindTableName(this.tableInfo, typeof(Table)));
+            }
+
+            this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
+            this.tableNamePoint = string.Concat(this.InsertTable, ".");
+            this.asTableNamePoint = string.Empty;
+
+            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("insert into ", this.InsertTable, "(") };
+            this.textLength += label.SqlText.Length;
+            this.labels.Add(label);
+            this.templateBuilder = new StringBuilder(300);
+            this.valueLabels = new List<ILabel>(10);
+            this.equalAndPrefix = string.Concat(" = ", this.dao.SqlExecuter.GetParameterPrefix());
             return this;
         }
 
         /// <summary>
-        /// 入口
+        /// 
+        /// </summary>
+        /// <typeparam name="Result"></typeparam>
+        /// <returns></returns>
+        public override Result GetResult<Result>()
+        {
+            this.LoadSqlOnGetResulting();
+            var sqlTag = new LinqSqlTag(this.cacheId, "insert")
+            {
+                Labels = this.labels.AsEnumerable(),
+                TextLength = this.textLength,
+            };
+
+            LinqSqlTagProvider.Set(sqlTag);
+            return this.Insert<Table, Parameter, Result>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void GetResult()
+        {
+            this.LoadSqlOnGetResulting();
+            var sqlTag = new LinqSqlTag(this.cacheId, "insert")
+            {
+                Labels = this.labels.AsEnumerable(),
+                TextLength = this.textLength,
+            };
+
+            LinqSqlTagProvider.Set(sqlTag);
+            this.InsertMany<Table, Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual void LoadSqlOnGetResulting()
+        {
+            if (this.templateBuilder.Length == 0)
+                return;
+
+            this.templateBuilder.Append(")values(");
+            this.templateBuilder.Insert(0, this.labels[0].SqlText);
+            ((BaseLabel)this.labels[0]).SqlText = this.templateBuilder.ToString();
+            this.textLength += this.labels[0].SqlText.Length;
+            if (this.useBulk)
+            {
+                var arrayLabel = new ArrayLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                    Open = "(",
+                    Close = ")",
+                    Split = ",",
+                };
+
+                this.templateBuilder.Clear();
+                int add = 0 - ((TextLabel)valueLabels.FirstOrDefault()).ParameterPositions.ElementAt(0).ParameterStartIndex;
+                foreach (TextLabel label in this.valueLabels)
+                {
+                    this.templateBuilder.Append(label.SqlText);
+                    var parameter = label.ParameterPositions.ElementAt(0);
+                    add += parameter.ParameterStartIndex;
+                    parameter.ParameterStartIndex = add;
+                    parameter.ParameterStopIndex = add;
+                    parameter.PrefixStartIndex = add;
+                    arrayLabel.Line.Add(parameter);
+                }
+
+                arrayLabel.Line = new TextLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                    SqlText = this.templateBuilder.ToString(),
+                };
+
+                this.labels.Add(arrayLabel);
+            }
+            else
+            {
+                this.labels.AddRange(this.valueLabels);
+                this.labels.Add(new TextLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                    SqlText = ");",
+                });
+            }
+
+            this.templateBuilder.Clear();
+        }
+
+        /// <summary>
+        /// 
         /// </summary>
         /// <returns></returns>
-        public override Linq.InsertContext<Table,Parameter> Entrance(char flag)
+        public override InsertContext<Table, Parameter> InsertLastInsertId()
         {
-            this.tableName = this.tableName.IsNullOrEmpty() ? this.FindTableName<Parameter>(tableInfo) : this.tableName;
-            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("insert into ", this.FormatTable(this.tableName)) };
-            this.textLength += label.SqlText.Length;
-            this.labels.Add(label);
-
             return this;
         }
 
-        public override Result GetResult<Result>()
+        /// <summary>
+        /// 插入某一个字段
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="parameterName"></param>
+        /// <param name="textParameter"></param>
+        /// <returns></returns>
+        public override InsertContext<Table, Parameter> InsertColumn(string columnName, string parameterName, bool textParameter)
         {
-            throw new NotImplementedException();
-        }
+            templateBuilder.Append(this.FormatColumn(columnName));
+            templateBuilder.Append(",");
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+            };
 
-        public override void GetResult()
-        {
-            throw new NotImplementedException();
-        }
+            if (insertTimes == 0)
+            {
+                insertTimes++;
+                label.SqlText = string.Concat(this.dao.SqlExecuter.GetParameterPrefix(), parameterName);
+            }
+            else
+            {
+                label.SqlText = string.Concat(",", this.dao.SqlExecuter.GetParameterPrefix(), parameterName);
+            }
 
-        public override Linq.InsertContext<Table,Parameter> InsertLastInsertId()
-        {
-            throw new NotImplementedException();
-        }
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = columnName,
+                OccupanLength = columnName.Length,
+                PrefixStartIndex = 1,
+                ParameterStartIndex = 1 + parameterName.Length,
+                ParameterStopIndex = 1 + parameterName.Length,
+                TextParameter = textParameter,
+            });
 
-        public override Linq.InsertContext<Table,Parameter> Colum(Expression<Func<Table, object>> expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Linq.InsertContext<Table,Parameter> ColumWithFunc(Expression<Func<Table, object>> expression, string function)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Linq.InsertContext<Table,Parameter> ColumWithValue<TMember>(Expression<Func<Table, TMember>> expression, TMember value)
-        {
-            throw new NotImplementedException();
+            this.textLength += label.SqlText.Length;
+            this.valueLabels.Add(label);
+            return this;
         }
     }
 }

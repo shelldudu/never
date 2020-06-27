@@ -27,6 +27,18 @@ namespace Never.EasySql.Linq
             return this;
         }
 
+
+        /// <summary>
+        /// 更新的字段名
+        /// </summary>
+        public UpdateGrammar<Table, Parameter> SetColumn<TMember>(Expression<Func<Table, TMember>> keyValue)
+        {
+            string columnName = this.Context.FindColumnName(keyValue, Never.EasySql.Linq.Context.FindTableInfo<Table>(), out _);
+            string parameterName = this.Context.FindColumnName(keyValue, Never.EasySql.Linq.Context.FindTableInfo<Table>(), out _);
+            this.Context.SetColumn(columnName, parameterName, false);
+            return this;
+        }
+
         /// <summary>
         /// 更新的字段名
         /// </summary>

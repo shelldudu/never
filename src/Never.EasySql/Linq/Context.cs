@@ -1,4 +1,6 @@
-﻿using Never.Exceptions;
+﻿using Never.EasySql.Labels;
+using Never.Exceptions;
+using Never.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,6 +108,91 @@ namespace Never.EasySql.Linq
                 }
 
                 return sb.ToString();
+            }
+
+            /// <summary>
+            /// 转成label
+            /// </summary>
+            /// <param name="leftPlaceholders"></param>
+            /// <param name="context"></param>
+            /// <param name="parameterPrefix"></param>
+            /// <param name="firstPositionFix"></param>
+            /// <returns></returns>
+            public ILabel ToLabel(string[] leftPlaceholders, Context context, string parameterPrefix, int firstPositionFix)
+            {
+                var label = new TextLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                };
+                var sb = new StringBuilder(200);
+                if (this.Left != null)
+                {
+                    if (this.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(this.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else if (this.Left.Index == 1)
+                    {
+                        sb.Append(parameterPrefix);
+                        sb.Append(this.Left.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = this.Left.Exp,
+                            OccupanLength = this.Left.Exp.Length,
+                            PrefixStartIndex = firstPositionFix + 0,
+                            ParameterStartIndex = firstPositionFix + 0,
+                            ParameterStopIndex = firstPositionFix + this.Left.Exp.Length,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[this.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(this.Left.Exp));
+                    }
+                }
+
+                sb.Append(this.Join);
+                if (this.Right != null)
+                {
+                    if (this.Right.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(this.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else if (this.Right.Index == 1)
+                    {
+                        var start = sb.Length;
+                        sb.Append(parameterPrefix);
+                        sb.Append(this.Right.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = this.Right.Exp,
+                            OccupanLength = this.Right.Exp.Length,
+                            PrefixStartIndex = firstPositionFix + start + 0,
+                            ParameterStartIndex = firstPositionFix + start + 0,
+                            ParameterStopIndex = firstPositionFix + start + this.Right.Exp.Length,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[this.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(this.Right.Exp));
+                    }
+                }
+
+                label.SqlText = sb.ToString();
+                return label;
             }
         }
 
@@ -278,7 +365,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected Table Select<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected Table Select<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.QueryForObject<Table, Parameter>(sqlTag, sqlParameter);
         }
@@ -291,7 +378,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected Table Select<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected Table Select<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -314,7 +401,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected IEnumerable<Table> SelectMany<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected IEnumerable<Table> SelectMany<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.QueryForEnumerable<Table, Parameter>(sqlTag, sqlParameter);
         }
@@ -327,7 +414,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected IEnumerable<Table> SelectMany<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected IEnumerable<Table> SelectMany<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -350,7 +437,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Update<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Update<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.Update(sqlTag, sqlParameter);
         }
@@ -363,7 +450,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Update<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Update<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -386,7 +473,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Delete<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Delete<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.Delete(sqlTag, sqlParameter);
         }
@@ -399,7 +486,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Delete<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Delete<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -422,9 +509,9 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Insert<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected Result Insert<Table, Parameter,Result>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
-            return (int)dao.Insert(sqlTag, sqlParameter);
+            return (Result)dao.Insert(sqlTag, sqlParameter);
         }
 
         /// <summary>
@@ -435,19 +522,19 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Insert<Table,Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected Result Insert<Table, Parameter, Result>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
             {
-                var row = (int)dao.Insert(sqlTag, sqlParameter);
+                var row = (Result)dao.Insert(sqlTag, sqlParameter);
                 dao.CommitTransaction();
                 return row;
             }
             catch
             {
                 dao.RollBackTransaction();
-                return -1;
+                return default(Result);
             }
         }
 
@@ -458,7 +545,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected void InsertMany<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected void InsertMany<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             dao.Insert(sqlTag, sqlParameter);
         }
@@ -471,7 +558,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected void InsertMany<Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected void InsertMany<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -505,7 +592,7 @@ namespace Never.EasySql.Linq
         protected abstract string FormatColumn(string text);
 
         /// <summary>
-        /// 
+        /// 清空原来格式化字段后重新格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -537,7 +624,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public static TableInfo FindTableInfo<Table>()
         {
-            if (TableInfoProvider.TryUpdateTableInfo(typeof(Table), out var tableInfo))
+            if (TableInfoCachedProvider.TryUpdateTableInfo(typeof(Table), out var tableInfo))
                 return tableInfo;
 
             throw new KeyNotExistedException("table", "table info not found");
@@ -550,7 +637,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public static TableInfo FindTableInfo(Type type)
         {
-            if (TableInfoProvider.TryUpdateTableInfo(type, out var tableInfo))
+            if (TableInfoCachedProvider.TryUpdateTableInfo(type, out var tableInfo))
                 return tableInfo;
 
             throw new KeyNotExistedException("table", "table info not found");
@@ -563,7 +650,7 @@ namespace Never.EasySql.Linq
         /// <param name="expression"></param>
         /// <param name="memberInfo"></param>
         /// <returns></returns>
-        protected virtual string FindColumnName(LambdaExpression expression, TableInfo tableInfo, out MemberInfo memberInfo)
+        public virtual string FindColumnName(LambdaExpression expression, TableInfo tableInfo, out MemberInfo memberInfo)
         {
             var body = expression.Body;
             var model = body as ParameterExpression;
@@ -1179,7 +1266,7 @@ namespace Never.EasySql.Linq
         /// <param name="analyzeParameters"></param>
         /// <param name="tableInfo"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze<Table,Parameter>(Expression<Func<Table,Parameter, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Table, Parameter>(Expression<Func<Table, Parameter, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -1244,10 +1331,38 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table"></typeparam>
         /// <param name="expression"></param>
         /// <param name="collection"></param>
+        /// <param name="tableNameOrTableAliasName"></param>
+        /// <param name="contentPositionFix"></param>
+        /// <param name="parameterPrefix"></param>
         /// <returns></returns>
-        protected bool AnalyzeWhereExpress<Table, Parameter>(Expression<Func<Table, Parameter, bool>> expression, List<ILabel> collection)
+        protected bool AnalyzeWhereExpress<Table, Parameter>(Expression<Func<Table, Parameter, bool>> expression, List<ILabel> collection, string tableNameOrTableAliasName, string parameterPrefix, int contentPositionFix)
         {
+            var whereCollection = new List<BinaryBlock>();
+            var analyzeParameters = new List<AnalyzeParameter>();
+            var types = new[] { typeof(Table), typeof(Parameter) };
+            for (var k = 0; k < 2; k++)
+            {
+                analyzeParameters.Add(new AnalyzeParameter()
+                {
+                    Placeholder = expression.Parameters[k].Name,
+                    TableInfo = FindTableInfo(types[k]),
+                    Type = types[k],
+                });
+            }
 
+            if (this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection) == false)
+                return false;
+
+            var pp = new[] { tableNameOrTableAliasName, expression.Parameters[1].Name };
+            if (collection == null)
+                collection = new List<ILabel>(whereCollection.Count());
+
+            foreach (var where in whereCollection)
+            {
+                collection.Add(where.ToLabel(pp, this, parameterPrefix, contentPositionFix));
+            }
+
+            return true;
         }
 
         /// <summary>

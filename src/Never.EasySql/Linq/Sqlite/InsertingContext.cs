@@ -25,6 +25,23 @@ namespace Never.EasySql.Linq.Sqlite
         {
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override InsertContext<Table, Parameter> InsertLastInsertId()
+        {
+            this.LoadSqlOnGetResulting();
+            this.labels.Add(new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = this.useBulk ? ";select @@Ideneity;" : "select @@Ideneity;",
+            });
+
+            return this;
+        }
+
         /// <summary>
         /// 对表名格式化
         /// </summary>

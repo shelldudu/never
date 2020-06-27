@@ -5,15 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Never.SqlClient;
-using static Never.EasySql.Linq.TableInfo;
 using System.Reflection;
 
-namespace Never.EasySql.Linq
+namespace Never.EasySql
 {
     /// <summary>
     /// 
     /// </summary>
-    public static class TableInfoProvider
+    public static class TableInfoCachedProvider
     {
         /// <summary>
         /// 获取表的信息
@@ -28,12 +27,12 @@ namespace Never.EasySql.Linq
         public static TableInfo AnalyzeTableInfo(Type type)
         {
             var table = type.GetAttribute<TableNameAttribute>();
-            var columns = new List<ColumnInfo>();
+            var columns = new List<TableInfo.ColumnInfo>();
             foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
             {
                 if (member.MemberType == MemberTypes.Property || member.MemberType == MemberTypes.Field)
                 {
-                    var column = new ColumnInfo()
+                    var column = new TableInfo.ColumnInfo()
                     {
                         Member = member,
                         Column = member.GetAttribute<ColumnAttribute>(),

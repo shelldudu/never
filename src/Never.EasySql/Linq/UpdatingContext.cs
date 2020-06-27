@@ -15,6 +15,7 @@ namespace Never.EasySql.Linq
     public class UpdatingContext<Table, Parameter> : UpdateContext<Table, Parameter>
     {
         #region prop
+
         /// <summary>
         /// 缓存Id
         /// </summary>
@@ -147,7 +148,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected override UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter)
+        public override UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter)
         {
             var label = new TextLabel()
             {
@@ -236,7 +237,7 @@ namespace Never.EasySql.Linq
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             int s = this.labels.Count;
-            if (this.AnalyzeWhereExpress(expression, this.labels))
+            if (this.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix(), label.SqlText.Length))
             {
                 int e = this.labels.Count;
                 for (var i = s; i < e; i++)

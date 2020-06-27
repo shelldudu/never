@@ -83,7 +83,7 @@ namespace Never.Test
 
             //推入
             var insert = dao.ToEasyLinqDao(new SqlServerBuilder()).Insert<MyTable>()
-                .UseUnit()
+                .UseSingle()
                 .Colum(m => m.EmbeddedSqlMaps)
                 .ColumWithFunc(m => m.ConnectionString, "uuid()")
                 .LastInsertId()

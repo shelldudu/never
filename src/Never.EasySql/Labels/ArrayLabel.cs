@@ -163,6 +163,8 @@ namespace Never.EasySql.Labels
                 {
                     throw new InvalidException("the sql tag {0} need the array {1} parameter;", format.Id, Parameter);
                 }
+
+                return;
             }
 
             if (parameter.Count <= 0)

@@ -65,7 +65,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// <summary>
         /// where 条件
         /// </summary>
-        public override UpdateContext<Table,Parameter> Where(Expression<Func<Table,Parameter, object>> expression)
+        public override UpdateContext<Table,Parameter> Where(Expression<Func<Table,Parameter, bool>> expression)
         {
             if (this.AsTable.IsNotNullOrEmpty())
             {
@@ -92,15 +92,6 @@ namespace Never.EasySql.Linq.SqlServer
             }
 
             return base.Where(expression);
-        }
-
-        /// <summary>
-        /// 在update的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint
-        /// </summary>
-        /// <returns></returns>
-        protected override string SelectTableNamePointOnSetColunm()
-        {
-            return base.asTableNamePoint;
         }
 
         /// <summary>

@@ -32,20 +32,20 @@ namespace Never.EasySql.Linq
         /// 单条插入
         /// </summary>
         /// <returns></returns>
-        public UnitInsertGrammar<Parameter> UseUnit()
+        public SingleInsertGrammar<Table, Parameter> UseSingle()
         {
-            this.Context.Entrance('s');
-            return new UnitInsertGrammar<Parameter>() { Context = this.Context };
+            this.Context.StartInsertColumn('s');
+            return new SingleInsertGrammar<Table, Parameter>() { Context = this.Context };
         }
 
         /// <summary>
         /// 批量插入
         /// </summary>
         /// <returns></returns>
-        public BulkInsertGrammar<Parameter> UseBulk()
+        public BulkInsertGrammar<Table, Parameter> UseBulk()
         {
-            this.Context.Entrance('b');
-            return new BulkInsertGrammar<Parameter>() { Context = this.Context };
+            this.Context.StartInsertColumn('b');
+            return new BulkInsertGrammar<Table, Parameter>() { Context = this.Context };
         }
     }
 }

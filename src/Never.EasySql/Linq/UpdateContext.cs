@@ -120,7 +120,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected abstract UpdateContext<Table, Parameter> SetColumn(string columnName,  string parameterName, bool textParameter);
+        public abstract UpdateContext<Table, Parameter> SetColumn(string columnName,  string parameterName, bool textParameter);
 
         /// <summary>
         /// 更新字段名
@@ -135,9 +135,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        public virtual UpdateContext<Table, Parameter> SetFunc<TMember>(Expression<Func<Table, TMember>> expression, string value)
+        public virtual UpdateContext<Table, Parameter> SetFunc<TMember>(Expression<Func<Table, TMember>> key, string value)
         {
-            string columnName = this.FindColumnName(expression, this.tableInfo, out _);
+            string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
             return this.SetColumn(columnName, columnName, true);
         }
@@ -145,9 +145,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        public virtual UpdateContext<Table, Parameter> SetValue<TMember>(Expression<Func<Table, TMember>> expression, TMember value)
+        public virtual UpdateContext<Table, Parameter> SetValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
         {
-            string columnName = this.FindColumnName(expression, this.tableInfo, out _);
+            string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
             return this.SetColumn(columnName, columnName, false);
         }

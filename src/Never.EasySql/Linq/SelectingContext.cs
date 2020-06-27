@@ -14,7 +14,7 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public class SelectingContext<Table,Parameter> : SelectContext<Table,Parameter>
+    public class SelectingContext<Table, Parameter> : SelectContext<Table, Parameter>
     {
         #region prop
         /// <summary>
@@ -101,7 +101,7 @@ namespace Never.EasySql.Linq
             };
 
             LinqSqlTagProvider.Set(sqlTag);
-            return this.Select<Table,Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            return this.Select<Table, Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Never.EasySql.Linq
             this.templateParameter["EndIndex"] = endIndex;
 
             LinqSqlTagProvider.Set(sqlTag);
-            return this.SelectMany<Table,Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            return this.SelectMany<Table, Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Never.EasySql.Linq
         /// 
         /// </summary>
         /// <returns></returns>
-        protected override SelectContext<Table,Parameter> OnWhereExists()
+        protected override SelectContext<Table, Parameter> OnWhereExists()
         {
             var label = new TextLabel()
             {
@@ -174,7 +174,7 @@ namespace Never.EasySql.Linq
         /// 
         /// </summary>
         /// <returns></returns>
-        protected override SelectContext<Table,Parameter> OnWhereIn()
+        protected override SelectContext<Table, Parameter> OnWhereIn()
         {
             var label = new TextLabel()
             {
@@ -194,7 +194,7 @@ namespace Never.EasySql.Linq
         /// <param name="originalColunmName"></param>
         /// <param name="as"></param>
         /// <returns></returns>
-        protected override SelectContext<Table,Parameter> SelectColumn(string memberName, string originalColunmName, string @as)
+        protected override SelectContext<Table, Parameter> SelectColumn(string memberName, string originalColunmName, string @as)
         {
             var label = new TextLabel()
             {
@@ -221,7 +221,7 @@ namespace Never.EasySql.Linq
         /// 
         /// </summary>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> SelectAll()
+        public override SelectContext<Table, Parameter> SelectAll()
         {
             if (this.selectTimes > 0)
                 throw new Exception("select * just use one time");
@@ -232,7 +232,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public override SelectContext<Table,Parameter> StartSelectColumn()
+        public override SelectContext<Table, Parameter> StartSelectColumn()
         {
             if (this.FromTable.IsNullOrEmpty())
             {
@@ -263,7 +263,7 @@ namespace Never.EasySql.Linq
         /// where
         /// </summary>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> Where()
+        public override SelectContext<Table, Parameter> Where()
         {
             if (this.onWhereInited == false)
             {
@@ -328,7 +328,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> Where(Expression<Func<Table,Parameter, object>> expression)
+        public override SelectContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
         {
             if (this.onWhereInited == false)
             {
@@ -389,7 +389,7 @@ namespace Never.EasySql.Linq
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             int s = this.labels.Count;
-            if (base.AnalyzeWhereObjectExpression(expression, this.labels)) 
+            if (base.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix(), label.SqlText.Length))
             {
                 int e = this.labels.Count;
                 for (var i = s; i < e; i++)
@@ -433,7 +433,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> Append(string sql)
+        public override SelectContext<Table, Parameter> Append(string sql)
         {
             if (sql.IsNullOrEmpty())
                 return this;
@@ -453,7 +453,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> Last(string sql)
+        public override SelectContext<Table, Parameter> Last(string sql)
         {
             if (sql.IsNullOrEmpty())
                 return this;
@@ -478,7 +478,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> AppenInWhereExists(WhereExistsInfo whereExists)
+        public override SelectContext<Table, Parameter> AppenInWhereExists(WhereExistsInfo whereExists)
         {
             var label = new TextLabel()
             {
@@ -495,7 +495,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> AppenInWhereIn(WhereInInfo whereIn)
+        public override SelectContext<Table, Parameter> AppenInWhereIn(WhereInInfo whereIn)
         {
             var label = new TextLabel()
             {
