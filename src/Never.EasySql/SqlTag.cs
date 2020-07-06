@@ -97,12 +97,16 @@ namespace Never.EasySql
             var i = -1;
             var length = text.Length;
             var label = new TextLabel() { };
-            var cuted = false;
+            bool escape = false;
             while (true)
             {
                 i++;
                 if (i >= length)
                 {
+                    if (escape == true)
+                    {
+                        throw new DataFormatException("sql tag {0} can not find ' char on ending;", this.Id);
+                    }
                     break;
                 }
 
@@ -111,98 +115,22 @@ namespace Never.EasySql
                     case '\'':
                         {
                             writer.Write('\'');
-                            var start = i;
-                            var end = text.Length;
-                            while (true)
+                            if (escape == false)
                             {
-                                start++;
-                                if (text.Length <= start)
-                                {
-                                    throw new DataFormatException("sql tag {0} can not find ' char on ending;", this.Id);
-                                }
-
-                                if (text[start] == '$')
-                                {
-                                    writer.Write('$');
-                                    var start2 = start;
-                                    var end2 = text.Length;
-                                    while (true)
-                                    {
-                                        start2++;
-                                        if (text.Length <= start2)
-                                        {
-                                            break;
-                                        }
-
-                                        if (text[start2] == '\'')
-                                        {
-                                            throw new DataFormatException("sql tag {0} can not find $ char;", this.Id);
-                                        }
-
-                                        if (text[start2] == '$')
-                                        {
-                                            writer.Write('$');
-                                            end2 = start2 - 1;
-                                            cuted = true;
-                                            break;
-                                        }
-
-                                        writer.Write(text[start2]);
-                                        if (this.Pause(readerHelper, text[start2]))
-                                        {
-                                            end2 = start2 - 1;
-                                            break;
-                                        }
-                                    }
-
-                                    //从引号到$中间多了某些字符
-                                    var ss = start + 1;
-                                    var se = end2 - start;
-                                    var name = text.Sub(ss, se);
-                                    var parameter = new SqlTagParameterPosition()
-                                    {
-                                        Name = name,
-                                        SourcePrefix = new string(text[start], 1),
-                                        ActualPrefix = parameterPrefix,
-                                        ParameterStartIndex = start + 1,
-                                        PrefixStartIndex = start,
-                                        ParameterStopIndex = end2,
-                                        OccupanLength = end2 - start,
-                                    };
-
-                                    if (cuted)
-                                    {
-                                        parameter.ParameterStopIndex += 1;
-                                        parameter.OccupanLength += 1;
-                                        cuted = false;
-                                    }
-
-                                    parameter.TextParameter = parameter.SourcePrefix == "$";
-                                    label.Add(parameter);
-                                    start = start2;
-                                }
-                                else if (text[start] == '@')
-                                {
-                                    throw new DataFormatException("sql tag {0} reading '@' is error;", this.Id);
-                                }
-                                else
-                                {
-                                    writer.Write(text[start]);
-                                }
-                                if (text[start] == '\'')
-                                {
-                                    i = start;
-                                    break;
-                                }
+                                escape = true;
+                            }
+                            else
+                            {
+                                escape = false;
                             }
                         }
                         break;
 
                     case '$':
                         {
-                            writer.Write('$');
+                            writer.Write(parameterPrefix);
                             var start = i;
-                            var end = text.Length;
+                            int end;
                             while (true)
                             {
                                 start++;
@@ -213,9 +141,7 @@ namespace Never.EasySql
 
                                 if (text[start] == '$')
                                 {
-                                    writer.Write('$');
                                     end = start - 1;
-                                    cuted = true;
                                     break;
                                 }
 
@@ -233,20 +159,13 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                ParameterStartIndex = i + 1,
+                                ParameterStartIndex = i + parameterPrefix.Length,
                                 PrefixStartIndex = i,
-                                ParameterStopIndex = 1 + end,
+                                ParameterStopIndex = end,
                                 OccupanLength = end - i,
+                                TextParameter = true,
                             };
 
-                            if (cuted)
-                            {
-                                parameter.ParameterStopIndex += 1;
-                                parameter.OccupanLength += 1;
-                                cuted = false;
-                            }
-
-                            parameter.TextParameter = parameter.SourcePrefix == "$";
                             label.Add(parameter);
                             i = start;
                         }
@@ -254,9 +173,33 @@ namespace Never.EasySql
 
                     case '@':
                         {
-                            writer.Write(parameterPrefix);
                             var start = i;
-                            var end = text.Length;
+                            if (text.Length > i + 1 && text[i + 1] == '@')
+                            {
+                                while (true)
+                                {
+                                    start++;
+                                    if (text.Length <= start)
+                                    {
+                                        label.SqlText = writer.ToString();
+                                        this.TextLength += label.SqlText.Length;
+                                        writer.Clear();
+                                        return label;
+                                    }
+
+                                    writer.Write(text[start]);
+                                    if (this.Pause(readerHelper, text[start]))
+                                    {
+                                        label.SqlText = writer.ToString();
+                                        this.TextLength += label.SqlText.Length;
+                                        writer.Clear();
+                                        return label;
+                                    }
+                                }
+                            };
+
+                            writer.Write(parameterPrefix);
+                            int end;
                             while (true)
                             {
                                 start++;
@@ -280,20 +223,12 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                ParameterStartIndex = i + 1,
+                                ParameterStartIndex = i + parameterPrefix.Length,
                                 PrefixStartIndex = i,
-                                ParameterStopIndex = (i + 1) + end - i,
-                                OccupanLength = 1 + end - i,
+                                ParameterStopIndex = end,
+                                OccupanLength = end - i,
+                                TextParameter = false,
                             };
-
-                            parameter.TextParameter = parameter.SourcePrefix == "$";
-
-                            /*前缀为@@这样的长度*/
-                            if (parameterPrefix.Length > 1)
-                            {
-                                parameter.ParameterStopIndex += parameterPrefix.Length - 1;
-                                parameter.OccupanLength += parameterPrefix.Length - 1;
-                            }
 
                             label.Add(parameter);
                             i = start;
@@ -328,13 +263,18 @@ namespace Never.EasySql
             var length = text.Length;
             var label = new TextLabel() { };
             var hack = 0;
-            var cuted = false;
+            bool escape = false;
             char last = 'a';
             while (true)
             {
                 i++;
                 if (i >= length)
                 {
+                    if (escape == true)
+                    {
+                        throw new DataFormatException("sql tag {0} can not find ' char on ending;", this.Id);
+                    }
+
                     break;
                 }
 
@@ -402,92 +342,14 @@ namespace Never.EasySql
 
                     case '\'':
                         {
-                            writer.Write(last = text[i]);
-                            var start = i;
-                            var end = text.Length;
-                            while (true)
+                            writer.Write('\'');
+                            if (escape == false)
                             {
-                                start++;
-                                if (text.Length <= start)
-                                {
-                                    throw new DataFormatException("sql tag {0} can not find ' char;", this.Id);
-                                }
-
-                                if (text[start] == '$')
-                                {
-                                    last = '$';
-                                    writer.Write('$');
-                                    var start2 = start;
-                                    var end2 = text.Length;
-                                    while (true)
-                                    {
-                                        start2++;
-                                        if (text.Length <= start2)
-                                        {
-                                            break;
-                                        }
-
-                                        if (text[start2] == '\'')
-                                        {
-                                            throw new DataFormatException("sql tag {0} can not find $ char;", this.Id);
-                                        }
-
-                                        if (text[start2] == '$')
-                                        {
-                                            writer.Write(last = '$');
-                                            end2 = start2 - 1;
-                                            cuted = true;
-                                            break;
-                                        }
-
-                                        writer.Write(last = text[start2]);
-                                        if (this.Pause(readerHelper, text[start2]))
-                                        {
-                                            end2 = start2 - 1;
-                                            break;
-                                        }
-                                    }
-
-                                    //从引号到$中间多了某些字符
-                                    var ss = start + 1;
-                                    var se = end2 - start;
-                                    var name = text.Sub(ss, se);
-                                    var parameter = new SqlTagParameterPosition()
-                                    {
-                                        Name = name,
-                                        SourcePrefix = new string(text[start], 1),
-                                        ActualPrefix = parameterPrefix,
-                                        ParameterStartIndex = start + 1 - hack,
-                                        PrefixStartIndex = start - hack,
-                                        ParameterStopIndex = end2 - hack,
-                                        OccupanLength = end2 - start,
-                                    };
-
-                                    if (cuted)
-                                    {
-                                        parameter.ParameterStopIndex += 1;
-                                        parameter.OccupanLength += 1;
-                                        cuted = false;
-                                    }
-
-                                    parameter.TextParameter = parameter.SourcePrefix == "$";
-                                    label.Add(parameter);
-                                    start = start2;
-                                }
-                                else if (text[start] == '@')
-                                {
-                                    throw new DataFormatException("sql tag {0} reading '@' is error;", this.Id);
-                                }
-                                else
-                                {
-                                    writer.Write(last = text[start]);
-                                }
-
-                                if (text[start] == '\'')
-                                {
-                                    i = start;
-                                    break;
-                                }
+                                escape = true;
+                            }
+                            else
+                            {
+                                escape = false;
                             }
                         }
                         break;
@@ -495,9 +357,9 @@ namespace Never.EasySql
                     case '$':
                         {
                             last = '$';
-                            writer.Write('$');
+                            writer.Write(parameterPrefix);
                             var start = i;
-                            var end = text.Length;
+                            int end;
                             while (true)
                             {
                                 start++;
@@ -508,10 +370,8 @@ namespace Never.EasySql
 
                                 if (text[start] == '$')
                                 {
-                                    last = '$';
-                                    writer.Write('$');
                                     end = start - 1;
-                                    cuted = true;
+                                    last = text[end];
                                     break;
                                 }
 
@@ -529,20 +389,13 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                ParameterStartIndex = (i + 1) - hack,
+                                ParameterStartIndex = (i + parameterPrefix.Length) - hack,
                                 PrefixStartIndex = i - hack,
                                 ParameterStopIndex = end - hack,
-                                OccupanLength = (end - i),
+                                OccupanLength = end - i,
+                                TextParameter = true,
                             };
 
-                            if (cuted)
-                            {
-                                parameter.ParameterStopIndex += 1;
-                                parameter.OccupanLength += 1;
-                                cuted = false;
-                            }
-
-                            parameter.TextParameter = parameter.SourcePrefix == "$";
                             label.Add(parameter);
                             i = start;
                         }
@@ -550,10 +403,34 @@ namespace Never.EasySql
 
                     case '@':
                         {
+                            var start = i;
+                            if (text.Length > i + 1 && text[i + 1] == '@')
+                            {
+                                while (true)
+                                {
+                                    start++;
+                                    if (text.Length <= start)
+                                    {
+                                        label.SqlText = writer.ToString();
+                                        this.TextLength += label.SqlText.Length;
+                                        writer.Clear();
+                                        return label;
+                                    }
+
+                                    writer.Write(text[start]);
+                                    if (this.Pause(readerHelper, text[start]))
+                                    {
+                                        label.SqlText = writer.ToString();
+                                        this.TextLength += label.SqlText.Length;
+                                        writer.Clear();
+                                        return label;
+                                    }
+                                }
+                            };
+
                             last = parameterPrefix.Last();
                             writer.Write(parameterPrefix);
-                            var start = i;
-                            var end = text.Length;
+                            int end;
                             while (true)
                             {
                                 start++;
@@ -564,7 +441,6 @@ namespace Never.EasySql
                                 }
 
                                 writer.Write(last = text[start]);
-
                                 if (this.Pause(readerHelper, text[start]))
                                 {
                                     end = start - 1;
@@ -578,20 +454,12 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                ParameterStartIndex = (i + 1) - hack,
+                                ParameterStartIndex = (i + parameterPrefix.Length) - hack,
                                 PrefixStartIndex = i - hack,
-                                ParameterStopIndex = (i + end - i) - hack,
-                                OccupanLength = 1 + (end - i),
+                                ParameterStopIndex = end - hack,
+                                OccupanLength = end - i,
+                                TextParameter = false,
                             };
-
-                            parameter.TextParameter = parameter.SourcePrefix == "$";
-
-                            /*前缀为@@这样的长度*/
-                            if (parameterPrefix.Length > 1)
-                            {
-                                parameter.ParameterStopIndex += parameterPrefix.Length - 1;
-                                parameter.OccupanLength += parameterPrefix.Length - 1;
-                            }
 
                             label.Add(parameter);
                             i = start;

@@ -15,6 +15,8 @@ namespace Never.Test
         [Xunit.Fact]
         public void TestId_1()
         {
+            var text = new StringBuilder().Append("abcdef", 0, 1).ToString();
+            text = new StringBuilder().Append("abcdef", 1, 1).ToString();
             //var list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyTextDao(new { Id = 1, UserId = DBNull.Value, IdArray = new[] { 1, 2, 3, 4 } }).QueryForEnumerable<User>("select * from [user] where Id = $Id$and Id in ($IdArray)");
             //list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyXmlDao(new { Id = 1, UserId = 1, IdArray = new[] { 1, 2, 3, 4 } }).QueryForEnumerable<User>("qryUser");
             //list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyTextDao(new { Id = 1, UserId = DBNull.Value, IdArray = new[] { 1, 2, 3, 4 } }).QueryForEnumerable<User>((x, s) =>
@@ -31,11 +33,12 @@ namespace Never.Test
             var dao = ConstructibleDaoBuilder<MySqlBuilder>.Value.Build();
 
             //返回单条
-            // var one = dao.ToEasyLinqDao(new { Id = 1 })
-            //    .Select<MyTable>()
-            //    .ToSingle()
-            //      .Where((t, p) => t.Id >= p.Id)
-            //     .GetResult();
+            var one = dao.ToEasyLinqDao(new { Id = 1 })
+               .Select<MyTable>()
+               .ToEnumerable()
+               .Where((t, p) => t.Id >= p.Id)
+               .OrderByDescending(t => t.Id)
+               .GetResult(0, 4);
 
             //返回列表
             //var array = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().Where(null).ToList(1, 5).GetResult();
@@ -82,10 +85,11 @@ namespace Never.Test
             //  .GetResult();
 
             //推入
-            var insert = dao.ToEasyLinqDao(new MyTable() { Id = 1,Name = "666" }).Insert<MyTable>()
+            var insert = dao.ToEasyLinqDao(new MyTable() { Id = 1, Name = "666", CreateTime = DateTime.Now, UserId = 555 }).Insert<MyTable>()
                 .UseSingle()
-                .Colum(m => m.UserId)
-                .Colum(m => m.Name)
+                .InsertAll()
+                //.Colum(m => m.UserId)
+                //.Colum(m => m.Name)
                 .LastInsertId<int>()
                 .GetResult<int>();
         }
@@ -100,7 +104,7 @@ namespace Never.Test
         [Never.SqlClient.TableName(Name = "user")]
         public class MyTable
         {
-            [Never.SqlClient.Column(Optional = SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement & SqlClient.ColumnAttribute.ColumnOptional.Primary)]
+            [Never.SqlClient.Column(Optional = SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | SqlClient.ColumnAttribute.ColumnOptional.Primary)]
             public int Id;
             public long UserId;
             [Never.SqlClient.Column(Alias = "UserName")]
@@ -111,7 +115,7 @@ namespace Never.Test
         [Never.SqlClient.TableName(Name = "user_info")]
         public class MyTable2
         {
-            [Never.SqlClient.Column(Optional = SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement & SqlClient.ColumnAttribute.ColumnOptional.Primary)]
+            [Never.SqlClient.Column(Optional = SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | SqlClient.ColumnAttribute.ColumnOptional.Primary)]
             public int Id;
             public long UserId;
             public string Name;

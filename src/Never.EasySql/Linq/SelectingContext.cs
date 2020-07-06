@@ -81,19 +81,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override Table GetResult()
         {
-            if (this.orderBies.IsNotNullOrEmpty())
-            {
-                var label = new TextLabel()
-                {
-                    SqlText = this.LoadOrderBy(this.orderBies).ToString(),
-                    TagId = NewId.GenerateNumber(),
-                };
-
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
-            }
-
-
+            this.LoadOrderBy(true);
             var sqlTag = new LinqSqlTag(this.cacheId, "select")
             {
                 Labels = this.labels.AsEnumerable(),
@@ -112,18 +100,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override IEnumerable<Table> GetResults(int startIndex, int endIndex)
         {
-            if (this.orderBies.IsNotNullOrEmpty())
-            {
-                var label = new TextLabel()
-                {
-                    SqlText = this.LoadOrderBy(this.orderBies).ToString(),
-                    TagId = NewId.GenerateNumber(),
-                };
-
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
-            }
-
+            this.LoadOrderBy(true);
             var sqlTag = new LinqSqlTag(this.cacheId, "select")
             {
                 Labels = this.labels.AsEnumerable(),
@@ -135,6 +112,28 @@ namespace Never.EasySql.Linq
 
             LinqSqlTagProvider.Set(sqlTag);
             return this.SelectMany<Table, Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+        }
+
+        /// <summary>
+        /// 加载orderby
+        /// </summary>
+        /// <param name="clear"></param>
+        protected void LoadOrderBy(bool clear = true)
+        {
+            if (this.orderBies.IsNotNullOrEmpty())
+            {
+                var label = new TextLabel()
+                {
+                    SqlText = this.LoadOrderBy(this.orderBies).Insert(0, "\r").ToString(),
+                    TagId = NewId.GenerateNumber(),
+                };
+
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
+            if (clear)
+                this.orderBies.Clear();
         }
 
         /// <summary>
@@ -389,7 +388,7 @@ namespace Never.EasySql.Linq
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             int s = this.labels.Count;
-            if (base.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix(), label.SqlText.Length))
+            if (base.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix()))
             {
                 int e = this.labels.Count;
                 for (var i = s; i < e; i++)

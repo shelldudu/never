@@ -658,7 +658,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SingleSelectGrammar<Table,Parameter> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -726,7 +726,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
 
@@ -1947,7 +1947,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SingleSelectGrammar<Table,Parameter, Table1> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -2036,7 +2036,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
             /// <summary>
@@ -3289,7 +3289,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SingleSelectGrammar<Table,Parameter, Table1, Table2> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -3400,7 +3400,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
 
@@ -4677,7 +4677,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -4809,7 +4809,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
 
@@ -6108,7 +6108,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -6240,7 +6240,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
 
@@ -7560,7 +7560,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public EnumerableSelectGrammar<Table,Parameter> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -7627,7 +7627,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
 
@@ -8860,7 +8860,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public EnumerableSelectGrammar<Table,Parameter, Table1> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -8949,7 +8949,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
             /// <summary>
@@ -10203,7 +10203,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -10314,7 +10314,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
 
@@ -11591,7 +11591,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -11723,7 +11723,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
 
@@ -13022,7 +13022,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescending(Expression<Func<Table, object>> expression)
         {
-            this.Context.OrderBy(expression);
+            this.Context.OrderByDescending(expression);
             return this;
         }
 
@@ -13154,7 +13154,7 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
-                this.Context.OrderBy(expression);
+                this.Context.OrderByDescending(expression);
                 return this;
             }
 

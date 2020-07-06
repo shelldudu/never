@@ -116,14 +116,15 @@ namespace Never.EasySql.Linq
             /// <param name="leftPlaceholders"></param>
             /// <param name="context"></param>
             /// <param name="parameterPrefix"></param>
-            /// <param name="firstPositionFix"></param>
+            /// <param name="parameterIndex"></param>
             /// <returns></returns>
-            public ILabel ToLabel(string[] leftPlaceholders, Context context, string parameterPrefix, int firstPositionFix)
+            public ILabel ToLabel(string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
             {
                 var label = new TextLabel()
                 {
                     TagId = NewId.GenerateNumber(),
                 };
+
                 var sb = new StringBuilder(200);
                 if (this.Left != null)
                 {
@@ -133,7 +134,7 @@ namespace Never.EasySql.Linq
                         sb.Append(this.Left.Exp);
                         sb.Append("'");
                     }
-                    else if (this.Left.Index == 1)
+                    else if (this.Left.Index == parameterIndex)
                     {
                         sb.Append(parameterPrefix);
                         sb.Append(this.Left.Exp);
@@ -143,9 +144,9 @@ namespace Never.EasySql.Linq
                             SourcePrefix = parameterPrefix,
                             Name = this.Left.Exp,
                             OccupanLength = parameterPrefix.Length + this.Left.Exp.Length,
-                            PrefixStartIndex = firstPositionFix + 0,
-                            ParameterStartIndex = firstPositionFix + 0,
-                            ParameterStopIndex = firstPositionFix + this.Left.Exp.Length,
+                            PrefixStartIndex = 0,
+                            ParameterStartIndex = 0 + 1,
+                            ParameterStopIndex = 0 + this.Left.Exp.Length - 1,
                             TextParameter = false,
                         });
                     }
@@ -158,6 +159,7 @@ namespace Never.EasySql.Linq
                 }
 
                 sb.Append(this.Join);
+
                 if (this.Right != null)
                 {
                     if (this.Right.IsConstant)
@@ -166,7 +168,7 @@ namespace Never.EasySql.Linq
                         sb.Append(this.Right.Exp);
                         sb.Append("'");
                     }
-                    else if (this.Right.Index == 1)
+                    else if (this.Right.Index == parameterIndex)
                     {
                         var start = sb.Length;
                         sb.Append(parameterPrefix);
@@ -177,9 +179,9 @@ namespace Never.EasySql.Linq
                             SourcePrefix = parameterPrefix,
                             Name = this.Right.Exp,
                             OccupanLength = parameterPrefix.Length + this.Right.Exp.Length,
-                            PrefixStartIndex = firstPositionFix + start + 0,
-                            ParameterStartIndex = firstPositionFix + start + 0,
-                            ParameterStopIndex = firstPositionFix + start + this.Right.Exp.Length,
+                            PrefixStartIndex = start + 0,
+                            ParameterStartIndex = start + 1,
+                            ParameterStopIndex = start + 0 + this.Right.Exp.Length - 1,
                             TextParameter = false,
                         });
                     }
@@ -763,7 +765,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo"></param>
         /// <param name="columnInfo"></param>
         /// <returns></returns>
-        protected virtual string FindColumnName(TableInfo tableInfo, MemberInfo memberInfo, out TableInfo.ColumnInfo columnInfo) 
+        protected virtual string FindColumnName(TableInfo tableInfo, MemberInfo memberInfo, out TableInfo.ColumnInfo columnInfo)
         {
             IEnumerable<TableInfo.ColumnInfo> column = tableInfo.Columns.Where(ta => ta.Member == memberInfo);
             if (column.Any())
@@ -1375,10 +1377,9 @@ namespace Never.EasySql.Linq
         /// <param name="expression"></param>
         /// <param name="collection"></param>
         /// <param name="tableNameOrTableAliasName"></param>
-        /// <param name="contentPositionFix"></param>
         /// <param name="parameterPrefix"></param>
         /// <returns></returns>
-        protected bool AnalyzeWhereExpress<Table, Parameter>(Expression<Func<Table, Parameter, bool>> expression, List<ILabel> collection, string tableNameOrTableAliasName, string parameterPrefix, int contentPositionFix)
+        protected bool AnalyzeWhereExpress<Table, Parameter>(Expression<Func<Table, Parameter, bool>> expression, List<ILabel> collection, string tableNameOrTableAliasName, string parameterPrefix)
         {
             var whereCollection = new List<BinaryBlock>();
             var analyzeParameters = new List<AnalyzeParameter>();
@@ -1402,7 +1403,8 @@ namespace Never.EasySql.Linq
 
             foreach (var where in whereCollection)
             {
-                collection.Add(where.ToLabel(pp, this, parameterPrefix, contentPositionFix));
+                //1标识第二个是参数，因为索引从0开始
+                collection.Add(where.ToLabel(pp, this, parameterPrefix, 1));
             }
 
             return true;

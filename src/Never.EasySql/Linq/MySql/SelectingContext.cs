@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 查询操作
     /// </summary>
-    public sealed class SelectingContext<Table,Parameter> : Linq.SelectingContext<Table,Parameter>
+    public sealed class SelectingContext<Table, Parameter> : Linq.SelectingContext<Table, Parameter>
     {
         /// <summary>
         /// ctor
@@ -29,7 +29,7 @@ namespace Never.EasySql.Linq.MySql
         /// 入口
         /// </summary>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> StartEntrance()
+        public override SelectContext<Table, Parameter> StartEntrance()
         {
             return base.StartEntrance();
         }
@@ -38,7 +38,7 @@ namespace Never.EasySql.Linq.MySql
         /// where
         /// </summary>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> Where()
+        public override SelectContext<Table, Parameter> Where()
         {
             return base.Where();
         }
@@ -48,7 +48,7 @@ namespace Never.EasySql.Linq.MySql
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public override SelectContext<Table,Parameter> Where(Expression<Func<Table,Parameter, bool>> expression)
+        public override SelectContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
         {
             return base.Where(expression);
         }
@@ -69,12 +69,47 @@ namespace Never.EasySql.Linq.MySql
         /// <returns></returns>
         public override IEnumerable<Table> GetResults(int startIndex, int endIndex)
         {
+            this.LoadOrderBy(true);
+            var change = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = "\r",
+            };
+
+            this.labels.Add(change);
+            this.textLength += change.SqlText.Length;
+
             var label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat("limit ", this.dao.SqlExecuter.GetParameterPrefix(), "PageNow", ", ", this.dao.SqlExecuter.GetParameterPrefix(), "PageSize"),
+                SqlText = string.Concat("limit ", this.dao.SqlExecuter.GetParameterPrefix(), "StartIndex", ", ", this.dao.SqlExecuter.GetParameterPrefix(), "EndIndex"),
             };
+
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = "StartIndex",
+                OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length,
+                PrefixStartIndex = "limit ".Length,
+                ParameterStartIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                ParameterStopIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length - 1,
+                TextParameter = false,
+            });
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = "EndIndex",
+                OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length,
+                PrefixStartIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length + ", ".Length,
+                ParameterStartIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length + ", ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                ParameterStopIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length + ", ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length - 1,
+                TextParameter = false,
+            });
+
             this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
 
             return base.GetResults(startIndex, endIndex);
         }

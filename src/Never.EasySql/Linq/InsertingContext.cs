@@ -247,7 +247,7 @@ namespace Never.EasySql.Linq
                         OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + columnName.Length,
                         PrefixStartIndex = 0,
                         ParameterStartIndex = this.dao.SqlExecuter.GetParameterPrefix().Length,
-                        ParameterStopIndex = this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length,
+                        ParameterStopIndex = this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
                         TextParameter = textParameter,
                     });
                 }
@@ -263,8 +263,8 @@ namespace Never.EasySql.Linq
                         Name = columnName,
                         OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + columnName.Length,
                         PrefixStartIndex = 1,
-                        ParameterStartIndex = 1 + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length,
-                        ParameterStopIndex = 1 + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length,
+                        ParameterStartIndex = 1 + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                        ParameterStopIndex = 1 + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
                         TextParameter = textParameter,
                     });
                 }
@@ -275,7 +275,7 @@ namespace Never.EasySql.Linq
                 {
                     templateBuilder.Append(this.FormatColumn(columnName));
                     insertTimes++;
-                    label.SqlText = string.Concat("$", parameterName, "$");
+                    label.SqlText = string.Concat(this.dao.SqlExecuter.GetParameterPrefix(), parameterName);
                     label.Add(new SqlTagParameterPosition()
                     {
                         ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
@@ -283,8 +283,8 @@ namespace Never.EasySql.Linq
                         Name = columnName,
                         OccupanLength = columnName.Length + 2,
                         PrefixStartIndex = 0,
-                        ParameterStartIndex = 0 + "$".Length,
-                        ParameterStopIndex = 0 + "$".Length + parameterName.Length,
+                        ParameterStartIndex = 0 + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                        ParameterStopIndex = 0 + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
                         TextParameter = textParameter,
                     });
                 }
@@ -292,7 +292,7 @@ namespace Never.EasySql.Linq
                 {
                     templateBuilder.Append(",");
                     templateBuilder.Append(this.FormatColumn(columnName));
-                    label.SqlText = string.Concat(",'", "$", parameterName, "$", "'");
+                    label.SqlText = string.Concat(",'", this.dao.SqlExecuter.GetParameterPrefix(), parameterName, "'");
                     label.Add(new SqlTagParameterPosition()
                     {
                         ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
@@ -300,8 +300,8 @@ namespace Never.EasySql.Linq
                         Name = columnName,
                         OccupanLength = columnName.Length + 2,
                         PrefixStartIndex = 1 + 1,
-                        ParameterStartIndex = 1 + 1 + "$".Length,
-                        ParameterStopIndex = 1 + 1 + "$".Length + parameterName.Length,
+                        ParameterStartIndex = 1 + 1 + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                        ParameterStopIndex = 1 + 1 + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
                         TextParameter = textParameter,
                     });
                 }

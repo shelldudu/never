@@ -169,7 +169,7 @@ namespace Never.EasySql.Linq
                         OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + columnName.Length,
                         PrefixStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length - 1,
                         ParameterStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length,
-                        ParameterStopIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length + parameterName.Length,
+                        ParameterStopIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length + parameterName.Length - 1,
                         TextParameter = textParameter,
                     });
                 }
@@ -184,7 +184,7 @@ namespace Never.EasySql.Linq
                         OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + columnName.Length,
                         PrefixStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length - 1,
                         ParameterStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length,
-                        ParameterStopIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length + parameterName.Length,
+                        ParameterStopIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length + parameterName.Length - 1,
                         TextParameter = textParameter,
                     });
                 }
@@ -203,7 +203,7 @@ namespace Never.EasySql.Linq
                         OccupanLength = columnName.Length + 2,
                         PrefixStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length - 1,
                         ParameterStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length,
-                        ParameterStopIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length + parameterName.Length + 1,
+                        ParameterStopIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length + parameterName.Length,
                         TextParameter = textParameter,
                     });
                 }
@@ -218,7 +218,7 @@ namespace Never.EasySql.Linq
                         OccupanLength = columnName.Length + 2,
                         PrefixStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length - 1,
                         ParameterStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length,
-                        ParameterStopIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length + parameterName.Length + 1,
+                        ParameterStopIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length + parameterName.Length,
                         TextParameter = textParameter,
                     });
                 }
@@ -276,7 +276,7 @@ namespace Never.EasySql.Linq
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             int s = this.labels.Count;
-            if (this.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix(), label.SqlText.Length))
+            if (this.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix()))
             {
                 int e = this.labels.Count;
                 for (var i = s; i < e; i++)

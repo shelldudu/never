@@ -111,61 +111,8 @@ namespace Never.EasySql.Labels
 
             if (this.parameterPositionCount == 1)
             {
-                var item = convert.FirstOrDefault(o => o.Key.Equals(this.parameterPositions[0].Name));
-                if (item == null)
-                    throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, this.parameterPositions[0].Name);
-
-                var value = item.Value;
-                if (item.Value is IReferceNullableParameter)
-                    value = ((IReferceNullableParameter)item.Value).Value;
-
-                if (value == null)
-                {
-                    if (format.IfTextParameter(this.parameterPositions[0]))
-                    {
-                        format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStartIndex);
-                        //format.WriteOnTextMode("\'null\'");
-                        //format.WriteOnTextMode("null");
-                        format.WriteOnTextMode(this.SqlText, this.parameterPositions[0].ParameterStopIndex + 1, this.SqlText.Length - (this.parameterPositions[0].ParameterStopIndex + 1));
-                    }
-                    else
-                    {
-                        format.Write(this.SqlText);
-                        format.AddParameter(this.parameterPositions[0].Name, DBNull.Value);
-                    }
-                }
-                else if (value == DBNull.Value)
-                {
-                    if (format.IfTextParameter(this.parameterPositions[0]))
-                    {
-                        format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStartIndex);
-                        //format.WriteOnTextMode("\'null\'");
-                        format.WriteOnTextMode("null");
-                        format.WriteOnTextMode(this.SqlText, this.parameterPositions[0].ParameterStopIndex + 1, this.SqlText.Length - (this.parameterPositions[0].ParameterStopIndex + 1));
-                    }
-                    else
-                    {
-                        format.Write(this.SqlText);
-                        format.AddParameter(this.parameterPositions[0].Name, DBNull.Value);
-                    }
-                }
-                else
-                {
-                    if (format.IfTextParameter(this.parameterPositions[0]))
-                    {
-                        format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStartIndex);
-                        //format.WriteOnTextMode('\'');
-                        format.WriteOnTextMode(value.ToString());
-                        //format.WriteOnTextMode('\'');
-                        format.WriteOnTextMode(this.SqlText, this.parameterPositions[0].ParameterStopIndex + 1, this.SqlText.Length - (this.parameterPositions[0].ParameterStopIndex + 1));
-                    }
-                    else
-                    {
-                        format.Write(this.SqlText);
-                        format.AddParameter(this.parameterPositions[0].Name, value);
-                    }
-                }
-
+                format.WriteOnTextMode(this.SqlText, 0, this.parameterPositions[0].PrefixStartIndex);
+                writeParameter(this.SqlText, this.parameterPositions[0]);
                 return;
             }
 
@@ -179,48 +126,63 @@ namespace Never.EasySql.Labels
                     continue;
                 }
 
-                if (format.IfTextParameter(para))
+                writeParameter(this.SqlText, para);
+                i += para.OccupanLength;
+                if (i < this.SqlText.Length)
+                    format.WriteOnTextMode(this.SqlText[i]);
+            }
+
+            //写参数
+            void writeParameter(string text, SqlTagParameterPosition parameterPosition)
+            {
+                var item = convert.FirstOrDefault(o => o.Key.Equals(parameterPosition.Name));
+                if (item == null)
+                    throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, parameterPosition.Name);
+
+                var value = item.Value;
+                if (item.Value is IReferceNullableParameter)
+                    value = ((IReferceNullableParameter)item.Value).Value;
+
+                if (value == null)
                 {
-                    var item = convert.FirstOrDefault(o => o.Key.Equals(para.Name));
-                    if (item == null)
-                        throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, para.Name);
-
-                    var value = item.Value;
-                    if (item.Value is IReferceNullableParameter)
-                        value = ((IReferceNullableParameter)item.Value).Value;
-
-                    if (value == null)
+                    if (format.IfTextParameter(parameterPosition))
                     {
-                        //format.WriteOnTextMode("\'null\'");
-                        //format.WriteOnTextMode("null");
-                    }
-                    if (value == DBNull.Value)
-                    {
-                        //format.WriteOnTextMode("\'null\'");
-                        format.WriteOnTextMode("null");
+                        format.WriteOnTextMode(text, parameterPosition.PrefixStartIndex + 1, parameterPosition.PrefixStartIndex);
+                        format.WriteOnTextMode(text, parameterPosition.ParameterStopIndex + 1, this.SqlText.Length - (parameterPosition.ParameterStopIndex + 1));
                     }
                     else
                     {
-                        //format.WriteOnTextMode('\'');
-                        format.WriteOnTextMode(value.ToString());
-                        //format.WriteOnTextMode('\'');
+                        format.WriteOnTextMode(text, parameterPosition.PrefixStartIndex, parameterPosition.ParameterStopIndex + 1);
+                        format.AddParameter(parameterPosition.Name, DBNull.Value);
                     }
-
-                    i += para.OccupanLength + 1;
-                    if (i < this.SqlText.Length)
-                        format.WriteOnTextMode(this.SqlText[i]);
+                }
+                else if (value == DBNull.Value)
+                {
+                    if (format.IfTextParameter(parameterPosition))
+                    {
+                        format.WriteOnTextMode(text, parameterPosition.PrefixStartIndex + 1, parameterPosition.PrefixStartIndex);
+                        format.WriteOnTextMode("null");
+                        format.WriteOnTextMode(text, parameterPosition.ParameterStopIndex + 1, this.SqlText.Length - (parameterPosition.ParameterStopIndex + 1));
+                    }
+                    else
+                    {
+                        format.WriteOnTextMode(text, parameterPosition.PrefixStartIndex, parameterPosition.ParameterStopIndex + 1);
+                        format.AddParameter(parameterPosition.Name, DBNull.Value);
+                    }
                 }
                 else
                 {
-                    var item = convert.FirstOrDefault(o => o.Key.Equals(para.Name));
-                    if (item == null)
-                        throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, para.Name);
-
-                    format.Write(this.SqlText, para.PrefixStartIndex, para.OccupanLength);
-                    format.AddParameter(item);
-                    i += para.OccupanLength;
-                    if (i < this.SqlText.Length)
-                        format.Write(this.SqlText[i]);
+                    if (format.IfTextParameter(parameterPosition))
+                    {
+                        format.WriteOnTextMode(text, parameterPosition.PrefixStartIndex + 1, parameterPosition.ParameterStartIndex - parameterPosition.PrefixStartIndex);
+                        format.WriteOnTextMode(value.ToString());
+                        format.WriteOnTextMode(text, parameterPosition.ParameterStopIndex + 1, this.SqlText.Length - (parameterPosition.ParameterStopIndex + 1));
+                    }
+                    else
+                    {
+                        format.WriteOnTextMode(text, parameterPosition.PrefixStartIndex, parameterPosition.ParameterStopIndex - parameterPosition.PrefixStartIndex + 1);
+                        format.AddParameter(parameterPosition.Name, value);
+                    }
                 }
             }
         }
@@ -244,6 +206,12 @@ namespace Never.EasySql.Labels
                 return;
             }
 
+            if (this.parameterPositionCount == 1)
+            {
+                writeParameter(this.SqlText, this.parameterPositions[0], 0);
+                return;
+            }
+
             var copy = this.Copy();
             for (var i = 0; i < this.SqlText.Length; i++)
             {
@@ -254,6 +222,15 @@ namespace Never.EasySql.Labels
                     continue;
                 }
 
+                writeParameter(this.SqlText, para, i);
+                i += para.OccupanLength + 1;
+                if (i < this.SqlText.Length)
+                    format.WriteOnTextMode(this.SqlText[i]);
+            }
+
+            //写参数
+            void writeParameter(string text, SqlTagParameterPosition parameterPosition, int index)
+            {
                 var value = convert.Value;
                 if (convert.Value is IReferceNullableParameter)
                     value = ((IReferceNullableParameter)convert.Value).Value;
@@ -262,7 +239,7 @@ namespace Never.EasySql.Labels
                 var ator = item.GetEnumerator();
                 var hadA = false;
                 var arrayLevel = 0;
-                if (format.IfTextParameter(para))
+                if (format.IfTextParameter(parameterPosition))
                 {
                     while (ator.MoveNext())
                     {
@@ -272,31 +249,26 @@ namespace Never.EasySql.Labels
                         if (hadA)
                             format.WriteOnTextMode(arrayLabel.Split);
 
-                        //format.WriteOnTextMode('\'');
                         format.WriteOnTextMode(ator.Current.ToString());
-                        //format.WriteOnTextMode('\'');
                         hadA = true;
                     }
 
-                    i += para.OccupanLength + 1;
-                    if (i < this.SqlText.Length)
-                        format.WriteOnTextMode(this.SqlText[i]);
                 }
                 else
                 {
-                    format.Write(this.SqlText[i]);
+                    format.Write(text[index]);
                     while (ator.MoveNext())
                     {
                         if (ator.Current == null || ator.Current == DBNull.Value)
                             continue;
 
                         var newvalue = (ator.Current == null || ator.Current == DBNull.Value) ? DBNull.Value : ator.Current;
-                        var newkey = string.Format("{0}x{1}z", para.Name, arrayLevel);
+                        var newkey = string.Format("{0}x{1}z", parameterPosition.Name, arrayLevel);
 
                         if (hadA)
                         {
                             format.Write(arrayLabel.Split);
-                            format.Write(para.ActualPrefix);
+                            format.Write(parameterPosition.ActualPrefix);
                         }
 
                         format.Write(newkey);
@@ -305,10 +277,6 @@ namespace Never.EasySql.Labels
                         format.AddParameter(newkey, newvalue);
                         hadA = true;
                     }
-
-                    i += para.OccupanLength;
-                    if (i < this.SqlText.Length)
-                        format.Write(this.SqlText[i]);
                 }
             }
         }
@@ -333,8 +301,13 @@ namespace Never.EasySql.Labels
                 return;
             }
 
+            if (this.parameterPositionCount == 1)
+            {
+                writeParameter(this.SqlText, this.parameterPositions[0], 0);
+                return;
+            }
+
             var copy = this.Copy();
-            var sb = new StringBuilder(this.SqlText);
             for (var i = 0; i < this.SqlText.Length; i++)
             {
                 var para = this.MathPosition(copy, i);
@@ -344,11 +317,20 @@ namespace Never.EasySql.Labels
                     continue;
                 }
 
-                if (format.IfTextParameter(para))
+                writeParameter(this.SqlText, para, i);
+                i += para.OccupanLength + 1;
+                if (i < this.SqlText.Length)
+                    format.WriteOnTextMode(this.SqlText[i]);
+            }
+
+            //写参数
+            void writeParameter(string text, SqlTagParameterPosition parameterPosition, int index)
+            {
+                if (format.IfTextParameter(parameterPosition))
                 {
-                    var item = convert.FirstOrDefault(o => o.Key.Equals(para.Name));
+                    var item = convert.FirstOrDefault(o => o.Key.Equals(parameterPosition.Name));
                     if (item == null)
-                        throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, para.Name);
+                        throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, parameterPosition.Name);
 
                     var value = item.Value;
                     if (item.Value is IReferceNullableParameter)
@@ -357,36 +339,27 @@ namespace Never.EasySql.Labels
                     if (value == null || value == DBNull.Value)
                     {
                         format.WriteOnTextMode("null");
-                        i += para.OccupanLength + 1;
                     }
                     else
                     {
-                        //format.WriteOnTextMode('\'');
                         format.WriteOnTextMode(value.ToString());
-                        //format.WriteOnTextMode('\'');
-                        i += para.OccupanLength + 1;
-                        if (i < this.SqlText.Length)
-                            format.WriteOnTextMode(this.SqlText[i]);
                     }
                 }
                 else
                 {
-                    format.Write(this.SqlText[i]);
-                    var item = convert.FirstOrDefault(o => o.Key.Equals(para.Name));
+                    format.Write(text[index]);
+                    var item = convert.FirstOrDefault(o => o.Key.Equals(parameterPosition.Name));
                     if (item == null)
-                        throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, para.Name);
+                        throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, parameterPosition.Name);
 
                     var value = item.Value;
                     if (item.Value is IReferceNullableParameter)
                         value = ((IReferceNullableParameter)item.Value).Value;
 
                     var newvalue = (value == null || value == DBNull.Value) ? DBNull.Value : value;
-                    var newkey = string.Format("{0}x{1}z", para.Name, arrayLevel);
+                    var newkey = string.Format("{0}x{1}z", parameterPosition.Name, arrayLevel);
                     format.Write(newkey);
                     format.AddParameter(newkey, newvalue);
-                    i += para.OccupanLength;
-                    if (i < this.SqlText.Length)
-                        format.Write(this.SqlText[i]);
                 }
             }
         }

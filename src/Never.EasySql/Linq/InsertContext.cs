@@ -145,11 +145,19 @@ namespace Never.EasySql.Linq
         {
             foreach (var i in this.tableInfo.Columns)
             {
-                if (i.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement)
-                    continue;
+                if (i.Column == null)
+                {
+                    var name = i.Member.Name;
+                    this.InsertColumn(name, name, false);
+                }
+                else
+                {
+                    if ((i.Column.Optional & SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement) == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement)
+                        continue;
 
-                var name = i.Column.Alias.IsNullOrEmpty() ? i.Member.Name : i.Column.Alias;
-                this.InsertColumn(name, name, false);
+                    var name = i.Column.Alias.IsNullOrEmpty() ? i.Member.Name : i.Column.Alias;
+                    this.InsertColumn(name, name, false);
+                }
             }
 
             return this;

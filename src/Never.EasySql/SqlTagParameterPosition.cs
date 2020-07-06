@@ -32,7 +32,7 @@ namespace Never.EasySql
         public bool TextParameter { get; set; }
 
         /// <summary>
-        /// 前辍的开始位置PrefixStart
+        /// 前辍的开始位置(字符串的索引位置）
         /// </summary>
         public int PrefixStartIndex { get; set; }
 

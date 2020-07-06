@@ -204,7 +204,7 @@ namespace Never.EasySql.Linq
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             int s = this.labels.Count;
-            if (this.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix(), label.SqlText.Length))
+            if (this.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix()))
             {
                 int e = this.labels.Count;
                 for (var i = s; i < e; i++)

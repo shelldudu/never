@@ -90,7 +90,8 @@ namespace Never.EasySql.Text
                         }
 
                         i += para.OccupanLength + 1;
-                        format.WriteOnTextMode(this.lable.SqlText[i]);
+                        if (i < this.lable.SqlText.Length)
+                            format.WriteOnTextMode(this.lable.SqlText[i]);
                     }
                     else
                     {
@@ -103,7 +104,8 @@ namespace Never.EasySql.Text
                         format.Write(this.lable.SqlText, para.PrefixStartIndex, para.OccupanLength + 1);
                         format.AddParameter(item);
                         i += para.OccupanLength + 1;
-                        format.Write(this.lable.SqlText[i]);
+                        if (i < this.lable.SqlText.Length)
+                            format.Write(this.lable.SqlText[i]);
                     }
                 }
                 else
@@ -133,7 +135,8 @@ namespace Never.EasySql.Text
                         }
 
                         i += para.OccupanLength + 1;
-                        format.WriteOnTextMode(this.lable.SqlText[i]);
+                        if (i < this.lable.SqlText.Length)
+                            format.WriteOnTextMode(this.lable.SqlText[i]);
                     }
                     else
                     {
@@ -162,7 +165,8 @@ namespace Never.EasySql.Text
                         }
 
                         i += para.OccupanLength + 1;
-                        format.Write(this.lable.SqlText[i]);
+                        if (i < this.lable.SqlText.Length)
+                            format.Write(this.lable.SqlText[i]);
                     }
                 }
             }
