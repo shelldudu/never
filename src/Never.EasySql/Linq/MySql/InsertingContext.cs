@@ -29,13 +29,18 @@ namespace Never.EasySql.Linq.MySql
         /// 
         /// </summary>
         /// <returns></returns>
-        public override InsertContext<Table, Parameter> InsertLastInsertId()
+        public override InsertContext<Table, Parameter> InsertLastInsertId<ReturnType>()
         {
             this.LoadSqlOnGetResulting();
-            this.labels.Add(new TextLabel()
+            this.labels.Add(new ReturnLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = this.UseBulk ? ";select last_insert_id() as id;" : "select last_insert_id() as id;",
+                Line = new TextLabel() 
+                {
+                    TagId = NewId.GenerateNumber(),
+                    SqlText = this.UseBulk ? ";select last_insert_id() as id;" : "select last_insert_id() as id;",
+                },
+                Type = typeof(ReturnType).Name.ToLower(),
             });
 
             return this;

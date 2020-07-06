@@ -216,9 +216,9 @@ namespace Never.EasySql.Labels
                     if (item == null)
                         throw new InvalidException("the sql tag {0} need the {1} parameters;", format.Id, para.Name);
 
-                    format.Write(this.SqlText, para.PrefixStartIndex, para.OccupanLength + 1);
+                    format.Write(this.SqlText, para.PrefixStartIndex, para.OccupanLength);
                     format.AddParameter(item);
-                    i += para.OccupanLength + 1;
+                    i += para.OccupanLength;
                     if (i < this.SqlText.Length)
                         format.Write(this.SqlText[i]);
                 }
@@ -306,7 +306,7 @@ namespace Never.EasySql.Labels
                         hadA = true;
                     }
 
-                    i += para.OccupanLength + 1;
+                    i += para.OccupanLength;
                     if (i < this.SqlText.Length)
                         format.Write(this.SqlText[i]);
                 }
@@ -384,7 +384,7 @@ namespace Never.EasySql.Labels
                     var newkey = string.Format("{0}x{1}z", para.Name, arrayLevel);
                     format.Write(newkey);
                     format.AddParameter(newkey, newvalue);
-                    i += para.OccupanLength + 1;
+                    i += para.OccupanLength;
                     if (i < this.SqlText.Length)
                         format.Write(this.SqlText[i]);
                 }

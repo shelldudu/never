@@ -56,7 +56,7 @@ namespace Never.Test
         }
     }
 
-    public class MySqlBuilder : EmbeddedDaoBuilder
+    public class MySqlBuilder : XmlContentDaoBuilder.XmlEmbeddedDaoBuilder
     {
         public override string[] EmbeddedSqlMaps
         {
@@ -73,7 +73,7 @@ namespace Never.Test
         {
             get
             {
-                return "server=127.0.0.1;uid=sa;pwd=gg123456;database=b2c_message;port=3306;";
+                return "server=127.0.0.1;uid=sa;pwd=gg123456;database=test;port=3306;";
             }
         }
 

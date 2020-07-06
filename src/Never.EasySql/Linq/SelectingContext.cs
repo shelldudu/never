@@ -407,7 +407,8 @@ namespace Never.EasySql.Linq
         /// </summary>
         protected virtual void OnWhereInit()
         {
-
+            if (this.selectTimes == 0)
+                this.SelectAll();
         }
 
         /// <summary>

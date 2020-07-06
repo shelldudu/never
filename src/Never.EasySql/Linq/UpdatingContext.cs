@@ -155,37 +155,76 @@ namespace Never.EasySql.Linq
                 TagId = NewId.GenerateNumber(),
             };
 
-            if (setTimes == 0)
+            if (textParameter == false)
             {
-                setTimes++;
-                label.SqlText = string.Concat("set ", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), equalAndPrefix, parameterName, " \r");
-                label.Add(new SqlTagParameterPosition()
+                if (setTimes == 0)
                 {
-                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                    Name = columnName,
-                    OccupanLength = columnName.Length,
-                    PrefixStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndPrefix.Length,
-                    ParameterStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndPrefix.Length,
-                    ParameterStopIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndPrefix.Length + parameterName.Length,
-                    TextParameter = textParameter,
-                });
+                    setTimes++;
+                    label.SqlText = string.Concat("set ", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), this.equalAndPrefix, parameterName, " \r");
+                    label.Add(new SqlTagParameterPosition()
+                    {
+                        ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                        SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                        Name = columnName,
+                        OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + columnName.Length,
+                        PrefixStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length - 1,
+                        ParameterStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length,
+                        ParameterStopIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length + parameterName.Length,
+                        TextParameter = textParameter,
+                    });
+                }
+                else
+                {
+                    label.SqlText = string.Concat(",", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), this.equalAndPrefix, parameterName, " \r");
+                    label.Add(new SqlTagParameterPosition()
+                    {
+                        ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                        SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                        Name = columnName,
+                        OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + columnName.Length,
+                        PrefixStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length - 1,
+                        ParameterStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length,
+                        ParameterStopIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + this.equalAndPrefix.Length + parameterName.Length,
+                        TextParameter = textParameter,
+                    });
+                }
             }
             else
             {
-                label.SqlText = string.Concat(",", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), equalAndPrefix, parameterName, " \r");
-                label.Add(new SqlTagParameterPosition()
+                if (setTimes == 0)
                 {
-                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                    Name = columnName,
-                    OccupanLength = columnName.Length,
-                    PrefixStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndPrefix.Length,
-                    ParameterStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndPrefix.Length,
-                    ParameterStopIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndPrefix.Length + parameterName.Length,
-                    TextParameter = textParameter,
-                });
+                    setTimes++;
+                    label.SqlText = string.Concat("set ", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), " = $", parameterName, "$ \r");
+                    label.Add(new SqlTagParameterPosition()
+                    {
+                        ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                        SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                        Name = columnName,
+                        OccupanLength = columnName.Length + 2,
+                        PrefixStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length - 1,
+                        ParameterStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length,
+                        ParameterStopIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length + parameterName.Length + 1,
+                        TextParameter = textParameter,
+                    });
+                }
+                else
+                {
+                    label.SqlText = string.Concat(",", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), " = $", parameterName, "$ \r");
+                    label.Add(new SqlTagParameterPosition()
+                    {
+                        ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                        SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                        Name = columnName,
+                        OccupanLength = columnName.Length + 2,
+                        PrefixStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length - 1,
+                        ParameterStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length,
+                        ParameterStopIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length + parameterName.Length + 1,
+                        TextParameter = textParameter,
+                    });
+                }
             }
+
+
 
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;

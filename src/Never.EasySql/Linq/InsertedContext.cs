@@ -52,7 +52,7 @@ namespace Never.EasySql.Linq
             this.Insert<Table, Parameter>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
-        public override Linq.InsertContext<Table, Parameter> InsertLastInsertId()
+        public override Linq.InsertContext<Table, Parameter> InsertLastInsertId<ReturnType>()
         {
             return this;
         }

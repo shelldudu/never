@@ -142,7 +142,7 @@ namespace Never.EasySql.Linq
                             ActualPrefix = parameterPrefix,
                             SourcePrefix = parameterPrefix,
                             Name = this.Left.Exp,
-                            OccupanLength = this.Left.Exp.Length,
+                            OccupanLength = parameterPrefix.Length + this.Left.Exp.Length,
                             PrefixStartIndex = firstPositionFix + 0,
                             ParameterStartIndex = firstPositionFix + 0,
                             ParameterStopIndex = firstPositionFix + this.Left.Exp.Length,
@@ -176,7 +176,7 @@ namespace Never.EasySql.Linq
                             ActualPrefix = parameterPrefix,
                             SourcePrefix = parameterPrefix,
                             Name = this.Right.Exp,
-                            OccupanLength = this.Right.Exp.Length,
+                            OccupanLength = parameterPrefix.Length + this.Right.Exp.Length,
                             PrefixStartIndex = firstPositionFix + start + 0,
                             ParameterStartIndex = firstPositionFix + start + 0,
                             ParameterStopIndex = firstPositionFix + start + this.Right.Exp.Length,
@@ -509,7 +509,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected Result Insert<Table, Parameter,Result>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected Result Insert<Table, Parameter, Result>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return (Result)dao.Insert(sqlTag, sqlParameter);
         }
@@ -652,6 +652,19 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public virtual string FindColumnName(LambdaExpression expression, TableInfo tableInfo, out MemberInfo memberInfo)
         {
+            return this.FindColumnName(expression, tableInfo, out memberInfo, out _);
+        }
+
+        /// <summary>
+        /// 对表达式的字段提取其名称
+        /// </summary>
+        /// <param name="tableInfo"></param>
+        /// <param name="expression"></param>
+        /// <param name="memberInfo"></param>
+        /// <param name="columnInfo"></param>
+        /// <returns></returns>
+        public virtual string FindColumnName(LambdaExpression expression, TableInfo tableInfo, out MemberInfo memberInfo, out TableInfo.ColumnInfo columnInfo)
+        {
             var body = expression.Body;
             var model = body as ParameterExpression;
             if (model != null)
@@ -660,7 +673,8 @@ namespace Never.EasySql.Linq
                 IEnumerable<TableInfo.ColumnInfo> column = tableInfo.Columns.Where(ta => ta.Member.Name.IsEquals(model.Name));
                 if (column.Any())
                 {
-                    if (column.FirstOrDefault().Column != null)
+                    columnInfo = column.FirstOrDefault();
+                    if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
                     {
                         return column.FirstOrDefault().Column.Alias;
                     }
@@ -668,6 +682,7 @@ namespace Never.EasySql.Linq
                     return column.FirstOrDefault().Member.Name;
                 }
 
+                columnInfo = default(TableInfo.ColumnInfo);
                 return model.Name;
             }
 
@@ -678,7 +693,8 @@ namespace Never.EasySql.Linq
                 IEnumerable<TableInfo.ColumnInfo> column = tableInfo.Columns.Where(ta => ta.Member.Name.IsEquals(member.Member.Name));
                 if (column.Any())
                 {
-                    if (column.FirstOrDefault().Column != null)
+                    columnInfo = column.FirstOrDefault();
+                    if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
                     {
                         return column.FirstOrDefault().Column.Alias;
                     }
@@ -686,6 +702,7 @@ namespace Never.EasySql.Linq
                     return column.FirstOrDefault().Member.Name;
                 }
 
+                columnInfo = default(TableInfo.ColumnInfo);
                 return memberInfo.Name;
             }
 
@@ -699,18 +716,20 @@ namespace Never.EasySql.Linq
                     IEnumerable<TableInfo.ColumnInfo> column = tableInfo.Columns.Where(ta => ta.Member.Name.IsEquals(property.Member.Name));
                     if (column.Any())
                     {
-                        if (column.FirstOrDefault().Column != null)
+                        columnInfo = column.FirstOrDefault();
+                        if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
                         {
                             return column.FirstOrDefault().Column.Alias;
                         }
 
                         return column.FirstOrDefault().Member.Name;
                     }
-
+                    columnInfo = default(TableInfo.ColumnInfo);
                     return memberInfo.Name;
                 }
             }
 
+            columnInfo = default(TableInfo.ColumnInfo);
             memberInfo = null;
             return null;
         }
@@ -726,7 +745,7 @@ namespace Never.EasySql.Linq
             IEnumerable<TableInfo.ColumnInfo> column = tableInfo.Columns.Where(ta => ta.Member == memberInfo);
             if (column.Any())
             {
-                if (column.FirstOrDefault().Column != null)
+                if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
                 {
                     return column.FirstOrDefault().Column.Alias;
                 }
@@ -737,6 +756,30 @@ namespace Never.EasySql.Linq
             return memberInfo.Name;
         }
 
+        /// <summary>
+        /// 查询字段名字
+        /// </summary>
+        /// <param name="memberInfo"></param>
+        /// <param name="tableInfo"></param>
+        /// <param name="columnInfo"></param>
+        /// <returns></returns>
+        protected virtual string FindColumnName(TableInfo tableInfo, MemberInfo memberInfo, out TableInfo.ColumnInfo columnInfo) 
+        {
+            IEnumerable<TableInfo.ColumnInfo> column = tableInfo.Columns.Where(ta => ta.Member == memberInfo);
+            if (column.Any())
+            {
+                columnInfo = column.FirstOrDefault();
+                if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
+                {
+                    return column.FirstOrDefault().Column.Alias;
+                }
+
+                return column.FirstOrDefault().Member.Name;
+            }
+
+            columnInfo = default(TableInfo.ColumnInfo);
+            return memberInfo.Name;
+        }
         /// <summary>
         /// 查询tableName
         /// </summary>

@@ -74,9 +74,9 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 返回最后插入语句
         /// </summary>
-        public SingleInsertGrammar<Table, Parameter> LastInsertId()
+        public SingleInsertGrammar<Table, Parameter> LastInsertId<ReturnType>()
         {
-            this.Context.InsertLastInsertId();
+            this.Context.InsertLastInsertId<ReturnType>();
             return this;
         }
 

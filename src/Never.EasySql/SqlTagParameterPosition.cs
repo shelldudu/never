@@ -47,7 +47,7 @@ namespace Never.EasySql
         public int ParameterStopIndex { get; set; }
 
         /// <summary>
-        /// 占地长度（如果是文本参数，则包含了$$，如果是常规参数，则不包含@）
+        /// 占地长度（如果是文本参数，则包含了$$，如果是常规参数，则包含了@）
         /// </summary>
         public int OccupanLength { get; set; }
 

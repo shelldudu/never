@@ -141,16 +141,14 @@ namespace Never.EasySql.Linq
             if (this.AsTable.IsNullOrEmpty())
             {
                 this.asTableNamePoint = string.Empty;
-                label.SqlText = string.Concat("delete ", this.FromTable, "\r");
+                label.SqlText = string.Concat("delete ", this.FromTable, "\rfrom", this.FromTable, "\r");
                 this.textLength += label.SqlText.Length;
-                this.labels.Add(label);
             }
             else
             {
                 this.asTableNamePoint = string.Concat(this.AsTable, ".");
                 label.SqlText = string.Concat("delete ", this.AsTable, " from ", this.FromTable, " as ", this.AsTable, "\r");
                 this.textLength += label.SqlText.Length;
-                this.labels.Add(label);
             }
 
             this.textLength += label.SqlText.Length;

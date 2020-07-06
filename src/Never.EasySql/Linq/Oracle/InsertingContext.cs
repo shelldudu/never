@@ -30,13 +30,18 @@ namespace Never.EasySql.Linq.Oracle
         /// 
         /// </summary>
         /// <returns></returns>
-        public override InsertContext<Table, Parameter> InsertLastInsertId()
+        public override InsertContext<Table, Parameter> InsertLastInsertId<ReturnType>()
         {
             this.LoadSqlOnGetResulting();
-            this.labels.Add(new TextLabel()
+            this.labels.Add(new ReturnLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = this.UseBulk ? ";select @@Ideneity;" : "select @@Ideneity;",
+                Line = new TextLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                    SqlText = this.UseBulk ? ";select @@Ideneity;" : "select @@Ideneity;",
+                },
+                Type = typeof(ReturnType).Name.ToLower(),
             });
 
             return this;

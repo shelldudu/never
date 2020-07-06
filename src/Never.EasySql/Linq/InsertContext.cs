@@ -130,7 +130,7 @@ namespace Never.EasySql.Linq
         /// 最后自增字符串
         /// </summary>
         /// <returns></returns>
-        public abstract InsertContext<Table, Parameter> InsertLastInsertId();
+        public abstract InsertContext<Table, Parameter> InsertLastInsertId<ReturnType>();
 
         /// <summary>
         /// 插入字段名
@@ -162,7 +162,10 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public virtual InsertContext<Table, Parameter> Colum(Expression<Func<Table, object>> keyValue)
         {
-            string columnName = this.FindColumnName(keyValue, this.tableInfo, out _);
+            string columnName = this.FindColumnName(keyValue, this.tableInfo, out _, out var columnInfo);
+            if (columnInfo.Column != null && ((columnInfo.Column.Optional & SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement) == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement))
+                return this;
+
             return this.InsertColumn(columnName, columnName, false);
         }
 

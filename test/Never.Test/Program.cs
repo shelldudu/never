@@ -105,21 +105,7 @@ namespace Never.Test
 
         private static void Main(string[] args)
         {
-            var lines = System.IO.File.ReadAllLines("d:\\a.txt");
-            var list = new List<string>(30);
-            var reader = new Never.Serialization.Json.SequenceStringReader("a");
-            foreach (var line in lines)
-            {
-                if (line.IsNullOrEmpty())
-                    continue;
-
-                for (var k = 0; k < line.Length; k++) {
-                    if (reader.IsWhiteSpaceChangeLine(line[k])) {
-                        list.Add(line.Sub(0, k));
-                        break;
-                    }
-                }
-            }
+            new SelectTest().TestId_1();
         }
 
         private static void ChangeBuilder(System.Text.StringBuilder builder)

@@ -283,7 +283,7 @@ namespace Never.EasySql
                                 ParameterStartIndex = i + 1,
                                 PrefixStartIndex = i,
                                 ParameterStopIndex = (i + 1) + end - i,
-                                OccupanLength = end - i,
+                                OccupanLength = 1 + end - i,
                             };
 
                             parameter.TextParameter = parameter.SourcePrefix == "$";
@@ -581,7 +581,7 @@ namespace Never.EasySql
                                 ParameterStartIndex = (i + 1) - hack,
                                 PrefixStartIndex = i - hack,
                                 ParameterStopIndex = (i + end - i) - hack,
-                                OccupanLength = (end - i),
+                                OccupanLength = 1 + (end - i),
                             };
 
                             parameter.TextParameter = parameter.SourcePrefix == "$";
