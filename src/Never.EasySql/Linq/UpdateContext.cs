@@ -117,10 +117,11 @@ namespace Never.EasySql.Linq
         /// </summary>
         public abstract UpdateContext<Table, Parameter> StartEntrance();
 
+
         /// <summary>
         /// 更新字段名
         /// </summary>
-        public abstract UpdateContext<Table, Parameter> SetColumn(string columnName,  string parameterName, bool textParameter);
+        public abstract UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter, bool function);
 
         /// <summary>
         /// 更新字段名
@@ -129,7 +130,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             string parameterName = this.FindColumnName(value, this.tableInfo, out _);
-            return this.SetColumn(columnName, parameterName, false);
+            return this.SetColumn(columnName, parameterName, false, false);
         }
 
         /// <summary>
@@ -139,7 +140,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
-            return this.SetColumn(columnName, columnName, true);
+            return this.SetColumn(columnName, columnName, true, true);
         }
 
         /// <summary>
@@ -149,7 +150,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
-            return this.SetColumn(columnName, columnName, false);
+            return this.SetColumn(columnName, columnName, false, false);
         }
 
         /// <summary>
@@ -160,7 +161,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public abstract UpdateContext<Table, Parameter> Where(Expression<Func<Table,Parameter, bool>> expression);
+        public abstract UpdateContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression);
 
         /// <summary>
         /// where

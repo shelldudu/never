@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Never.EasySql
 {
     /// <summary>
-    /// sql参数，只接受key-value这种形式的对象，如果是value文本参数，请传入<see cref="KeyValueEasySqlParameter{T}"/>对象
+    /// sql参数，只接受key-value这种形式的对象，如果是value文本参数，请传入<see cref="KeyValueSqlParameter{T}"/>对象
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class EasySqlParameter<T> : DataEmitBuilder<T>
@@ -18,13 +18,21 @@ namespace Never.EasySql
         #region ctor
 
         /// <summary>
-        /// sql参数，只接受key-value这种形式的对象，如果是value文本参数，请传入<see cref="KeyValueEasySqlParameter{T}"/>对象
+        /// sql参数，只接受key-value这种形式的对象，如果是value文本参数，请传入<see cref="KeyValueSqlParameter{T}"/>对象
         /// </summary>
         /// <param name="object"></param>
         protected EasySqlParameter(T @object)
         {
             this.Object = @object;
-            this.IsIEnumerable = this.Object is IEnumerable;
+            if (this.Object is string)
+            {
+                this.IsIEnumerable = false;
+            }
+            else
+            {
+                this.IsIEnumerable = this.Object is IEnumerable;
+            }
+
             if (this.IsIEnumerable)
             {
                 if (this.Object is ICollection)

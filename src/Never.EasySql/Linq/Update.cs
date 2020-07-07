@@ -104,7 +104,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Table, Parameter> SetColumWithFunc<TMember>(Expression<Func<Table, TMember>> key, string value)
+        public UpdateGrammar<Table, Parameter> SetColumnWithFunc<TMember>(Expression<Func<Table, TMember>> key, string value)
         {
             return new UpdateGrammar<Table, Parameter>() { Context = this.Context }.StartSetColumn().SetColumnWithFunc(key, value);
         }
@@ -112,7 +112,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Table, Parameter> SetColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
+        public UpdateGrammar<Table, Parameter> SetColumnWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
         {
             return new UpdateGrammar<Table, Parameter>() { Context = this.Context }.StartSetColumn().SetColumnWithValue(key, value);
         }

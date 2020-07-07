@@ -10,7 +10,7 @@ namespace Never.EasySql
     /// key-value参数
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class KeyValueEasySqlParameter<T> : EasySqlParameter<T>
+    internal class KeyValueSqlParameter<T> : EasySqlParameter<T>
     {
         #region ctor
 
@@ -18,7 +18,7 @@ namespace Never.EasySql
         /// sql参数，只接受key-value这种形式的对象
         /// </summary>
         /// <param name="object"></param>
-        public KeyValueEasySqlParameter(T @object) : base(@object)
+        public KeyValueSqlParameter(T @object) : base(@object)
         {
         }
 

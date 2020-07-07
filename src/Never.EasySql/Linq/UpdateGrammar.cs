@@ -35,7 +35,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.Context.FindColumnName(keyValue, Never.EasySql.Linq.Context.FindTableInfo<Table>(), out _);
             string parameterName = this.Context.FindColumnName(keyValue, Never.EasySql.Linq.Context.FindTableInfo<Table>(), out _);
-            this.Context.SetColumn(columnName, parameterName, false);
+            this.Context.SetColumn(columnName, parameterName, false, false);
             return this;
         }
 

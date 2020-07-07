@@ -64,8 +64,8 @@ namespace Never.EasySql.Labels
         /// <returns></returns>
         public override bool ContainParameter<T>(EasySqlParameter<T> parameter, IReadOnlyList<KeyValueTuple<string, object>> convert)
         {
-            if (Parameter.IsNullOrEmpty())
-                return true;
+            if (this.Parameter.IsNullOrEmpty())
+                return parameter is ArraySqlParameter<T>;
 
             var item = convert.FirstOrDefault(o => o.Key.Equals(Parameter));
             if (item != null)
@@ -93,93 +93,103 @@ namespace Never.EasySql.Labels
         /// <param name="convert"></param>
         public override void Format<T>(SqlTagFormat format, EasySqlParameter<T> parameter, IReadOnlyList<KeyValueTuple<string, object>> convert)
         {
-            if (Parameter.IsNullOrEmpty())
+            if (this.Parameter.IsNullOrEmpty())
             {
-                if (parameter.IsIEnumerable || parameter is ISqlParameterEnumerable)
-                {
-                    if (parameter.Object is INullableParameter)
-                    {
-                        if (format.IfContainer)
-                        {
-                            if (format.IfThenCount > 0 && Then != null)
-                                format.Write(Then);
-                            else
-                                format.IfThenCount++;
-                        }
-                        else
-                        {
-                            format.Write(Then);
-                        }
-
-                        var ator = (((IReferceNullableParameter)parameter.Object).Value as System.Collections.IEnumerable).GetEnumerator();
-                        var i = 0;
-                        var hadA = false;
-                        while (ator.MoveNext())
-                        {
-                            if (hadA)
-                                format.Write(Split);
-
-                            format.Write(Open);
-                            Build(ator.Current).Invoke(format, this, Line, ator.Current, i++);
-                            format.Write(Close);
-                            hadA = true;
-                        }
-                    }
-                    else
-                    {
-                        if (format.IfContainer)
-                        {
-                            if (format.IfThenCount > 0 && Then != null)
-                                format.Write(Then);
-                            else
-                                format.IfThenCount++;
-                        }
-                        else
-                        {
-                            format.Write(Then);
-                        }
-
-                        IEnumerator ator = null;
-                        if (parameter is ISqlParameterEnumerable)
-                            ator = ((IEnumerable)parameter).GetEnumerator();
-                        else
-                            ator = (parameter.Object as System.Collections.IEnumerable).GetEnumerator();
-
-                        var i = 0;
-                        var hadA = false;
-                        while (ator.MoveNext())
-                        {
-                            if (hadA)
-                                format.Write(Split);
-
-                            format.Write(Open);
-                            Build(ator.Current).Invoke(format, this, Line, ator.Current, i++);
-                            format.Write(Close);
-                            hadA = true;
-                        }
-                    }
-                }
-                else
-                {
-                    throw new InvalidException("the sql tag {0} need the array {1} parameter;", format.Id, Parameter);
-                }
-
+                writeAllParameterIsArray();
+                return;
+            }
+            else
+            {
+                writeTheParameterIsArray();
                 return;
             }
 
-            if (parameter.Count <= 0)
-                return;
-
-            var item = convert.FirstOrDefault(o => o.Key.Equals(Parameter));
-            if (item == null)
-                return;
-
-            var value = item.Value;
-            if (item.Value is INullableParameter)
+            //全部参数都是数组，表明使用了array标签
+            void writeAllParameterIsArray()
             {
-                if (((INullableParameter)item.Value).HasValue)
+                //直接是sql遍历参数
+                if (parameter is ISqlParameterEnumerable)
                 {
-                    if (((IReferceNullableParameter)item.Value).Value is System.Collections.IEnumerable)
+                    if (format.IfContainer)
+                    {
+                        if (format.IfThenCount > 0 && Then != null)
+                            format.Write(Then);
+                        else
+                            format.IfThenCount++;
+                    }
+                    else
+                    {
+                        format.Write(Then);
+                    }
+
+                    IEnumerator ator = ((IEnumerable)parameter).GetEnumerator();
+                    var arrayLevel = 0;
+                    var appendValue = false;
+                    while (ator.MoveNext())
+                    {
+                        if (appendValue)
+                            format.Write(Split);
+
+                        format.Write(Open);
+                        var para = new KeyValueSqlParameter<T>((T)ator.Current);
+                        this.Line.FormatArray(format, this, para, para.Convert(), arrayLevel++);
+                        format.Write(Close);
+                        appendValue = true;
+                    }
+                }
+
+                //数组方式
+                if (parameter.IsIEnumerable)
+                {
+                    if (format.IfContainer)
+                    {
+                        if (format.IfThenCount > 0 && Then != null)
+                            format.Write(Then);
+                        else
+                            format.IfThenCount++;
+                    }
+                    else
+                    {
+                        format.Write(Then);
+                    }
+
+                    var ator = (((INullableParameter)parameter.Object).Value as System.Collections.IEnumerable).GetEnumerator();
+                    var arrayLevel = 0;
+                    var appendValue = false;
+                    while (ator.MoveNext())
+                    {
+                        if (appendValue)
+                            format.Write(Split);
+
+                        format.Write(Open);
+                        var para = new KeyValueSqlParameter<T>((T)ator.Current);
+                        this.Line.FormatArray(format, this, para, para.Convert(), arrayLevel++);
+                        format.Write(Close);
+                        appendValue = true;
+                    }
+                }
+
+                throw new InvalidException("the sql tag {0} need the array {1} parameter;", format.Id, Parameter);
+            }
+
+            //这个参数是一个数组
+            void writeTheParameterIsArray()
+            {
+                if (parameter.Count <= 0)
+                    return;
+
+                var item = convert.FirstOrDefault(o => o.Key.Equals(Parameter));
+                if (item == null)
+                    return;
+
+                var value = item.Value;
+                if (value is INullableParameter)
+                {
+                    var nullValue = value as INullableParameter;
+                    if (nullValue.HasValue == false)
+                        return;
+
+                    if (nullValue.Value is IEnumerable)
                     {
                         if (format.IfContainer)
                         {
@@ -194,110 +204,37 @@ namespace Never.EasySql.Labels
                         }
 
                         format.Write(Open);
-                        Line.FormatArray<T>(format, this, parameter, item);
+                        Line.FormatArray(format, this, parameter, item);
                         format.Write(Close);
+                        return;
+                    }
+
+                    throw new InvalidException("the sql tag {0} need the array {1} parameter;", format.Id, Parameter);
+                }
+
+                if (value is IEnumerable)
+                {
+                    if (format.IfContainer)
+                    {
+                        if (format.IfThenCount > 0 && Then != null)
+                            format.Write(Then);
+                        else
+                            format.IfThenCount++;
                     }
                     else
                     {
-                        throw new InvalidException("the sql tag {0} need the array {1} parameter;", format.Id, Parameter);
-                    }
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else if (value is System.Collections.IEnumerable)
-            {
-                if (format.IfContainer)
-                {
-                    if (format.IfThenCount > 0 && Then != null)
                         format.Write(Then);
-                    else
-                        format.IfThenCount++;
-                }
-                else
-                {
-                    format.Write(Then);
+                    }
+
+                    format.Write(Open);
+                    this.Line.FormatArray(format, this, parameter, item);
+                    format.Write(Close);
                 }
 
-                format.Write(Open);
-                Line.FormatArray<T>(format, this, parameter, item);
-                format.Write(Close);
-            }
-            else
-            {
                 throw new InvalidException("the sql tag {0} need the array {1} parameter;", format.Id, Parameter);
             }
         }
 
         #endregion baseLabel
-
-        #region build
-
-        private interface IBuild
-        {
-            Action<SqlTagFormat, ArrayLabel, TextLabel, object, int> Build();
-        }
-
-        private class ArrayLabelBuilder<T> : IBuild
-        {
-            static ArrayLabelBuilder()
-            {
-                Empty = new Action<SqlTagFormat, ArrayLabel, TextLabel, object, int>((x, y, z, o, s) => { });
-            }
-
-            public static Action<SqlTagFormat, ArrayLabel, TextLabel, object, int> Action { get; private set; }
-            public static Action<SqlTagFormat, ArrayLabel, TextLabel, object, int> Empty { get; private set; }
-
-            public Action<SqlTagFormat, ArrayLabel, TextLabel, object, int> Build()
-            {
-                if (Action != null)
-                    return Action;
-
-                var emit = EasyEmitBuilder<Action<SqlTagFormat, ArrayLabel, TextLabel, object, int>>.NewDynamicMethod();
-                var method = typeof(ArrayLabel).GetMethod("LoadUsingDelegated").MakeGenericMethod(typeof(T));
-                emit.LoadArgument(0);
-                emit.LoadArgument(1);
-                emit.LoadArgument(2);
-                emit.LoadArgument(3);
-                emit.LoadArgument(4);
-                emit.Call(method);
-                emit.Return();
-                Action = emit.CreateDelegate();
-                return Action;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
-        public static Action<SqlTagFormat, ArrayLabel, TextLabel, object, int> Build(object parameter)
-        {
-            if (parameter.GetType() == typeof(object))
-                return ArrayLabelBuilder<object>.Empty;
-
-            var @class = typeof(ArrayLabelBuilder<>).MakeGenericType(parameter.GetType());
-            return ((IBuild)Activator.CreateInstance(@class)).Build();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="format"></param>
-        /// <param name="arrayLabel"></param>
-        /// <param name="label"></param>
-        /// <param name="parameter"></param>
-        /// <param name="arrayLevel"></param>
-        public static void LoadUsingDelegated<T>(SqlTagFormat format, ArrayLabel arrayLabel, TextLabel label, object parameter, int arrayLevel)
-        {
-            var para = new KeyValueEasySqlParameter<T>((T)parameter);
-            label.FormatArray(format, arrayLabel, para, para.Convert(), arrayLevel);
-        }
-
-        #endregion build
     }
 }

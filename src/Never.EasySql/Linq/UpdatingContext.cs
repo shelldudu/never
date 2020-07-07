@@ -148,7 +148,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        public override UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter)
+        public override UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter, bool function)
         {
             var label = new TextLabel()
             {
@@ -191,34 +191,36 @@ namespace Never.EasySql.Linq
             }
             else
             {
+                var equalAndQuotation = function ? " = " : " = '";
+                var equalAndQuotationEnd = function ? " \r" : "' \r";
                 if (setTimes == 0)
                 {
                     setTimes++;
-                    label.SqlText = string.Concat("set ", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), " = $", parameterName, "$ \r");
+                    label.SqlText = string.Concat("set ", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), equalAndQuotation, this.dao.SqlExecuter.GetParameterPrefix(), parameterName, equalAndQuotationEnd);
                     label.Add(new SqlTagParameterPosition()
                     {
                         ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                         SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                         Name = columnName,
-                        OccupanLength = columnName.Length + 2,
-                        PrefixStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length - 1,
-                        ParameterStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length,
-                        ParameterStopIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length + parameterName.Length,
+                        OccupanLength = columnName.Length + 1,
+                        PrefixStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndQuotation.Length,
+                        ParameterStartIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                        ParameterStopIndex = 4 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
                         TextParameter = textParameter,
                     });
                 }
                 else
                 {
-                    label.SqlText = string.Concat(",", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), " = $", parameterName, "$ \r");
+                    label.SqlText = string.Concat(",", string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)), equalAndQuotation, this.dao.SqlExecuter.GetParameterPrefix(), parameterName, equalAndQuotationEnd);
                     label.Add(new SqlTagParameterPosition()
                     {
                         ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                         SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                         Name = columnName,
-                        OccupanLength = columnName.Length + 2,
-                        PrefixStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length - 1,
-                        ParameterStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length,
-                        ParameterStopIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + " = $".Length + parameterName.Length,
+                        OccupanLength = columnName.Length + 1,
+                        PrefixStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndQuotation.Length,
+                        ParameterStartIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                        ParameterStopIndex = 1 + string.Concat(this.SelectTableNamePointOnSetColunm(), this.FormatColumn(columnName)).Length + equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
                         TextParameter = textParameter,
                     });
                 }

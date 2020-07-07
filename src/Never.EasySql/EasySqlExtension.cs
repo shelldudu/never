@@ -23,23 +23,22 @@ namespace Never.EasySql
             if (parameter is INullableParameter)
                 throw new ArgumentException("parameter类型不能是INullableParameter");
 
-            return new EasyDecoratedXmlDao<T>(dao, new KeyValueEasySqlParameter<T>(parameter));
+            return new EasyDecoratedXmlDao<T>(dao, new KeyValueSqlParameter<T>(parameter));
         }
 
         /// <summary>
         /// 对idao进一步装饰
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <typeparam name="V"></typeparam>
         /// <param name="dao"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T, V>(this IDao dao, IEnumerable<V> parameter)
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, IEnumerable<T> parameter)
         {
             if (parameter is INullableParameter)
                 throw new ArgumentException("parameter类型不能是INullableParameter");
 
-            return new EasyDecoratedXmlDao<T>(dao, new ArrayEasySqlParameter<T,V>(parameter));
+            return new EasyDecoratedXmlDao<T>(dao, new ArraySqlParameter<T>(parameter));
         }
 
         /// <summary>
@@ -54,24 +53,22 @@ namespace Never.EasySql
             if (parameter is INullableParameter)
                 throw new ArgumentException("parameter类型不能是INullableParameter");
 
-            return new EasyDecoratedTextDao<T>(dao, new KeyValueEasySqlParameter<T>(parameter));
+            return new EasyDecoratedTextDao<T>(dao, new KeyValueSqlParameter<T>(parameter));
         }
 
         /// <summary>
         /// 对idao进一步装饰
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <typeparam name="V"></typeparam>
         /// <param name="dao"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedTextDao<T> ToEasyTextDao<T, V>(this IDao dao, IEnumerable<V> parameter)
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, IEnumerable<T> parameter)
         {
-
             if (parameter is INullableParameter)
                 throw new ArgumentException("parameter类型不能是INullableParameter");
 
-            return new EasyDecoratedTextDao<T>(dao, new ArrayEasySqlParameter<T, V>(parameter));
+            return new EasyDecoratedTextDao<T>(dao, new ArraySqlParameter<T>(parameter));
         }
 
         /// <summary>
@@ -82,23 +79,22 @@ namespace Never.EasySql
         /// <returns></returns>
         public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, T parameter)
         {
-            return new EasyDecoratedLinqDao<T>(dao, new KeyValueEasySqlParameter<T>(parameter));
+            return new EasyDecoratedLinqDao<T>(dao, new KeyValueSqlParameter<T>(parameter));
         }
 
         /// <summary>
         /// 对idao进一步装饰
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <typeparam name="V"></typeparam>
         /// <param name="dao"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T, V>(this IDao dao, IEnumerable<V> parameter)
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, IEnumerable<T> parameter)
         {
             if (parameter is INullableParameter)
                 throw new ArgumentException("parameter类型不能是INullableParameter");
 
-            return new EasyDecoratedLinqDao<T>(dao, new ArrayEasySqlParameter<T, V>(parameter));
+            return new EasyDecoratedLinqDao<T>(dao, new ArraySqlParameter<T>(parameter));
         }
 
         /// <summary>

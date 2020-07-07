@@ -146,7 +146,7 @@ namespace Never.EasySql.Linq
                             OccupanLength = parameterPrefix.Length + this.Left.Exp.Length,
                             PrefixStartIndex = 0,
                             ParameterStartIndex = 0 + 1,
-                            ParameterStopIndex = 0 + this.Left.Exp.Length - 1,
+                            ParameterStopIndex = 0 + 1 + this.Left.Exp.Length - 1,
                             TextParameter = false,
                         });
                     }
@@ -181,7 +181,7 @@ namespace Never.EasySql.Linq
                             OccupanLength = parameterPrefix.Length + this.Right.Exp.Length,
                             PrefixStartIndex = start + 0,
                             ParameterStartIndex = start + 1,
-                            ParameterStopIndex = start + 0 + this.Right.Exp.Length - 1,
+                            ParameterStopIndex = start + 1 + this.Right.Exp.Length - 1,
                             TextParameter = false,
                         });
                     }
@@ -905,7 +905,7 @@ namespace Never.EasySql.Linq
                     {
                         Left = new BinaryExp()
                         {
-                            Exp = constantExpress.Value.ToString(),
+                            Exp = constantExpress.Value == null ? null : constantExpress.Value.ToString(),
                             IsConstant = true,
                             Index = 0,
                         }
@@ -977,7 +977,7 @@ namespace Never.EasySql.Linq
                 {
                     current.Right = new BinaryExp()
                     {
-                        Exp = constantExpress.Value.ToString(),
+                        Exp = constantExpress.Value == null ? null : constantExpress.Value.ToString(),
                         IsConstant = true,
                         Index = 0,
                     };

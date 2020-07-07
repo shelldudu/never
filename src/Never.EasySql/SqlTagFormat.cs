@@ -83,10 +83,10 @@ namespace Never.EasySql
             if (this.Keys.Any(o => o == parameter.Key))
                 return;
 
-            if (parameter.Value is IReferceNullableParameter)
+            if (parameter.Value is INullableParameter)
             {
                 this.Keys.Add(parameter.Key);
-                var value = ((IReferceNullableParameter)parameter.Value).Value;
+                var value = ((INullableParameter)parameter.Value).Value;
                 this.Parameters.Add(new KeyValuePair<string, object>(parameter.Key, value));
             }
             else

@@ -72,7 +72,7 @@ namespace Never.EasySql.Linq
             return text;
         }
 
-        public override InsertContext<Table, Parameter> InsertColumn(string columnName, string parameterName, bool textParameter)
+        public override InsertContext<Table, Parameter> InsertColumn(string columnName, string parameterName, bool textParameter, bool function)
         {
             return this;
         }

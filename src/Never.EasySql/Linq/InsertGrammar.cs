@@ -142,7 +142,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.Context.FindColumnName(key, Linq.Context.FindTableInfo<Table>(), out _);
             string parameterName = this.Context.FindColumnName(value, Linq.Context.FindTableInfo<UnitParameter>(), out _);
-            this.Context.InsertColumn(columnName, parameterName, false);
+            this.Context.InsertColumn(columnName, parameterName, false, false);
             return this;
         }
 

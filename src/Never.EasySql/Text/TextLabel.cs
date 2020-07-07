@@ -22,6 +22,7 @@ namespace Never.EasySql.Text
         public TextLabel(Labels.TextLabel lable)
         {
             this.lable = lable;
+            this.SqlText = this.lable.SqlText;
             this.parameterPositions = new List<SqlTagParameterPosition>(lable.ParameterPositions);
             this.parameterPositionCount = this.parameterPositions.Count;
         }
@@ -35,26 +36,20 @@ namespace Never.EasySql.Text
         /// <param name="convert"></param>
         public override void Format<T>(SqlTagFormat format, EasySqlParameter<T> parameter, IReadOnlyList<KeyValueTuple<string, object>> convert)
         {
-            if (this.lable.SqlText.IsNullOrEmpty())
+            if (this.SqlText.IsNullOrEmpty())
             {
                 return;
             }
 
             if (this.parameterPositions == null || this.parameterPositionCount == 0)
             {
-                format.Write(this.lable.SqlText);
+                format.Write(this.SqlText);
                 return;
             }
 
-            for (var i = 0; i < this.lable.SqlText.Length; i++)
+            int start = 0;
+            foreach (var para in this.parameterPositions)
             {
-                var para = this.MathPosition(this.parameterPositions, i);
-                if (para == null)
-                {
-                    format.Write(this.lable.SqlText[i]);
-                    continue;
-                }
-
                 var firstConvert = convert.FirstOrDefault(o => o.Key.IsEquals(para.Name));
                 if (firstConvert == null)
                 {
@@ -62,111 +57,107 @@ namespace Never.EasySql.Text
                 }
 
                 var value = firstConvert.Value;
-                if (value is INullableParameter)
+                if (value is INullableParameter && ((INullableParameter)value).HasValue)
                 {
-                    value = ((IReferceNullableParameter)firstConvert.Value).Value;
+                    value = ((INullableParameter)firstConvert.Value).Value;
                 }
 
-                var isArray = value is System.Collections.IEnumerable;
-                if (!isArray || value is string)
+                format.WriteOnTextMode(this.SqlText, start, para.PrefixStartIndex - start);
+                //非数组
+                if (value is System.Collections.IEnumerable == false || value is string)
                 {
-                    if (format.IfTextParameter(para))
+                    writeObject(value, para);
+                }
+                else
+                {
+                    writeArray(value, para);
+                }
+
+                start = para.ParameterStopIndex + 1;
+            }
+
+            if (this.SqlText.Length >= start)
+            {
+                format.WriteOnTextMode(this.SqlText, start, this.SqlText.Length - start);
+                return;
+            }
+
+            throw new Exception(string.Format("{0}字符串遍历出错", ""));
+
+            void writeArray(object value, SqlTagParameterPosition para)
+            {
+                var item = value as System.Collections.IEnumerable;
+                var ator = item.GetEnumerator();
+                var appendValue = false;
+                var arrayLevel = 0;
+                if (format.IfTextParameter(para))
+                {
+                    while (ator.MoveNext())
                     {
-                        if (value == null)
+                        if (ator.Current == null || ator.Current == DBNull.Value)
                         {
-                            //format.WriteOnTextMode("\'null\'");
-                            //format.WriteOnTextMode("null");
-                        }
-                        if (value == DBNull.Value)
-                        {
-                            //format.WriteOnTextMode("\'null\'");
-                            format.WriteOnTextMode("null");
-                        }
-                        else
-                        {
-                            //format.WriteOnTextMode('\'');
-                            format.WriteOnTextMode(value.ToString());
-                            //format.WriteOnTextMode('\'');
+                            continue;
                         }
 
-                        i += para.OccupanLength + 1;
-                        if (i < this.lable.SqlText.Length)
-                            format.WriteOnTextMode(this.lable.SqlText[i]);
-                    }
-                    else
-                    {
-                        var item = convert.FirstOrDefault(o => o.Key.Equals(para.Name));
-                        if (item == null)
+                        if (appendValue)
                         {
-                            throw new Exception(string.Format("当前在sql语句中参数为{0}的值在所提供的参数列表中找不到", para.Name));
+                            format.WriteOnTextMode(",");
                         }
 
-                        format.Write(this.lable.SqlText, para.PrefixStartIndex, para.OccupanLength + 1);
-                        format.AddParameter(item);
-                        i += para.OccupanLength + 1;
-                        if (i < this.lable.SqlText.Length)
-                            format.Write(this.lable.SqlText[i]);
+                        format.WriteOnTextMode(ator.Current.ToString());
+                        appendValue = true;
                     }
                 }
                 else
                 {
-                    var item = value as System.Collections.IEnumerable;
-                    var ator = item.GetEnumerator();
-                    var hadA = false;
-                    var arrayLevel = 0;
-                    if (format.IfTextParameter(para))
+                    while (ator.MoveNext())
                     {
-                        while (ator.MoveNext())
+                        if (ator.Current == null || ator.Current == DBNull.Value)
                         {
-                            if (ator.Current == null || ator.Current == DBNull.Value)
-                            {
-                                continue;
-                            }
-
-                            if (hadA)
-                            {
-                                format.WriteOnTextMode(",");
-                            }
-
-                            //format.WriteOnTextMode('\'');
-                            format.WriteOnTextMode(ator.Current.ToString());
-                            //format.WriteOnTextMode('\'');
-                            hadA = true;
+                            continue;
                         }
 
-                        i += para.OccupanLength + 1;
-                        if (i < this.lable.SqlText.Length)
-                            format.WriteOnTextMode(this.lable.SqlText[i]);
+                        var newvalue = (ator.Current == null || ator.Current == DBNull.Value) ? DBNull.Value : ator.Current;
+                        var newkey = string.Format("{0}x{1}z", para.Name, arrayLevel);
+
+                        if (appendValue)
+                        {
+                            format.Write(",");
+                        }
+
+                        format.Write(para.ActualPrefix);
+                        format.Write(newkey);
+                        arrayLevel++;
+
+                        format.AddParameter(newkey, newvalue);
+                        appendValue = true;
+                    }
+                }
+            }
+            void writeObject(object value, SqlTagParameterPosition para)
+            {
+                if (value == null || value == DBNull.Value)
+                {
+                    if (format.IfTextParameter(para))
+                    {
+                        format.WriteOnTextMode("null");
                     }
                     else
                     {
-                        format.Write(this.lable.SqlText[i]);
-                        while (ator.MoveNext())
-                        {
-                            if (ator.Current == null || ator.Current == DBNull.Value)
-                            {
-                                continue;
-                            }
-
-                            var newvalue = (ator.Current == null || ator.Current == DBNull.Value) ? DBNull.Value : ator.Current;
-                            var newkey = string.Format("{0}x{1}z", para.Name, arrayLevel);
-
-                            if (hadA)
-                            {
-                                format.Write(",");
-                                format.Write(para.ActualPrefix);
-                            }
-
-                            format.Write(newkey);
-                            arrayLevel++;
-
-                            format.AddParameter(newkey, newvalue);
-                            hadA = true;
-                        }
-
-                        i += para.OccupanLength + 1;
-                        if (i < this.lable.SqlText.Length)
-                            format.Write(this.lable.SqlText[i]);
+                        format.WriteOnTextMode(this.SqlText, para.PrefixStartIndex, para.ParameterStopIndex - para.PrefixStartIndex + 1);
+                        format.AddParameter(para.Name, DBNull.Value);
+                    }
+                }
+                else
+                {
+                    if (format.IfTextParameter(para))
+                    {
+                        format.WriteOnTextMode(value.ToString());
+                    }
+                    else
+                    {
+                        format.WriteOnTextMode(this.SqlText, para.PrefixStartIndex, para.ParameterStopIndex - para.PrefixStartIndex + 1);
+                        format.AddParameter(para.Name, value);
                     }
                 }
             }

@@ -95,7 +95,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter)
+        public override UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter, bool function)
         {
             return this;
         }

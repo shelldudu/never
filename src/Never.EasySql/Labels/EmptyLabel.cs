@@ -61,9 +61,9 @@ namespace Never.EasySql.Labels
                 if (item.Value is string && ((string)item.Value).IsNullOrEmpty())
                     return true;
 
-                if (item.Value is IGenericeNullableParameter<string>)
+                if (item.Value is StringNullableParameter)
                 {
-                    var @null = (IGenericeNullableParameter<string>)item.Value;
+                    var @null = (StringNullableParameter)item.Value;
                     if (!@null.HasValue)
                         return true;
 

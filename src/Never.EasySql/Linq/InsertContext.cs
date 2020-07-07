@@ -135,7 +135,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入字段名
         /// </summary>
-        public abstract InsertContext<Table, Parameter> InsertColumn(string columnName, string parameterName, bool textParameter);
+        public abstract InsertContext<Table, Parameter> InsertColumn(string columnName, string parameterName, bool textParameter, bool function);
 
         /// <summary>
         /// 插入所有字段
@@ -148,7 +148,7 @@ namespace Never.EasySql.Linq
                 if (i.Column == null)
                 {
                     var name = i.Member.Name;
-                    this.InsertColumn(name, name, false);
+                    this.InsertColumn(name, name, false, false);
                 }
                 else
                 {
@@ -156,7 +156,7 @@ namespace Never.EasySql.Linq
                         continue;
 
                     var name = i.Column.Alias.IsNullOrEmpty() ? i.Member.Name : i.Column.Alias;
-                    this.InsertColumn(name, name, false);
+                    this.InsertColumn(name, name, false, false);
                 }
             }
 
@@ -174,7 +174,7 @@ namespace Never.EasySql.Linq
             if (columnInfo.Column != null && ((columnInfo.Column.Optional & SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement) == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement))
                 return this;
 
-            return this.InsertColumn(columnName, columnName, false);
+            return this.InsertColumn(columnName, columnName, false, false);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             string parameterName = this.FindColumnName(value, this.tableInfo, out _);
-            return this.InsertColumn(columnName, parameterName, false);
+            return this.InsertColumn(columnName, parameterName, false, false);
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
-            return this.InsertColumn(columnName, columnName, true);
+            return this.InsertColumn(columnName, columnName, true, true);
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace Never.EasySql.Linq
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
-            return this.InsertColumn(columnName, columnName, false);
+            return this.InsertColumn(columnName, columnName, true, false);
         }
     }
 }

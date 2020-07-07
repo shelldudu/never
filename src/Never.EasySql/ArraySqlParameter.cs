@@ -10,11 +10,11 @@ namespace Never.EasySql
     /// <summary>
     /// 数组参数
     /// </summary>
-    internal class ArrayEasySqlParameter<T, V> : EasySqlParameter<T>, IEnumerable<V>, ISqlParameterEnumerable
+    internal class ArraySqlParameter<T> : EasySqlParameter<T>, IEnumerable<T>, ISqlParameterEnumerable
     {
-        public IEnumerable<V> Array { get; set; }
+        public IEnumerable<T> Array { get; set; }
 
-        public ArrayEasySqlParameter(IEnumerable<V> array) : base(default(T))
+        public ArraySqlParameter(IEnumerable<T> array) : base(default(T))
         {
             this.Array = array;
         }
@@ -34,9 +34,9 @@ namespace Never.EasySql
         /// 迭代器
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<V> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
-            return (this.Array ?? Enumerable.Empty<V>()).GetEnumerator();
+            return (this.Array ?? Enumerable.Empty<T>()).GetEnumerator();
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Never.EasySql
         /// <returns></returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return (this.Array ?? Enumerable.Empty<V>()).GetEnumerator();
+            return (this.Array ?? Enumerable.Empty<T>()).GetEnumerator();
         }
     }
 }
