@@ -56,7 +56,7 @@ namespace Never.EasySql.Text
                 TextLength = sql.Length,
             };
 
-            var label = sqltag.ReadTextNode(sql, new Serialization.Json.ThunderWriter(sql.Length), new Serialization.Json.SequenceStringReader("1"), dao.SqlExecuter.GetParameterPrefix());
+            var label = sqltag.ReadTextNode(sql, new Serialization.Json.ThunderWriter(sql.Length), new Serialization.Json.SequenceStringReader("1"), dao.SqlExecuter.GetParameterPrefix(), false);
             ((List<ILabel>)sqltag.Labels).Add(new TextLabel(label));
             return sqltag;
         }

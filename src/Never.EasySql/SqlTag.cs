@@ -91,13 +91,15 @@ namespace Never.EasySql
         /// <param name="writer"></param>
         /// <param name="readerHelper"></param>
         /// <param name="parameterPrefix"></param>
+        /// <param name="needChangeLine">是否换行</param>
         /// <returns></returns>
-        public TextLabel ReadTextNode(string text, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
+        public TextLabel ReadTextNode(string text, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix,bool needChangeLine)
         {
             var i = -1;
             var length = text.Length;
             var label = new TextLabel() { };
             bool escape = false;
+            int eatcount = 0;
             while (true)
             {
                 i++;
@@ -131,6 +133,7 @@ namespace Never.EasySql
                             writer.Write(parameterPrefix);
                             var start = i;
                             int end;
+                            bool eated = false;
                             while (true)
                             {
                                 start++;
@@ -141,6 +144,7 @@ namespace Never.EasySql
 
                                 if (text[start] == '$')
                                 {
+                                    eated = true;
                                     end = start - 1;
                                     break;
                                 }
@@ -159,15 +163,19 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                ParameterStartIndex = i + parameterPrefix.Length,
-                                PrefixStartIndex = i,
-                                ParameterStopIndex = end,
-                                OccupanLength = end - i,
+                                ParameterStartIndex = i - eatcount + parameterPrefix.Length,
+                                PrefixStartIndex = i - eatcount,
+                                ParameterStopIndex = end - eatcount,
+                                OccupanLength = end - i + 1 - eatcount,
                                 TextParameter = true,
                             };
 
                             label.Add(parameter);
                             i = start;
+                            if (eated == true)
+                            {
+                                eatcount++;
+                            }
                         }
                         break;
 
@@ -226,7 +234,7 @@ namespace Never.EasySql
                                 ParameterStartIndex = i + parameterPrefix.Length,
                                 PrefixStartIndex = i,
                                 ParameterStopIndex = end,
-                                OccupanLength = end - i,
+                                OccupanLength = end - i + 1,
                                 TextParameter = false,
                             };
 
@@ -243,10 +251,16 @@ namespace Never.EasySql
                 }
             }
 
+            if (needChangeLine && readerHelper.IsWhiteSpaceChangeLine(writer.Read(0)) == false && readerHelper.IsWhiteSpaceChangeLine(writer.Read(writer.Length - 1)) == false && writer.Read(writer.Length - 1) != ';')
+            {
+                writer.Write(' ');
+            }
+
             label.SqlText = writer.ToString();
             this.TextLength += label.SqlText.Length;
             writer.Clear();
             return label;
+
         }
 
         /// <summary>
@@ -256,8 +270,9 @@ namespace Never.EasySql
         /// <param name="writer"></param>
         /// <param name="readerHelper"></param>
         /// <param name="parameterPrefix"></param>
+        /// <param name="needChangeLine">是否换行</param>
         /// <returns></returns>
-        public TextLabel ReadTextNodeUsingFormatLine(string text, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
+        public TextLabel ReadTextNodeUsingFormatLine(string text, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix, bool needChangeLine)
         {
             var i = -1;
             var length = text.Length;
@@ -265,6 +280,7 @@ namespace Never.EasySql
             var hack = 0;
             bool escape = false;
             char last = 'a';
+            int eatcount = 0;
             while (true)
             {
                 i++;
@@ -360,6 +376,7 @@ namespace Never.EasySql
                             writer.Write(parameterPrefix);
                             var start = i;
                             int end;
+                            bool eated = false;
                             while (true)
                             {
                                 start++;
@@ -370,6 +387,7 @@ namespace Never.EasySql
 
                                 if (text[start] == '$')
                                 {
+                                    eated = true;
                                     end = start - 1;
                                     last = text[end];
                                     break;
@@ -389,15 +407,19 @@ namespace Never.EasySql
                                 Name = name,
                                 SourcePrefix = new string(text[i], 1),
                                 ActualPrefix = parameterPrefix,
-                                ParameterStartIndex = (i + parameterPrefix.Length) - hack,
-                                PrefixStartIndex = i - hack,
-                                ParameterStopIndex = end - hack,
-                                OccupanLength = end - i,
+                                ParameterStartIndex = i - eatcount + parameterPrefix.Length - hack,
+                                PrefixStartIndex = i - eatcount - hack,
+                                ParameterStopIndex = end - eatcount - hack,
+                                OccupanLength = end - eatcount - i + 1,
                                 TextParameter = true,
                             };
 
                             label.Add(parameter);
                             i = start;
+                            if (eated == true)
+                            {
+                                eatcount++;
+                            }
                         }
                         break;
 
@@ -457,7 +479,7 @@ namespace Never.EasySql
                                 ParameterStartIndex = (i + parameterPrefix.Length) - hack,
                                 PrefixStartIndex = i - hack,
                                 ParameterStopIndex = end - hack,
-                                OccupanLength = end - i,
+                                OccupanLength = end - i + 1,
                                 TextParameter = false,
                             };
 
@@ -472,6 +494,11 @@ namespace Never.EasySql
                         }
                         break;
                 }
+            }
+
+            if (needChangeLine && readerHelper.IsWhiteSpaceChangeLine(writer.Read(0)) == false && readerHelper.IsWhiteSpaceChangeLine(writer.Read(writer.Length - 1)) == false && writer.Read(writer.Length - 1) != ';')
+            {
+                writer.Write(' ');
             }
 
             label.SqlText = writer.ToString();

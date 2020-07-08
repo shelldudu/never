@@ -457,7 +457,7 @@ namespace Never.EasySql.Xml
         /// <returns></returns>
         public TextLabel ReadTextNode(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
         {
-            return this.ReadTextNode(node.InnerText, writer, readerHelper, parameterPrefix);
+            return this.ReadTextNode(node.InnerText, writer, readerHelper, parameterPrefix, true);
         }
 
         /// <summary>
@@ -470,7 +470,7 @@ namespace Never.EasySql.Xml
         /// <returns></returns>
         public TextLabel ReadTextNodeUsingFormatLine(XmlNode node, ThunderWriter writer, SequenceStringReader readerHelper, string parameterPrefix)
         {
-            return this.ReadTextNodeUsingFormatLine(node.InnerText, writer, readerHelper, parameterPrefix);
+            return this.ReadTextNodeUsingFormatLine(node.InnerText, writer, readerHelper, parameterPrefix, true);
         }
 
         /// <summary>

@@ -229,6 +229,7 @@ namespace Never.EasySql.Labels
                     format.Write(Open);
                     this.Line.FormatArray(format, this, parameter, item);
                     format.Write(Close);
+                    return;
                 }
 
                 throw new InvalidException("the sql tag {0} need the array {1} parameter;", format.Id, Parameter);

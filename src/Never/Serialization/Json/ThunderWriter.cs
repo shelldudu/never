@@ -50,6 +50,30 @@ namespace Never.Serialization.Json
 
         #endregion ctor
 
+        #region read
+
+        /// <summary>
+        /// 读取某一个字符
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public char Read(int index)
+        {
+            return this.sb[index];
+        }
+
+        /// <summary>
+        /// 长度
+        /// </summary>
+        public int Length
+        {
+            get
+            {
+                return this.sb.Length;
+            }
+        }
+        #endregion
+
         #region write
 
         /// <summary>
