@@ -13,7 +13,7 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// 更新操作上下文
     /// </summary>
-    public abstract class UpdateContext<Table, Parameter> : Context
+    public abstract class UpdateContext<Parameter, Table> : Context
     {
         /// <summary>
         /// dao
@@ -78,11 +78,17 @@ namespace Never.EasySql.Linq
         public abstract int GetResult();
 
         /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public abstract SqlTagFormat GetSqlTagFormat(bool formatText = false);
+
+        /// <summary>
         /// 表名
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public virtual UpdateContext<Table, Parameter> From(string table)
+        public virtual UpdateContext<Parameter, Table> From(string table)
         {
             this.FromTable = this.FormatTable(table);
             return this;
@@ -93,7 +99,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public virtual UpdateContext<Table, Parameter> As(string table)
+        public virtual UpdateContext<Parameter, Table> As(string table)
         {
             this.AsTable = table;
             return this;
@@ -115,18 +121,18 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public abstract UpdateContext<Table, Parameter> StartEntrance();
+        public abstract UpdateContext<Parameter, Table> StartEntrance();
 
 
         /// <summary>
         /// 更新字段名
         /// </summary>
-        public abstract UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter, bool function);
+        public abstract UpdateContext<Parameter, Table> SetColumn(string columnName, string parameterName, bool textParameter, bool function);
 
         /// <summary>
         /// 更新字段名
         /// </summary>
-        public virtual UpdateContext<Table, Parameter> Set<TMember>(Expression<Func<Table, TMember>> key, Expression<Func<Parameter, TMember>> value)
+        public virtual UpdateContext<Parameter, Table> Set<TMember>(Expression<Func<Table, TMember>> key, Expression<Func<Parameter, TMember>> value)
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             string parameterName = this.FindColumnName(value, this.tableInfo, out _);
@@ -136,7 +142,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        public virtual UpdateContext<Table, Parameter> SetFunc<TMember>(Expression<Func<Table, TMember>> key, string value)
+        public virtual UpdateContext<Parameter, Table> SetFunc<TMember>(Expression<Func<Table, TMember>> key, string value)
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
@@ -146,7 +152,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        public virtual UpdateContext<Table, Parameter> SetValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
+        public virtual UpdateContext<Parameter, Table> SetValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
@@ -156,42 +162,42 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public abstract UpdateContext<Table, Parameter> Where();
+        public abstract UpdateContext<Parameter, Table> Where();
 
         /// <summary>
         /// where
         /// </summary>
-        public abstract UpdateContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression);
+        public abstract UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression);
 
         /// <summary>
         /// where
         /// </summary>
-        public abstract UpdateContext<Table, Parameter> Where(AndOrOption andOrOption, string sql);
+        public abstract UpdateContext<Parameter, Table> Where(AndOrOption andOrOption, string sql);
 
         /// <summary>
         /// append
         /// </summary>
-        public abstract UpdateContext<Table, Parameter> Append(string sql);
+        public abstract UpdateContext<Parameter, Table> Append(string sql);
 
         /// <summary>
         /// join
         /// </summary>
         /// <param name="joins"></param>
         /// <returns></returns>
-        public abstract UpdateContext<Table, Parameter> JoinOnUpdate(List<JoinInfo> joins);
+        public abstract UpdateContext<Parameter, Table> JoinOnUpdate(List<JoinInfo> joins);
 
         /// <summary>
         /// exists
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public abstract UpdateContext<Table, Parameter> JoinOnWhereExists(WhereExistsInfo whereExists);
+        public abstract UpdateContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists);
 
         /// <summary>
         /// in
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public abstract UpdateContext<Table, Parameter> JoinOnWhereIn(WhereInInfo whereIn);
+        public abstract UpdateContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn);
     }
 }

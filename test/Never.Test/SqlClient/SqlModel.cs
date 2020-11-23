@@ -7,16 +7,21 @@ using System.Threading.Tasks;
 
 namespace Never.Test
 {
+    [Never.SqlClient.TableName(Name = "user")]
     public class User
     {
-        public int Id { get; set; }
-        public long UserId { get; set; }
-        public string UserName { get; set; }
-        public DateTime EditDate { get; set; }
         public Guid AggregateId { get; set; }
-        public decimal Amount { get; set; }
-        public float Balance { get; set; }
-        public double Freeze { get; set; }
+        public string UserName { get; set; }
+
+        [Never.SqlClient.Column(Optional = Never.SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | Never.SqlClient.ColumnAttribute.ColumnOptional.Primary)]
+        public int Id { get; set; }
+
+        public long UserId { get; set; }
+        [Never.SqlClient.Column(Alias = "UserName")]
+        public string Name { get; set; }
+
+        public DateTime CreateTime { get; set; }
+        public DateTime EditDate { get; set; }
     }
 
     public struct MyUserParameter
@@ -46,7 +51,7 @@ namespace Never.Test
         {
             get
             {
-                return @"server=192.168.110.130;uid=sa;pwd=gg123456;database=p2p_admin;";
+                return @"server=192.168.137.110;uid=sa;pwd=gg123456;database=p2p_login;";
             }
         }
 
@@ -73,7 +78,7 @@ namespace Never.Test
         {
             get
             {
-                return "server=127.0.0.1;uid=sa;pwd=gg123456;database=test;port=3306;";
+                return "server=192.168.137.110;uid=sa;pwd=gg123456;database=test;port=3306;";
             }
         }
 
@@ -83,7 +88,7 @@ namespace Never.Test
         }
     }
 
-    public class PostgreSqlBuilder : EmbeddedDaoBuilder
+    public class PostgreSqlBuilder : XmlContentDaoBuilder.XmlEmbeddedDaoBuilder
     {
         public override string[] EmbeddedSqlMaps
         {
@@ -100,7 +105,7 @@ namespace Never.Test
         {
             get
             {
-                return "server=127.0.0.1;uid=sa;pwd=gg123456;database=b2c_message;port=3306;";
+                return "server=192.168.137.110;uid=sa;pwd=gg123456;database=p2p_login;port=3306;";
             }
         }
 

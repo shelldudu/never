@@ -10,18 +10,18 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// update操作语法
     /// </summary>
-    public struct UpdateGrammar<Table, Parameter>
+    public struct UpdateGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal UpdateContext<Table, Parameter> Context { get; set; }
+        internal UpdateContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal UpdateGrammar<Table, Parameter> StartSetColumn()
+        internal UpdateGrammar<Parameter, Table> StartSetColumn()
         {
             this.Context.StartEntrance();
             return this;
@@ -31,7 +31,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Table, Parameter> SetColumn<TMember>(Expression<Func<Table, TMember>> keyValue)
+        public UpdateGrammar<Parameter, Table> SetColumn<TMember>(Expression<Func<Table, TMember>> keyValue)
         {
             string columnName = this.Context.FindColumnName(keyValue, Never.EasySql.Linq.Context.FindTableInfo<Table>(), out _);
             string parameterName = this.Context.FindColumnName(keyValue, Never.EasySql.Linq.Context.FindTableInfo<Table>(), out _);
@@ -42,7 +42,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Table, Parameter> SetColumn<TMember>(Expression<Func<Table, TMember>> key, Expression<Func<Parameter, TMember>> value)
+        public UpdateGrammar<Parameter, Table> SetColumn<TMember>(Expression<Func<Table, TMember>> key, Expression<Func<Parameter, TMember>> value)
         {
             this.Context.Set<TMember>(key, value);
             return this;
@@ -51,7 +51,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Table, Parameter> SetColumnWithFunc<TMember>(Expression<Func<Table, TMember>> key, string value)
+        public UpdateGrammar<Parameter, Table> SetColumnWithFunc<TMember>(Expression<Func<Table, TMember>> key, string value)
         {
             this.Context.SetFunc<TMember>(key, value);
             return this;
@@ -60,7 +60,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新的字段名
         /// </summary>
-        public UpdateGrammar<Table, Parameter> SetColumnWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
+        public UpdateGrammar<Parameter, Table> SetColumnWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
         {
             this.Context.SetValue<TMember>(key, value);
             return this;
@@ -77,19 +77,19 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> Where()
+        public UpdateWhereGrammar<Parameter, Table> Where()
         {
             this.Context.Where();
-            return new UpdateWhereGrammar<Table, Parameter>() { Context = this.Context };
+            return new UpdateWhereGrammar<Parameter, Table>() { Context = this.Context };
         }
 
         /// <summary>
         /// where
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
+        public UpdateWhereGrammar<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
-            return new UpdateWhereGrammar<Table, Parameter>() { Context = this.Context };
+            return new UpdateWhereGrammar<Parameter, Table>() { Context = this.Context };
         }
     }
 
@@ -99,9 +99,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
-    public struct UpdateJoinGrammar<Table, Parameter, Table1>
+    public struct UpdateJoinGrammar<Parameter, Table, Table1>
     {
-        internal UpdateGrammar<Table, Parameter> update { get; set; }
+        internal UpdateGrammar<Parameter, Table> update { get; set; }
         private readonly string @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -123,7 +123,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1> On(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public UpdateJoinGrammar<Parameter, Table, Table1> On(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -141,7 +141,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1> And(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public UpdateJoinGrammar<Parameter, Table, Table1> And(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -156,7 +156,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2> Join<Table2>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2> Join<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -164,7 +164,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.joins) { update = this.update };
         }
 
 
@@ -174,7 +174,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2> InnerJoin<Table2>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2> InnerJoin<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -182,7 +182,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.joins) { update = this.update };
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2> LeftJoin<Table2>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2> LeftJoin<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -199,7 +199,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.joins) { update = this.update };
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2> RightJoin<Table2>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2> RightJoin<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -216,13 +216,13 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.joins) { update = this.update };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public UpdateGrammar<Table, Parameter> ToUpdate()
+        public UpdateGrammar<Parameter, Table> ToUpdate()
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -240,9 +240,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
-    public struct UpdateJoinGrammar<Table, Parameter, Table1, Table2>
+    public struct UpdateJoinGrammar<Parameter, Table, Table1, Table2>
     {
-        internal UpdateGrammar<Table, Parameter> update { get; set; }
+        internal UpdateGrammar<Parameter, Table> update { get; set; }
         private readonly List<string> @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -265,7 +265,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2> On(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2> On(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -282,7 +282,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2> And(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2> And(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -297,7 +297,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3> Join<Table3>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3> Join<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -306,7 +306,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.joins) { update = this.update };
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -324,7 +324,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.joins) { update = this.update };
         }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -342,7 +342,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.joins) { update = this.update };
         }
 
         /// <summary>
@@ -351,7 +351,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3> RightJoin<Table3>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3> RightJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -360,13 +360,13 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.joins) { update = this.update };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public UpdateGrammar<Table, Parameter> ToUpdate()
+        public UpdateGrammar<Parameter, Table> ToUpdate()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -388,9 +388,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
-    public struct UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3>
+    public struct UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3>
     {
-        internal UpdateGrammar<Table, Parameter> update { get; set; }
+        internal UpdateGrammar<Parameter, Table> update { get; set; }
         private readonly List<string> @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -413,7 +413,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -430,7 +430,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -445,7 +445,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -454,7 +454,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.joins) { update = this.update };
         }
 
         /// <summary>
@@ -463,7 +463,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -472,7 +472,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.joins) { update = this.update };
         }
 
         /// <summary>
@@ -481,7 +481,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -490,7 +490,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.joins) { update = this.update };
         }
 
         /// <summary>
@@ -499,7 +499,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -508,13 +508,13 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.joins) { update = this.update };
+            return new UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.joins) { update = this.update };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public UpdateGrammar<Table, Parameter> ToUpdate()
+        public UpdateGrammar<Parameter, Table> ToUpdate()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -537,9 +537,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
     /// <typeparam name="Table4"></typeparam>
-    public struct UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>
+    public struct UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>
     {
-        internal UpdateGrammar<Table, Parameter> update { get; set; }
+        internal UpdateGrammar<Parameter, Table> update { get; set; }
         private readonly List<string> @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -561,7 +561,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -578,7 +578,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public UpdateJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -590,7 +590,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public UpdateGrammar<Table, Parameter> ToUpdate()
+        public UpdateGrammar<Parameter, Table> ToUpdate()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -610,9 +610,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
-    public struct UpdateWhereExistsGrammar<Table, Parameter, Table1>
+    public struct UpdateWhereExistsGrammar<Parameter, Table, Table1>
     {
-        internal UpdateWhereGrammar<Table, Parameter> where { get; set; }
+        internal UpdateWhereGrammar<Parameter, Table> where { get; set; }
         private readonly string @as;
         private readonly Context.WhereExistsInfo exists;
         /// <summary>
@@ -639,7 +639,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1> Where(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1> Where(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             this.exists.Where = expression;
             return this;
@@ -650,7 +650,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1> And(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1> And(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             if (this.exists.Where == null)
                 throw new Exception("please use Where method first;");
@@ -665,7 +665,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2> Join<Table2>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2> Join<Table2>(string @as)
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -673,7 +673,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.exists) { where = this.where };
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.exists) { where = this.where };
         }
 
 
@@ -683,7 +683,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2> InnerJoin<Table2>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2> InnerJoin<Table2>(string @as)
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -691,7 +691,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.exists) { where = this.where };
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.exists) { where = this.where };
         }
 
 
@@ -701,7 +701,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2> LeftJoin<Table2>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2> LeftJoin<Table2>(string @as)
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -709,7 +709,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.exists) { where = this.where };
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.exists) { where = this.where };
         }
 
         /// <summary>
@@ -718,7 +718,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2> RightJoin<Table2>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2> RightJoin<Table2>(string @as)
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -726,13 +726,13 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.exists) { where = this.where };
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.exists) { where = this.where };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> ToWhere()
+        public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -749,9 +749,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
-    public struct UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2>
+    public struct UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2>
     {
-        internal UpdateWhereGrammar<Table, Parameter> where { get; set; }
+        internal UpdateWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereExistsInfo exists;
         /// <summary>
@@ -777,7 +777,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2> On(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2> On(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             this.exists.Joins.Last().On = expression;
             return this;
@@ -788,7 +788,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2> And(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2> And(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             if (this.exists.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -804,7 +804,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> Join<Table3>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> Join<Table3>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -813,7 +813,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.exists)
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.exists)
             {
                 where = this.where,
             };
@@ -826,7 +826,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -835,7 +835,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.exists)
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.exists)
             {
                 where = this.where,
             };
@@ -848,7 +848,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -857,7 +857,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.exists)
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.exists)
             {
                 where = this.where,
             };
@@ -869,7 +869,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> RightJoin<Table3>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> RightJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -878,7 +878,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.exists)
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.exists)
             {
                 where = this.where,
             };
@@ -887,7 +887,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> ToWhere()
+        public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -908,9 +908,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
-    public struct UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>
+    public struct UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>
     {
-        internal UpdateWhereGrammar<Table, Parameter> where { get; set; }
+        internal UpdateWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereExistsInfo exists;
         /// <summary>
@@ -936,7 +936,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             this.exists.Joins.Last().On = expression;
             return this;
@@ -947,7 +947,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             if (this.exists.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -963,7 +963,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -972,7 +972,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.exists)
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.exists)
             {
                 where = this.where,
             };
@@ -985,7 +985,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -994,7 +994,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.exists)
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.exists)
             {
                 where = this.where,
             };
@@ -1007,7 +1007,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -1016,7 +1016,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.exists)
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.exists)
             {
                 where = this.where,
             };
@@ -1028,7 +1028,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -1037,7 +1037,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.exists)
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.exists)
             {
                 where = this.where,
             };
@@ -1046,7 +1046,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> ToWhere()
+        public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -1068,9 +1068,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
     /// <typeparam name="Table4"></typeparam>
-    public struct UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>
+    public struct UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>
     {
-        internal UpdateWhereGrammar<Table, Parameter> where { get; set; }
+        internal UpdateWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereExistsInfo exists;
         /// <summary>
@@ -1096,7 +1096,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             this.exists.Joins.Last().On = expression;
             return this;
@@ -1107,7 +1107,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             if (this.exists.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1119,7 +1119,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> ToWhere()
+        public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -1138,9 +1138,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
-    public struct UpdateWhereInGrammar<Table, Parameter, Table1>
+    public struct UpdateWhereInGrammar<Parameter, Table, Table1>
     {
-        internal UpdateWhereGrammar<Table, Parameter> where { get; set; }
+        internal UpdateWhereGrammar<Parameter, Table> where { get; set; }
         private readonly string @as;
         private readonly Context.WhereInInfo @in;
 
@@ -1168,7 +1168,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1> Field(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public UpdateWhereInGrammar<Parameter, Table, Table1> Field(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             this.@in.Field = expression;
             return this;
@@ -1179,7 +1179,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1> Where(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public UpdateWhereInGrammar<Parameter, Table, Table1> Where(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             if (this.@in.Field == null)
                 throw new Exception("please use On Field first;");
@@ -1194,12 +1194,12 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2> Join<Table2>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2> Join<Table2>(string @as)
         {
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.@in) { where = this.where };
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.@in) { where = this.where };
         }
 
 
@@ -1209,12 +1209,12 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2> InnerJoin<Table2>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2> InnerJoin<Table2>(string @as)
         {
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.@in) { where = this.where };
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.@in) { where = this.where };
         }
 
 
@@ -1224,12 +1224,12 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2> LeftJoin<Table2>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2> LeftJoin<Table2>(string @as)
         {
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.@in) { where = this.where };
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.@in) { where = this.where };
         }
 
         /// <summary>
@@ -1238,18 +1238,18 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2> RightJoin<Table2>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2> RightJoin<Table2>(string @as)
         {
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.@in) { where = this.where };
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.@in) { where = this.where };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> ToWhere()
+        public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@in.Field == null)
                 throw new Exception("please use On Field first;");
@@ -1266,9 +1266,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
-    public struct UpdateWhereInGrammar<Table, Parameter, Table1, Table2>
+    public struct UpdateWhereInGrammar<Parameter, Table, Table1, Table2>
     {
-        internal UpdateWhereGrammar<Table, Parameter> where { get; set; }
+        internal UpdateWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereInInfo @in;
         /// <summary>
@@ -1294,7 +1294,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2> On(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2> On(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             this.@in.Joins.Last().On = expression;
             return this;
@@ -1305,7 +1305,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2> And(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2> And(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1321,13 +1321,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3> Join<Table3>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3> Join<Table3>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.@in)
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.@in)
             {
                 where = this.where,
             };
@@ -1340,13 +1340,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.@in)
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1359,13 +1359,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.@in)
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1377,13 +1377,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3> RightJoin<Table3>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3> RightJoin<Table3>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.@in)
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1392,7 +1392,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> ToWhere()
+        public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1410,9 +1410,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
-    public struct UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3>
+    public struct UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3>
     {
-        internal UpdateWhereGrammar<Table, Parameter> where { get; set; }
+        internal UpdateWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereInInfo @in;
         /// <summary>
@@ -1438,7 +1438,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             this.@in.Joins.Last().On = expression;
             return this;
@@ -1449,7 +1449,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1465,13 +1465,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.@in)
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.@in)
             {
                 where = this.where,
             };
@@ -1484,13 +1484,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.@in)
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1503,13 +1503,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.@in)
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1521,13 +1521,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.@in)
+            return new UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1536,7 +1536,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> ToWhere()
+        public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1555,9 +1555,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
     /// <typeparam name="Table4"></typeparam>
-    public struct UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>
+    public struct UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>
     {
-        internal UpdateWhereGrammar<Table, Parameter> where { get; set; }
+        internal UpdateWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereInInfo @in;
         /// <summary>
@@ -1583,7 +1583,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             this.@in.Joins.Last().On = expression;
             return this;
@@ -1594,7 +1594,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public UpdateWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1606,7 +1606,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public UpdateWhereGrammar<Table, Parameter> ToWhere()
+        public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1621,58 +1621,33 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">目标表</typeparam>
-    public struct UpdateWhereGrammar<Table, Parameter>
+    public struct UpdateWhereGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal UpdateContext<Table, Parameter> Context { get; set; }
+        internal UpdateContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
-        /// 存在
+        /// 
         /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="as"></param>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1> AndExists<Table1>(string @as)
+        public UpdateWhereGrammar<Parameter, Table> And(Expression<Func<Parameter, Table, bool>> expression)
         {
-            this.Context.CheckTableNameIsExists(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1>(@as, AndOrOption.and, 'e') { where = this };
+            this.Context.Where(expression);
+            return this;
         }
 
         /// <summary>
-        /// 不存在
+        /// 
         /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="as"></param>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1> AndNotExists<Table1>(string @as)
+        public UpdateWhereGrammar<Parameter, Table> Or(Expression<Func<Parameter, Table, bool>> expression)
         {
-            this.Context.CheckTableNameIsExists(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1>(@as, AndOrOption.and, 'n') { where = this };
-        }
-        /// <summary>
-        /// 存在
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="as"></param>
-        /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1> OrExists<Table1>(string @as)
-        {
-            this.Context.CheckTableNameIsExists(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1>(@as, AndOrOption.or, 'e') { where = this };
-        }
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="as"></param>
-        /// <returns></returns>
-        public UpdateWhereExistsGrammar<Table, Parameter, Table1> OrNotExists<Table1>(string @as)
-        {
-            this.Context.CheckTableNameIsExists(@as);
-            return new UpdateWhereExistsGrammar<Table, Parameter, Table1>(@as, AndOrOption.or, 'n') { where = this };
+            this.Context.Where(expression);
+            return this;
         }
 
         /// <summary>
@@ -1681,10 +1656,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1> AndIn<Table1>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1> AndExists<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1>(@as, AndOrOption.and, 'i') { where = this };
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1>(@as, AndOrOption.and, 'e') { where = this };
         }
 
         /// <summary>
@@ -1693,10 +1668,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1> AndNotIn<Table1>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1> AndNotExists<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1>(@as, AndOrOption.and, 'n') { where = this };
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1>(@as, AndOrOption.and, 'n') { where = this };
         }
         /// <summary>
         /// 存在
@@ -1704,10 +1679,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1> OrIn<Table1>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1> OrExists<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1>(@as, AndOrOption.or, 'i') { where = this };
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1>(@as, AndOrOption.or, 'e') { where = this };
         }
 
         /// <summary>
@@ -1716,17 +1691,64 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public UpdateWhereInGrammar<Table, Parameter, Table1> OrNotIn<Table1>(string @as)
+        public UpdateWhereExistsGrammar<Parameter, Table, Table1> OrNotExists<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new UpdateWhereInGrammar<Table, Parameter, Table1>(@as, AndOrOption.or, 'n') { where = this };
+            return new UpdateWhereExistsGrammar<Parameter, Table, Table1>(@as, AndOrOption.or, 'n') { where = this };
+        }
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        public UpdateWhereInGrammar<Parameter, Table, Table1> AndIn<Table1>(string @as)
+        {
+            this.Context.CheckTableNameIsExists(@as);
+            return new UpdateWhereInGrammar<Parameter, Table, Table1>(@as, AndOrOption.and, 'i') { where = this };
+        }
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        public UpdateWhereInGrammar<Parameter, Table, Table1> AndNotIn<Table1>(string @as)
+        {
+            this.Context.CheckTableNameIsExists(@as);
+            return new UpdateWhereInGrammar<Parameter, Table, Table1>(@as, AndOrOption.and, 'n') { where = this };
+        }
+        /// <summary>
+        /// 存在
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        public UpdateWhereInGrammar<Parameter, Table, Table1> OrIn<Table1>(string @as)
+        {
+            this.Context.CheckTableNameIsExists(@as);
+            return new UpdateWhereInGrammar<Parameter, Table, Table1>(@as, AndOrOption.or, 'i') { where = this };
+        }
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        public UpdateWhereInGrammar<Parameter, Table, Table1> OrNotIn<Table1>(string @as)
+        {
+            this.Context.CheckTableNameIsExists(@as);
+            return new UpdateWhereInGrammar<Parameter, Table, Table1>(@as, AndOrOption.or, 'n') { where = this };
         }
 
         /// <summary>
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-        public UpdateWhereGrammar<Table, Parameter> AndNotExists(string expression)
+        public UpdateWhereGrammar<Parameter, Table> AndNotExists(string expression)
         {
             this.Context.Where(AndOrOption.and, expression);
             return this;
@@ -1736,7 +1758,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-        public UpdateWhereGrammar<Table, Parameter> OrNotExists(string expression)
+        public UpdateWhereGrammar<Parameter, Table> OrNotExists(string expression)
         {
             this.Context.Where(AndOrOption.or, expression);
             return this;
@@ -1746,7 +1768,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public UpdateWhereGrammar<Table, Parameter> AndIn(string expression)
+        public UpdateWhereGrammar<Parameter, Table> AndIn(string expression)
         {
             this.Context.Where(AndOrOption.and, expression);
             return this;
@@ -1756,7 +1778,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public UpdateWhereGrammar<Table, Parameter> AndNotIn(string expression)
+        public UpdateWhereGrammar<Parameter, Table> AndNotIn(string expression)
         {
             this.Context.Where(AndOrOption.and, expression);
             return this;
@@ -1766,7 +1788,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public UpdateWhereGrammar<Table, Parameter> OrIn(string expression)
+        public UpdateWhereGrammar<Parameter, Table> OrIn(string expression)
         {
             this.Context.Where(AndOrOption.or, expression);
             return this;
@@ -1776,7 +1798,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public UpdateWhereGrammar<Table, Parameter> OrNotIn(string expression)
+        public UpdateWhereGrammar<Parameter, Table> OrNotIn(string expression)
         {
             this.Context.Where(AndOrOption.or, expression);
             return this;
@@ -1786,7 +1808,7 @@ namespace Never.EasySql.Linq
         /// 字符串
         /// </summary>
         /// <param name="sql">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public UpdateWhereGrammar<Table, Parameter> Append(string sql)
+        public UpdateWhereGrammar<Parameter, Table> Append(string sql)
         {
             this.Context.Append(sql);
             return this;

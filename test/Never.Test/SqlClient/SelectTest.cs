@@ -32,17 +32,20 @@ namespace Never.Test
 
             var dao = ConstructibleDaoBuilder<MySqlBuilder>.Value.Build();
 
-            var more = dao.ToEasyTextDao(new { Id = new[] { 1, 2 }, UserName = "666" }).QueryForEnumerable<MyTable>("select a.* from `user` as a where a.Id in (@Id) or a.UserName = @UserName;");
+            //var more = dao.ToEasyTextDao(new { Id = new[] { 1, 2 }, UserName = "666" }).QueryForEnumerable<MyTable>("select a.* from `user` as a where a.Id in (@Id) or a.UserName = @UserName;");
 
             //返回单条
-            var one = dao.ToEasyLinqDao(new { Id = 1 })
-               .Select<MyTable>()
+            var one = dao.ToEasyLinqDao(new { Id = 1, IdArray = new[] { 1, 2, 3, 4 }.ToNullableParameter(), Name = "ee" })
+               .Select<User>()
                .ToEnumerable()
-               .Where((t, p) => t.Id >= p.Id)
+               .Where((p, t) => t.Id >= p.Id)
+               //.AndNotExists<MyTable2>("t1").Where((p, t, t1) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2).And((p, t, t1) => t1.Id != 2).ToWhere()
+               //.And((p, t) => p.Id == t.Id)
+               .And((p, t) => p.IdArray.Contains(222) && t.Id >= 2 && p.Name.Like("e") && p.Name.Like("e"))
                .OrderByDescending(t => t.Id)
-               .GetResult(0, 4);
+               .GetSqlTagFormat();
 
-            return;
+            //return;
             //返回列表
             //var array = dao.ToEasyLinqDao(new { Id = 1 }).Select<SqlServerBuilder>().Where(null).ToList(1, 5).GetResult();
             //返回列表，里面join了其他表
@@ -50,18 +53,18 @@ namespace Never.Test
             //     .Where(null).ToList(1, 5).GetResult();
 
             //更新
-            var update = dao.ToEasyLinqDao(new MyTable() { Id = 7 }).Cached("AAA").Update()
+            var update = dao.ToEasyLinqDao(new { Id = 7 }).Cached("AAA").Update()
                .From("user").As("u")
-            //.Join<MyTable2>("t1").On((p, t) => p.Id >= 1).And((p, t) => t.Name == "3")
-            // .Join<MyTable2>("t2").On((p, t1, t2) => p.Id == t1.Id).And((p, t1, t2) => t2.Name == "3")
+            //.Join<User>("t1").On((t, t2, p) => p.Id >= 1).And((t, t2, p) => p.Name == "3").ToUpdate()
+            //  .Join<MyTable2>("t2").On((p, t1, t2) => p.Id == t1.Id).And((p, t1, t2) => t2.Name == "3")
             //.Join<MyTable2>("t3")
             //.Join<MyTable2>("t4")
             //.ToUpdate()
-            //.SetColumn(m => m.Name)
-              .SetColumnWithFunc(m => m.CreateTime, "now()")
-              .SetColumnWithValue(m => m.Name, "abcd")
-            .Where((t, p) => p.Id == t.Id)
-            //.AndNotExists<MyTable2>("t1").Where((p, t, t1) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2).And((p, t, t1) => t1.Id != 2).ToWhere()
+            .SetColumn(m => m.Id)
+            //.SetColumnWithFunc(m => m.CreateTime, "now()")
+            // .SetColumnWithValue(m => m.Name, "abcd")
+            .Where((p, t) => p.Id == t.Id)
+            .AndNotExists<User>("t1").Where((p, t, t1) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2).And((p, t, t1) => t1.Id != 2).ToWhere()
             //.Join<MyTable2>("t2").On((p, t1, t2) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2) => t1.Id != 2)
             //.Join<MyTable2>("t3").On((p, t1, t2, t3) => (t1.Id == p.Id && p.Id >= t1.Id) || (p.Id > 0) || t1.Id != 2).And((p, t1, t2, t3) => t1.Id != 2).ToWhere()
             //.AndExists<MyTable2>("t1").Where((p, t) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2).And((p, t) => t.Id != 2)
@@ -81,46 +84,18 @@ namespace Never.Test
 
             //删除
 
-            var delete = dao.ToEasyLinqDao(new MyTable()).Delete<MyTable>()
-             .Where((t, p) => t.Name == "abc")
+            var delete = dao.ToEasyLinqDao(new User()).Delete<User>()
+             .Where((p, t) => t.Name == "abc")
              .GetResult();
 
             //推入
-            var insert = dao.ToEasyLinqDao(new MyTable() { Id = 1, Name = "666", CreateTime = DateTime.Now, UserId = 555 }).Insert<MyTable>()
+            var insert = dao.ToEasyLinqDao(new User() { Id = 1, Name = "666", CreateTime = DateTime.Now, UserId = 555 }).Insert<User>()
                 .UseSingle()
                 .InsertAll()
                 //.Colum(m => m.UserId)
                 //.Colum(m => m.Name)
                 .LastInsertId<int>()
                 .GetResult<int>();
-        }
-
-        [Xunit.Fact]
-        public void TestId_11()
-        {
-            var list = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyXmlDao(new { Id = 1, UserName = 666, UserId = 666 }).QueryForEnumerable<User>("qryUser");
-            var list2 = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build().ToEasyXmlDao(new { Id = 1, UserId = 2, UserName = "".ToNullableParameter() }).QueryForEnumerable<User>("qryUser");
-        }
-
-        [Never.SqlClient.TableName(Name = "user")]
-        public class MyTable
-        {
-            [Never.SqlClient.Column(Optional = SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | SqlClient.ColumnAttribute.ColumnOptional.Primary)]
-            public int Id;
-            public long UserId;
-            [Never.SqlClient.Column(Alias = "UserName")]
-            public string Name;
-            public DateTime CreateTime;
-        }
-
-        [Never.SqlClient.TableName(Name = "user_info")]
-        public class MyTable2
-        {
-            [Never.SqlClient.Column(Optional = SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | SqlClient.ColumnAttribute.ColumnOptional.Primary)]
-            public int Id;
-            public long UserId;
-            public string Name;
-            public DateTime CreateTime;
         }
     }
 }

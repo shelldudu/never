@@ -13,9 +13,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
-    public struct SelectJoinGrammar<Table,Parameter, Table1>
+    public struct SelectJoinGrammar<Parameter, Table, Table1>
     {
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
         private readonly string @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -37,7 +37,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1> On(Expression<Func<Table,Parameter, Table1, bool>> expression)
+        public SelectJoinGrammar<Parameter, Table, Table1> On(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -55,7 +55,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1> And(Expression<Func<Table,Parameter, Table1, bool>> expression)
+        public SelectJoinGrammar<Parameter, Table, Table1> And(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -70,7 +70,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2> Join<Table2>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2> Join<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -78,7 +78,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.joins) { Context = this.Context };
         }
 
 
@@ -88,7 +88,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2> InnerJoin<Table2>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2> InnerJoin<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -96,7 +96,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.joins) { Context = this.Context };
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2> LeftJoin<Table2>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2> LeftJoin<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -113,7 +113,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.joins) { Context = this.Context };
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2> RightJoin<Table2>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2> RightJoin<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -130,33 +130,33 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.joins) { Context = this.Context };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1> ToSingle()
+        public SingleSelectGrammar<Parameter, Table, Table1> ToSingle()
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
             this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
-            return new SingleSelectGrammar<Table,Parameter, Table1>() { Context = this.Context };
+            return new SingleSelectGrammar<Parameter, Table, Table1>() { Context = this.Context };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1> ToEnumerable()
+        public EnumerableSelectGrammar<Parameter, Table, Table1> ToEnumerable()
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
 
             this.Context.SetPage().StartEntrance();
             this.Context.JoinSelect(this.joins);
-            return new EnumerableSelectGrammar<Table,Parameter, Table1>() { Context = this.Context };
+            return new EnumerableSelectGrammar<Parameter, Table, Table1>() { Context = this.Context };
         }
     }
 
@@ -167,9 +167,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
-    public struct SelectJoinGrammar<Table,Parameter, Table1, Table2>
+    public struct SelectJoinGrammar<Parameter, Table, Table1, Table2>
     {
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
         private readonly List<string> @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -192,7 +192,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2> On(Expression<Func<Table,Parameter, Table1, Table2, bool>> expression)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2> On(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -209,7 +209,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2> And(Expression<Func<Table,Parameter, Table1, Table2, bool>> expression)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2> And(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -224,7 +224,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3> Join<Table3>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3> Join<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -233,7 +233,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.joins) { Context = this.Context };
         }
 
         /// <summary>
@@ -242,7 +242,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -251,7 +251,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.joins) { Context = this.Context };
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -269,7 +269,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.joins) { Context = this.Context };
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3> RightJoin<Table3>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3> RightJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -287,13 +287,13 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.joins) { Context = this.Context };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> ToSingle()
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> ToSingle()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -303,13 +303,13 @@ namespace Never.EasySql.Linq
 
             this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
-            return new SingleSelectGrammar<Table,Parameter, Table1, Table2>() { Context = this.Context };
+            return new SingleSelectGrammar<Parameter, Table, Table1, Table2>() { Context = this.Context };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> ToEnumerable()
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> ToEnumerable()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -319,7 +319,7 @@ namespace Never.EasySql.Linq
 
             this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
-            return new EnumerableSelectGrammar<Table,Parameter, Table1, Table2>() { Context = this.Context };
+            return new EnumerableSelectGrammar<Parameter, Table, Table1, Table2>() { Context = this.Context };
         }
     }
 
@@ -331,9 +331,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
-    public struct SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3>
+    public struct SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3>
     {
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
         private readonly List<string> @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -356,7 +356,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3> On(Expression<Func<Table,Parameter, Table1, Table2, Table3, bool>> expression)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -373,7 +373,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3> And(Expression<Func<Table,Parameter, Table1, Table2, Table3, bool>> expression)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -388,7 +388,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -397,7 +397,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.joins) { Context = this.Context };
         }
 
         /// <summary>
@@ -406,7 +406,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -415,7 +415,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.joins) { Context = this.Context };
         }
 
         /// <summary>
@@ -424,7 +424,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -433,7 +433,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.joins) { Context = this.Context };
         }
 
         /// <summary>
@@ -442,7 +442,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -451,13 +451,13 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.joins) { Context = this.Context };
+            return new SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.joins) { Context = this.Context };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> ToSingle()
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> ToSingle()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -467,13 +467,13 @@ namespace Never.EasySql.Linq
 
             this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
-            return new SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3>() { Context = this.Context };
+            return new SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3>() { Context = this.Context };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> ToEnumerable()
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> ToEnumerable()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -483,7 +483,7 @@ namespace Never.EasySql.Linq
 
             this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
-            return new EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3>() { Context = this.Context };
+            return new EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3>() { Context = this.Context };
         }
     }
 
@@ -496,9 +496,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
     /// <typeparam name="Table4"></typeparam>
-    public struct SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4>
+    public struct SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>
     {
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
         private readonly List<string> @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -520,7 +520,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4> On(Expression<Func<Table,Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -537,7 +537,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectJoinGrammar<Table,Parameter, Table1, Table2, Table3, Table4> And(Expression<Func<Table,Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public SelectJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -549,7 +549,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> ToSingle()
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> ToSingle()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -559,13 +559,13 @@ namespace Never.EasySql.Linq
 
             this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
-            return new SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4>() { Context = this.Context };
+            return new SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4>() { Context = this.Context };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> ToEnumerable()
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> ToEnumerable()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -575,7 +575,7 @@ namespace Never.EasySql.Linq
 
             this.Context.SetSingle().StartEntrance();
             this.Context.JoinSelect(this.joins);
-            return new EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4>() { Context = this.Context };
+            return new EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4>() { Context = this.Context };
         }
     }
 
@@ -584,18 +584,18 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">查询结果对象</typeparam>
-    public struct SingleSelectGrammar<Table,Parameter>
+    public struct SingleSelectGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal SingleSelectGrammar<Table,Parameter> StartSelectColumn()
+        internal SingleSelectGrammar<Parameter, Table> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -607,7 +607,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter> SelectAll()
+        public SingleSelectGrammar<Parameter, Table> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -616,7 +616,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public SingleSelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -625,7 +625,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter> Select(string func, string @as)
+        public SingleSelectGrammar<Parameter, Table> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -634,7 +634,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public SingleSelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -645,7 +645,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter> OrderBy(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -656,7 +656,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter> OrderByDescending(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -677,7 +677,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -694,6 +694,15 @@ namespace Never.EasySql.Linq
             return this.Context.GetResult();
         }
 
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
+
         #endregion
 
         #region where
@@ -706,7 +715,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -727,6 +736,28 @@ namespace Never.EasySql.Linq
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
                 this.Context.OrderByDescending(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
                 return this;
             }
 
@@ -862,6 +893,15 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResult();
             }
+
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -901,7 +941,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -912,7 +952,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -1037,7 +1077,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -1048,7 +1088,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -1194,7 +1234,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -1205,7 +1245,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -1352,7 +1392,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -1363,7 +1403,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -1422,7 +1462,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5> Field(Expression<Func<Table5, bool>> expression)
+            public SelectWhereInGrammar<Table5> Field(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.@in.Field = expression;
                 return this;
@@ -1433,7 +1473,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereInGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.@in.Field == null)
                     throw new Exception("please use On Field first;");
@@ -1546,7 +1586,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -1557,7 +1597,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -1688,7 +1728,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -1699,7 +1739,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -1831,7 +1871,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -1842,7 +1882,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -1873,18 +1913,18 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">查询结果对象</typeparam>
     /// <typeparam name="Table1"></typeparam>
-    public struct SingleSelectGrammar<Table,Parameter, Table1>
+    public struct SingleSelectGrammar<Parameter, Table, Table1>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal SingleSelectGrammar<Table,Parameter, Table1> StartSelectColumn()
+        internal SingleSelectGrammar<Parameter, Table, Table1> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -1896,7 +1936,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1> SelectAll()
+        public SingleSelectGrammar<Parameter, Table, Table1> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -1905,7 +1945,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -1914,7 +1954,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1> Select(string func, string @as)
+        public SingleSelectGrammar<Parameter, Table, Table1> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -1923,7 +1963,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public SingleSelectGrammar<Parameter, Table, Table1> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -1934,7 +1974,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1> OrderBy(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -1945,7 +1985,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1> OrderByDescending(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -1956,7 +1996,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1> OrderByTable1(Expression<Func<Table1, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1> OrderByTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -1967,7 +2007,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -1987,7 +2027,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -2004,6 +2044,15 @@ namespace Never.EasySql.Linq
             return this.Context.GetResult();
         }
 
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
+
         #endregion
 
         #region where
@@ -2016,7 +2065,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -2058,6 +2107,28 @@ namespace Never.EasySql.Linq
             public SelectWhereGrammar OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
             {
                 this.Context.OrderBy(expression, 0);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
                 return this;
             }
 
@@ -2203,6 +2274,15 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResult();
             }
+
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -2242,7 +2322,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -2253,7 +2333,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -2378,7 +2458,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -2389,7 +2469,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -2535,7 +2615,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -2546,7 +2626,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -2693,7 +2773,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -2704,7 +2784,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -2887,7 +2967,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -2898,7 +2978,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -3029,7 +3109,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -3040,7 +3120,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -3172,7 +3252,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -3183,7 +3263,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -3215,18 +3295,18 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table">查询结果对象</typeparam>
     /// <typeparam name="Table1">join的表</typeparam>
     /// <typeparam name="Table2">join的表</typeparam>
-    public struct SingleSelectGrammar<Table,Parameter, Table1, Table2>
+    public struct SingleSelectGrammar<Parameter, Table, Table1, Table2>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal SingleSelectGrammar<Table,Parameter, Table1, Table2> StartSelectColumn()
+        internal SingleSelectGrammar<Parameter, Table, Table1, Table2> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -3238,7 +3318,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> SelectAll()
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -3247,7 +3327,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -3256,7 +3336,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> Select(string func, string @as)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -3265,7 +3345,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -3276,7 +3356,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> OrderBy(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -3287,7 +3367,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> OrderByDescending(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -3298,7 +3378,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> OrderByTable1(Expression<Func<Table1, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> OrderByTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -3309,7 +3389,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -3320,7 +3400,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> OrderByTable2(Expression<Func<Table2, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> OrderByTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -3331,7 +3411,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -3351,7 +3431,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -3368,6 +3448,14 @@ namespace Never.EasySql.Linq
             return this.Context.GetResult();
         }
 
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
         #endregion
 
         #region where
@@ -3380,7 +3468,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -3449,6 +3537,28 @@ namespace Never.EasySql.Linq
             }
 
             /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
             /// 存在
             /// </summary>
             /// <typeparam name="Table5"></typeparam>
@@ -3590,6 +3700,15 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResult();
             }
+
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -3629,7 +3748,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -3640,7 +3759,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -4080,7 +4199,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -4091,7 +4210,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -4274,7 +4393,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -4285,7 +4404,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -4416,7 +4535,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -4427,7 +4546,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -4559,7 +4678,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -4570,7 +4689,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -4603,18 +4722,18 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table1">join的表</typeparam>
     /// <typeparam name="Table2">join的表</typeparam>
     /// <typeparam name="Table3">join的表</typeparam>
-    public struct SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3>
+    public struct SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> StartSelectColumn()
+        internal SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -4626,7 +4745,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> SelectAll()
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -4635,7 +4754,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -4644,7 +4763,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> Select(string func, string @as)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -4653,7 +4772,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -4664,7 +4783,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderBy(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -4675,7 +4794,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescending(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -4686,7 +4805,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByTable1(Expression<Func<Table1, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -4697,7 +4816,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -4708,7 +4827,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByTable2(Expression<Func<Table2, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -4719,7 +4838,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -4729,7 +4848,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByTable3(Expression<Func<Table3, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByTable3(Expression<Func<Table3, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -4740,7 +4859,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescendingTable3(Expression<Func<Table3, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByDescendingTable3(Expression<Func<Table3, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -4760,7 +4879,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -4776,7 +4895,14 @@ namespace Never.EasySql.Linq
         {
             return this.Context.GetResult();
         }
-
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
         #endregion
 
         #region where
@@ -4789,7 +4915,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -4876,6 +5002,28 @@ namespace Never.EasySql.Linq
             public SelectWhereGrammar OrderByDescendingTable3(Expression<Func<Table3, object>> expression)
             {
                 this.Context.OrderBy(expression, 0);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
                 return this;
             }
 
@@ -5021,6 +5169,14 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResult();
             }
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -5060,7 +5216,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -5071,7 +5227,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -5196,7 +5352,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -5207,7 +5363,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -5352,7 +5508,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -5363,7 +5519,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -5510,7 +5666,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -5521,7 +5677,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -5704,7 +5860,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -5715,7 +5871,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -5846,7 +6002,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -5857,7 +6013,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -5989,7 +6145,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -6000,7 +6156,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -6034,18 +6190,18 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table2">join的表</typeparam>
     /// <typeparam name="Table3">join的表</typeparam>
     /// <typeparam name="Table4">join的表</typeparam>
-    public struct SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4>
+    public struct SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> StartSelectColumn()
+        internal SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -6057,7 +6213,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> SelectAll()
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -6066,7 +6222,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -6075,7 +6231,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> Select(string func, string @as)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -6084,7 +6240,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -6095,7 +6251,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderBy(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -6106,7 +6262,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescending(Expression<Func<Table, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -6117,7 +6273,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByTable1(Expression<Func<Table1, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -6128,7 +6284,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -6139,7 +6295,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByTable2(Expression<Func<Table2, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -6150,7 +6306,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -6160,7 +6316,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByTable3(Expression<Func<Table3, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByTable3(Expression<Func<Table3, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -6171,7 +6327,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SingleSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescendingTable3(Expression<Func<Table3, object>> expression)
+        public SingleSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByDescendingTable3(Expression<Func<Table3, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -6191,7 +6347,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -6207,6 +6363,14 @@ namespace Never.EasySql.Linq
         {
             return this.Context.GetResult();
         }
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
 
         #endregion
 
@@ -6220,7 +6384,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -6329,6 +6493,28 @@ namespace Never.EasySql.Linq
             public SelectWhereGrammar OrderByDescendingTable3(Expression<Func<Table4, object>> expression)
             {
                 this.Context.OrderBy(expression, 3);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
                 return this;
             }
 
@@ -6476,6 +6662,14 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResult();
             }
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -6515,7 +6709,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -6526,7 +6720,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -6651,7 +6845,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -6662,7 +6856,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -6808,7 +7002,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -6819,7 +7013,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -6966,7 +7160,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -6977,7 +7171,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -7160,7 +7354,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -7171,7 +7365,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -7302,7 +7496,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -7313,7 +7507,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -7445,7 +7639,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -7456,7 +7650,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -7486,18 +7680,18 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">查询结果对象</typeparam>
-    public struct EnumerableSelectGrammar<Table,Parameter>
+    public struct EnumerableSelectGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal EnumerableSelectGrammar<Table,Parameter> StartSelectColumn()
+        internal EnumerableSelectGrammar<Parameter, Table> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -7509,7 +7703,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter> SelectAll()
+        public EnumerableSelectGrammar<Parameter, Table> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -7518,7 +7712,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public EnumerableSelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -7527,7 +7721,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter> Select(string func, string @as)
+        public EnumerableSelectGrammar<Parameter, Table> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -7536,7 +7730,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public EnumerableSelectGrammar<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -7547,7 +7741,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter> OrderBy(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -7558,7 +7752,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter> OrderByDescending(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -7578,7 +7772,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -7595,6 +7789,14 @@ namespace Never.EasySql.Linq
             return this.Context.GetResults(startIndex, endIndex);
         }
 
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
         #endregion
 
         #region where
@@ -7607,7 +7809,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -7628,6 +7830,29 @@ namespace Never.EasySql.Linq
             public SelectWhereGrammar OrderByDescending(Expression<Func<Table, object>> expression)
             {
                 this.Context.OrderByDescending(expression);
+                return this;
+            }
+
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
                 return this;
             }
 
@@ -7775,6 +8000,14 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -7814,7 +8047,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -7825,7 +8058,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -7950,7 +8183,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -7961,7 +8194,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -8107,7 +8340,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -8118,7 +8351,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -8265,7 +8498,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -8276,7 +8509,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -8459,7 +8692,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -8470,7 +8703,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -8601,7 +8834,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -8612,7 +8845,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -8744,7 +8977,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -8755,7 +8988,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -8786,18 +9019,18 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">查询结果对象</typeparam>
     /// <typeparam name="Table1"></typeparam>
-    public struct EnumerableSelectGrammar<Table,Parameter, Table1>
+    public struct EnumerableSelectGrammar<Parameter, Table, Table1>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal EnumerableSelectGrammar<Table,Parameter, Table1> StartSelectColumn()
+        internal EnumerableSelectGrammar<Parameter, Table, Table1> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -8809,7 +9042,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1> SelectAll()
+        public EnumerableSelectGrammar<Parameter, Table, Table1> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -8818,7 +9051,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -8827,7 +9060,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1> Select(string func, string @as)
+        public EnumerableSelectGrammar<Parameter, Table, Table1> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -8836,7 +9069,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public EnumerableSelectGrammar<Parameter, Table, Table1> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -8847,7 +9080,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1> OrderBy(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -8858,7 +9091,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1> OrderByDescending(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -8869,7 +9102,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1> OrderByTable1(Expression<Func<Table1, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1> OrderByTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -8880,7 +9113,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -8900,7 +9133,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -8916,6 +9149,14 @@ namespace Never.EasySql.Linq
         {
             return this.Context.GetResults(startIndex, endIndex);
         }
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
 
         #endregion
 
@@ -8929,7 +9170,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -8971,6 +9212,28 @@ namespace Never.EasySql.Linq
             public SelectWhereGrammar OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
             {
                 this.Context.OrderBy(expression, 0);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
                 return this;
             }
 
@@ -9117,6 +9380,14 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -9156,7 +9427,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -9167,7 +9438,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -9292,7 +9563,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -9303,7 +9574,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -9449,7 +9720,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -9460,7 +9731,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -9607,7 +9878,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -9618,7 +9889,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -9801,7 +10072,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -9812,7 +10083,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -9943,7 +10214,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -9954,7 +10225,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -10086,7 +10357,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -10097,7 +10368,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -10129,18 +10400,18 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table">查询结果对象</typeparam>
     /// <typeparam name="Table1">join的表</typeparam>
     /// <typeparam name="Table2">join的表</typeparam>
-    public struct EnumerableSelectGrammar<Table,Parameter, Table1, Table2>
+    public struct EnumerableSelectGrammar<Parameter, Table, Table1, Table2>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal EnumerableSelectGrammar<Table,Parameter, Table1, Table2> StartSelectColumn()
+        internal EnumerableSelectGrammar<Parameter, Table, Table1, Table2> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -10152,7 +10423,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> SelectAll()
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -10161,7 +10432,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -10170,7 +10441,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> Select(string func, string @as)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -10179,7 +10450,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -10190,7 +10461,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> OrderBy(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -10201,7 +10472,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> OrderByDescending(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -10212,7 +10483,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> OrderByTable1(Expression<Func<Table1, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> OrderByTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -10223,7 +10494,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -10234,7 +10505,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> OrderByTable2(Expression<Func<Table2, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> OrderByTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -10245,7 +10516,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -10265,7 +10536,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -10282,6 +10553,14 @@ namespace Never.EasySql.Linq
             return this.Context.GetResults(startIndex, endIndex);
         }
 
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
         #endregion
 
         #region where
@@ -10294,7 +10573,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -10362,6 +10641,29 @@ namespace Never.EasySql.Linq
                 return this;
             }
 
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
             /// <summary>
             /// 存在
             /// </summary>
@@ -10504,6 +10806,14 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -10543,7 +10853,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -10554,7 +10864,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -10679,7 +10989,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -10690,7 +11000,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -10836,7 +11146,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -10847,7 +11157,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -10994,7 +11304,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -11005,7 +11315,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -11188,7 +11498,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -11199,7 +11509,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -11330,7 +11640,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -11341,7 +11651,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -11473,7 +11783,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -11484,7 +11794,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -11517,18 +11827,18 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table1">join的表</typeparam>
     /// <typeparam name="Table2">join的表</typeparam>
     /// <typeparam name="Table3">join的表</typeparam>
-    public struct EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3>
+    public struct EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> StartSelectColumn()
+        internal EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -11540,7 +11850,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> SelectAll()
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -11549,7 +11859,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -11558,7 +11868,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> Select(string func, string @as)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -11567,7 +11877,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -11578,7 +11888,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderBy(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -11589,7 +11899,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescending(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -11600,7 +11910,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByTable1(Expression<Func<Table1, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -11611,7 +11921,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -11622,7 +11932,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByTable2(Expression<Func<Table2, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -11633,7 +11943,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -11643,7 +11953,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByTable3(Expression<Func<Table3, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByTable3(Expression<Func<Table3, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -11654,7 +11964,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3> OrderByDescendingTable3(Expression<Func<Table3, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3> OrderByDescendingTable3(Expression<Func<Table3, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -11674,7 +11984,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -11690,7 +12000,14 @@ namespace Never.EasySql.Linq
         {
             return this.Context.GetResults(startIndex, endIndex);
         }
-
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
         #endregion
 
         #region where
@@ -11703,7 +12020,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -11794,6 +12111,28 @@ namespace Never.EasySql.Linq
             }
 
             /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
             /// 存在
             /// </summary>
             /// <typeparam name="Table5"></typeparam>
@@ -11935,6 +12274,14 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -11974,7 +12321,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -11985,7 +12332,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -12110,7 +12457,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -12121,7 +12468,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -12266,7 +12613,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -12277,7 +12624,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -12424,7 +12771,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -12435,7 +12782,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -12618,7 +12965,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -12629,7 +12976,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -12760,7 +13107,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -12771,7 +13118,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -12903,7 +13250,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -12914,7 +13261,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -12948,18 +13295,18 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table2">join的表</typeparam>
     /// <typeparam name="Table3">join的表</typeparam>
     /// <typeparam name="Table4">join的表</typeparam>
-    public struct EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4>
+    public struct EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal SelectContext<Table,Parameter> Context { get; set; }
+        internal SelectContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> StartSelectColumn()
+        internal EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> StartSelectColumn()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -12971,7 +13318,7 @@ namespace Never.EasySql.Linq
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> SelectAll()
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> SelectAll()
         {
             this.Context.SelectAll();
             return this;
@@ -12980,7 +13327,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             this.Context.Select(expression);
             return this;
@@ -12989,7 +13336,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> Select(string func, string @as)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Select(string func, string @as)
         {
             this.Context.Select(func, @as);
             return this;
@@ -12998,7 +13345,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             this.Context.Select(expression, @as);
             return this;
@@ -13009,7 +13356,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderBy(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderBy(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderBy(expression);
             return this;
@@ -13020,7 +13367,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescending(Expression<Func<Table, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             this.Context.OrderByDescending(expression);
             return this;
@@ -13031,7 +13378,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByTable1(Expression<Func<Table1, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -13042,7 +13389,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByDescendingTable1(Expression<Func<Table1, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -13053,7 +13400,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByTable2(Expression<Func<Table2, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -13064,7 +13411,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByDescendingTable2(Expression<Func<Table2, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -13074,7 +13421,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByTable3(Expression<Func<Table3, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByTable3(Expression<Func<Table3, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -13085,7 +13432,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public EnumerableSelectGrammar<Table,Parameter, Table1, Table2, Table3, Table4> OrderByDescendingTable3(Expression<Func<Table3, object>> expression)
+        public EnumerableSelectGrammar<Parameter, Table, Table1, Table2, Table3, Table4> OrderByDescendingTable3(Expression<Func<Table3, object>> expression)
         {
             this.Context.OrderBy(expression, 0);
             return this;
@@ -13105,7 +13452,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public SelectWhereGrammar Where(Expression<Func<Table,Parameter, bool>> expression)
+        public SelectWhereGrammar Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
             return new SelectWhereGrammar()
@@ -13121,6 +13468,14 @@ namespace Never.EasySql.Linq
         {
             return this.Context.GetResults(startIndex, endIndex);
         }
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.Context.GetSqlTagFormat(formatText);
+        }
 
         #endregion
 
@@ -13134,7 +13489,7 @@ namespace Never.EasySql.Linq
             /// <summary>
             /// 上下文
             /// </summary>
-            internal SelectContext<Table,Parameter> Context { get; set; }
+            internal SelectContext<Parameter, Table> Context { get; set; }
 
             /// <summary>
             /// 
@@ -13247,6 +13602,28 @@ namespace Never.EasySql.Linq
             }
 
             /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar And(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public SelectWhereGrammar Or(Expression<Func<Parameter, Table, bool>> expression)
+            {
+                this.Context.Where(expression);
+                return this;
+            }
+
+            /// <summary>
             /// 存在
             /// </summary>
             /// <typeparam name="Table5"></typeparam>
@@ -13389,6 +13766,14 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+            /// <summary>
+            /// 获取sql语句
+            /// </summary>
+            /// <returns></returns>
+            public SqlTagFormat GetSqlTagFormat(bool formatText = false)
+            {
+                return this.Context.GetSqlTagFormat(formatText);
+            }
         }
 
         #endregion
@@ -13428,7 +13813,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> Where(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 this.exists.Where = expression;
                 return this;
@@ -13439,7 +13824,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table5, bool>> expression)
+            public SelectWhereExistsGrammar<Table5> And(Expression<Func<Table, Parameter, Table5, bool>> expression)
             {
                 if (this.exists.Where == null)
                     throw new Exception("please use Where method first;");
@@ -13564,7 +13949,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -13575,7 +13960,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -13721,7 +14106,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -13732,7 +14117,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -13879,7 +14264,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.exists.Joins.Last().On = expression;
                 return this;
@@ -13890,7 +14275,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereExistsGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.exists.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -14073,7 +14458,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> On(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -14084,7 +14469,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table5, Table6, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6> And(Expression<Func<Table, Parameter, Table5, Table6, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -14215,7 +14600,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -14226,7 +14611,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table5, Table6, Table7, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");
@@ -14358,7 +14743,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> On(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 this.@in.Joins.Last().On = expression;
                 return this;
@@ -14369,7 +14754,7 @@ namespace Never.EasySql.Linq
             /// </summary>
             /// <param name="expression"></param>
             /// <returns></returns>
-            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table5, Table6, Table7, Table8, bool>> expression)
+            public SelectWhereInGrammar<Table5, Table6, Table7, Table8> And(Expression<Func<Table, Parameter, Table5, Table6, Table7, Table8, bool>> expression)
             {
                 if (this.@in.Joins.Last().On == null)
                     throw new Exception("please use On method first;");

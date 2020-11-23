@@ -207,7 +207,7 @@ namespace Never.EasySql
                 case "Boolean":
                     return Convert.ChangeType(@object, TypeCode.Boolean);
 
-                case "char": 
+                case "char":
                 case "Char":
                     return Convert.ChangeType(@object, TypeCode.Char);
 
@@ -219,11 +219,11 @@ namespace Never.EasySql
                 case "Decimal":
                     return Convert.ChangeType(@object, TypeCode.Decimal);
 
-                case "double":  
+                case "double":
                 case "Double":
                     return Convert.ChangeType(@object, TypeCode.Double);
 
-                case "float": 
+                case "float":
                 case "Single":
                     return Convert.ChangeType(@object, TypeCode.Single);
 
@@ -231,15 +231,15 @@ namespace Never.EasySql
                 case "int32":
                     return Convert.ChangeType(@object, TypeCode.Int32);
 
-                case "uint": 
+                case "uint":
                 case "UInt32":
                     return Convert.ChangeType(@object, TypeCode.UInt32);
 
-                case "short": 
+                case "short":
                 case "Int16":
                     return Convert.ChangeType(@object, TypeCode.Int16);
 
-                case "ushort": 
+                case "ushort":
                 case "UInt16":
                     return Convert.ChangeType(@object, TypeCode.UInt16);
 
@@ -247,11 +247,11 @@ namespace Never.EasySql
                 case "Int64":
                     return Convert.ChangeType(@object, TypeCode.Int64);
 
-                case "ulong": 
+                case "ulong":
                 case "UInt64":
                     return Convert.ChangeType(@object, TypeCode.UInt64);
 
-                case "guid": 
+                case "guid":
                 case "Guid":
                     return @object == null ? Guid.Empty : Guid.Parse(@object.ToString());
 
@@ -288,6 +288,9 @@ namespace Never.EasySql
         public virtual IEnumerable<Result> QueryForEnumerable<Result, T>(SqlTag sqlTag, EasySqlParameter<T> parameter)
         {
             var format = sqlTag.Format(parameter);
+#if DEBUG
+            Console.WriteLine(format.ToString());
+#endif
             var temp = this.SqlExecuter.QueryForEnumerable<Result>(format.ToString(), CommandType.Text, format.Parameters.ToArray());
             return temp == null ? new Result[0] : temp;
         }

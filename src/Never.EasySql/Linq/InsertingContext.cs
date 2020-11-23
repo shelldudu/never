@@ -14,7 +14,7 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public class InsertingContext<Table, Parameter> : InsertContext<Table, Parameter>
+    public class InsertingContext<Parameter, Table> : InsertContext<Parameter, Table>
     {
         #region prop
         /// <summary>
@@ -98,7 +98,7 @@ namespace Never.EasySql.Linq
         /// 入口
         /// </summary>
         /// <returns></returns>
-        public override Linq.InsertContext<Table, Parameter> StartEntrance()
+        public override Linq.InsertContext<Parameter, Table> StartEntrance()
         {
             if (this.InsertTable.IsNullOrEmpty())
             {
@@ -138,6 +138,21 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public override SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            var sqlTag = new LinqSqlTag(this.cacheId, "insert")
+            {
+                Labels = this.labels.AsEnumerable(),
+                TextLength = this.textLength,
+            };
+
+            return this.dao.GetSqlTagFormat<Parameter>(sqlTag.Clone(this.templateParameter), this.sqlParameter, formatText);
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         public override void GetResult()
@@ -150,7 +165,7 @@ namespace Never.EasySql.Linq
             };
 
             LinqSqlTagProvider.Set(sqlTag);
-            this.Insert<Table, Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            this.Insert<Parameter, Table>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         /// <summary>
@@ -213,7 +228,7 @@ namespace Never.EasySql.Linq
         /// 
         /// </summary>
         /// <returns></returns>
-        public override InsertContext<Table, Parameter> InsertLastInsertId<ReturnType>()
+        public override InsertContext<Parameter, Table> InsertLastInsertId<ReturnType>()
         {
             return this;
         }
@@ -226,7 +241,7 @@ namespace Never.EasySql.Linq
         /// <param name="textParameter"></param>
         /// <param name="function"></param>
         /// <returns></returns>
-        public override InsertContext<Table, Parameter> InsertColumn(string columnName, string parameterName, bool textParameter, bool function)
+        public override InsertContext<Parameter, Table> InsertColumn(string columnName, string parameterName, bool textParameter, bool function)
         {
             var label = new TextLabel()
             {

@@ -34,67 +34,123 @@ namespace Never.EasySql
         T TValue { get; }
     }
 
-    internal class StructNullableParameter<T> : INullableParameter, IGenericeNullableParameter<T> where T : struct
+    /// <summary>
+    /// 值对象的可空类型
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class StructNullableParameter<T> : INullableParameter, IGenericeNullableParameter<T> where T : struct
     {
         private readonly T? value = null;
-
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="value"></param>
         public StructNullableParameter(T? value)
         {
             this.value = value;
         }
 
+        /// <summary>
+        /// 是否有值
+        /// </summary>
         public bool HasValue => this.value.HasValue;
 
+        /// <summary>
+        /// 值
+        /// </summary>
         public object Value => this.value.HasValue ? (object)this.value.Value : null;
 
+        /// <summary>
+        /// 值
+        /// </summary>
         public T TValue => this.value.HasValue ? this.value.Value : default(T);
+
     }
 
-    internal class StringNullableParameter : INullableParameter, IGenericeNullableParameter<string>
+    /// <summary>
+    /// 字符串对象的可空类型
+    /// </summary>
+    public class StringNullableParameter : INullableParameter, IGenericeNullableParameter<string>
     {
         private readonly string value = null;
-
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="value"></param>
         public StringNullableParameter(string value)
         {
             this.value = value;
         }
-
+        /// <summary>
+        /// 是否有值
+        /// </summary>
         public bool HasValue => this.value.IsNotNullOrEmpty();
-
+        /// <summary>
+        /// 值
+        /// </summary>
         public object Value => this.value.IsNotNullOrEmpty() ? this.value : null;
-
+        /// <summary>
+        /// 值
+        /// </summary>
         public string TValue => this.value.IsNotNullOrEmpty() ? this.value : null;
     }
 
-    internal class GuidNullableParameter : INullableParameter, IGenericeNullableParameter<Guid>
+    /// <summary>
+    /// Guid对象的可空类型
+    /// </summary>
+    public class GuidNullableParameter : INullableParameter, IGenericeNullableParameter<Guid>
     {
         private readonly Guid value = Guid.Empty;
 
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="value"></param>
         public GuidNullableParameter(Guid value)
         {
             this.value = value;
         }
-
+        /// <summary>
+        /// 是否有值
+        /// </summary>
         public bool HasValue => this.value != Guid.Empty;
-
+        /// <summary>
+        /// 值
+        /// </summary>
         public object Value => this.value;
-
+        /// <summary>
+        /// 值
+        /// </summary>
         public Guid TValue => this.value;
     }
 
-    internal class EnumerableNullableParameter<T> : INullableParameter, IGenericeNullableParameter<IEnumerable<T>>
+    /// <summary>
+    /// 可遍历对象的可空类型
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class EnumerableNullableParameter<T> : INullableParameter, IGenericeNullableParameter<IEnumerable<T>>
     {
         private readonly IEnumerable<T> value = null;
 
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="value"></param>
         public EnumerableNullableParameter(IEnumerable<T> value)
         {
             this.value = value;
         }
-
+        /// <summary>
+        /// 是否有值
+        /// </summary>
         public bool HasValue => this.value != null && this.value.Any();
-
+        /// <summary>
+        /// 值
+        /// </summary>
         public object Value => this.value;
-
+        /// <summary>
+        /// 值
+        /// </summary>
         public IEnumerable<T> TValue => this.value;
     }
 }

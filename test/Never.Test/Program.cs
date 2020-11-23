@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using static Never.Test.MyCtorTest;
 
 namespace Never.Test
@@ -105,7 +106,15 @@ namespace Never.Test
 
         private static void Main(string[] args)
         {
-            new SelectTest().TestId_1();
+            // System.IO.File.AppendAllLines("d:\\tutui.txt",System.IO.File.ReadAllLines("d:\\tuitu.txt").Reverse());
+            var a1 = System.IO.File.ReadAllLines(@"C:\Users\shelldudu\Documents\leidian\Pictures\a1.txt");
+            var a2 = System.IO.File.ReadAllLines(@"C:\Users\shelldudu\Documents\leidian\Pictures\a2.txt");
+            var list = new List<String>();
+            //list.AddRange(a1);
+            list.AddRange(a2);
+            list.Sort();
+            //list.Reverse();
+            System.IO.File.WriteAllLines(@"C:\Users\shelldudu\Documents\leidian\Pictures\a2.txt", list);
         }
 
         private static void ChangeBuilder(System.Text.StringBuilder builder)

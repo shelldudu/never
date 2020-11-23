@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.Sqlite
     /// <summary>
     /// 更新操作
     /// </summary>
-    public sealed class UpdatingContext<Table,Parameter> : Linq.UpdatingContext<Table,Parameter>
+    public sealed class UpdatingContext<Parameter, Table> : Linq.UpdatingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor

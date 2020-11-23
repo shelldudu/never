@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Never.Attributes;
+using Never.EasySql.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -103,7 +105,7 @@ namespace Never.EasySql
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static INullableParameter ToNullableParameter<T>(this T? value) where T : struct
+        public static StructNullableParameter<T> ToNullableParameter<T>(this T? value) where T : struct
         {
             return new StructNullableParameter<T>(value);
         }
@@ -113,7 +115,7 @@ namespace Never.EasySql
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static INullableParameter ToNullableParameter(this string value)
+        public static StringNullableParameter ToNullableParameter(this string value)
         {
             return new StringNullableParameter(value);
         }
@@ -123,7 +125,7 @@ namespace Never.EasySql
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static INullableParameter ToNullableParameter(this Guid value)
+        public static GuidNullableParameter ToNullableParameter(this Guid value)
         {
             return new GuidNullableParameter(value);
         }
@@ -134,7 +136,7 @@ namespace Never.EasySql
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static INullableParameter ToNullableParameter<T>(this IEnumerable<T> value) where T : IConvertible
+        public static EnumerableNullableParameter<T> ToNullableParameter<T>(this IEnumerable<T> value) where T : IConvertible
         {
             return new EnumerableNullableParameter<T>(value);
         }
@@ -144,9 +146,68 @@ namespace Never.EasySql
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static INullableParameter ToNullableParameter(this IEnumerable<Guid> value)
+        public static EnumerableNullableParameter<Guid> ToNullableParameter(this IEnumerable<Guid> value)
         {
             return new EnumerableNullableParameter<Guid>(value);
+        }
+
+        /// <summary>
+        /// 转换为可空类型参数
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static EnumerableNullableParameter<string> ToNullableParameter(this IEnumerable<string> value)
+        {
+            return new EnumerableNullableParameter<string>(value);
+        }
+
+        /// <summary>
+        /// 包含
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        [Summary(Descn = "linq extension method")]
+        public static bool Contains<T>(this EnumerableNullableParameter<T> value, T target)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// like
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        [Summary(Descn = "linq extension method")]
+        public static bool Like(this string value, string target)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// like
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        [Summary(Descn = "linq extension method")]
+        public static bool LeftLike(this string value, string target)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// like
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        [Summary(Descn = "linq extension method")]
+        public static bool RightLike(this string value, string target)
+        {
+            return false;
         }
     }
 }

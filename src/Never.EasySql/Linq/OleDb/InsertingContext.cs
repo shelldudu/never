@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.OleDb
     /// <summary>
     /// 插入操作
     /// </summary>
-    public sealed class InsertingContext<Table,Parameter> : Linq.InsertingContext<Table,Parameter>
+    public sealed class InsertingContext<Parameter, Table> : Linq.InsertingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor
@@ -30,7 +30,7 @@ namespace Never.EasySql.Linq.OleDb
         /// 
         /// </summary>
         /// <returns></returns>
-        public override InsertContext<Table, Parameter> InsertLastInsertId<ReturnType>()
+        public override InsertContext<Parameter, Table> InsertLastInsertId<ReturnType>()
         {
             this.LoadSqlOnGetResulting();
             this.labels.Add(new ReturnLabel()

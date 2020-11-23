@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    internal sealed class DeletedContext<Table,Parameter> : DeleteContext<Table, Parameter>
+    internal sealed class DeletedContext<Parameter, Table> : DeleteContext<Parameter, Table>
     {
         private readonly LinqSqlTag sqlTag;
 
@@ -16,47 +16,47 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override DeleteContext<Table, Parameter> Append(string sql)
+        public override DeleteContext<Parameter, Table> Append(string sql)
         {
             return this;
         }
 
         public override int GetResult()
         {
-            return this.Delete<Table, Parameter>(this.sqlTag, this.dao, this.sqlParameter);
+            return this.Delete<Parameter, Table>(this.sqlTag, this.dao, this.sqlParameter);
         }
 
-        public override DeleteContext<Table, Parameter> JoinOnDelete(List<JoinInfo> joins)
+        public override DeleteContext<Parameter, Table> JoinOnDelete(List<JoinInfo> joins)
         {
             return this;
         }
 
-        public override DeleteContext<Table, Parameter> JoinOnWhereExists(WhereExistsInfo whereExists)
+        public override DeleteContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
             return this;
         }
 
-        public override DeleteContext<Table, Parameter> JoinOnWhereIn(WhereInInfo whereIn)
+        public override DeleteContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn)
         {
             return this;
         }
 
-        public override DeleteContext<Table, Parameter> StartEntrance()
+        public override DeleteContext<Parameter, Table> StartEntrance()
         {
             return this;
         }
 
-        public override DeleteContext<Table, Parameter> Where()
+        public override DeleteContext<Parameter, Table> Where()
         {
             return this;
         }
 
-        public override DeleteContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
+        public override DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             return this;
         }
 
-        public override DeleteContext<Table, Parameter> Where(AndOrOption andOrOption, string sql)
+        public override DeleteContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
         {
             return this;
         }
@@ -69,6 +69,11 @@ namespace Never.EasySql.Linq
         protected override string FormatTable(string text)
         {
             return text;
+        }
+
+        public override SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.dao.GetSqlTagFormat<Parameter>(this.sqlTag.Clone(this.templateParameter), this.sqlParameter, formatText);
         }
     }
 }

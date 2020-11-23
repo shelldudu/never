@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 插入操作
     /// </summary>
-    public sealed class InsertingContext<Table,Parameter> : Linq.InsertingContext<Table,Parameter>
+    public sealed class InsertingContext<Parameter, Table> : Linq.InsertingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor
@@ -29,13 +29,13 @@ namespace Never.EasySql.Linq.MySql
         /// 
         /// </summary>
         /// <returns></returns>
-        public override InsertContext<Table, Parameter> InsertLastInsertId<ReturnType>()
+        public override InsertContext<Parameter, Table> InsertLastInsertId<ReturnType>()
         {
             this.LoadSqlOnGetResulting();
             this.labels.Add(new ReturnLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                Line = new TextLabel() 
+                Line = new TextLabel()
                 {
                     TagId = NewId.GenerateNumber(),
                     SqlText = this.UseBulk ? ";select last_insert_id() as id;" : "select last_insert_id() as id;",

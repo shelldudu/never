@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public abstract class DeleteContext<Table,Parameter> : Context
+    public abstract class DeleteContext<Parameter, Table> : Context
     {
         /// <summary>
         /// dao
@@ -74,11 +74,17 @@ namespace Never.EasySql.Linq
         public abstract int GetResult();
 
         /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public abstract SqlTagFormat GetSqlTagFormat(bool formatText = false);
+
+        /// <summary>
         /// 表名
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public virtual DeleteContext<Table, Parameter> From(string table)
+        public virtual DeleteContext<Parameter, Table> From(string table)
         {
             this.FromTable = this.FormatTable(table);
             return this;
@@ -89,7 +95,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public virtual DeleteContext<Table, Parameter> As(string table)
+        public virtual DeleteContext<Parameter, Table> As(string table)
         {
             this.AsTable = table;
             return this;
@@ -111,47 +117,47 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public abstract DeleteContext<Table, Parameter> StartEntrance();
+        public abstract DeleteContext<Parameter, Table> StartEntrance();
 
         /// <summary>
         /// where
         /// </summary>
-        public abstract DeleteContext<Table, Parameter> Where();
+        public abstract DeleteContext<Parameter, Table> Where();
 
         /// <summary>
         /// where
         /// </summary>
-        public abstract DeleteContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression);
+        public abstract DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression);
 
         /// <summary>
         /// where
         /// </summary>
-        public abstract DeleteContext<Table, Parameter> Where(AndOrOption andOrOption, string sql);
+        public abstract DeleteContext<Parameter, Table> Where(AndOrOption andOrOption, string sql);
 
         /// <summary>
         /// append
         /// </summary>
-        public abstract DeleteContext<Table, Parameter> Append(string sql);
+        public abstract DeleteContext<Parameter, Table> Append(string sql);
 
         /// <summary>
         /// join
         /// </summary>
         /// <param name="joins"></param>
         /// <returns></returns>
-        public abstract DeleteContext<Table, Parameter> JoinOnDelete(List<JoinInfo> joins);
+        public abstract DeleteContext<Parameter, Table> JoinOnDelete(List<JoinInfo> joins);
 
         /// <summary>
         /// exists
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public abstract DeleteContext<Table, Parameter> JoinOnWhereExists(WhereExistsInfo whereExists);
+        public abstract DeleteContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists);
 
         /// <summary>
         /// in
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public abstract DeleteContext<Table, Parameter> JoinOnWhereIn(WhereInInfo whereIn);
+        public abstract DeleteContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn);
     }
 }

@@ -10,7 +10,7 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// 
     /// </summary>
-    internal sealed class UpdatedContext<Table, Parameter> : Linq.UpdateContext<Table, Parameter>
+    internal sealed class UpdatedContext<Parameter, Table> : Linq.UpdateContext<Parameter, Table>
     {
         private readonly LinqSqlTag sqlTag;
 
@@ -19,17 +19,17 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override Linq.UpdateContext<Table, Parameter> As(string table)
+        public override Linq.UpdateContext<Parameter, Table> As(string table)
         {
             return this;
         }
 
-        public override Linq.UpdateContext<Table, Parameter> StartEntrance()
+        public override Linq.UpdateContext<Parameter, Table> StartEntrance()
         {
             return this;
         }
 
-        public override Linq.UpdateContext<Table, Parameter> From(string table)
+        public override Linq.UpdateContext<Parameter, Table> From(string table)
         {
             return this;
         }
@@ -45,62 +45,62 @@ namespace Never.EasySql.Linq
 
         public override int GetResult()
         {
-            return this.Update<Table, Parameter>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            return this.Update<Parameter, Table>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
-        public override Linq.UpdateContext<Table, Parameter> Set<TMember>(Expression<Func<Table, TMember>> key, Expression<Func<Parameter, TMember>> value)
+        public override Linq.UpdateContext<Parameter, Table> Set<TMember>(Expression<Func<Table, TMember>> key, Expression<Func<Parameter, TMember>> value)
         {
             return this;
         }
 
-        public override Linq.UpdateContext<Table, Parameter> SetFunc<TMember>(Expression<Func<Table, TMember>> key, string value)
-        {
-            this.templateParameter[this.FindColumnName(key, this.tableInfo, out _)] = value;
-            return this;
-        }
-
-        public override Linq.UpdateContext<Table, Parameter> SetValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
+        public override Linq.UpdateContext<Parameter, Table> SetFunc<TMember>(Expression<Func<Table, TMember>> key, string value)
         {
             this.templateParameter[this.FindColumnName(key, this.tableInfo, out _)] = value;
             return this;
         }
 
-        public override Linq.UpdateContext<Table, Parameter> Where()
+        public override Linq.UpdateContext<Parameter, Table> SetValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
+        {
+            this.templateParameter[this.FindColumnName(key, this.tableInfo, out _)] = value;
+            return this;
+        }
+
+        public override Linq.UpdateContext<Parameter, Table> Where()
         {
             return this;
         }
 
-        public override Linq.UpdateContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
+        public override Linq.UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             return this;
         }
 
-        public override UpdateContext<Table, Parameter> JoinOnUpdate(List<JoinInfo> joins)
+        public override UpdateContext<Parameter, Table> JoinOnUpdate(List<JoinInfo> joins)
         {
             return this;
         }
 
-        public override UpdateContext<Table, Parameter> JoinOnWhereExists(WhereExistsInfo whereExists)
+        public override UpdateContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
             return this;
         }
 
-        public override UpdateContext<Table, Parameter> JoinOnWhereIn(WhereInInfo whereIn)
+        public override UpdateContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn)
         {
             return this;
         }
 
-        public override UpdateContext<Table, Parameter> Where(AndOrOption andOrOption, string sql)
+        public override UpdateContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
         {
             return this;
         }
 
-        public override UpdateContext<Table, Parameter> SetColumn(string columnName, string parameterName, bool textParameter, bool function)
+        public override UpdateContext<Parameter, Table> SetColumn(string columnName, string parameterName, bool textParameter, bool function)
         {
             return this;
         }
 
-        public override UpdateContext<Table, Parameter> Append(string sql)
+        public override UpdateContext<Parameter, Table> Append(string sql)
         {
             return this;
         }
@@ -113,6 +113,11 @@ namespace Never.EasySql.Linq
         protected override string FormatColumn(string text)
         {
             return string.Empty;
+        }
+
+        public override SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.dao.GetSqlTagFormat<Parameter>(this.sqlTag.Clone(this.templateParameter), this.sqlParameter, formatText);
         }
     }
 }

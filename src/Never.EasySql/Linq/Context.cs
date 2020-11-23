@@ -19,7 +19,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 二进制运算
         /// </summary>
-        public class BinaryExp
+        public class BlockSetting
         {
             /// <summary>
             /// 表达式
@@ -38,31 +38,61 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 二进制运算
+        /// 运算表达式 
         /// </summary>
-        public class BinaryBlock
+        public class BlockExpression
         {
             /// <summary>
             /// 左边
             /// </summary>
-            public BinaryExp Left;
+            public BlockSetting Left;
 
             /// <summary>
             /// 连接符
             /// </summary>
-            public string Join;
+            public string Method;
 
             /// <summary>
             /// 右边
             /// </summary>
-            public BinaryExp Right;
+            public BlockSetting Right;
 
+            /// <summary>
+            /// 返回字符串
+            /// </summary>
+            /// <param name="leftPlaceholders"></param>
+            /// <param name="context"></param>
+            /// <returns></returns>
+            public virtual string ToString(string[] leftPlaceholders, Context context)
+            {
+                return string.Empty;
+            }
+
+            /// <summary>
+            /// 转成label
+            /// </summary>
+            /// <param name="leftPlaceholders"></param>
+            /// <param name="context"></param>
+            /// <param name="parameterPrefix"></param>
+            /// <param name="parameterIndex"></param>
+            /// <returns></returns>
+            public virtual ILabel ToLabel(string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 二进制运算
+        /// </summary>
+        public class BinaryBlock : BlockExpression
+        {
             /// <summary>
             /// 
             /// </summary>
             public BinaryBlock()
             {
-                this.Join = string.Empty;
+                this.Method = string.Empty;
             }
 
             /// <summary>
@@ -71,7 +101,7 @@ namespace Never.EasySql.Linq
             /// <param name="leftPlaceholders"></param>
             /// <param name="context"></param>
             /// <returns></returns>
-            public string ToString(string[] leftPlaceholders, Context context)
+            public override string ToString(string[] leftPlaceholders, Context context)
             {
                 var sb = new StringBuilder(30);
                 if (this.Left != null)
@@ -90,7 +120,7 @@ namespace Never.EasySql.Linq
                     }
                 }
 
-                sb.Append(this.Join);
+                sb.Append(this.Method);
                 if (this.Right != null)
                 {
                     if (this.Right.IsConstant)
@@ -118,7 +148,7 @@ namespace Never.EasySql.Linq
             /// <param name="parameterPrefix"></param>
             /// <param name="parameterIndex"></param>
             /// <returns></returns>
-            public ILabel ToLabel(string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
+            public override ILabel ToLabel(string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
             {
                 var label = new TextLabel()
                 {
@@ -158,7 +188,153 @@ namespace Never.EasySql.Linq
                     }
                 }
 
-                sb.Append(this.Join);
+                sb.Append(this.Method);
+
+                if (this.Right != null)
+                {
+                    if (this.Right.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(this.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else if (this.Right.Index == parameterIndex)
+                    {
+                        var start = sb.Length;
+                        sb.Append(parameterPrefix);
+                        sb.Append(this.Right.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = this.Right.Exp,
+                            OccupanLength = parameterPrefix.Length + this.Right.Exp.Length,
+                            PrefixStartIndex = start + 0,
+                            ParameterStartIndex = start + 1,
+                            ParameterStopIndex = start + 1 + this.Right.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[this.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(this.Right.Exp));
+                    }
+                }
+
+                label.SqlText = sb.ToString();
+                return label;
+            }
+        }
+
+        /// <summary>
+        /// 方法块运算
+        /// </summary>
+        public class MethodBlock : BlockExpression
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            public MethodBlock()
+            {
+                this.Method = string.Empty;
+            }
+
+            /// <summary>
+            /// 返回字符串
+            /// </summary>
+            /// <param name="leftPlaceholders"></param>
+            /// <param name="context"></param>
+            /// <returns></returns>
+            public override string ToString(string[] leftPlaceholders, Context context)
+            {
+                var sb = new StringBuilder(30);
+                if (this.Left != null)
+                {
+                    if (this.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(this.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[this.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(this.Left.Exp));
+                    }
+                }
+
+                sb.Append(this.Method);
+                if (this.Right != null)
+                {
+                    if (this.Right.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(this.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[this.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(this.Right.Exp));
+                    }
+                }
+
+                return sb.ToString();
+            }
+
+            /// <summary>
+            /// 转成label
+            /// </summary>
+            /// <param name="leftPlaceholders"></param>
+            /// <param name="context"></param>
+            /// <param name="parameterPrefix"></param>
+            /// <param name="parameterIndex"></param>
+            /// <returns></returns>
+            public override ILabel ToLabel(string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
+            {
+                var label = new TextLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                };
+
+                var sb = new StringBuilder(200);
+                if (this.Left != null)
+                {
+                    if (this.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(this.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else if (this.Left.Index == parameterIndex)
+                    {
+                        sb.Append(parameterPrefix);
+                        sb.Append(this.Left.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = this.Left.Exp,
+                            OccupanLength = parameterPrefix.Length + this.Left.Exp.Length,
+                            PrefixStartIndex = 0,
+                            ParameterStartIndex = 0 + 1,
+                            ParameterStopIndex = 0 + 1 + this.Left.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[this.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(this.Left.Exp));
+                    }
+                }
+
+                sb.Append(this.Method);
 
                 if (this.Right != null)
                 {
@@ -367,7 +543,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected Table Select<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected Table Select<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.QueryForObject<Table, Parameter>(sqlTag, sqlParameter);
         }
@@ -380,7 +556,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected Table Select<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected Table Select<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -403,7 +579,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected IEnumerable<Table> SelectMany<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected IEnumerable<Table> SelectMany<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.QueryForEnumerable<Table, Parameter>(sqlTag, sqlParameter);
         }
@@ -416,7 +592,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected IEnumerable<Table> SelectMany<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected IEnumerable<Table> SelectMany<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -439,7 +615,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Update<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Update<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.Update(sqlTag, sqlParameter);
         }
@@ -452,7 +628,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Update<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Update<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -475,7 +651,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Delete<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected int Delete<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             return dao.Delete(sqlTag, sqlParameter);
         }
@@ -488,7 +664,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected int Delete<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected int Delete<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -547,7 +723,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected void Insert<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
+        protected void Insert<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter)
         {
             dao.Insert(sqlTag, sqlParameter);
         }
@@ -560,7 +736,7 @@ namespace Never.EasySql.Linq
         /// <param name="sqlTag"></param>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        protected void Insert<Table, Parameter>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
+        protected void Insert<Parameter, Table>(LinqSqlTag sqlTag, IDao dao, EasySqlParameter<Parameter> sqlParameter, System.Data.IsolationLevel isolationLevel)
         {
             dao.BeginTransaction(isolationLevel);
             try
@@ -830,19 +1006,33 @@ namespace Never.EasySql.Linq
         #endregion
 
         #region analyze
-
         /// <summary>
         /// 分析bool的表达式
         /// </summary>
         /// <param name="analyzeParameters"></param>
         /// <param name="expression"></param>
         /// <param name="whereCollection"></param>
-        protected bool AnalyzeBooleanExpression(Expression expression, List<AnalyzeParameter> analyzeParameters, List<BinaryBlock> whereCollection)
+        protected bool AnalyzeBooleanExpression(Expression expression, List<AnalyzeParameter> analyzeParameters, List<BlockExpression> whereCollection)
         {
             var binary = expression as BinaryExpression;
-            if (binary == null)
-                return false;
+            if (binary != null)
+                return this.AnalyzeBooleanBinaryExpression(expression, analyzeParameters, whereCollection);
 
+            var method = expression as System.Linq.Expressions.MethodCallExpression;
+            if (method != null)
+                return this.AnalyzeBooleanMethodExpression(expression, analyzeParameters, whereCollection);
+
+            return false;
+        }
+        /// <summary>
+        /// 分析bool的表达式
+        /// </summary>
+        /// <param name="analyzeParameters"></param>
+        /// <param name="expression"></param>
+        /// <param name="whereCollection"></param>
+        protected bool AnalyzeBooleanBinaryExpression(Expression expression, List<AnalyzeParameter> analyzeParameters, List<BlockExpression> whereCollection)
+        {
+            var binary = expression as BinaryExpression;
             //是第一个还是第二个还是第三个，返回值当作索引
             int leftOrRight(Expression exp)
             {
@@ -868,11 +1058,11 @@ namespace Never.EasySql.Linq
                 case ExpressionType.AndAlso:
                 case ExpressionType.OrElse:
                     {
-                        whereCollection.Add(new BinaryBlock() { Join = "(" });
+                        whereCollection.Add(new BinaryBlock() { Method = "(" });
                         AnalyzeBooleanExpression(binary.Left, analyzeParameters, whereCollection);
-                        whereCollection.Add(new BinaryBlock() { Join = binary.NodeType == ExpressionType.AndAlso ? " and " : " or " });
+                        whereCollection.Add(new BinaryBlock() { Method = binary.NodeType == ExpressionType.AndAlso ? " and " : " or " });
                         AnalyzeBooleanExpression(binary.Right, analyzeParameters, whereCollection);
-                        whereCollection.Add(new BinaryBlock() { Join = ")" });
+                        whereCollection.Add(new BinaryBlock() { Method = ")" });
                         return true;
                     }
             }
@@ -885,7 +1075,7 @@ namespace Never.EasySql.Linq
                 int index = leftOrRight(memberExpress.Expression);
                 current = new BinaryBlock()
                 {
-                    Left = new BinaryExp()
+                    Left = new BlockSetting()
                     {
                         Exp = this.FindColumnName(matchTable(index), memberExpress.Member),
                         IsConstant = false,
@@ -903,7 +1093,7 @@ namespace Never.EasySql.Linq
                 {
                     current = new BinaryBlock()
                     {
-                        Left = new BinaryExp()
+                        Left = new BlockSetting()
                         {
                             Exp = constantExpress.Value == null ? null : constantExpress.Value.ToString(),
                             IsConstant = true,
@@ -925,32 +1115,32 @@ namespace Never.EasySql.Linq
             {
                 case ExpressionType.LessThan:
                     {
-                        current.Join = " < ";
+                        current.Method = " < ";
                     }
                     break;
                 case ExpressionType.LessThanOrEqual:
                     {
-                        current.Join = " <= ";
+                        current.Method = " <= ";
                     }
                     break;
                 case ExpressionType.GreaterThanOrEqual:
                     {
-                        current.Join = " >= ";
+                        current.Method = " >= ";
                     }
                     break;
                 case ExpressionType.GreaterThan:
                     {
-                        current.Join = " > ";
+                        current.Method = " > ";
                     }
                     break;
                 case ExpressionType.Equal:
                     {
-                        current.Join = " = ";
+                        current.Method = " = ";
                     }
                     break;
                 case ExpressionType.NotEqual:
                     {
-                        current.Join = " != ";
+                        current.Method = " != ";
                     }
                     break;
             }
@@ -960,7 +1150,7 @@ namespace Never.EasySql.Linq
             if (memberExpress != null)
             {
                 int index = leftOrRight(memberExpress.Expression);
-                current.Right = new BinaryExp()
+                current.Right = new BlockSetting()
                 {
                     Exp = this.FindColumnName(matchTable(index), memberExpress.Member),
                     IsConstant = false,
@@ -975,7 +1165,7 @@ namespace Never.EasySql.Linq
                 var constantExpress = binary.Right as ConstantExpression;
                 if (constantExpress != null)
                 {
-                    current.Right = new BinaryExp()
+                    current.Right = new BlockSetting()
                     {
                         Exp = constantExpress.Value == null ? null : constantExpress.Value.ToString(),
                         IsConstant = true,
@@ -1000,6 +1190,93 @@ namespace Never.EasySql.Linq
             whereCollection.Add(current);
             return true;
         }
+        /// <summary>
+        /// 分析bool的表达式
+        /// </summary>
+        /// <param name="analyzeParameters"></param>
+        /// <param name="expression"></param>
+        /// <param name="whereCollection"></param>
+        protected bool AnalyzeBooleanMethodExpression(Expression expression, List<AnalyzeParameter> analyzeParameters, List<BlockExpression> whereCollection)
+        {
+            var method = expression as MethodCallExpression;
+            if (method.Arguments.Count != 2)
+                throw new Exception(string.Format("parameter typs just has two argements"));
+
+            //是第一个还是第二个还是第三个，返回值当作索引
+            int leftOrRight(MemberExpression exp)
+            {
+                for (int i = 0, j = analyzeParameters.Count; i < j; i++)
+                {
+                    var item = analyzeParameters[i];
+                    if (exp.Expression.Type == item.Type && (exp.Expression is ParameterExpression && ((ParameterExpression)exp.Expression).Name == item.Placeholder))
+                        return i;
+                }
+
+                return 0;
+            }
+
+            //匹配TableInfo
+            TableInfo matchTable(int index)
+            {
+                return analyzeParameters[index].TableInfo;
+            }
+
+            MethodBlock blockExpression = new MethodBlock();
+            switch (method.Method.Name)
+            {
+                case "Contains":
+                    {
+                        blockExpression.Method = method.Method.Name;
+                        if (method.Arguments[0].NodeType == ExpressionType.Constant)
+                        {
+                            blockExpression.Right = new BlockSetting()
+                            {
+                                Exp = ((ConstantExpression)method.Arguments[0].Reduce()).Value.ToString(),
+                                IsConstant = true,
+                                Index = 0,
+                            };
+                        }
+                        else
+                        {
+                            int index = leftOrRight((System.Linq.Expressions.MemberExpression)method.Arguments[0]);
+                            blockExpression.Right = new BlockSetting()
+                            {
+                                Exp = this.FindColumnName(matchTable(index), ((System.Linq.Expressions.MemberExpression)method.Arguments[0]).Member),
+                                IsConstant = false,
+                                Index = index,
+                            };
+                        }
+                        if (method.Arguments[1].NodeType == ExpressionType.Constant)
+                        {
+                            blockExpression.Left = new BlockSetting()
+                            {
+                                Exp = ((ConstantExpression)method.Arguments[1].Reduce()).Value.ToString(),
+                                IsConstant = true,
+                                Index = 0,
+                            };
+                        }
+                        else
+                        {
+                            int index = leftOrRight((System.Linq.Expressions.MemberExpression)method.Arguments[1]);
+                            blockExpression.Left = new BlockSetting()
+                            {
+                                Exp = this.FindColumnName(matchTable(index), ((System.Linq.Expressions.MemberExpression)method.Arguments[1]).Member),
+                                IsConstant = false,
+                                Index = index,
+                            };
+                        }
+                    }
+                    break;
+                default:
+                    {
+                        return false;
+                    }
+
+            }
+
+            whereCollection.Add(blockExpression);
+            return true;
+        }
 
         /// <summary>
         /// 分析语句
@@ -1021,7 +1298,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo5"></param>
         /// <param name="tableInfo6"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5, Table6>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, Table6, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, TableInfo tableInfo6, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5, Table6>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, Table6, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, TableInfo tableInfo6, List<BlockExpression> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -1095,7 +1372,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo4"></param>
         /// <param name="tableInfo5"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2, Table3, Table4, Table5>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, Table5, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, TableInfo tableInfo5, List<BlockExpression> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -1161,7 +1438,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo3"></param>
         /// <param name="tableInfo4"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze<Parameter, Table1, Table2, Table3, Table4>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2, Table3, Table4>(Expression<Func<Parameter, Table1, Table2, Table3, Table4, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, TableInfo tableInfo4, List<BlockExpression> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -1219,7 +1496,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo2"></param>
         /// <param name="tableInfo3"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze<Parameter, Table1, Table2, Table3>(Expression<Func<Parameter, Table1, Table2, Table3, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2, Table3>(Expression<Func<Parameter, Table1, Table2, Table3, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, TableInfo tableInfo3, List<BlockExpression> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -1269,7 +1546,7 @@ namespace Never.EasySql.Linq
         /// <param name="tableInfo1"></param>
         /// <param name="tableInfo2"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze<Parameter, Table1, Table2>(Expression<Func<Parameter, Table1, Table2, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table1, Table2>(Expression<Func<Parameter, Table1, Table2, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo1, TableInfo tableInfo2, List<BlockExpression> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -1311,7 +1588,7 @@ namespace Never.EasySql.Linq
         /// <param name="analyzeParameters"></param>
         /// <param name="tableInfo"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze<Table, Parameter>(Expression<Func<Table, Parameter, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, TableInfo parameterTableInfo, TableInfo tableInfo, List<BlockExpression> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -1345,7 +1622,7 @@ namespace Never.EasySql.Linq
         /// <param name="parameterTableInfo"></param>
         /// <param name="analyzeParameters"></param>
         /// <param name="whereCollection"></param>
-        protected bool Analyze<Parameter>(Expression<Func<Parameter, bool>> expression, TableInfo parameterTableInfo, List<BinaryBlock> whereCollection, out List<AnalyzeParameter> analyzeParameters)
+        protected bool Analyze<Parameter>(Expression<Func<Parameter, bool>> expression, TableInfo parameterTableInfo, List<BlockExpression> whereCollection, out List<AnalyzeParameter> analyzeParameters)
         {
             analyzeParameters = null;
             var binary = expression.Body as BinaryExpression;
@@ -1379,9 +1656,9 @@ namespace Never.EasySql.Linq
         /// <param name="tableNameOrTableAliasName"></param>
         /// <param name="parameterPrefix"></param>
         /// <returns></returns>
-        protected bool AnalyzeWhereExpress<Table, Parameter>(Expression<Func<Table, Parameter, bool>> expression, List<ILabel> collection, string tableNameOrTableAliasName, string parameterPrefix)
+        protected bool AnalyzeWhereExpress<Parameter, Table>(Expression<Func<Parameter, Table, bool>> expression, List<ILabel> collection, string tableNameOrTableAliasName, string parameterPrefix)
         {
-            var whereCollection = new List<BinaryBlock>();
+            var whereCollection = new List<BlockExpression>();
             var analyzeParameters = new List<AnalyzeParameter>();
             var types = new[] { typeof(Table), typeof(Parameter) };
             for (var k = 0; k < 2; k++)
@@ -1423,7 +1700,7 @@ namespace Never.EasySql.Linq
             var pp = new[] { "" }.Concat(joins.Select(ta => ta.AsName)).ToArray();
             pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
 
-            var whereCollection = new List<BinaryBlock>();
+            var whereCollection = new List<BlockExpression>();
             var analyzeParameters = new List<AnalyzeParameter>();
             for (int i = 0, j = joins.Count; i < j; i++)
             {
@@ -1508,7 +1785,7 @@ namespace Never.EasySql.Linq
             var pp = new[] { "", whereExists.AsName }.Concat(whereExists.Joins.Select(ta => this.FormatColumn(ta.AsName))).ToArray();
             pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
 
-            var whereCollection = new List<BinaryBlock>();
+            var whereCollection = new List<BlockExpression>();
             var analyzeParameters = new List<AnalyzeParameter>();
             LambdaExpression lambda = whereExists.Where;
             if (whereExists.Types.Length != 2)
@@ -1536,7 +1813,7 @@ namespace Never.EasySql.Linq
             builder.Append(" ");
             if (whereExists.Joins.Any())
             {
-                var joinCollection = new List<BinaryBlock>();
+                var joinCollection = new List<BlockExpression>();
                 var joinAnalyzeParameters = new List<AnalyzeParameter>();
                 bool firstJoin = true;
                 for (int i = 0, j = whereExists.Joins.Count; i < j; i++)
@@ -1658,7 +1935,7 @@ namespace Never.EasySql.Linq
             var pp = new[] { "", whereIn.AsName }.Concat(whereIn.Joins.Select(ta => ta.AsName)).ToArray();
             pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
 
-            var whereCollection = new List<BinaryBlock>();
+            var whereCollection = new List<BlockExpression>();
             var analyzeParameters = new List<AnalyzeParameter>();
             LambdaExpression lambda = whereIn.Field;
             if (whereIn.Types.Length != 2)
@@ -1678,13 +1955,13 @@ namespace Never.EasySql.Linq
                 return builder;
 
             if (whereCollection.Count > 1)
-                whereCollection.RemoveAll(p => p.Join.IsEquals("(") || p.Join.IsEquals(")"));
+                whereCollection.RemoveAll(p => p.Method.IsEquals("(") || p.Method.IsEquals(")"));
 
 
             if (whereCollection.Any() == false)
                 return builder;
 
-            if (whereCollection.Count > 1 || whereCollection[0].Join.IsNotEquals(" = ") || whereCollection[0].Left.IsConstant || whereCollection[0].Right.IsConstant)
+            if (whereCollection.Count > 1 || whereCollection[0].Method.IsNotEquals(" = ") || whereCollection[0].Left.IsConstant || whereCollection[0].Right.IsConstant)
                 throw new Exception("in expression must like this (p,t)=>p.Id == t.Id");
 
             builder.Append(whereIn.AndOrOption == AndOrOption.and ? "and " : "or ");
@@ -1720,7 +1997,7 @@ namespace Never.EasySql.Linq
                     if (item.Types.Length != (i + 3))
                         throw new Exception(string.Format("parameter typs not padding,the left length is {0}, and the right length is {1}", whereIn.Joins[i].Types.Length, i + 3));
 
-                    var joinCollection = new List<BinaryBlock>();
+                    var joinCollection = new List<BlockExpression>();
                     var joinAnalyzeParameters = new List<AnalyzeParameter>();
                     lambda = item.On;
                     for (var k = 0; k < item.Types.Length; k++)

@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq.MySql
     /// <summary>
     /// 查询操作
     /// </summary>
-    public sealed class SelectingContext<Table, Parameter> : Linq.SelectingContext<Table, Parameter>
+    public sealed class SelectingContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
     {
         /// <summary>
         /// ctor
@@ -29,7 +29,7 @@ namespace Never.EasySql.Linq.MySql
         /// 入口
         /// </summary>
         /// <returns></returns>
-        public override SelectContext<Table, Parameter> StartEntrance()
+        public override SelectContext<Parameter, Table> StartEntrance()
         {
             return base.StartEntrance();
         }
@@ -38,7 +38,7 @@ namespace Never.EasySql.Linq.MySql
         /// where
         /// </summary>
         /// <returns></returns>
-        public override SelectContext<Table, Parameter> Where()
+        public override SelectContext<Parameter, Table> Where()
         {
             return base.Where();
         }
@@ -48,7 +48,7 @@ namespace Never.EasySql.Linq.MySql
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public override SelectContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             return base.Where(expression);
         }

@@ -12,17 +12,17 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public struct Delete<Table, Parameter>
+    public struct Delete<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal DeleteContext<Table, Parameter> Context { get; set; }
+        internal DeleteContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 删除的表名
         /// </summary>
-        public Delete<Table, Parameter> As(string table)
+        public Delete<Parameter, Table> As(string table)
         {
             this.Context.As(table);
             return this;
@@ -31,7 +31,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 从哪一张表删除
         /// </summary>
-        public Delete<Table, Parameter> From(string table)
+        public Delete<Parameter, Table> From(string table)
         {
             this.Context.From(table);
             return this;
@@ -44,10 +44,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1> Join<Table1>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1> Join<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1>(@as, JoinOption.Join) { delete = new DeleteGrammar<Table, Parameter>() { Context = this.Context } };
+            return new DeleteJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.Join) { delete = new DeleteGrammar<Parameter, Table>() { Context = this.Context } };
         }
 
         /// <summary>
@@ -56,10 +56,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1> InnerJoin<Table1>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1> InnerJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1>(@as, JoinOption.InnerJoin) { delete = new DeleteGrammar<Table, Parameter>() { Context = this.Context } };
+            return new DeleteJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.InnerJoin) { delete = new DeleteGrammar<Parameter, Table>() { Context = this.Context } };
         }
 
         /// <summary>
@@ -68,10 +68,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1> LeftJoin<Table1>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1> LeftJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1>(@as, JoinOption.LeftJoin) { delete = new DeleteGrammar<Table, Parameter>() { Context = this.Context } };
+            return new DeleteJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.LeftJoin) { delete = new DeleteGrammar<Parameter, Table>() { Context = this.Context } };
         }
 
         /// <summary>
@@ -80,26 +80,26 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1> RightJoin<Table1>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1> RightJoin<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1>(@as, JoinOption.RightJoin) { delete = new DeleteGrammar<Table, Parameter>() { Context = this.Context } };
+            return new DeleteJoinGrammar<Parameter, Table, Table1>(@as, JoinOption.RightJoin) { delete = new DeleteGrammar<Parameter, Table>() { Context = this.Context } };
         }
 
         /// <summary>
         /// where
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> Where()
+        public DeleteWhereGrammar<Parameter, Table> Where()
         {
-            return new DeleteGrammar<Table, Parameter>() { Context = this.Context }.StartDeleteRecord().Where();
+            return new DeleteGrammar<Parameter, Table>() { Context = this.Context }.StartDeleteRecord().Where();
         }
 
         /// <summary>
         /// where
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
+        public DeleteWhereGrammar<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
         {
-            return new DeleteGrammar<Table, Parameter>() { Context = this.Context }.StartDeleteRecord().Where(expression);
+            return new DeleteGrammar<Parameter, Table>() { Context = this.Context }.StartDeleteRecord().Where(expression);
         }
     }
 }

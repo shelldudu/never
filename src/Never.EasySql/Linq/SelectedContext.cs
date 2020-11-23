@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Never.EasySql.Linq
 {
-    internal sealed class SelectedContext<Table,Parameter> : SelectContext<Table,Parameter>
+    internal sealed class SelectedContext<Parameter, Table> : SelectContext<Parameter, Table>
     {
         private readonly LinqSqlTag sqlTag;
 
@@ -16,58 +16,58 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override SelectContext<Table,Parameter> Append(string sql)
+        public override SelectContext<Parameter, Table> Append(string sql)
         {
             return this;
         }
-        public override SelectContext<Table,Parameter> Last(string sql)
+        public override SelectContext<Parameter, Table> Last(string sql)
         {
             return this;
         }
         public override Table GetResult()
         {
-            return this.Select<Table,Parameter>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            return this.Select<Parameter, Table>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         public override IEnumerable<Table> GetResults(int startIndex, int endIndex)
         {
             this.templateParameter["StartIndex"] = startIndex;
             this.templateParameter["EndIndex"] = endIndex;
-            return this.SelectMany<Table,Parameter>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            return this.SelectMany<Parameter, Table>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
 
-        public override SelectContext<Table,Parameter> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public override SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             return this;
         }
 
-        public override SelectContext<Table,Parameter> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public override SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             return this;
         }
 
-        protected override SelectContext<Table,Parameter> SelectColumn(string column, string originalColunmName, string @as)
+        protected override SelectContext<Parameter, Table> SelectColumn(string column, string originalColunmName, string @as)
         {
             return this;
         }
 
-        public override SelectContext<Table,Parameter> SelectAll()
+        public override SelectContext<Parameter, Table> SelectAll()
         {
             return this;
         }
 
-        public override SelectContext<Table,Parameter> StartEntrance()
+        public override SelectContext<Parameter, Table> StartEntrance()
         {
             return this;
         }
 
-        public override SelectContext<Table,Parameter> Where()
+        public override SelectContext<Parameter, Table> Where()
         {
             return this;
         }
 
-        public override SelectContext<Table,Parameter> Where(Expression<Func<Table,Parameter, bool>> expression)
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             return this;
         }
@@ -87,14 +87,19 @@ namespace Never.EasySql.Linq
             return string.Empty;
         }
 
-        public override SelectContext<Table,Parameter> AppenInWhereExists(WhereExistsInfo whereExists)
+        public override SelectContext<Parameter, Table> AppenInWhereExists(WhereExistsInfo whereExists)
         {
             return this;
         }
 
-        public override SelectContext<Table,Parameter> AppenInWhereIn(WhereInInfo whereExists)
+        public override SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereExists)
         {
             return this;
+        }
+
+        public override SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            return this.dao.GetSqlTagFormat<Parameter>(this.sqlTag.Clone(this.templateParameter), this.sqlParameter, formatText);
         }
     }
 }

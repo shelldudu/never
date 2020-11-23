@@ -14,7 +14,7 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public class DeletingContext<Table, Parameter> : DeleteContext<Table, Parameter>
+    public class DeletingContext<Parameter, Table> : DeleteContext<Parameter, Table>
     {
         #region prop
 
@@ -83,7 +83,22 @@ namespace Never.EasySql.Linq
             };
 
             LinqSqlTagProvider.Set(sqlTag);
-            return this.Delete<Table, Parameter>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+            return this.Delete<Parameter, Table>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
+        }
+
+        /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public override SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            var sqlTag = new LinqSqlTag(this.cacheId, "delete")
+            {
+                Labels = this.labels.AsEnumerable(),
+                TextLength = this.textLength,
+            };
+
+            return this.dao.GetSqlTagFormat<Parameter>(sqlTag.Clone(this.templateParameter), this.sqlParameter, formatText);
         }
 
         /// <summary>
@@ -124,7 +139,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public override DeleteContext<Table, Parameter> StartEntrance()
+        public override DeleteContext<Parameter, Table> StartEntrance()
         {
             if (this.FromTable.IsNullOrEmpty())
             {
@@ -162,7 +177,7 @@ namespace Never.EasySql.Linq
         /// 
         /// </summary>
         /// <returns></returns>
-        public override DeleteContext<Table, Parameter> Where()
+        public override DeleteContext<Parameter, Table> Where()
         {
             if (whereCount == 0)
             {
@@ -184,7 +199,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public override DeleteContext<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
+        public override DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             var label = new TextLabel()
             {
@@ -195,21 +210,47 @@ namespace Never.EasySql.Linq
             {
                 whereCount++;
                 label.SqlText = string.Concat("where ");
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+                int s = this.labels.Count;
+                if (this.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix()))
+                {
+                    int e = this.labels.Count;
+                    for (var i = s; i < e; i++)
+                    {
+                        this.textLength += this.labels[i].SqlText.Length;
+                    }
+
+                    label = new TextLabel()
+                    {
+                        TagId = NewId.GenerateNumber(),
+                        SqlText = "\r",
+                    };
+                    this.labels.Add(label);
+                    this.textLength += label.SqlText.Length;
+                }
             }
             else
             {
                 label.SqlText = string.Concat("and ");
-            }
-
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
-            int s = this.labels.Count;
-            if (this.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix()))
-            {
-                int e = this.labels.Count;
-                for (var i = s; i < e; i++)
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+                int s = this.labels.Count;
+                if (this.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix()))
                 {
-                    this.textLength += this.labels[i].SqlText.Length;
+                    int e = this.labels.Count;
+                    for (var i = s; i < e; i++)
+                    {
+                        this.textLength += this.labels[i].SqlText.Length;
+                    }
+
+                    label = new TextLabel()
+                    {
+                        TagId = NewId.GenerateNumber(),
+                        SqlText = "\r",
+                    };
+                    this.labels.Add(label);
+                    this.textLength += label.SqlText.Length;
                 }
             }
 
@@ -222,7 +263,7 @@ namespace Never.EasySql.Linq
         /// <param name="andOrOption"></param>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override DeleteContext<Table, Parameter> Where(AndOrOption andOrOption, string sql)
+        public override DeleteContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
         {
             var label = new TextLabel()
             {
@@ -239,7 +280,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override DeleteContext<Table, Parameter> Append(string sql)
+        public override DeleteContext<Parameter, Table> Append(string sql)
         {
             if (sql.IsNullOrEmpty())
                 return this;
@@ -259,7 +300,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="joins"></param>
         /// <returns></returns>
-        public override DeleteContext<Table, Parameter> JoinOnDelete(List<JoinInfo> joins)
+        public override DeleteContext<Parameter, Table> JoinOnDelete(List<JoinInfo> joins)
         {
             this.updateJoin = joins;
             var label = new TextLabel()
@@ -278,7 +319,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public override DeleteContext<Table, Parameter> JoinOnWhereExists(WhereExistsInfo whereExists)
+        public override DeleteContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
             var label = new TextLabel()
             {
@@ -295,7 +336,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public override DeleteContext<Table, Parameter> JoinOnWhereIn(WhereInInfo whereIn)
+        public override DeleteContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn)
         {
             var label = new TextLabel()
             {

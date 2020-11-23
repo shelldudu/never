@@ -10,19 +10,19 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// delete语法
     /// </summary>
-    public struct DeleteGrammar<Table,Parameter>
+    public struct DeleteGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal DeleteContext<Table,Parameter> Context { get; set; }
+        internal DeleteContext<Parameter, Table> Context { get; set; }
 
 
         /// <summary>
         /// 入口
         /// </summary>
         /// <returns></returns>
-        internal DeleteGrammar<Table, Parameter> StartDeleteRecord()
+        internal DeleteGrammar<Parameter, Table> StartDeleteRecord()
         {
             this.Context.StartEntrance();
             return this;
@@ -39,19 +39,19 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> Where()
+        public DeleteWhereGrammar<Parameter, Table> Where()
         {
             this.Context.Where();
-            return new DeleteWhereGrammar<Table, Parameter>() { Context = this.Context };
+            return new DeleteWhereGrammar<Parameter, Table>() { Context = this.Context };
         }
 
         /// <summary>
         /// where
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> Where(Expression<Func<Table, Parameter, bool>> expression)
+        public DeleteWhereGrammar<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
         {
             this.Context.Where(expression);
-            return new DeleteWhereGrammar<Table, Parameter>() { Context = this.Context };
+            return new DeleteWhereGrammar<Parameter, Table>() { Context = this.Context };
         }
     }
 
@@ -61,9 +61,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
-    public struct DeleteJoinGrammar<Table, Parameter, Table1>
+    public struct DeleteJoinGrammar<Parameter, Table, Table1>
     {
-        internal DeleteGrammar<Table, Parameter> delete { get; set; }
+        internal DeleteGrammar<Parameter, Table> delete { get; set; }
         private readonly string @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -85,7 +85,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1> On(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public DeleteJoinGrammar<Parameter, Table, Table1> On(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -103,7 +103,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1> And(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public DeleteJoinGrammar<Parameter, Table, Table1> And(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -118,7 +118,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2> Join<Table2>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2> Join<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -126,7 +126,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.joins) { delete = this.delete };
         }
 
 
@@ -136,7 +136,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2> InnerJoin<Table2>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2> InnerJoin<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -144,7 +144,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.joins) { delete = this.delete };
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2> LeftJoin<Table2>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2> LeftJoin<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -161,7 +161,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.joins) { delete = this.delete };
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2> RightJoin<Table2>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2> RightJoin<Table2>(string @as)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -178,13 +178,13 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.joins) { delete = this.delete };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public DeleteGrammar<Table, Parameter> ToDelete()
+        public DeleteGrammar<Parameter, Table> ToDelete()
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -202,9 +202,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
-    public struct DeleteJoinGrammar<Table, Parameter, Table1, Table2>
+    public struct DeleteJoinGrammar<Parameter, Table, Table1, Table2>
     {
-        internal DeleteGrammar<Table, Parameter> delete { get; set; }
+        internal DeleteGrammar<Parameter, Table> delete { get; set; }
         private readonly List<string> @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -227,7 +227,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2> On(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2> On(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -244,7 +244,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2> And(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2> And(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -259,7 +259,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3> Join<Table3>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3> Join<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -268,7 +268,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.joins) { delete = this.delete };
         }
 
         /// <summary>
@@ -277,7 +277,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -286,7 +286,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.joins) { delete = this.delete };
         }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -304,7 +304,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.joins) { delete = this.delete };
         }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3> RightJoin<Table3>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3> RightJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -322,13 +322,13 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.joins) { delete = this.delete };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public DeleteGrammar<Table, Parameter> ToDelete()
+        public DeleteGrammar<Parameter, Table> ToDelete()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -350,9 +350,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
-    public struct DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3>
+    public struct DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3>
     {
-        internal DeleteGrammar<Table, Parameter> delete { get; set; }
+        internal DeleteGrammar<Parameter, Table> delete { get; set; }
         private readonly List<string> @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -375,7 +375,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -392,7 +392,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -407,7 +407,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -416,7 +416,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.joins) { delete = this.delete };
         }
 
         /// <summary>
@@ -425,7 +425,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -434,7 +434,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.joins) { delete = this.delete };
         }
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -452,7 +452,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.joins) { delete = this.delete };
         }
 
         /// <summary>
@@ -461,7 +461,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -470,13 +470,13 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.joins) { delete = this.delete };
+            return new DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.joins) { delete = this.delete };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public DeleteGrammar<Table, Parameter> ToDelete()
+        public DeleteGrammar<Parameter, Table> ToDelete()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -499,9 +499,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
     /// <typeparam name="Table4"></typeparam>
-    public struct DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4>
+    public struct DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4>
     {
-        internal DeleteGrammar<Table, Parameter> delete { get; set; }
+        internal DeleteGrammar<Parameter, Table> delete { get; set; }
         private readonly List<string> @as;
         private readonly JoinOption option;
         private readonly List<Context.JoinInfo> joins;
@@ -523,7 +523,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             this.joins.Add(new Context.JoinInfo()
             {
@@ -540,7 +540,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteJoinGrammar<Table, Parameter, Table1, Table2, Table3, Table4> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public DeleteJoinGrammar<Parameter, Table, Table1, Table2, Table3, Table4> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             if (this.joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -552,7 +552,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public DeleteGrammar<Table, Parameter> ToDelete()
+        public DeleteGrammar<Parameter, Table> ToDelete()
         {
             if (this.@as.Count != this.joins.Count)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -572,9 +572,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
-    public struct DeleteWhereExistsGrammar<Table, Parameter, Table1>
+    public struct DeleteWhereExistsGrammar<Parameter, Table, Table1>
     {
-        internal DeleteWhereGrammar<Table, Parameter> where { get; set; }
+        internal DeleteWhereGrammar<Parameter, Table> where { get; set; }
         private readonly string @as;
         private readonly Context.WhereExistsInfo exists;
         /// <summary>
@@ -601,7 +601,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1> Where(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1> Where(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             this.exists.Where = expression;
             return this;
@@ -612,7 +612,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1> And(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1> And(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             if (this.exists.Where == null)
                 throw new Exception("please use Where method first;");
@@ -627,7 +627,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2> Join<Table2>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2> Join<Table2>(string @as)
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -635,7 +635,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.exists) { where = this.where };
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.exists) { where = this.where };
         }
 
 
@@ -645,7 +645,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2> InnerJoin<Table2>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2> InnerJoin<Table2>(string @as)
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -653,7 +653,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.exists) { where = this.where };
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.exists) { where = this.where };
         }
 
 
@@ -663,7 +663,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2> LeftJoin<Table2>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2> LeftJoin<Table2>(string @as)
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -671,7 +671,7 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.exists) { where = this.where };
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.exists) { where = this.where };
         }
 
         /// <summary>
@@ -680,7 +680,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2> RightJoin<Table2>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2> RightJoin<Table2>(string @as)
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -688,13 +688,13 @@ namespace Never.EasySql.Linq
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.exists) { where = this.where };
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.exists) { where = this.where };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> ToWhere()
+        public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.exists.Where == null && this.exists.And == null)
                 throw new Exception("please use Where or And method first;");
@@ -711,9 +711,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
-    public struct DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2>
+    public struct DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2>
     {
-        internal DeleteWhereGrammar<Table, Parameter> where { get; set; }
+        internal DeleteWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereExistsInfo exists;
         /// <summary>
@@ -739,7 +739,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2> On(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2> On(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             this.exists.Joins.Last().On = expression;
             return this;
@@ -750,7 +750,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2> And(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2> And(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             if (this.exists.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -766,7 +766,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> Join<Table3>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> Join<Table3>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -775,7 +775,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.exists)
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.exists)
             {
                 where = this.where,
             };
@@ -788,7 +788,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -797,7 +797,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.exists)
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.exists)
             {
                 where = this.where,
             };
@@ -810,7 +810,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -819,7 +819,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.exists)
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.exists)
             {
                 where = this.where,
             };
@@ -831,7 +831,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> RightJoin<Table3>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> RightJoin<Table3>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -840,7 +840,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.exists)
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.exists)
             {
                 where = this.where,
             };
@@ -849,7 +849,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> ToWhere()
+        public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -870,9 +870,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
-    public struct DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3>
+    public struct DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3>
     {
-        internal DeleteWhereGrammar<Table, Parameter> where { get; set; }
+        internal DeleteWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereExistsInfo exists;
         /// <summary>
@@ -898,7 +898,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             this.exists.Joins.Last().On = expression;
             return this;
@@ -909,7 +909,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             if (this.exists.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -925,7 +925,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -934,7 +934,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.exists)
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.exists)
             {
                 where = this.where,
             };
@@ -947,7 +947,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -956,7 +956,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.exists)
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.exists)
             {
                 where = this.where,
             };
@@ -969,7 +969,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -978,7 +978,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.exists)
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.exists)
             {
                 where = this.where,
             };
@@ -990,7 +990,7 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -999,7 +999,7 @@ namespace Never.EasySql.Linq
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.exists)
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.exists)
             {
                 where = this.where,
             };
@@ -1008,7 +1008,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> ToWhere()
+        public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -1030,9 +1030,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
     /// <typeparam name="Table4"></typeparam>
-    public struct DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4>
+    public struct DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4>
     {
-        internal DeleteWhereGrammar<Table, Parameter> where { get; set; }
+        internal DeleteWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereExistsInfo exists;
         /// <summary>
@@ -1058,7 +1058,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             this.exists.Joins.Last().On = expression;
             return this;
@@ -1069,7 +1069,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1, Table2, Table3, Table4> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1, Table2, Table3, Table4> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             if (this.exists.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1081,7 +1081,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> ToWhere()
+        public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@as.Count != this.exists.Joins.Count + 1)
                 throw new Exception(string.Format("please use {0} On method first;", this.@as.Last()));
@@ -1100,9 +1100,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
-    public struct DeleteWhereInGrammar<Table, Parameter, Table1>
+    public struct DeleteWhereInGrammar<Parameter, Table, Table1>
     {
-        internal DeleteWhereGrammar<Table, Parameter> where { get; set; }
+        internal DeleteWhereGrammar<Parameter, Table> where { get; set; }
         private readonly string @as;
         private readonly Context.WhereInInfo @in;
 
@@ -1130,7 +1130,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1> Field(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public DeleteWhereInGrammar<Parameter, Table, Table1> Field(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             this.@in.Field = expression;
             return this;
@@ -1141,7 +1141,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1> Where(Expression<Func<Table, Parameter, Table1, bool>> expression)
+        public DeleteWhereInGrammar<Parameter, Table, Table1> Where(Expression<Func<Parameter, Table, Table1, bool>> expression)
         {
             if (this.@in.Field == null)
                 throw new Exception("please use On Field first;");
@@ -1156,12 +1156,12 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2> Join<Table2>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2> Join<Table2>(string @as)
         {
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.@in) { where = this.where };
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.Join, this.@in) { where = this.where };
         }
 
 
@@ -1171,12 +1171,12 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2> InnerJoin<Table2>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2> InnerJoin<Table2>(string @as)
         {
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.@in) { where = this.where };
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.InnerJoin, this.@in) { where = this.where };
         }
 
 
@@ -1186,12 +1186,12 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2> LeftJoin<Table2>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2> LeftJoin<Table2>(string @as)
         {
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.@in) { where = this.where };
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.LeftJoin, this.@in) { where = this.where };
         }
 
         /// <summary>
@@ -1200,18 +1200,18 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table2"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2> RightJoin<Table2>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2> RightJoin<Table2>(string @as)
         {
             if (this.@as == @as)
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.@in) { where = this.where };
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2>(new List<string>(4) { this.@as, @as }, JoinOption.RightJoin, this.@in) { where = this.where };
         }
 
         /// <summary>
         /// then
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> ToWhere()
+        public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@in.Field == null)
                 throw new Exception("please use On Field first;");
@@ -1228,9 +1228,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table"></typeparam>
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
-    public struct DeleteWhereInGrammar<Table, Parameter, Table1, Table2>
+    public struct DeleteWhereInGrammar<Parameter, Table, Table1, Table2>
     {
-        internal DeleteWhereGrammar<Table, Parameter> where { get; set; }
+        internal DeleteWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereInInfo @in;
         /// <summary>
@@ -1256,7 +1256,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2> On(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2> On(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             this.@in.Joins.Last().On = expression;
             return this;
@@ -1267,7 +1267,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2> And(Expression<Func<Table, Parameter, Table1, Table2, bool>> expression)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2> And(Expression<Func<Parameter, Table, Table1, Table2, bool>> expression)
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1283,13 +1283,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3> Join<Table3>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3> Join<Table3>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.@in)
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.Join, this.@in)
             {
                 where = this.where,
             };
@@ -1302,13 +1302,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3> InnerJoin<Table3>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.@in)
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.InnerJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1321,13 +1321,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3> LeftJoin<Table3>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.@in)
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.LeftJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1339,13 +1339,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table3"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3> RightJoin<Table3>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3> RightJoin<Table3>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.@in)
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3>(this.@as, JoinOption.RightJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1354,7 +1354,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> ToWhere()
+        public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1372,9 +1372,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table1"></typeparam>
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
-    public struct DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3>
+    public struct DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3>
     {
-        internal DeleteWhereGrammar<Table, Parameter> where { get; set; }
+        internal DeleteWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereInInfo @in;
         /// <summary>
@@ -1400,7 +1400,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             this.@in.Joins.Last().On = expression;
             return this;
@@ -1411,7 +1411,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, bool>> expression)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, bool>> expression)
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1427,13 +1427,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> Join<Table4>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.@in)
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.Join, this.@in)
             {
                 where = this.where,
             };
@@ -1446,13 +1446,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> InnerJoin<Table4>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.@in)
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.InnerJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1465,13 +1465,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> LeftJoin<Table4>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.@in)
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.LeftJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1483,13 +1483,13 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table4"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> RightJoin<Table4>(string @as)
         {
             if (this.@as.Any(ta => ta == @as))
                 throw new Exception(string.Format("the alias name {0} is already exists", @as));
 
             this.@as.Add(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.@in)
+            return new DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>(this.@as, JoinOption.RightJoin, this.@in)
             {
                 where = this.where,
             };
@@ -1498,7 +1498,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> ToWhere()
+        public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1517,9 +1517,9 @@ namespace Never.EasySql.Linq
     /// <typeparam name="Table2"></typeparam>
     /// <typeparam name="Table3"></typeparam>
     /// <typeparam name="Table4"></typeparam>
-    public struct DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4>
+    public struct DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4>
     {
-        internal DeleteWhereGrammar<Table, Parameter> where { get; set; }
+        internal DeleteWhereGrammar<Parameter, Table> where { get; set; }
         private readonly List<string> @as;
         private readonly Context.WhereInInfo @in;
         /// <summary>
@@ -1545,7 +1545,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> On(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> On(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             this.@in.Joins.Last().On = expression;
             return this;
@@ -1556,7 +1556,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1, Table2, Table3, Table4> And(Expression<Func<Table, Parameter, Table1, Table2, Table3, Table4, bool>> expression)
+        public DeleteWhereInGrammar<Parameter, Table, Table1, Table2, Table3, Table4> And(Expression<Func<Parameter, Table, Table1, Table2, Table3, Table4, bool>> expression)
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1568,7 +1568,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// then
         /// </summary>
-        public DeleteWhereGrammar<Table, Parameter> ToWhere()
+        public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
             if (this.@in.Joins.Last().On == null)
                 throw new Exception("please use On method first;");
@@ -1583,58 +1583,34 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter">查询参数</typeparam>
     /// <typeparam name="Table">目标表</typeparam>
-    public struct DeleteWhereGrammar<Table, Parameter>
+    public struct DeleteWhereGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal DeleteContext<Table, Parameter> Context { get; set; }
+        internal DeleteContext<Parameter, Table> Context { get; set; }
+
 
         /// <summary>
-        /// 存在
+        /// 
         /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="as"></param>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1> AndExists<Table1>(string @as)
+        public DeleteWhereGrammar<Parameter, Table> And(Expression<Func<Parameter, Table, bool>> expression)
         {
-            this.Context.CheckTableNameIsExists(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1>(@as, AndOrOption.and, 'e') { where = this };
+            this.Context.Where(expression);
+            return this;
         }
 
         /// <summary>
-        /// 不存在
+        /// 
         /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="as"></param>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1> AndNotExists<Table1>(string @as)
+        public DeleteWhereGrammar<Parameter, Table> Or(Expression<Func<Parameter, Table, bool>> expression)
         {
-            this.Context.CheckTableNameIsExists(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1>(@as, AndOrOption.and, 'n') { where = this };
-        }
-        /// <summary>
-        /// 存在
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="as"></param>
-        /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1> OrExists<Table1>(string @as)
-        {
-            this.Context.CheckTableNameIsExists(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1>(@as, AndOrOption.or, 'e') { where = this };
-        }
-
-        /// <summary>
-        /// 不存在
-        /// </summary>
-        /// <typeparam name="Table1"></typeparam>
-        /// <param name="as"></param>
-        /// <returns></returns>
-        public DeleteWhereExistsGrammar<Table, Parameter, Table1> OrNotExists<Table1>(string @as)
-        {
-            this.Context.CheckTableNameIsExists(@as);
-            return new DeleteWhereExistsGrammar<Table, Parameter, Table1>(@as, AndOrOption.or, 'n') { where = this };
+            this.Context.Where(expression);
+            return this;
         }
 
         /// <summary>
@@ -1643,10 +1619,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1> AndIn<Table1>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1> AndExists<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1>(@as, AndOrOption.and, 'i') { where = this };
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1>(@as, AndOrOption.and, 'e') { where = this };
         }
 
         /// <summary>
@@ -1655,10 +1631,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1> AndNotIn<Table1>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1> AndNotExists<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1>(@as, AndOrOption.and, 'n') { where = this };
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1>(@as, AndOrOption.and, 'n') { where = this };
         }
         /// <summary>
         /// 存在
@@ -1666,10 +1642,10 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1> OrIn<Table1>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1> OrExists<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1>(@as, AndOrOption.or, 'i') { where = this };
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1>(@as, AndOrOption.or, 'e') { where = this };
         }
 
         /// <summary>
@@ -1678,17 +1654,64 @@ namespace Never.EasySql.Linq
         /// <typeparam name="Table1"></typeparam>
         /// <param name="as"></param>
         /// <returns></returns>
-        public DeleteWhereInGrammar<Table, Parameter, Table1> OrNotIn<Table1>(string @as)
+        public DeleteWhereExistsGrammar<Parameter, Table, Table1> OrNotExists<Table1>(string @as)
         {
             this.Context.CheckTableNameIsExists(@as);
-            return new DeleteWhereInGrammar<Table, Parameter, Table1>(@as, AndOrOption.or, 'n') { where = this };
+            return new DeleteWhereExistsGrammar<Parameter, Table, Table1>(@as, AndOrOption.or, 'n') { where = this };
+        }
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        public DeleteWhereInGrammar<Parameter, Table, Table1> AndIn<Table1>(string @as)
+        {
+            this.Context.CheckTableNameIsExists(@as);
+            return new DeleteWhereInGrammar<Parameter, Table, Table1>(@as, AndOrOption.and, 'i') { where = this };
+        }
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        public DeleteWhereInGrammar<Parameter, Table, Table1> AndNotIn<Table1>(string @as)
+        {
+            this.Context.CheckTableNameIsExists(@as);
+            return new DeleteWhereInGrammar<Parameter, Table, Table1>(@as, AndOrOption.and, 'n') { where = this };
+        }
+        /// <summary>
+        /// 存在
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        public DeleteWhereInGrammar<Parameter, Table, Table1> OrIn<Table1>(string @as)
+        {
+            this.Context.CheckTableNameIsExists(@as);
+            return new DeleteWhereInGrammar<Parameter, Table, Table1>(@as, AndOrOption.or, 'i') { where = this };
+        }
+
+        /// <summary>
+        /// 不存在
+        /// </summary>
+        /// <typeparam name="Table1"></typeparam>
+        /// <param name="as"></param>
+        /// <returns></returns>
+        public DeleteWhereInGrammar<Parameter, Table, Table1> OrNotIn<Table1>(string @as)
+        {
+            this.Context.CheckTableNameIsExists(@as);
+            return new DeleteWhereInGrammar<Parameter, Table, Table1>(@as, AndOrOption.or, 'n') { where = this };
         }
 
         /// <summary>
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Table, Parameter> AndNotExists(string expression)
+        public DeleteWhereGrammar<Parameter, Table> AndNotExists(string expression)
         {
             this.Context.Where(AndOrOption.and, expression);
             return this;
@@ -1698,7 +1721,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Table, Parameter> OrNotExists(string expression)
+        public DeleteWhereGrammar<Parameter, Table> OrNotExists(string expression)
         {
             this.Context.Where(AndOrOption.or, expression);
             return this;
@@ -1708,7 +1731,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Table, Parameter> AndIn(string expression)
+        public DeleteWhereGrammar<Parameter, Table> AndIn(string expression)
         {
             this.Context.Where(AndOrOption.and, expression);
             return this;
@@ -1718,7 +1741,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Table, Parameter> AndNotIn(string expression)
+        public DeleteWhereGrammar<Parameter, Table> AndNotIn(string expression)
         {
             this.Context.Where(AndOrOption.and, expression);
             return this;
@@ -1728,7 +1751,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Table, Parameter> OrIn(string expression)
+        public DeleteWhereGrammar<Parameter, Table> OrIn(string expression)
         {
             this.Context.Where(AndOrOption.or, expression);
             return this;
@@ -1738,7 +1761,7 @@ namespace Never.EasySql.Linq
         /// 存在
         /// </summary>
         /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Table, Parameter> OrNotIn(string expression)
+        public DeleteWhereGrammar<Parameter, Table> OrNotIn(string expression)
         {
             this.Context.Where(AndOrOption.or, expression);
             return this;
@@ -1748,7 +1771,7 @@ namespace Never.EasySql.Linq
         /// 字符串
         /// </summary>
         /// <param name="sql">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Table, Parameter> Append(string sql)
+        public DeleteWhereGrammar<Parameter, Table> Append(string sql)
         {
             this.Context.Append(sql);
             return this;

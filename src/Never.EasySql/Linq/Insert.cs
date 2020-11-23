@@ -12,17 +12,17 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public struct Insert<Table,Parameter>
+    public struct Insert<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal InsertContext<Table,Parameter> Context { get; set; }
+        internal InsertContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 从哪一张表插入
         /// </summary>
-        public Insert<Table,Parameter> Into(string table)
+        public Insert<Parameter, Table> Into(string table)
         {
             this.Context.Into(table);
             return this;
@@ -32,18 +32,18 @@ namespace Never.EasySql.Linq
         /// 单条插入
         /// </summary>
         /// <returns></returns>
-        public SingleInsertGrammar<Table, Parameter> UseSingle()
+        public SingleInsertGrammar<Parameter, Table> UseSingle()
         {
-            return new SingleInsertGrammar<Table, Parameter>() { Context = this.Context }.StartInsertRecord();
+            return new SingleInsertGrammar<Parameter, Table>() { Context = this.Context }.StartInsertRecord();
         }
 
         /// <summary>
         /// 批量插入
         /// </summary>
         /// <returns></returns>
-        public BulkInsertGrammar<Table, Parameter> UseBulk()
+        public BulkInsertGrammar<Parameter, Table> UseBulk()
         {
-            return new BulkInsertGrammar<Table, Parameter>() { Context = this.Context }.StartInsertRecord();
+            return new BulkInsertGrammar<Parameter, Table>() { Context = this.Context }.StartInsertRecord();
         }
     }
 }

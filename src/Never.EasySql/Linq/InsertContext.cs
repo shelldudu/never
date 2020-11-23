@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public abstract class InsertContext<Table, Parameter> : Context
+    public abstract class InsertContext<Parameter, Table> : Context
     {
         /// <summary>
         /// dao
@@ -73,7 +73,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public virtual InsertContext<Table, Parameter> Into(string table)
+        public virtual InsertContext<Parameter, Table> Into(string table)
         {
             this.InsertTable = this.FormatTable(table);
             return this;
@@ -94,13 +94,13 @@ namespace Never.EasySql.Linq
         /// 入口
         /// </summary>
         /// <returns></returns>
-        public abstract InsertContext<Table, Parameter> StartEntrance();
+        public abstract InsertContext<Parameter, Table> StartEntrance();
 
         /// <summary>
         /// 设为单条
         /// </summary>
         /// <returns></returns>
-        public InsertContext<Table, Parameter> SetSingle()
+        public InsertContext<Parameter, Table> SetSingle()
         {
             this.UseBulk = false;
             return this;
@@ -110,7 +110,7 @@ namespace Never.EasySql.Linq
         /// 设为多条
         /// </summary>
         /// <returns></returns>
-        public InsertContext<Table, Parameter> SetBulk()
+        public InsertContext<Parameter, Table> SetBulk()
         {
             this.UseBulk = true;
             return this;
@@ -127,21 +127,27 @@ namespace Never.EasySql.Linq
         public abstract void GetResult();
 
         /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public abstract SqlTagFormat GetSqlTagFormat(bool formatText = false);
+
+        /// <summary>
         /// 最后自增字符串
         /// </summary>
         /// <returns></returns>
-        public abstract InsertContext<Table, Parameter> InsertLastInsertId<ReturnType>();
+        public abstract InsertContext<Parameter, Table> InsertLastInsertId<ReturnType>();
 
         /// <summary>
         /// 插入字段名
         /// </summary>
-        public abstract InsertContext<Table, Parameter> InsertColumn(string columnName, string parameterName, bool textParameter, bool function);
+        public abstract InsertContext<Parameter, Table> InsertColumn(string columnName, string parameterName, bool textParameter, bool function);
 
         /// <summary>
         /// 插入所有字段
         /// </summary>
         /// <returns></returns>
-        public virtual InsertContext<Table, Parameter> InsertAll()
+        public virtual InsertContext<Parameter, Table> InsertAll()
         {
             foreach (var i in this.tableInfo.Columns)
             {
@@ -168,7 +174,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="keyValue"></param>
         /// <returns></returns>
-        public virtual InsertContext<Table, Parameter> Colum(Expression<Func<Table, object>> keyValue)
+        public virtual InsertContext<Parameter, Table> Colum(Expression<Func<Table, object>> keyValue)
         {
             string columnName = this.FindColumnName(keyValue, this.tableInfo, out _, out var columnInfo);
             if (columnInfo.Column != null && ((columnInfo.Column.Optional & SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement) == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement))
@@ -183,7 +189,7 @@ namespace Never.EasySql.Linq
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public virtual InsertContext<Table, Parameter> Colum(Expression<Func<Table, object>> key, Expression<Func<Parameter, object>> value)
+        public virtual InsertContext<Parameter, Table> Colum(Expression<Func<Table, object>> key, Expression<Func<Parameter, object>> value)
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             string parameterName = this.FindColumnName(value, this.tableInfo, out _);
@@ -196,7 +202,7 @@ namespace Never.EasySql.Linq
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public virtual InsertContext<Table, Parameter> ColumWithFunc(Expression<Func<Table, object>> key, string value)
+        public virtual InsertContext<Parameter, Table> ColumWithFunc(Expression<Func<Table, object>> key, string value)
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;
@@ -209,7 +215,7 @@ namespace Never.EasySql.Linq
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public virtual InsertContext<Table, Parameter> ColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
+        public virtual InsertContext<Parameter, Table> ColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
             this.templateParameter[columnName] = value;

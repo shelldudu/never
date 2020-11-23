@@ -12,7 +12,7 @@ namespace Never.EasySql.Linq
     /// </summary>
     /// <typeparam name="Parameter"></typeparam>
     /// <typeparam name="Table"></typeparam>
-    public abstract class SelectContext<Table,Parameter> : Context
+    public abstract class SelectContext<Parameter, Table> : Context
     {
         /// <summary>
         /// dao
@@ -103,7 +103,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public virtual SelectContext<Table,Parameter> From(string table)
+        public virtual SelectContext<Parameter, Table> From(string table)
         {
             this.FromTable = this.FormatTable(table);
             return this;
@@ -114,7 +114,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public virtual SelectContext<Table,Parameter> As(string table)
+        public virtual SelectContext<Parameter, Table> As(string table)
         {
             this.AsTable = table;
             return this;
@@ -137,7 +137,7 @@ namespace Never.EasySql.Linq
         /// 设为单条
         /// </summary>
         /// <returns></returns>
-        public SelectContext<Table,Parameter> SetSingle()
+        public SelectContext<Parameter, Table> SetSingle()
         {
             this.isSingle = true;
             return this;
@@ -147,7 +147,7 @@ namespace Never.EasySql.Linq
         /// 设为单条
         /// </summary>
         /// <returns></returns>
-        public SelectContext<Table,Parameter> SetPage()
+        public SelectContext<Parameter, Table> SetPage()
         {
             this.isSingle = false;
             return this;
@@ -156,7 +156,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public abstract SelectContext<Table,Parameter> StartEntrance();
+        public abstract SelectContext<Parameter, Table> StartEntrance();
 
         /// <summary>
         /// 在select的时候，set字段使用表明还是别名，你可以返回tableNamePoint或者asTableNamePoint
@@ -167,13 +167,13 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected abstract SelectContext<Table,Parameter> SelectColumn(string columnName, string originalColunmName, string @as);
+        protected abstract SelectContext<Parameter, Table> SelectColumn(string columnName, string originalColunmName, string @as);
 
         /// <summary>
         /// 查询所有
         /// </summary>
         /// <returns></returns>
-        public virtual SelectContext<Table,Parameter> SelectAll()
+        public virtual SelectContext<Parameter, Table> SelectAll()
         {
             return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), "*"), "*", string.Empty);
         }
@@ -181,7 +181,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public virtual SelectContext<Table,Parameter> Select<TMember>(Expression<Func<Table, TMember>> expression)
+        public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
             return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), this.FormatColumn(columnName)), columnName, string.Empty);
@@ -190,7 +190,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public virtual SelectContext<Table,Parameter> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
+        public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out _);
             return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), this.FormatColumn(columnName)), columnName, @as);
@@ -199,7 +199,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 字段名
         /// </summary>
-        public virtual SelectContext<Table,Parameter> Select(string func, string @as)
+        public virtual SelectContext<Parameter, Table> Select(string func, string @as)
         {
             return this.SelectColumn(func, func, @as);
         }
@@ -217,11 +217,17 @@ namespace Never.EasySql.Linq
         public abstract IEnumerable<Table> GetResults(int startIndex, int endIndex);
 
         /// <summary>
+        /// 获取sql语句
+        /// </summary>
+        /// <returns></returns>
+        public abstract SqlTagFormat GetSqlTagFormat(bool formatText = false);
+
+        /// <summary>
         /// order by
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectContext<Table,Parameter> OrderBy(Expression<Func<Table, object>> expression)
+        public SelectContext<Parameter, Table> OrderBy(Expression<Func<Table, object>> expression)
         {
             string @as = this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable;
             if (this.orderBies == null)
@@ -243,7 +249,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public SelectContext<Table,Parameter> OrderByDescending(Expression<Func<Table, object>> expression)
+        public SelectContext<Parameter, Table> OrderByDescending(Expression<Func<Table, object>> expression)
         {
             string @as = this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable;
             if (this.orderBies == null)
@@ -266,7 +272,7 @@ namespace Never.EasySql.Linq
         /// <param name="expression"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        internal SelectContext<Table,Parameter> OrderBy<Table1>(Expression<Func<Table1, object>> expression, int index)
+        internal SelectContext<Parameter, Table> OrderBy<Table1>(Expression<Func<Table1, object>> expression, int index)
         {
             string @as = this.selectJoin[index].AsName;
             if (this.orderBies == null)
@@ -289,7 +295,7 @@ namespace Never.EasySql.Linq
         /// <param name="expression"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        internal SelectContext<Table,Parameter> OrderByDescending<Table1>(Expression<Func<Table1, object>> expression, int index)
+        internal SelectContext<Parameter, Table> OrderByDescending<Table1>(Expression<Func<Table1, object>> expression, int index)
         {
             string @as = this.selectJoin[index].AsName;
             if (this.orderBies == null)
@@ -309,29 +315,29 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public abstract SelectContext<Table,Parameter> Where();
+        public abstract SelectContext<Parameter, Table> Where();
 
         /// <summary>
         /// where
         /// </summary>
-        public abstract SelectContext<Table,Parameter> Where(Expression<Func<Table,Parameter, bool>> expression);
+        public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression);
 
         /// <summary>
         /// append
         /// </summary>
-        public abstract SelectContext<Table,Parameter> Append(string sql);
+        public abstract SelectContext<Parameter, Table> Append(string sql);
 
         /// <summary>
         /// last
         /// </summary>
-        public abstract SelectContext<Table,Parameter> Last(string sql);
+        public abstract SelectContext<Parameter, Table> Last(string sql);
 
         /// <summary>
         /// join
         /// </summary>
         /// <param name="joins"></param>
         /// <returns></returns>
-        public SelectContext<Table,Parameter> JoinSelect(List<JoinInfo> joins)
+        public SelectContext<Parameter, Table> JoinSelect(List<JoinInfo> joins)
         {
             this.selectJoin = joins;
             return this.OnJoinSelect();
@@ -341,7 +347,7 @@ namespace Never.EasySql.Linq
         /// join
         /// </summary>
         /// <returns></returns>
-        protected virtual SelectContext<Table,Parameter> OnJoinSelect()
+        protected virtual SelectContext<Parameter, Table> OnJoinSelect()
         {
             return this;
         }
@@ -351,54 +357,13 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public abstract SelectContext<Table,Parameter> AppenInWhereExists(WhereExistsInfo whereExists);
+        public abstract SelectContext<Parameter, Table> AppenInWhereExists(WhereExistsInfo whereExists);
 
         /// <summary>
         /// where里面的in
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public abstract SelectContext<Table,Parameter> AppenInWhereIn(WhereInInfo whereIn);
-
-        /// <summary>
-        /// exists
-        /// </summary>
-        /// <param name="whereExists"></param>
-        /// <returns></returns>
-        public SelectContext<Table,Parameter> WhereExists(WhereExistsInfo whereExists)
-        {
-            this.whereExists = whereExists;
-            return this.OnWhereExists();
-        }
-
-        /// <summary>
-        /// exists
-        /// </summary>
-        /// <returns></returns>
-        protected virtual SelectContext<Table,Parameter> OnWhereExists()
-        {
-            return this;
-        }
-
-        /// <summary>
-        /// in
-        /// </summary>
-        /// <param name="whereIn"></param>
-        /// <returns></returns>
-        public SelectContext<Table,Parameter> WhereIn(WhereInInfo whereIn)
-        {
-            this.whereIn = whereIn;
-            return this.OnWhereIn();
-        }
-
-
-        /// <summary>
-        /// in
-        /// </summary>
-        /// <returns></returns>
-        protected virtual SelectContext<Table,Parameter> OnWhereIn()
-        {
-            return this;
-        }
+        public abstract SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereIn);
     }
 }

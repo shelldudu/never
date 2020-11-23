@@ -10,17 +10,17 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// insert 语法
     /// </summary>
-    public struct SingleInsertGrammar<Table, Parameter>
+    public struct SingleInsertGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal InsertContext<Table, Parameter> Context { get; set; }
+        internal InsertContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
-        public SingleInsertGrammar<Table, Parameter> StartInsertRecord()
+        public SingleInsertGrammar<Parameter, Table> StartInsertRecord()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -29,7 +29,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的所有字段名
         /// </summary>
-        public SingleInsertGrammar<Table, Parameter> InsertAll()
+        public SingleInsertGrammar<Parameter, Table> InsertAll()
         {
             this.Context.InsertAll();
             return this;
@@ -38,7 +38,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public SingleInsertGrammar<Table, Parameter> Colum(Expression<Func<Table, object>> keyValue)
+        public SingleInsertGrammar<Parameter, Table> Colum(Expression<Func<Table, object>> keyValue)
         {
             this.Context.Colum(keyValue);
             return this;
@@ -47,7 +47,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public SingleInsertGrammar<Table, Parameter> Colum(Expression<Func<Table, object>> key, Expression<Func<Parameter, object>> value)
+        public SingleInsertGrammar<Parameter, Table> Colum(Expression<Func<Table, object>> key, Expression<Func<Parameter, object>> value)
         {
             this.Context.Colum(key, value);
             return this;
@@ -56,7 +56,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public SingleInsertGrammar<Table, Parameter> ColumWithFunc(Expression<Func<Table, object>> key, string value)
+        public SingleInsertGrammar<Parameter, Table> ColumWithFunc(Expression<Func<Table, object>> key, string value)
         {
             this.Context.ColumWithFunc(key, value);
             return this;
@@ -65,7 +65,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public SingleInsertGrammar<Table, Parameter> ColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
+        public SingleInsertGrammar<Parameter, Table> ColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
         {
             this.Context.ColumWithValue(key, value);
             return this;
@@ -74,7 +74,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 返回最后插入语句
         /// </summary>
-        public SingleInsertGrammar<Table, Parameter> LastInsertId<ReturnType>()
+        public SingleInsertGrammar<Parameter, Table> LastInsertId<ReturnType>()
         {
             this.Context.InsertLastInsertId<ReturnType>();
             return this;
@@ -101,17 +101,17 @@ namespace Never.EasySql.Linq
     /// <summary>
     /// insert 语法
     /// </summary>
-    public struct BulkInsertGrammar<Table, Parameter>
+    public struct BulkInsertGrammar<Parameter, Table>
     {
         /// <summary>
         /// 上下文
         /// </summary>
-        internal InsertContext<Table, Parameter> Context { get; set; }
+        internal InsertContext<Parameter, Table> Context { get; set; }
 
         /// <summary>
         /// 入口
         /// </summary>
-        public BulkInsertGrammar<Table, Parameter> StartInsertRecord()
+        public BulkInsertGrammar<Parameter, Table> StartInsertRecord()
         {
             this.Context.SetBulk().StartEntrance();
             return this;
@@ -120,7 +120,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的所有字段名
         /// </summary>
-        public BulkInsertGrammar<Table, Parameter> InsertAll()
+        public BulkInsertGrammar<Parameter, Table> InsertAll()
         {
             this.Context.InsertAll();
             return this;
@@ -129,7 +129,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public BulkInsertGrammar<Table, Parameter> Colum(Expression<Func<Table, object>> keyValue)
+        public BulkInsertGrammar<Parameter, Table> Colum(Expression<Func<Table, object>> keyValue)
         {
             this.Context.Colum(keyValue);
             return this;
@@ -138,7 +138,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public BulkInsertGrammar<Table, Parameter> Colum<UnitParameter>(Expression<Func<Table, object>> key, Expression<Func<UnitParameter, object>> value)
+        public BulkInsertGrammar<Parameter, Table> Colum<UnitParameter>(Expression<Func<Table, object>> key, Expression<Func<UnitParameter, object>> value)
         {
             string columnName = this.Context.FindColumnName(key, Linq.Context.FindTableInfo<Table>(), out _);
             string parameterName = this.Context.FindColumnName(value, Linq.Context.FindTableInfo<UnitParameter>(), out _);
@@ -149,7 +149,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public BulkInsertGrammar<Table, Parameter> ColumWithFunc(Expression<Func<Table, object>> key, string value)
+        public BulkInsertGrammar<Parameter, Table> ColumWithFunc(Expression<Func<Table, object>> key, string value)
         {
             this.Context.ColumWithFunc(key, value);
             return this;
@@ -158,7 +158,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的字段名
         /// </summary>
-        public BulkInsertGrammar<Table, Parameter> ColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
+        public BulkInsertGrammar<Parameter, Table> ColumWithValue<TMember>(Expression<Func<Table, TMember>> key, TMember value)
         {
             this.Context.ColumWithValue(key, value);
             return this;
