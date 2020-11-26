@@ -15,6 +15,11 @@ namespace Never.EasySql.Linq.SqlServer
     public sealed class SelectingContext<Parameter, Table> : Linq.SelectingContext<Parameter, Table>
     {
         /// <summary>
+        /// 分页的配置
+        /// </summary>
+        private TextLabel rowNumberTextLabel;
+
+        /// <summary>
         /// ctor
         /// </summary>
         /// <param name="cacheId"></param>
@@ -55,6 +60,20 @@ namespace Never.EasySql.Linq.SqlServer
         }
 
         /// <summary>
+        /// 分页
+        /// </summary>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> SetPage()
+        {
+            this.rowNumberTextLabel = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+            };
+
+            return base.SetPage();
+        }
+
+        /// <summary>
         /// 查询结果
         /// </summary>
         public override Table GetResult()
@@ -87,23 +106,65 @@ namespace Never.EasySql.Linq.SqlServer
             label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat("where", " qwertyuiop._ >= ", this.dao.SqlExecuter.GetParameterPrefix(), "StartIndex", " and qwertyuiop._ < ", this.dao.SqlExecuter.GetParameterPrefix(), "EndIndex"),
+                SqlText = string.Concat("\r", "where", " qwertyuiop._ >= ", this.dao.SqlExecuter.GetParameterPrefix(), "StartIndex", " and qwertyuiop._ < ", this.dao.SqlExecuter.GetParameterPrefix(), "EndIndex"),
             };
+
+
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = "StartIndex",
+                OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length,
+                PrefixStartIndex = "where qwertyuiop._ >= ".Length,
+                ParameterStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                ParameterStopIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length - 1,
+                TextParameter = false,
+            });
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = "EndIndex",
+                OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length,
+                PrefixStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ < ".Length,
+                ParameterStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ < ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                ParameterStopIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ < ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length - 1,
+                TextParameter = false,
+            });
+
             this.labels.Add(label);
 
-            return base.GetResults(startIndex, endIndex);
+            if (this.isSingle)
+            {
+                if (this.orderBies.IsNotNullOrEmpty())
+                    base.LoadOrderBy(true);
+            }
+            else
+            {
+                this.LoadRowNumber();
+            }
+            var sqlTag = new LinqSqlTag(this.cacheId, "select")
+            {
+                Labels = this.labels.AsEnumerable(),
+                TextLength = this.textLength,
+            };
+
+            this.templateParameter["StartIndex"] = startIndex;
+            this.templateParameter["EndIndex"] = endIndex;
+
+            LinqSqlTagProvider.Set(sqlTag);
+            return this.SelectMany<Parameter, Table>(sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
         /// <summary>
-        /// 
+        /// 加载分页
         /// </summary>
-        protected override void OnWhereInit()
+        /// <param name="clear"></param>
+        public void LoadRowNumber(bool clear = true)
         {
-            if (this.isSingle)
-            {
-                base.OnWhereInit();
-                return;
-            }
+            if (this.onWhereInited == false && this.rowNumberTextLabel != null)
+                this.labels.Add(this.rowNumberTextLabel);
 
             if (this.orderBies.IsNullOrEmpty())
             {
@@ -129,14 +190,22 @@ namespace Never.EasySql.Linq.SqlServer
                 }
             }
 
-            var label = new TextLabel()
-            {
-                TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat(", ", (this.LoadOrderBy(this.orderBies).ToString()), " as _"),
-            };
+            this.rowNumberTextLabel.SqlText = string.Concat(", row_number() over (", this.LoadOrderBy(this.orderBies).ToString(), ") as _\r");
+            this.textLength += this.rowNumberTextLabel.SqlText.Length;
 
-            this.labels.Add(label);
-            this.orderBies.Clear();
+            if (clear)
+                this.orderBies.Clear();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected override void OnWhereInit()
+        {
+            base.OnWhereInit();
+
+            if (this.rowNumberTextLabel != null)
+                this.labels.Add(this.rowNumberTextLabel);
         }
 
         /// <summary>

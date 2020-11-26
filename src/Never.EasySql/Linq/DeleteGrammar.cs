@@ -182,7 +182,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteGrammar<Parameter, Table> ToDelete()
         {
@@ -326,7 +326,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteGrammar<Parameter, Table> ToDelete()
         {
@@ -474,7 +474,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteGrammar<Parameter, Table> ToDelete()
         {
@@ -550,7 +550,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteGrammar<Parameter, Table> ToDelete()
         {
@@ -692,7 +692,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -847,7 +847,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1006,7 +1006,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1079,7 +1079,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1209,7 +1209,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1352,7 +1352,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1496,7 +1496,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1566,7 +1566,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to delete
         /// </summary>
         public DeleteWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1711,9 +1711,9 @@ namespace Never.EasySql.Linq
         /// 字符串
         /// </summary>
         /// <param name="sql">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Parameter, Table> Then(string sql)
+        public DeleteWhereGrammar<Parameter, Table> AddSql(string sql)
         {
-            this.Context.Then(sql);
+            this.Context.AddSql(sql);
             return this;
         }
 

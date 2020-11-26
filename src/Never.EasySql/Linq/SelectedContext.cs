@@ -16,7 +16,7 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override SelectContext<Parameter, Table> Then(string sql)
+        public override SelectContext<Parameter, Table> AddSql(string sql)
         {
             return this;
         }
@@ -84,12 +84,12 @@ namespace Never.EasySql.Linq
             return string.Empty;
         }
 
-        public override SelectContext<Parameter, Table> AppenInWhereExists(WhereExistsInfo whereExists)
+        public override SelectContext<Parameter, Table> AddInWhereExists(WhereExistsInfo whereExists)
         {
             return this;
         }
 
-        public override SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereExists)
+        public override SelectContext<Parameter, Table> AddInWhereIn(WhereInInfo whereExists)
         {
             return this;
         }

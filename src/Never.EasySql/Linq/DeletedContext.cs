@@ -16,7 +16,7 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override DeleteContext<Parameter, Table> Then(string sql)
+        public override DeleteContext<Parameter, Table> AddSql(string sql)
         {
             return this;
         }

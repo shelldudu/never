@@ -137,7 +137,7 @@ namespace Never.EasySql.Linq
         /// 设为单条
         /// </summary>
         /// <returns></returns>
-        public SelectContext<Parameter, Table> SetSingle()
+        public virtual SelectContext<Parameter, Table> SetSingle()
         {
             this.isSingle = true;
             return this;
@@ -147,7 +147,7 @@ namespace Never.EasySql.Linq
         /// 设为单条
         /// </summary>
         /// <returns></returns>
-        public SelectContext<Parameter, Table> SetPage()
+        public virtual SelectContext<Parameter, Table> SetPage()
         {
             this.isSingle = false;
             return this;
@@ -323,9 +323,9 @@ namespace Never.EasySql.Linq
         public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null);
 
         /// <summary>
-        /// append
+        /// add sql
         /// </summary>
-        public abstract SelectContext<Parameter, Table> Then(string sql);
+        public abstract SelectContext<Parameter, Table> AddSql(string sql);
 
         /// <summary>
         /// join
@@ -352,13 +352,13 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public abstract SelectContext<Parameter, Table> AppenInWhereExists(WhereExistsInfo whereExists);
+        public abstract SelectContext<Parameter, Table> AddInWhereExists(WhereExistsInfo whereExists);
 
         /// <summary>
         /// where里面的in
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public abstract SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereIn);
+        public abstract SelectContext<Parameter, Table> AddInWhereIn(WhereInInfo whereIn);
     }
 }

@@ -319,7 +319,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override UpdateContext<Parameter, Table> Then(string sql)
+        public override UpdateContext<Parameter, Table> AddSql(string sql)
         {
             if (sql.IsNullOrEmpty())
                 return this;

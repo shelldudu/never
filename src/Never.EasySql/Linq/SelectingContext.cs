@@ -56,7 +56,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where的调用方法第一次
         /// </summary>
-        private bool onWhereInited;
+        protected bool onWhereInited;
 
         /// <summary>
         /// where的条数
@@ -169,39 +169,6 @@ namespace Never.EasySql.Linq
                         throw new Exception(string.Format("the table alias name {0} is equal alias Name {1}", a.AsName, tableName));
                 }
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        protected SelectContext<Parameter, Table> OnWhereExists()
-        {
-            var label = new TextLabel()
-            {
-                SqlText = this.LoadWhereExists(this.FromTable, this.AsTable, this.whereExists).ToString(),
-                TagId = NewId.GenerateNumber(),
-            };
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        protected SelectContext<Parameter, Table> OnWhereIn()
-        {
-            var label = new TextLabel()
-            {
-                SqlText = this.LoadWhereIn(this.FromTable, this.AsTable, this.whereIn).ToString(),
-                TagId = NewId.GenerateNumber(),
-            };
-
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
-            return this;
         }
 
         /// <summary>
@@ -478,7 +445,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> Then(string sql)
+        public override SelectContext<Parameter, Table> AddSql(string sql)
         {
             if (sql.IsNullOrEmpty())
                 return this;
@@ -495,7 +462,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereExists"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> AppenInWhereExists(WhereExistsInfo whereExists)
+        public override SelectContext<Parameter, Table> AddInWhereExists(WhereExistsInfo whereExists)
         {
             var label = new TextLabel()
             {
@@ -512,7 +479,7 @@ namespace Never.EasySql.Linq
         /// </summary>
         /// <param name="whereIn"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> AppenInWhereIn(WhereInInfo whereIn)
+        public override SelectContext<Parameter, Table> AddInWhereIn(WhereInInfo whereIn)
         {
             var label = new TextLabel()
             {

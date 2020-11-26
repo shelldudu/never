@@ -220,7 +220,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to update
         /// </summary>
         public UpdateGrammar<Parameter, Table> ToUpdate()
         {
@@ -364,7 +364,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to update
         /// </summary>
         public UpdateGrammar<Parameter, Table> ToUpdate()
         {
@@ -512,7 +512,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to update
         /// </summary>
         public UpdateGrammar<Parameter, Table> ToUpdate()
         {
@@ -588,7 +588,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to update
         /// </summary>
         public UpdateGrammar<Parameter, Table> ToUpdate()
         {
@@ -730,7 +730,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to where
         /// </summary>
         public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -885,7 +885,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to where
         /// </summary>
         public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1044,7 +1044,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to where
         /// </summary>
         public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1117,7 +1117,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to where
         /// </summary>
         public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1247,7 +1247,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to where
         /// </summary>
         public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1390,7 +1390,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to where
         /// </summary>
         public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1534,7 +1534,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to where
         /// </summary>
         public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1604,7 +1604,7 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// then
+        /// to where
         /// </summary>
         public UpdateWhereGrammar<Parameter, Table> ToWhere()
         {
@@ -1748,9 +1748,9 @@ namespace Never.EasySql.Linq
         /// 字符串
         /// </summary>
         /// <param name="sql">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public UpdateWhereGrammar<Parameter, Table> Then(string sql)
+        public UpdateWhereGrammar<Parameter, Table> AddSql(string sql)
         {
-            this.Context.Then(sql);
+            this.Context.AddSql(sql);
             return this;
         }
 

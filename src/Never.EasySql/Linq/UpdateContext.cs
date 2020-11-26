@@ -170,9 +170,9 @@ namespace Never.EasySql.Linq
         public abstract UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null);
 
         /// <summary>
-        /// append
+        /// add
         /// </summary>
-        public abstract UpdateContext<Parameter, Table> Then(string sql);
+        public abstract UpdateContext<Parameter, Table> AddSql(string sql);
 
         /// <summary>
         /// join

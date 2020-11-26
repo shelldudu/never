@@ -95,7 +95,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override UpdateContext<Parameter, Table> Then(string sql)
+        public override UpdateContext<Parameter, Table> AddSql(string sql)
         {
             return this;
         }
