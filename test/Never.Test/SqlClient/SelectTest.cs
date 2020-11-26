@@ -89,7 +89,7 @@ namespace Never.Test
              .GetResult();
 
             //推入
-            var insert = dao.ToEasyLinqDao(new User() { Id = 1, Name = "666", CreateTime = DateTime.Now, UserId = 555 }).Insert<User>()
+            var insert = dao.ToEasyLinqDao(new User() { Id = 1, Name = "666", CreateDate = DateTime.Now, UserId = 555 }).Insert<User>()
                 .UseSingle()
                 .InsertAll()
                 //.Colum(m => m.UserId)

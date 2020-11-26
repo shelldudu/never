@@ -284,11 +284,7 @@ namespace Never.EasySql.Linq
         public override DeleteContext<Parameter, Table> JoinOnDelete(List<JoinInfo> joins)
         {
             this.updateJoin = joins;
-            var label = new TextLabel()
-            {
-                SqlText = this.LoadJoin(this.FromTable, this.AsTable, joins).ToString(),
-                TagId = NewId.GenerateNumber(),
-            };
+            var label = this.LoadJoinLabel(this.FromTable, this.AsTable, joins, this.dao);
 
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
@@ -302,11 +298,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override DeleteContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
-            var label = new TextLabel()
-            {
-                SqlText = this.LoadWhereExists(this.FromTable, this.AsTable, whereExists).ToString(),
-                TagId = NewId.GenerateNumber(),
-            };
+            var label = this.LoadWhereExistsLabel(this.FromTable, this.AsTable, whereExists, this.dao);
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;
@@ -319,11 +311,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override DeleteContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn)
         {
-            var label = new TextLabel()
-            {
-                SqlText = this.LoadWhereIn(this.FromTable, this.AsTable, whereIn).ToString(),
-                TagId = NewId.GenerateNumber(),
-            };
+            var label = this.LoadWhereInLabel(this.FromTable, this.AsTable, whereIn, this.dao);
 
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;

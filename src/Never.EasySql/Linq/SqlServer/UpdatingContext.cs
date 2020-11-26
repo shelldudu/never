@@ -49,11 +49,7 @@ namespace Never.EasySql.Linq.SqlServer
         {
             if (this.updateJoin.IsNotNullOrEmpty())
             {
-                var label = new TextLabel()
-                {
-                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
-                    TagId = NewId.GenerateNumber(),
-                };
+                var label = this.LoadJoinLabel(this.FromTable, this.AsTable, updateJoin, this.dao);
 
                 this.labels.Add(label);
                 this.textLength += label.SqlText.Length;
@@ -81,11 +77,7 @@ namespace Never.EasySql.Linq.SqlServer
 
             if (this.updateJoin.IsNotNullOrEmpty())
             {
-                var label = new TextLabel()
-                {
-                    SqlText = this.LoadJoin(this.FromTable, this.AsTable, updateJoin).ToString(),
-                    TagId = NewId.GenerateNumber(),
-                };
+                var label = this.LoadJoinLabel(this.FromTable, this.AsTable, updateJoin, this.dao);
 
                 this.labels.Add(label);
                 this.textLength += label.SqlText.Length;

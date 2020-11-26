@@ -121,14 +121,19 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override SqlTagFormat GetSqlTagFormat(bool formatText = false)
         {
+            this.LoadOrderBy(true);
             var sqlTag = new LinqSqlTag(this.cacheId, "select")
             {
                 Labels = this.labels.AsEnumerable(),
                 TextLength = this.textLength,
             };
 
-            this.templateParameter["StartIndex"] = 0;
-            this.templateParameter["EndIndex"] = 1;
+            if (this.isSingle == false)
+            {
+                this.templateParameter["StartIndex"] = 0;
+                this.templateParameter["EndIndex"] = 1;
+            }
+
             return this.dao.GetSqlTagFormat<Parameter>(sqlTag.Clone(this.templateParameter), this.sqlParameter, formatText);
         }
 
@@ -142,10 +147,14 @@ namespace Never.EasySql.Linq
             {
                 var label = new TextLabel()
                 {
-                    SqlText = this.LoadOrderBy(this.orderBies).Insert(0, "\r").ToString(),
+                    SqlText = "\r",
                     TagId = NewId.GenerateNumber(),
                 };
 
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+
+                label = this.LoadOrderByLabel(this.orderBies, this.dao);
                 this.labels.Add(label);
                 this.textLength += label.SqlText.Length;
             }
@@ -285,12 +294,7 @@ namespace Never.EasySql.Linq
 
                 if (this.selectJoin.IsNotNullOrEmpty())
                 {
-                    var label = new TextLabel()
-                    {
-                        SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
-                        TagId = NewId.GenerateNumber(),
-                    };
-
+                    var label = this.LoadJoinLabel(this.FromTable, this.AsTable, selectJoin, this.dao);
                     this.labels.Add(label);
                     this.textLength += label.SqlText.Length;
                 }
@@ -356,12 +360,7 @@ namespace Never.EasySql.Linq
 
                 if (this.selectJoin.IsNotNullOrEmpty())
                 {
-                    var label2 = new TextLabel()
-                    {
-                        SqlText = this.LoadJoin(this.FromTable, this.AsTable, selectJoin).ToString(),
-                        TagId = NewId.GenerateNumber(),
-                    };
-
+                    var label2 = this.LoadJoinLabel(this.FromTable, this.AsTable, selectJoin, this.dao);
                     this.labels.Add(label2);
                     this.textLength += label.SqlText.Length;
                 }
@@ -464,11 +463,8 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override SelectContext<Parameter, Table> AddInWhereExists(WhereExistsInfo whereExists)
         {
-            var label = new TextLabel()
-            {
-                SqlText = this.LoadWhereExists(this.FromTable, this.AsTable, whereExists).ToString(),
-                TagId = NewId.GenerateNumber(),
-            };
+
+            var label = this.LoadWhereExistsLabel(this.FromTable, this.AsTable, whereExists, this.dao);
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;
@@ -481,12 +477,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override SelectContext<Parameter, Table> AddInWhereIn(WhereInInfo whereIn)
         {
-            var label = new TextLabel()
-            {
-                SqlText = this.LoadWhereIn(this.FromTable, this.AsTable, whereIn).ToString(),
-                TagId = NewId.GenerateNumber(),
-            };
-
+            var label = this.LoadWhereInLabel(this.FromTable, this.AsTable, whereIn, this.dao);
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;

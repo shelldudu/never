@@ -99,14 +99,14 @@ namespace Never.EasySql.Linq.SqlServer
             label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = ") as qwertyuiop",
+                SqlText = ") as qwertyuiop\r",
             };
             this.labels.Add(label);
 
             label = new TextLabel()
             {
                 TagId = NewId.GenerateNumber(),
-                SqlText = string.Concat("\r", "where", " qwertyuiop._ >= ", this.dao.SqlExecuter.GetParameterPrefix(), "StartIndex", " and qwertyuiop._ < ", this.dao.SqlExecuter.GetParameterPrefix(), "EndIndex"),
+                SqlText = string.Concat("where", " qwertyuiop._ >= ", this.dao.SqlExecuter.GetParameterPrefix(), "StartIndex", " and qwertyuiop._ <= ", this.dao.SqlExecuter.GetParameterPrefix(), "EndIndex"),
             };
 
 
@@ -127,9 +127,9 @@ namespace Never.EasySql.Linq.SqlServer
                 SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                 Name = "EndIndex",
                 OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length,
-                PrefixStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ < ".Length,
-                ParameterStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ < ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
-                ParameterStopIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ < ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length - 1,
+                PrefixStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ <= ".Length,
+                ParameterStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ <= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                ParameterStopIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ <= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length - 1,
                 TextParameter = false,
             });
 
@@ -190,13 +190,87 @@ namespace Never.EasySql.Linq.SqlServer
                 }
             }
 
-            this.rowNumberTextLabel.SqlText = string.Concat(", row_number() over (", this.LoadOrderBy(this.orderBies).ToString(), ") as _\r");
+            this.rowNumberTextLabel.SqlText = string.Concat(", row_number() over (", this.LoadOrderByContent(this.orderBies, this.dao).ToString(), ") as _\r");
             this.textLength += this.rowNumberTextLabel.SqlText.Length;
 
             if (clear)
                 this.orderBies.Clear();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="formatText"></param>
+        /// <returns></returns>
+        public override SqlTagFormat GetSqlTagFormat(bool formatText = false)
+        {
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = "select qwertyuiop.* from (",
+            };
+            this.labels.Insert(0, label);
+
+            label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = ") as qwertyuiop \r",
+            };
+            this.labels.Add(label);
+
+            label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat("where", " qwertyuiop._ >= ", this.dao.SqlExecuter.GetParameterPrefix(), "StartIndex", " and qwertyuiop._ <= ", this.dao.SqlExecuter.GetParameterPrefix(), "EndIndex"),
+            };
+
+
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = "StartIndex",
+                OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length,
+                PrefixStartIndex = "where qwertyuiop._ >= ".Length,
+                ParameterStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                ParameterStopIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length - 1,
+                TextParameter = false,
+            });
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = "EndIndex",
+                OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length,
+                PrefixStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ <= ".Length,
+                ParameterStartIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ <= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                ParameterStopIndex = "where qwertyuiop._ >= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex and qwertyuiop._ <= ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length - 1,
+                TextParameter = false,
+            });
+
+            this.labels.Add(label);
+
+            if (this.isSingle)
+            {
+                if (this.orderBies.IsNotNullOrEmpty())
+                    base.LoadOrderBy(true);
+            }
+            else
+            {
+                this.LoadRowNumber();
+            }
+            var sqlTag = new LinqSqlTag(this.cacheId, "select")
+            {
+                Labels = this.labels.AsEnumerable(),
+                TextLength = this.textLength,
+            };
+
+            int StartIndex = 0, EndIndex = 1;
+            this.templateParameter["StartIndex"] = StartIndex;
+            this.templateParameter["EndIndex"] = EndIndex;
+
+            return this.dao.GetSqlTagFormat<Parameter>(sqlTag.Clone(this.templateParameter), this.sqlParameter, formatText);
+        }
         /// <summary>
         /// 
         /// </summary>

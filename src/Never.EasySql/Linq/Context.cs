@@ -1,6 +1,7 @@
 ﻿using Never.Attributes;
 using Never.EasySql.Labels;
 using Never.Exceptions;
+using Never.Serialization.Json;
 using Never.Utils;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Never.EasySql.Linq
             public bool IsConstant;
 
             /// <summary>
-            /// 顺序,从0=参数，1=TableInfo
+            /// 顺序,从0=Parameter，1=Table
             /// </summary>
             public int Index;
         }
@@ -116,7 +117,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[this.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(this.Left.Exp));
                     }
                 }
@@ -133,7 +133,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[this.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(this.Right.Exp));
                     }
                 }
@@ -184,7 +183,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[this.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(this.Left.Exp));
                     }
                 }
@@ -219,7 +217,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[this.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(this.Right.Exp));
                     }
                 }
@@ -295,7 +292,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[this.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(this.Left.Exp));
                     }
                 }
@@ -312,7 +308,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[this.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(this.Right.Exp));
                     }
                 }
@@ -372,7 +367,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[this.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(this.Left.Exp));
                     }
                 }
@@ -407,7 +401,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[this.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(this.Right.Exp));
                     }
                 }
@@ -417,6 +410,7 @@ namespace Never.EasySql.Linq
             }
 
             #region netsted
+
             private struct InMethodBlock
             {
                 public string ToString(MethodBlock method, string[] leftPlaceholders, Context context)
@@ -431,7 +425,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Left.Exp));
                     }
 
@@ -446,7 +439,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Right.Exp));
                     }
 
@@ -492,7 +484,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Left.Exp));
                     }
 
@@ -526,7 +517,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Right.Exp));
                     }
 
@@ -550,7 +540,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Left.Exp));
                     }
 
@@ -564,7 +553,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Right.Exp));
                     }
 
@@ -604,7 +592,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Left.Exp));
                     }
 
@@ -635,7 +622,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Right.Exp));
                     }
 
@@ -659,7 +645,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Left.Exp));
                     }
 
@@ -673,7 +658,6 @@ namespace Never.EasySql.Linq
                     {
                         sb.Append(" like %");
                         sb.Append(leftPlaceholders[method.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Right.Exp));
                     }
 
@@ -713,7 +697,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Left.Exp));
                     }
 
@@ -745,7 +728,6 @@ namespace Never.EasySql.Linq
                     {
                         sb.Append(" like %");
                         sb.Append(leftPlaceholders[method.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Right.Exp));
                     }
 
@@ -769,7 +751,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Left.Exp));
                     }
 
@@ -783,7 +764,6 @@ namespace Never.EasySql.Linq
                     {
                         sb.Append(" like ");
                         sb.Append(leftPlaceholders[method.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Right.Exp));
                         sb.Append("%");
                     }
@@ -824,7 +804,6 @@ namespace Never.EasySql.Linq
                     else
                     {
                         sb.Append(leftPlaceholders[method.Left.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Left.Exp));
                     }
 
@@ -857,7 +836,6 @@ namespace Never.EasySql.Linq
                     {
                         sb.Append(" like ");
                         sb.Append(leftPlaceholders[method.Right.Index]);
-                        sb.Append(".");
                         sb.Append(context.FormatColumn(method.Right.Exp));
                         sb.Append("%");
                     }
@@ -1604,7 +1582,7 @@ namespace Never.EasySql.Linq
 
             if (leftConfirm == false)
             {
-                throw new Exception("");
+                throw new Exception("无法解析左侧表达式内容");
             }
 
             /*.Left不为空，则说明第一个参数是在左侧*/
@@ -2167,7 +2145,7 @@ namespace Never.EasySql.Linq
             if (this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection) == false)
                 return false;
 
-            var pp = new[] { expression.Parameters[1].Name, tableNameOrTableAliasName };
+            var pp = new[] { parameterPrefix, string.Concat(tableNameOrTableAliasName, ".") };
             if (collection == null)
                 collection = new List<ILabel>(whereCollection.Count());
 
@@ -2183,24 +2161,23 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="parameterTableName"></param>
-        /// <param name="parameterAsTableName"></param>
+        /// <param name="fromTable"></param>
+        /// <param name="asTableName"></param>
         /// <param name="joins"></param>
+        /// <param name="dao"></param>
         /// <returns></returns>
-        protected StringBuilder LoadJoin(string parameterTableName, string parameterAsTableName, List<JoinInfo> joins)
+        protected StringBuilder LoadJoinContent(string fromTable, string asTableName, List<JoinInfo> joins, IDao dao)
         {
             var builder = new StringBuilder(joins.Count * 20);
-            var pp = new[] { "" }.Concat(joins.Select(ta => ta.AsName)).ToArray();
-            pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
-
+            var pp = new[] { dao.SqlExecuter.GetParameterPrefix(), string.Concat(asTableName.IsNullOrEmpty() ? fromTable : asTableName, ".") }.Concat(joins.Select(ta => string.Concat(ta.AsName, "."))).ToArray();
             var whereCollection = new List<BlockExpression>();
             var analyzeParameters = new List<AnalyzeParameter>();
             for (int i = 0, j = joins.Count; i < j; i++)
             {
                 var item = joins[i];
-                //join是从第二张表开始的
-                if (item.Types.Length != (i + 2))
-                    throw new Exception(string.Format("parameter typs not padding,the left length is {0}, and the right length is {1}", joins[i].Types.Length, i + 2));
+                //join是从第二张表开始的，分别是Parameter,Table,Table1
+                if (item.Types.Length != (i + 3))
+                    throw new Exception(string.Format("parameter typs not padding,the left length is {0}, and the right length is {1}", joins[i].Types.Length, i + 3));
 
                 whereCollection.Clear();
                 analyzeParameters.Clear();
@@ -2266,18 +2243,33 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// loadLable
+        /// </summary>
+        /// <param name="fromTable"></param>
+        /// <param name="asTableName"></param>
+        /// <param name="joins"></param>
+        /// <param name="dao"></param>
+        /// <returns></returns>
+        protected TextLabel LoadJoinLabel(string fromTable, string asTableName, List<JoinInfo> joins, IDao dao)
+        {
+            var sql = this.LoadJoinContent(fromTable, asTableName, joins, dao).ToString();
+            var label = new SqlTag().ReadTextNodeUsingFormatLine(sql, new ThunderWriter(sql.Length), new SequenceStringReader("1"), dao.SqlExecuter.GetParameterPrefix(), true);
+            label.TagId = NewId.GenerateNumber();
+            return label;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
-        /// <param name="parameterTableName"></param>
-        /// <param name="parameterAsTableName"></param>
+        /// <param name="fromTable"></param>
+        /// <param name="asTableName"></param>
         /// <param name="whereExists"></param>
+        /// <param name="dao"></param>
         /// <returns></returns>
-        protected StringBuilder LoadWhereExists(string parameterTableName, string parameterAsTableName, WhereExistsInfo whereExists)
+        protected StringBuilder LoadWhereExistsContent(string fromTable, string asTableName, WhereExistsInfo whereExists, IDao dao)
         {
             var builder = new StringBuilder((1 + 1 + whereExists.Joins.Count) * 20);
-            var pp = new[] { "", whereExists.AsName }.Concat(whereExists.Joins.Select(ta => this.FormatColumn(ta.AsName))).ToArray();
-            pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
-
+            var pp = new[] { dao.SqlExecuter.GetParameterPrefix(), string.Concat(asTableName.IsNullOrEmpty() ? fromTable : asTableName, ".") }.Concat(whereExists.Joins.Select(ta => string.Concat(ta.AsName, "."))).ToArray();
             var whereCollection = new List<BlockExpression>();
             var analyzeParameters = new List<AnalyzeParameter>();
             LambdaExpression lambda = whereExists.Where;
@@ -2418,16 +2410,31 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="parameterTableName"></param>
-        /// <param name="parameterAsTableName"></param>
-        /// <param name="whereIn"></param>
+        /// <param name="fromTable"></param>
+        /// <param name="asTableName"></param>
+        /// <param name="whereExists"></param>
+        /// <param name="dao"></param>
         /// <returns></returns>
-        protected StringBuilder LoadWhereIn(string parameterTableName, string parameterAsTableName, WhereInInfo whereIn)
+        protected TextLabel LoadWhereExistsLabel(string fromTable, string asTableName, WhereExistsInfo whereExists, IDao dao)
+        {
+            var sql = this.LoadWhereExistsContent(fromTable, asTableName, whereExists, dao).ToString();
+            var label = new SqlTag().ReadTextNodeUsingFormatLine(sql, new ThunderWriter(sql.Length), new SequenceStringReader("1"), dao.SqlExecuter.GetParameterPrefix(), true);
+            label.TagId = NewId.GenerateNumber();
+            return label;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fromTable"></param>
+        /// <param name="asTableName"></param>
+        /// <param name="whereIn"></param>
+        /// <param name="dao"></param>
+        /// <returns></returns>
+        protected StringBuilder LoadWhereInContent(string fromTable, string asTableName, WhereInInfo whereIn, IDao dao)
         {
             var builder = new StringBuilder((1 + 1 + whereIn.Joins.Count) * 20);
-            var pp = new[] { "", whereIn.AsName }.Concat(whereIn.Joins.Select(ta => ta.AsName)).ToArray();
-            pp[0] = parameterAsTableName.IsNullOrEmpty() ? parameterTableName : parameterAsTableName;
-
+            var pp = new[] { dao.SqlExecuter.GetParameterPrefix(), string.Concat(asTableName.IsNullOrEmpty() ? fromTable : asTableName, ".") }.Concat(whereIn.Joins.Select(ta => string.Concat(ta.AsName, "."))).ToArray();
             var whereCollection = new List<BlockExpression>();
             var analyzeParameters = new List<AnalyzeParameter>();
             LambdaExpression lambda = whereIn.Field;
@@ -2458,15 +2465,15 @@ namespace Never.EasySql.Linq
                 throw new Exception("in expression must like this (p,t)=>p.Id == t.Id");
 
             builder.Append(whereIn.AndOrOption == AndOrOption.and ? "and " : "or ");
-            if (parameterAsTableName.IsNullOrEmpty())
+            if (asTableName.IsNullOrEmpty())
             {
-                builder.Append(parameterTableName);
+                builder.Append(asTableName);
                 builder.Append(".");
                 builder.Append(whereCollection[0].Left.Exp);
             }
             else
             {
-                builder.Append(parameterAsTableName);
+                builder.Append(asTableName);
                 builder.Append(".");
                 builder.Append(whereCollection[0].Left.Exp);
             }
@@ -2592,9 +2599,25 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="fromTable"></param>
+        /// <param name="asTableName"></param>
+        /// <param name="whereIn"></param>
+        /// <param name="dao"></param>
+        protected TextLabel LoadWhereInLabel(string fromTable, string asTableName, WhereInInfo whereIn, IDao dao)
+        {
+            var sql = this.LoadWhereInContent(fromTable, asTableName, whereIn, dao).ToString();
+            var label = new SqlTag().ReadTextNodeUsingFormatLine(sql, new ThunderWriter(sql.Length), new SequenceStringReader("1"), dao.SqlExecuter.GetParameterPrefix(), true);
+            label.TagId = NewId.GenerateNumber();
+            return label;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="orderBies"></param>
+        /// <param name="dao"></param>
         /// <returns></returns>
-        protected StringBuilder LoadOrderBy(List<OrderByInfo> orderBies)
+        protected StringBuilder LoadOrderByContent(List<OrderByInfo> orderBies, IDao dao)
         {
             var builder = new StringBuilder(orderBies.Count * 20);
             if (orderBies.IsNullOrEmpty())
@@ -2609,6 +2632,7 @@ namespace Never.EasySql.Linq
 
                 if (i > 0)
                     builder.Append(",");
+
                 builder.Append(item.Placeholder);
                 builder.Append(".");
                 builder.Append(this.FormatColumn(columnName));
@@ -2617,6 +2641,20 @@ namespace Never.EasySql.Linq
             }
 
             return builder;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderBies"></param>
+        /// <param name="dao"></param>
+        /// <returns></returns>
+        protected TextLabel LoadOrderByLabel(List<OrderByInfo> orderBies, IDao dao)
+        {
+            var sql = this.LoadOrderByContent(orderBies, dao).ToString();
+            var label = new SqlTag().ReadTextNodeUsingFormatLine(sql, new ThunderWriter(sql.Length), new SequenceStringReader("1"), dao.SqlExecuter.GetParameterPrefix(), true);
+            label.TagId = NewId.GenerateNumber();
+            return label;
         }
         #endregion
     }
