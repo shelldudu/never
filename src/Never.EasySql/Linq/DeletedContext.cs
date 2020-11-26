@@ -16,7 +16,7 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override DeleteContext<Parameter, Table> Append(string sql)
+        public override DeleteContext<Parameter, Table> Then(string sql)
         {
             return this;
         }
@@ -51,12 +51,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
-        {
-            return this;
-        }
-
-        public override DeleteContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
+        public override DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null)
         {
             return this;
         }

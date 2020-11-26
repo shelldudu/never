@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -128,7 +129,7 @@ namespace Never.EasySql
     /// 可遍历对象的可空类型
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class EnumerableNullableParameter<T> : INullableParameter, IGenericeNullableParameter<IEnumerable<T>>
+    public class EnumerableNullableParameter<T> : INullableParameter, IGenericeNullableParameter<IEnumerable<T>>, IEnumerable<T>
     {
         private readonly IEnumerable<T> value = null;
 
@@ -152,5 +153,29 @@ namespace Never.EasySql
         /// 值
         /// </summary>
         public IEnumerable<T> TValue => this.value;
+
+        /// <summary>
+        /// get enumerator
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<T> GetEnumerator()
+        {
+            if (this.HasValue)
+                return this.value.GetEnumerator();
+
+            return Enumerable.Empty<T>().GetEnumerator();
+        }
+
+        /// <summary>
+        /// get enumerator
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            if (this.HasValue)
+                return this.value.GetEnumerator();
+
+            return Enumerable.Empty<T>().GetEnumerator();
+        }
     }
 }

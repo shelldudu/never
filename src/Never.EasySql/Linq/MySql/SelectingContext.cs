@@ -47,10 +47,11 @@ namespace Never.EasySql.Linq.MySql
         /// wehre
         /// </summary>
         /// <param name="expression"></param>
+        /// <param name="andOr"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null)
         {
-            return base.Where(expression);
+            return base.Where(expression, andOr);
         }
 
         /// <summary>

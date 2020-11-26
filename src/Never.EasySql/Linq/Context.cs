@@ -1,4 +1,5 @@
-﻿using Never.EasySql.Labels;
+﻿using Never.Attributes;
+using Never.EasySql.Labels;
 using Never.Exceptions;
 using Never.Utils;
 using System;
@@ -32,7 +33,7 @@ namespace Never.EasySql.Linq
             public bool IsConstant;
 
             /// <summary>
-            /// 顺序,从0开始
+            /// 顺序,从0=参数，1=TableInfo
             /// </summary>
             public int Index;
         }
@@ -233,6 +234,30 @@ namespace Never.EasySql.Linq
         /// </summary>
         public class MethodBlock : BlockExpression
         {
+
+            /// <summary>
+            /// methods
+            /// </summary>
+            private static readonly IList<MethodInfo> methods;
+
+            /// <summary>
+            /// 是否包含
+            /// </summary>
+            /// <param name="methodInfo"></param>
+            /// <returns></returns>
+            public static bool Contains(MethodInfo methodInfo)
+            {
+                if (methodInfo.IsGenericMethod)
+                    return methods.Any(t => t == methodInfo.GetGenericMethodDefinition());
+
+                return methods.Any(t => t == methodInfo);
+            }
+
+            static MethodBlock()
+            {
+                methods = typeof(EasySqlExtension).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(t => t.GetAttribute<SummaryAttribute>() != null).ToList();
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -249,6 +274,15 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public override string ToString(string[] leftPlaceholders, Context context)
             {
+                if (this.Method.IsEquals("in", StringComparison.OrdinalIgnoreCase))
+                    return new InMethodBlock().ToString(this, leftPlaceholders, context);
+                if (this.Method.IsEquals("like", StringComparison.OrdinalIgnoreCase))
+                    return new LikeMethodBlock().ToString(this, leftPlaceholders, context);
+                if (this.Method.IsEquals("leftlike", StringComparison.OrdinalIgnoreCase))
+                    return new LeftLikeMethodBlock().ToString(this, leftPlaceholders, context);
+                if (this.Method.IsEquals("rightlike", StringComparison.OrdinalIgnoreCase))
+                    return new RightLikeMethodBlock().ToString(this, leftPlaceholders, context);
+
                 var sb = new StringBuilder(30);
                 if (this.Left != null)
                 {
@@ -296,6 +330,15 @@ namespace Never.EasySql.Linq
             /// <returns></returns>
             public override ILabel ToLabel(string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
             {
+                if (this.Method.IsEquals("in", StringComparison.OrdinalIgnoreCase))
+                    return new InMethodBlock().ToLabel(this, leftPlaceholders, context, parameterPrefix, parameterIndex);
+                if (this.Method.IsEquals("like", StringComparison.OrdinalIgnoreCase))
+                    return new LikeMethodBlock().ToLabel(this, leftPlaceholders, context, parameterPrefix, parameterIndex);
+                if (this.Method.IsEquals("leftlike", StringComparison.OrdinalIgnoreCase))
+                    return new LeftLikeMethodBlock().ToLabel(this, leftPlaceholders, context, parameterPrefix, parameterIndex);
+                if (this.Method.IsEquals("rightlike", StringComparison.OrdinalIgnoreCase))
+                    return new RightLikeMethodBlock().ToLabel(this, leftPlaceholders, context, parameterPrefix, parameterIndex);
+
                 var label = new TextLabel()
                 {
                     TagId = NewId.GenerateNumber(),
@@ -372,6 +415,460 @@ namespace Never.EasySql.Linq
                 label.SqlText = sb.ToString();
                 return label;
             }
+
+            #region netsted
+            private struct InMethodBlock
+            {
+                public string ToString(MethodBlock method, string[] leftPlaceholders, Context context)
+                {
+                    var sb = new StringBuilder(30);
+                    if (method.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Left.Exp));
+                    }
+
+                    sb.Append(" in (");
+
+                    if (method.Right.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Right.Exp));
+                    }
+
+                    sb.Append(") ");
+
+                    return sb.ToString();
+                }
+
+                public ILabel ToLabel(MethodBlock method, string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
+                {
+                    var arraylabel = new ArrayLabel()
+                    {
+                        TagId = NewId.GenerateNumber(),
+                        Split = ",",
+                        Line = new TextLabel(),
+                        SqlText = string.Empty,
+                    };
+
+                    var sb = new StringBuilder(200);
+                    if (method.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else if (method.Left.Index == parameterIndex)
+                    {
+                        sb.Append(parameterPrefix);
+                        sb.Append(method.Left.Exp);
+                        arraylabel.Parameter = method.Left.Exp;
+                        arraylabel.Line.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = method.Left.Exp,
+                            OccupanLength = parameterPrefix.Length + method.Left.Exp.Length,
+                            PrefixStartIndex = 0,
+                            ParameterStartIndex = 0 + 1,
+                            ParameterStopIndex = 0 + 1 + method.Left.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Left.Exp));
+                    }
+
+
+                    sb.Append(" in (");
+
+                    if (method.Right.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else if (method.Right.Index == parameterIndex)
+                    {
+                        var start = sb.Length;
+                        sb.Append(parameterPrefix);
+                        sb.Append(method.Right.Exp);
+                        arraylabel.Parameter = method.Right.Exp;
+                        arraylabel.Line.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = method.Right.Exp,
+                            OccupanLength = parameterPrefix.Length + method.Right.Exp.Length,
+                            PrefixStartIndex = start + 0,
+                            ParameterStartIndex = start + 1,
+                            ParameterStopIndex = start + 1 + method.Right.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Right.Exp));
+                    }
+
+                    sb.Append(") ");
+                    arraylabel.Line.SqlText = sb.ToString();
+                    return arraylabel;
+                }
+            }
+
+            private struct LikeMethodBlock
+            {
+                public string ToString(MethodBlock method, string[] leftPlaceholders, Context context)
+                {
+                    var sb = new StringBuilder(30);
+                    if (method.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Left.Exp));
+                    }
+
+                    sb.Append(" like ");
+                    if (method.Right.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Right.Exp));
+                    }
+
+                    sb.Append(" ");
+                    return sb.ToString();
+                }
+                public ILabel ToLabel(MethodBlock method, string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
+                {
+                    var label = new TextLabel()
+                    {
+                        TagId = NewId.GenerateNumber(),
+                    };
+
+                    var sb = new StringBuilder(200);
+                    if (method.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else if (method.Left.Index == parameterIndex)
+                    {
+                        sb.Append(parameterPrefix);
+                        sb.Append(method.Left.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = method.Left.Exp,
+                            OccupanLength = parameterPrefix.Length + method.Left.Exp.Length,
+                            PrefixStartIndex = 0,
+                            ParameterStartIndex = 0 + 1,
+                            ParameterStopIndex = 0 + 1 + method.Left.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Left.Exp));
+                    }
+
+                    sb.Append(" like ");
+                    if (method.Right.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else if (method.Right.Index == parameterIndex)
+                    {
+                        var start = sb.Length;
+                        sb.Append(parameterPrefix);
+                        sb.Append(method.Right.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = method.Right.Exp,
+                            OccupanLength = parameterPrefix.Length + method.Right.Exp.Length,
+                            PrefixStartIndex = start + 0,
+                            ParameterStartIndex = start + 1,
+                            ParameterStopIndex = start + 1 + method.Right.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Right.Exp));
+                    }
+
+                    sb.Append(" ");
+
+                    label.SqlText = sb.ToString();
+                    return label;
+                }
+            }
+            private struct LeftLikeMethodBlock
+            {
+                public string ToString(MethodBlock method, string[] leftPlaceholders, Context context)
+                {
+                    var sb = new StringBuilder(30);
+                    if (method.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Left.Exp));
+                    }
+
+                    if (method.Right.IsConstant)
+                    {
+                        sb.Append(" like '%");
+                        sb.Append(method.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(" like %");
+                        sb.Append(leftPlaceholders[method.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Right.Exp));
+                    }
+
+                    sb.Append(" ");
+                    return sb.ToString();
+                }
+                public ILabel ToLabel(MethodBlock method, string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
+                {
+                    var label = new TextLabel()
+                    {
+                        TagId = NewId.GenerateNumber(),
+                    };
+
+                    var sb = new StringBuilder(200);
+                    if (method.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else if (method.Left.Index == parameterIndex)
+                    {
+                        sb.Append(parameterPrefix);
+                        sb.Append(method.Left.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = method.Left.Exp,
+                            OccupanLength = parameterPrefix.Length + method.Left.Exp.Length,
+                            PrefixStartIndex = 0,
+                            ParameterStartIndex = 0 + 1,
+                            ParameterStopIndex = 0 + 1 + method.Left.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Left.Exp));
+                    }
+
+                    if (method.Right.IsConstant)
+                    {
+                        sb.Append(" like '%");
+                        sb.Append(method.Right.Exp);
+                        sb.Append("'");
+                    }
+                    else if (method.Right.Index == parameterIndex)
+                    {
+                        sb.Append(" like %");
+                        var start = sb.Length;
+                        sb.Append(parameterPrefix);
+                        sb.Append(method.Right.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = method.Right.Exp,
+                            OccupanLength = parameterPrefix.Length + method.Right.Exp.Length,
+                            PrefixStartIndex = start + 0,
+                            ParameterStartIndex = start + 1,
+                            ParameterStopIndex = start + 1 + method.Right.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(" like %");
+                        sb.Append(leftPlaceholders[method.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Right.Exp));
+                    }
+
+                    sb.Append(" ");
+
+                    label.SqlText = sb.ToString();
+                    return label;
+                }
+            }
+            private struct RightLikeMethodBlock
+            {
+                public string ToString(MethodBlock method, string[] leftPlaceholders, Context context)
+                {
+                    var sb = new StringBuilder(30);
+                    if (method.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Left.Exp));
+                    }
+
+                    if (method.Right.IsConstant)
+                    {
+                        sb.Append(" like '");
+                        sb.Append(method.Right.Exp);
+                        sb.Append("%'");
+                    }
+                    else
+                    {
+                        sb.Append(" like ");
+                        sb.Append(leftPlaceholders[method.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Right.Exp));
+                        sb.Append("%");
+                    }
+
+                    sb.Append(" ");
+                    return sb.ToString();
+                }
+                public ILabel ToLabel(MethodBlock method, string[] leftPlaceholders, Context context, string parameterPrefix, int parameterIndex)
+                {
+                    var label = new TextLabel()
+                    {
+                        TagId = NewId.GenerateNumber(),
+                    };
+
+                    var sb = new StringBuilder(200);
+                    if (method.Left.IsConstant)
+                    {
+                        sb.Append("'");
+                        sb.Append(method.Left.Exp);
+                        sb.Append("'");
+                    }
+                    else if (method.Left.Index == parameterIndex)
+                    {
+                        sb.Append(parameterPrefix);
+                        sb.Append(method.Left.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = method.Left.Exp,
+                            OccupanLength = parameterPrefix.Length + method.Left.Exp.Length,
+                            PrefixStartIndex = 0,
+                            ParameterStartIndex = 0 + 1,
+                            ParameterStopIndex = 0 + 1 + method.Left.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                    }
+                    else
+                    {
+                        sb.Append(leftPlaceholders[method.Left.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Left.Exp));
+                    }
+
+                    if (method.Right.IsConstant)
+                    {
+                        sb.Append(" like '");
+                        sb.Append(method.Right.Exp);
+                        sb.Append("%'");
+                    }
+                    else if (method.Right.Index == parameterIndex)
+                    {
+                        sb.Append(" like ");
+                        var start = sb.Length;
+                        sb.Append(parameterPrefix);
+                        sb.Append(method.Right.Exp);
+                        label.Add(new SqlTagParameterPosition()
+                        {
+                            ActualPrefix = parameterPrefix,
+                            SourcePrefix = parameterPrefix,
+                            Name = method.Right.Exp,
+                            OccupanLength = parameterPrefix.Length + method.Right.Exp.Length,
+                            PrefixStartIndex = start + 0,
+                            ParameterStartIndex = start + 1,
+                            ParameterStopIndex = start + 1 + method.Right.Exp.Length - 1,
+                            TextParameter = false,
+                        });
+                        sb.Append("%");
+                    }
+                    else
+                    {
+                        sb.Append(" like ");
+                        sb.Append(leftPlaceholders[method.Right.Index]);
+                        sb.Append(".");
+                        sb.Append(context.FormatColumn(method.Right.Exp));
+                        sb.Append("%");
+                    }
+
+                    sb.Append(" ");
+
+                    label.SqlText = sb.ToString();
+                    return label;
+                }
+            }
+            #endregion
         }
 
         /// <summary>
@@ -1222,60 +1719,56 @@ namespace Never.EasySql.Linq
             }
 
             MethodBlock blockExpression = new MethodBlock();
-            switch (method.Method.Name)
+            if (MethodBlock.Contains(method.Method))
             {
-                case "Contains":
+                blockExpression.Method = method.Method.Name;
+                //left
+                if (method.Arguments[0].NodeType == ExpressionType.Constant)
+                {
+                    blockExpression.Left = new BlockSetting()
                     {
-                        blockExpression.Method = method.Method.Name;
-                        if (method.Arguments[0].NodeType == ExpressionType.Constant)
-                        {
-                            blockExpression.Right = new BlockSetting()
-                            {
-                                Exp = ((ConstantExpression)method.Arguments[0].Reduce()).Value.ToString(),
-                                IsConstant = true,
-                                Index = 0,
-                            };
-                        }
-                        else
-                        {
-                            int index = leftOrRight((System.Linq.Expressions.MemberExpression)method.Arguments[0]);
-                            blockExpression.Right = new BlockSetting()
-                            {
-                                Exp = this.FindColumnName(matchTable(index), ((System.Linq.Expressions.MemberExpression)method.Arguments[0]).Member),
-                                IsConstant = false,
-                                Index = index,
-                            };
-                        }
-                        if (method.Arguments[1].NodeType == ExpressionType.Constant)
-                        {
-                            blockExpression.Left = new BlockSetting()
-                            {
-                                Exp = ((ConstantExpression)method.Arguments[1].Reduce()).Value.ToString(),
-                                IsConstant = true,
-                                Index = 0,
-                            };
-                        }
-                        else
-                        {
-                            int index = leftOrRight((System.Linq.Expressions.MemberExpression)method.Arguments[1]);
-                            blockExpression.Left = new BlockSetting()
-                            {
-                                Exp = this.FindColumnName(matchTable(index), ((System.Linq.Expressions.MemberExpression)method.Arguments[1]).Member),
-                                IsConstant = false,
-                                Index = index,
-                            };
-                        }
-                    }
-                    break;
-                default:
+                        Exp = ((ConstantExpression)method.Arguments[0].Reduce()).Value.ToString(),
+                        IsConstant = true,
+                        Index = 0,
+                    };
+                }
+                else
+                {
+                    int index = leftOrRight((System.Linq.Expressions.MemberExpression)method.Arguments[0]);
+                    blockExpression.Left = new BlockSetting()
                     {
-                        return false;
-                    }
+                        Exp = this.FindColumnName(matchTable(index), ((System.Linq.Expressions.MemberExpression)method.Arguments[0]).Member),
+                        IsConstant = false,
+                        Index = index,
+                    };
+                }
 
+                //right
+                if (method.Arguments[1].NodeType == ExpressionType.Constant)
+                {
+                    blockExpression.Right = new BlockSetting()
+                    {
+                        Exp = ((ConstantExpression)method.Arguments[1].Reduce()).Value.ToString(),
+                        IsConstant = true,
+                        Index = 1,
+                    };
+                }
+                else
+                {
+                    int index = leftOrRight((System.Linq.Expressions.MemberExpression)method.Arguments[1]);
+                    blockExpression.Right = new BlockSetting()
+                    {
+                        Exp = this.FindColumnName(matchTable(index), ((System.Linq.Expressions.MemberExpression)method.Arguments[1]).Member),
+                        IsConstant = false,
+                        Index = index,
+                    };
+                }
+
+                whereCollection.Add(blockExpression);
+                return true;
             }
 
-            whereCollection.Add(blockExpression);
-            return true;
+            throw new Exception(string.Format("custom method is {0} not support", method.Method.Name));
         }
 
         /// <summary>
@@ -1660,7 +2153,7 @@ namespace Never.EasySql.Linq
         {
             var whereCollection = new List<BlockExpression>();
             var analyzeParameters = new List<AnalyzeParameter>();
-            var types = new[] { typeof(Table), typeof(Parameter) };
+            var types = new[] { typeof(Parameter), typeof(Table) };
             for (var k = 0; k < 2; k++)
             {
                 analyzeParameters.Add(new AnalyzeParameter()
@@ -1674,14 +2167,14 @@ namespace Never.EasySql.Linq
             if (this.AnalyzeBooleanExpression(expression.Body, analyzeParameters, whereCollection) == false)
                 return false;
 
-            var pp = new[] { tableNameOrTableAliasName, expression.Parameters[1].Name };
+            var pp = new[] { expression.Parameters[1].Name, tableNameOrTableAliasName };
             if (collection == null)
                 collection = new List<ILabel>(whereCollection.Count());
 
             foreach (var where in whereCollection)
             {
-                //1标识第二个是参数，因为索引从0开始
-                collection.Add(where.ToLabel(pp, this, parameterPrefix, 1));
+                //1标识第一个是参数，因为索引从0开始
+                collection.Add(where.ToLabel(pp, this, parameterPrefix, 0));
             }
 
             return true;

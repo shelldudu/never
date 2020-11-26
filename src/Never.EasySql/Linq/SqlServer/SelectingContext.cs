@@ -47,10 +47,11 @@ namespace Never.EasySql.Linq.SqlServer
         /// wehre
         /// </summary>
         /// <param name="expression"></param>
+        /// <param name="andOr"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null)
         {
-            return base.Where(expression);
+            return base.Where(expression, andOr);
         }
 
         /// <summary>
@@ -106,10 +107,10 @@ namespace Never.EasySql.Linq.SqlServer
 
             if (this.orderBies.IsNullOrEmpty())
             {
-                var primary = this.tableInfo.Columns.Where(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.Primary);
+                var primary = this.tableInfo.Columns.Where(ta => ta.Column != null && ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.Primary);
                 if (primary.IsNullOrEmpty())
                 {
-                    primary = this.tableInfo.Columns.Where(ta => ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement);
+                    primary = this.tableInfo.Columns.Where(ta => ta.Column != null && ta.Column.Optional == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement);
                 }
                 if (primary.IsNullOrEmpty())
                 {

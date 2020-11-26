@@ -127,17 +127,12 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression);
-
-        /// <summary>
-        /// where
-        /// </summary>
-        public abstract DeleteContext<Parameter, Table> Where(AndOrOption andOrOption, string sql);
+        public abstract DeleteContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null);
 
         /// <summary>
         /// append
         /// </summary>
-        public abstract DeleteContext<Parameter, Table> Append(string sql);
+        public abstract DeleteContext<Parameter, Table> Then(string sql);
 
         /// <summary>
         /// join

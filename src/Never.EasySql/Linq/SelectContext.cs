@@ -320,17 +320,12 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where
         /// </summary>
-        public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression);
+        public abstract SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null);
 
         /// <summary>
         /// append
         /// </summary>
-        public abstract SelectContext<Parameter, Table> Append(string sql);
-
-        /// <summary>
-        /// last
-        /// </summary>
-        public abstract SelectContext<Parameter, Table> Last(string sql);
+        public abstract SelectContext<Parameter, Table> Then(string sql);
 
         /// <summary>
         /// join

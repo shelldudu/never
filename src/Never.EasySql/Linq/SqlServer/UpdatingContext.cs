@@ -65,7 +65,7 @@ namespace Never.EasySql.Linq.SqlServer
         /// <summary>
         /// where 条件
         /// </summary>
-        public override UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
+        public override UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null)
         {
             if (this.AsTable.IsNotNullOrEmpty())
             {

@@ -1,4 +1,5 @@
 ﻿using Never.EasySql.Labels;
+using Never.Serialization.Json;
 using Never.Utils;
 using System;
 using System.Collections.Generic;
@@ -273,7 +274,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where 条件
         /// </summary>
-        public override UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
+        public override UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null)
         {
             var label = new TextLabel()
             {
@@ -287,7 +288,7 @@ namespace Never.EasySql.Linq
             }
             else
             {
-                label.SqlText = string.Concat("and ");
+                label.SqlText = andOr == null ? "and " : string.Concat(andOr, " ");
             }
 
             this.labels.Add(label);
@@ -314,38 +315,18 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// where sql
-        /// </summary>
-        /// <param name="andOrOption"></param>
-        /// <param name="sql"></param>
-        /// <returns></returns>
-        public override UpdateContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
-        {
-            var label = new TextLabel()
-            {
-                SqlText = string.Concat(andOrOption == AndOrOption.and ? "and " : "or ", sql),
-                TagId = NewId.GenerateNumber(),
-            };
-            this.labels.Add(label);
-            this.textLength += label.SqlText.Length;
-            return this;
-        }
-
-        /// <summary>
         /// 结束
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override UpdateContext<Parameter, Table> Append(string sql)
+        public override UpdateContext<Parameter, Table> Then(string sql)
         {
             if (sql.IsNullOrEmpty())
                 return this;
 
-            var label = new TextLabel()
-            {
-                SqlText = sql,
-                TagId = NewId.GenerateNumber(),
-            };
+
+            var label = new SqlTag().ReadTextNodeUsingFormatLine(sql, new ThunderWriter(sql.Length), new SequenceStringReader("1"), this.dao.SqlExecuter.GetParameterPrefix(), true);
+            label.TagId = NewId.GenerateNumber();
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;

@@ -162,14 +162,38 @@ namespace Never.EasySql
         }
 
         /// <summary>
-        /// 包含
+        /// In
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <param name="target"></param>
         /// <returns></returns>
         [Summary(Descn = "linq extension method")]
-        public static bool Contains<T>(this EnumerableNullableParameter<T> value, T target)
+        public static bool In<T>(this T target, EnumerableNullableParameter<T> value) where T : struct, IConvertible
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// In
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        [Summary(Descn = "linq extension method")]
+        public static bool In(this string target, EnumerableNullableParameter<string> value)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// In
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        [Summary(Descn = "linq extension method")]
+        public static bool In(this Guid target, EnumerableNullableParameter<Guid> value)
         {
             return false;
         }

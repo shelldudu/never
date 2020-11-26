@@ -16,14 +16,11 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override SelectContext<Parameter, Table> Append(string sql)
+        public override SelectContext<Parameter, Table> Then(string sql)
         {
             return this;
         }
-        public override SelectContext<Parameter, Table> Last(string sql)
-        {
-            return this;
-        }
+
         public override Table GetResult()
         {
             return this.Select<Parameter, Table>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
@@ -67,7 +64,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null)
         {
             return this;
         }

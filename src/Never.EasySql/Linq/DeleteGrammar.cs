@@ -1708,72 +1708,12 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 存在
-        /// </summary>
-        /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Parameter, Table> AndNotExists(string expression)
-        {
-            this.Context.Where(AndOrOption.and, expression);
-            return this;
-        }
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        /// <param name="expression">自己写的sql语法，比如select 0 from table2 inner join table3 on table2.Id = table3.Id and table2.Name = table.UserName，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Parameter, Table> OrNotExists(string expression)
-        {
-            this.Context.Where(AndOrOption.or, expression);
-            return this;
-        }
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Parameter, Table> AndIn(string expression)
-        {
-            this.Context.Where(AndOrOption.and, expression);
-            return this;
-        }
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Parameter, Table> AndNotIn(string expression)
-        {
-            this.Context.Where(AndOrOption.and, expression);
-            return this;
-        }
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        /// <param name="expression">自己写的sql语法，比如table.UserName in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Parameter, Table> OrIn(string expression)
-        {
-            this.Context.Where(AndOrOption.or, expression);
-            return this;
-        }
-
-        /// <summary>
-        /// 存在
-        /// </summary>
-        /// <param name="expression">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Parameter, Table> OrNotIn(string expression)
-        {
-            this.Context.Where(AndOrOption.or, expression);
-            return this;
-        }
-
-        /// <summary>
         /// 字符串
         /// </summary>
         /// <param name="sql">自己写的sql语法，比如table.UserName not in (select table2.Name from table2 inner join table3 on table2.Id = table3.Id)，其中table的名字由参数Tableinfo传递</param>
-        public DeleteWhereGrammar<Parameter, Table> Append(string sql)
+        public DeleteWhereGrammar<Parameter, Table> Then(string sql)
         {
-            this.Context.Append(sql);
+            this.Context.Then(sql);
             return this;
         }
 

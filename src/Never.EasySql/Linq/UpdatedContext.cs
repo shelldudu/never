@@ -70,7 +70,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override Linq.UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression)
+        public override Linq.UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null)
         {
             return this;
         }
@@ -90,17 +90,12 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        public override UpdateContext<Parameter, Table> Where(AndOrOption andOrOption, string sql)
-        {
-            return this;
-        }
-
         public override UpdateContext<Parameter, Table> SetColumn(string columnName, string parameterName, bool textParameter, bool function)
         {
             return this;
         }
 
-        public override UpdateContext<Parameter, Table> Append(string sql)
+        public override UpdateContext<Parameter, Table> Then(string sql)
         {
             return this;
         }

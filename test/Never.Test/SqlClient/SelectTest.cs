@@ -41,7 +41,7 @@ namespace Never.Test
                .Where((p, t) => t.Id >= p.Id)
                //.AndNotExists<MyTable2>("t1").Where((p, t, t1) => (t.Id == p.Id && p.Id >= t.Id) || (p.Id > 0) || t.Id != 2).And((p, t, t1) => t1.Id != 2).ToWhere()
                //.And((p, t) => p.Id == t.Id)
-               .And((p, t) => p.IdArray.Contains(222) && t.Id >= 2 && p.Name.Like("e") && p.Name.Like("e"))
+               .And((p, t) => 222.In(p.IdArray) && t.Id >= 2 && p.Name.Like("e") && p.Name.Like("e"))
                .OrderByDescending(t => t.Id)
                .GetSqlTagFormat();
 
@@ -79,7 +79,7 @@ namespace Never.Test
             // .OrNotIn<MyTable2>("t1").Field((p, t) => p.Id == t.Id).Where((p, t) => t.Name == "ee")
             // .Join<MyTable2>("t2").On((p, t1, t2) => p.Id >= 1).And((p, t1, t2) => t1.Name == "3").ToWhere()
             //.OrIn<MyTable2>("t1").Field((p, t) => p.Id == t.Id).Where((p, t) => t.Name == "ee").ToWhere()
-            .Append(";")
+            .Then(";")
             .GetResult();
 
             //删除
