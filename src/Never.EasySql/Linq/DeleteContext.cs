@@ -86,7 +86,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public virtual DeleteContext<Parameter, Table> From(string table)
         {
-            this.FromTable = this.FormatTable(table);
+            this.FromTable = this.FormatTableAndColumn(table);
             return this;
         }
 

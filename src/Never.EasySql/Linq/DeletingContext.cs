@@ -103,19 +103,11 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 对表名格式化
+        /// 对表格或字段格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string FormatTable(string text)
-        {
-            return text;
-        }
-
-        /// <summary>
-        /// 对字段格式化
-        /// </summary>
-        protected override string FormatColumn(string text)
+        protected override string FormatTableAndColumn(string text)
         {
             return text;
         }
@@ -147,7 +139,7 @@ namespace Never.EasySql.Linq
                 this.From(this.FindTableName(this.tableInfo, typeof(Table)));
             }
 
-            this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
+            this.formatColumnAppendCount = this.FormatTableAndColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             var label = new TextLabel()
             {
@@ -298,7 +290,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override DeleteContext<Parameter, Table> JoinOnWhereExists(WhereExistsInfo whereExists)
         {
-            var label = this.LoadWhereExistsLabel(this.FromTable, this.AsTable, whereExists, this.dao);
+            var label = this.LoadWhereExistsLabel(this.FromTable, this.AsTable, whereExists, null, this.dao);
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;
@@ -311,7 +303,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override DeleteContext<Parameter, Table> JoinOnWhereIn(WhereInInfo whereIn)
         {
-            var label = this.LoadWhereInLabel(this.FromTable, this.AsTable, whereIn, this.dao);
+            var label = this.LoadWhereInLabel(this.FromTable, this.AsTable, whereIn, null, this.dao);
 
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;

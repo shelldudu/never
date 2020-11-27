@@ -3,20 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Never.Test.SqlClient
 {
     /// <summary>
-    /// sql server test
+    /// mysql test
     /// </summary>
-    public class SqlServerSelect
+    public class MySqlSelect
     {
         [Xunit.Fact]
         public void testSelect1()
         {
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            var dao = ConstructibleDaoBuilder<MySqlBuilder>.Value.Build();
             //返回条数
             var more = dao.ToEasyLinqDao(new { Id = 1, IdArray = new[] { 22, 23, 24, 25 }.ToNullableParameter(), Name = "ee" })
                .Select<User>()
@@ -38,14 +37,6 @@ namespace Never.Test.SqlClient
 
             string sql = more.ToString();
             System.Console.WriteLine(sql);
-        }
-
-        [Xunit.Fact]
-        public void testReges()
-        {
-            var regex = new Regex(@"\{(?<name>.*?)\}", RegexOptions.Compiled | RegexOptions.Singleline);
-            var sql = " and {user}.{id} != @Id ";
-            var text = regex.Replace(sql, m => string.Concat("[",m.Groups["name"].Value,"]"));
         }
     }
 }

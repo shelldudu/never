@@ -75,7 +75,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public virtual InsertContext<Parameter, Table> Into(string table)
         {
-            this.InsertTable = this.FormatTable(table);
+            this.InsertTable = this.FormatTableAndColumn(table);
             return this;
         }
 

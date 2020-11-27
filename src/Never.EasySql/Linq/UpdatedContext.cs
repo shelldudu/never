@@ -38,7 +38,7 @@ namespace Never.EasySql.Linq
         {
         }
 
-        protected override string ClearThenFormatColumn(string text)
+        protected override string ClearThenFormatTableAndColumn(string text)
         {
             return text;
         }
@@ -100,12 +100,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        protected override string FormatTable(string text)
-        {
-            return string.Empty;
-        }
-
-        protected override string FormatColumn(string text)
+        protected override string FormatTableAndColumn(string text)
         {
             return string.Empty;
         }

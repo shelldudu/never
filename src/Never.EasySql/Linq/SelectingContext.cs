@@ -232,7 +232,7 @@ namespace Never.EasySql.Linq
                 this.From(this.FindTableName(this.tableInfo, typeof(Table)));
             }
 
-            this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
+            this.formatColumnAppendCount = this.FormatTableAndColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
 
@@ -422,34 +422,34 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 对表名格式化
+        /// 对表格或字段格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string FormatTable(string text)
+        protected override string FormatTableAndColumn(string text)
         {
             return text;
         }
 
-        /// <summary>
-        /// 对字段格式化
-        /// </summary>
-        protected override string FormatColumn(string text)
-        {
-            return text;
-        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sql"></param>
+        /// <param name="formatTableOrColumn"></param>
         /// <returns></returns>
-        public override SelectContext<Parameter, Table> AddSql(string sql)
+        public override SelectContext<Parameter, Table> AddSql(string sql, bool formatTableOrColumn)
         {
             if (sql.IsNullOrEmpty())
                 return this;
 
-            var label = new SqlTag().ReadTextNodeUsingFormatLine(sql, new ThunderWriter(sql.Length), new SequenceStringReader("1"), this.dao.SqlExecuter.GetParameterPrefix(), true);
+            string text = sql;
+            if (formatTableOrColumn)
+            {
+                text = formatTableOrColumnRegex.Replace(sql, m => this.FormatTableAndColumn(m.Groups["name"].Value));
+            }
+
+            var label = new SqlTag().ReadTextNodeUsingFormatLine(text, new ThunderWriter(text.Length), new SequenceStringReader("1"), this.dao.SqlExecuter.GetParameterPrefix(), true);
             label.TagId = NewId.GenerateNumber();
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
@@ -463,8 +463,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override SelectContext<Parameter, Table> AddInWhereExists(WhereExistsInfo whereExists)
         {
-
-            var label = this.LoadWhereExistsLabel(this.FromTable, this.AsTable, whereExists, this.dao);
+            var label = this.LoadWhereExistsLabel(this.FromTable, this.AsTable, whereExists, this.selectJoin, this.dao);
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;
@@ -477,7 +476,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override SelectContext<Parameter, Table> AddInWhereIn(WhereInInfo whereIn)
         {
-            var label = this.LoadWhereInLabel(this.FromTable, this.AsTable, whereIn, this.dao);
+            var label = this.LoadWhereInLabel(this.FromTable, this.AsTable, whereIn, this.selectJoin, this.dao);
             this.labels.Add(label);
             this.textLength += label.SqlText.Length;
             return this;

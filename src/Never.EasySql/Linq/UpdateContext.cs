@@ -68,7 +68,7 @@ namespace Never.EasySql.Linq
             this.tableInfo = tableInfo;
             this.sqlParameter = sqlParameter;
             this.labels = new List<ILabel>(10);
-            this.FromTable = this.FormatTable(this.FindTableName<Parameter>(tableInfo));
+            this.FromTable = this.FormatTableAndColumn(this.FindTableName<Parameter>(tableInfo));
             this.templateParameter = new Dictionary<string, object>(10);
         }
 
@@ -90,7 +90,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public virtual UpdateContext<Parameter, Table> From(string table)
         {
-            this.FromTable = this.FormatTable(table);
+            this.FromTable = this.FormatTableAndColumn(table);
             return this;
         }
 

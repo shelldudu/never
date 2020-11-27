@@ -105,7 +105,7 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public virtual SelectContext<Parameter, Table> From(string table)
         {
-            this.FromTable = this.FormatTable(table);
+            this.FromTable = this.FormatTableAndColumn(table);
             return this;
         }
 
@@ -184,7 +184,7 @@ namespace Never.EasySql.Linq
         public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out var member);
-            return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), this.FormatColumn(columnName)), columnName, string.Empty);
+            return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), this.FormatTableAndColumn(columnName)), columnName, string.Empty);
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Never.EasySql.Linq
         public virtual SelectContext<Parameter, Table> Select<TMember>(Expression<Func<Table, TMember>> expression, string @as)
         {
             string columnName = this.FindColumnName(expression, this.tableInfo, out _);
-            return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), this.FormatColumn(columnName)), columnName, @as);
+            return this.SelectColumn(string.Concat(this.SelectTableNamePointOnSelectColunm(), this.FormatTableAndColumn(columnName)), columnName, @as);
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// add sql
         /// </summary>
-        public abstract SelectContext<Parameter, Table> AddSql(string sql);
+        public abstract SelectContext<Parameter, Table> AddSql(string sql, bool formatTableOrColumn);
 
         /// <summary>
         /// join

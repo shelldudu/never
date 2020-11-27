@@ -30,7 +30,7 @@ namespace Never.EasySql.Linq.MySql
         /// </summary>
         public override UpdateContext<Parameter, Table> StartEntrance()
         {
-            this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
+            this.formatColumnAppendCount = this.FormatTableAndColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
 
@@ -45,21 +45,11 @@ namespace Never.EasySql.Linq.MySql
         }
 
         /// <summary>
-        /// 对表名格式化
+        /// 对表格或字段格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string FormatTable(string text)
-        {
-            return string.Concat("`", text, "`");
-        }
-
-        /// <summary>
-        /// 对字段格式化
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        protected override string FormatColumn(string text)
+        protected override string FormatTableAndColumn(string text)
         {
             return string.Concat("`", text, "`");
         }

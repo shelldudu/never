@@ -77,22 +77,15 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 对表名格式化
+        /// 对表格或字段格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string FormatTable(string text)
+        protected override string FormatTableAndColumn(string text)
         {
             return text;
         }
 
-        /// <summary>
-        /// 对字段格式化
-        /// </summary>
-        protected override string FormatColumn(string text)
-        {
-            return text;
-        }
 
         /// <summary>
         /// 入口
@@ -105,7 +98,7 @@ namespace Never.EasySql.Linq
                 this.Into(this.FindTableName(this.tableInfo, typeof(Table)));
             }
 
-            this.formatColumnAppendCount = this.FormatColumn("a").Length - 1;
+            this.formatColumnAppendCount = this.FormatTableAndColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.InsertTable, ".");
             this.asTableNamePoint = string.Empty;
 
@@ -252,7 +245,7 @@ namespace Never.EasySql.Linq
             {
                 if (insertTimes == 0)
                 {
-                    templateBuilder.Append(this.FormatColumn(columnName));
+                    templateBuilder.Append(this.FormatTableAndColumn(columnName));
                     insertTimes++;
                     label.SqlText = string.Concat(this.dao.SqlExecuter.GetParameterPrefix(), parameterName);
                     label.Add(new SqlTagParameterPosition()
@@ -270,7 +263,7 @@ namespace Never.EasySql.Linq
                 else
                 {
                     templateBuilder.Append(",");
-                    templateBuilder.Append(this.FormatColumn(columnName));
+                    templateBuilder.Append(this.FormatTableAndColumn(columnName));
                     label.SqlText = string.Concat(",", this.dao.SqlExecuter.GetParameterPrefix(), parameterName);
                     label.Add(new SqlTagParameterPosition()
                     {
@@ -290,7 +283,7 @@ namespace Never.EasySql.Linq
                 if (insertTimes == 0)
                 {
                     var equalAndQuotation = function ? "" : "'";
-                    templateBuilder.Append(this.FormatColumn(columnName));
+                    templateBuilder.Append(this.FormatTableAndColumn(columnName));
                     insertTimes++;
                     label.SqlText = string.Concat(equalAndQuotation, this.dao.SqlExecuter.GetParameterPrefix(), parameterName, equalAndQuotation);
                     label.Add(new SqlTagParameterPosition()
@@ -310,7 +303,7 @@ namespace Never.EasySql.Linq
                     var equalAndQuotation = function ? "," : ",'";
                     var equalAndQuotationEnd = function ? "" : "'";
                     templateBuilder.Append(",");
-                    templateBuilder.Append(this.FormatColumn(columnName));
+                    templateBuilder.Append(this.FormatTableAndColumn(columnName));
                     label.SqlText = string.Concat(equalAndQuotation, this.dao.SqlExecuter.GetParameterPrefix(), parameterName, equalAndQuotationEnd);
                     label.Add(new SqlTagParameterPosition()
                     {

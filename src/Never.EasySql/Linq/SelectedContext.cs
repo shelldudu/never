@@ -16,7 +16,7 @@ namespace Never.EasySql.Linq
             this.sqlTag = sqlTag;
         }
 
-        public override SelectContext<Parameter, Table> AddSql(string sql)
+        public override SelectContext<Parameter, Table> AddSql(string sql, bool formatTableOrColumn)
         {
             return this;
         }
@@ -69,12 +69,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        protected override string FormatColumn(string text)
-        {
-            return text;
-        }
-
-        protected override string FormatTable(string text)
+        protected override string FormatTableAndColumn(string text)
         {
             return text;
         }

@@ -26,21 +26,11 @@ namespace Never.EasySql.Linq.Postgre
         }
 
         /// <summary>
-        /// 对表名格式化
+        /// 对表格或字段格式化
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected override string FormatTable(string text)
-        {
-            return string.Concat("`", text, "`");
-        }
-
-        /// <summary>
-        /// 对字段格式化
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        protected override string FormatColumn(string text)
+        protected override string FormatTableAndColumn(string text)
         {
             return string.Concat("`", text, "`");
         }
