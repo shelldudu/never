@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +16,23 @@ namespace Never.EasySql.Labels
     /// <seealso cref="Never.EasySql.Labels.BaseLabel" />
     public class ArrayLabel : BaseLabel
     {
+        #region static
+        private static readonly Hashtable arrayFormat = null;
+        private static readonly MethodInfo arrayMethod = null;
+        static ArrayLabel()
+        {
+            arrayFormat = new Hashtable(50);
+            foreach (var method in typeof(ArrayLabel).GetMethods(BindingFlags.Public | BindingFlags.Static))
+            {
+                if (method.IsGenericMethod && method.Name.IsEquals("FormatArray"))
+                {
+                    arrayMethod = method;
+                    break;
+                }
+            }
+        }
+        #endregion
+
         #region label   
 
         /// <summary>
@@ -132,10 +150,11 @@ namespace Never.EasySql.Labels
 
                         format.Write(Open);
                         var para = new KeyValueSqlParameter<T>((T)ator.Current);
-                        this.Line.FormatArray(format, this, para, para.Convert(), arrayLevel++);
+                        this.Line.FormatArray(format, this, para, para.Convert(), arrayLevel);
                         format.Write(Close);
                         appendValue = true;
                     }
+                    return;
                 }
 
                 //数组方式
@@ -153,19 +172,56 @@ namespace Never.EasySql.Labels
                         format.Write(Then);
                     }
 
-                    var ator = (((INullableParameter)parameter.Object).Value as System.Collections.IEnumerable).GetEnumerator();
-                    var arrayLevel = 0;
-                    var appendValue = false;
-                    while (ator.MoveNext())
+                    if (parameter is INullableParameter)
                     {
-                        if (appendValue)
-                            format.Write(Split);
+                        var ator = (((INullableParameter)parameter).Value as System.Collections.IEnumerable).GetEnumerator();
+                        var arrayLevel = 0;
+                        var appendValue = false;
+                        while (ator.MoveNext())
+                        {
+                            if (appendValue)
+                                format.Write(Split);
 
-                        format.Write(Open);
-                        var para = new KeyValueSqlParameter<T>((T)ator.Current);
-                        this.Line.FormatArray(format, this, para, para.Convert(), arrayLevel++);
-                        format.Write(Close);
-                        appendValue = true;
+                            format.Write(Open);
+                            this.FormatArray(this.Line, format, ator.Current, arrayLevel++);
+                            format.Write(Close);
+                            appendValue = true;
+                        }
+                        return;
+                    }
+                    else if (parameter is KeyValueSqlParameter<T>)
+                    {
+                        var ator = (((KeyValueSqlParameter<T>)parameter).Object as System.Collections.IEnumerable).GetEnumerator();
+                        var arrayLevel = 0;
+                        var appendValue = false;
+                        while (ator.MoveNext())
+                        {
+                            if (appendValue)
+                                format.Write(Split);
+
+                            format.Write(Open);
+                            this.FormatArray(this.Line, format, ator.Current, arrayLevel++);
+                            format.Write(Close);
+                            appendValue = true;
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        var ator = (parameter as System.Collections.IEnumerable).GetEnumerator();
+                        var arrayLevel = 0;
+                        var appendValue = false;
+                        while (ator.MoveNext())
+                        {
+                            if (appendValue)
+                                format.Write(Split);
+
+                            format.Write(Open);
+                            this.FormatArray(this.Line, format, ator.Current, arrayLevel++);
+                            format.Write(Close);
+                            appendValue = true;
+                        }
+                        return;
                     }
                 }
 
@@ -236,6 +292,51 @@ namespace Never.EasySql.Labels
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="textLabel"></param>
+        /// <param name="format"></param>
+        /// <param name="value"></param>
+        /// <param name="arrayLevel"></param>
+        public void FormatArray(TextLabel textLabel, SqlTagFormat format, object value, int arrayLevel)
+        {
+            if (value == null)
+                return;
+
+            var type = value.GetType();
+            if (arrayFormat[type] == null)
+            {
+                var emitBuilder = EasyEmitBuilder<Action<TextLabel, SqlTagFormat, ArrayLabel, object, int>>.NewDynamicMethod();
+                emitBuilder.LoadArgument(0);
+                emitBuilder.LoadArgument(1);
+                emitBuilder.LoadArgument(2);
+                emitBuilder.LoadArgument(3);
+                emitBuilder.LoadArgument(4);
+                emitBuilder.Call(arrayMethod.MakeGenericMethod(type));
+                emitBuilder.Return();
+                arrayFormat[type] = emitBuilder.CreateDelegate();
+            }
+
+            Action<TextLabel, SqlTagFormat, ArrayLabel, object, int> action = arrayFormat[type] as Action<TextLabel, SqlTagFormat, ArrayLabel, object, int>;
+            action.Invoke(textLabel, format, this, value, arrayLevel);
+            return;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="textLabel"></param>
+        /// <param name="format"></param>
+        /// <param name="arrayLabel"></param>
+        /// <param name="value"></param>
+        /// <param name="arrayLevel"></param>
+        public static void FormatArray<T>(TextLabel textLabel, SqlTagFormat format, ArrayLabel arrayLabel, object value, int arrayLevel)
+        {
+            var para = new KeyValueSqlParameter<T>((T)value);
+            textLabel.FormatArray(format, arrayLabel, para, para.Convert(), arrayLevel);
+        }
         #endregion baseLabel
     }
 }

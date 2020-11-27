@@ -28,11 +28,6 @@ namespace Never.EasySql.Linq
         protected int textLength;
 
         /// <summary>
-        /// 插入记录次数
-        /// </summary>
-        protected int insertTimes;
-
-        /// <summary>
         /// tableName.
         /// </summary>
         protected string tableNamePoint;
@@ -169,7 +164,7 @@ namespace Never.EasySql.Linq
             if (this.templateBuilder.Length == 0)
                 return;
 
-            this.templateBuilder.Append(")values(");
+            this.templateBuilder.Append(")values");
             this.templateBuilder.Insert(0, this.labels[0].SqlText);
             ((BaseLabel)this.labels[0]).SqlText = this.templateBuilder.ToString();
             this.textLength += this.labels[0].SqlText.Length;
@@ -184,16 +179,18 @@ namespace Never.EasySql.Linq
                 };
 
                 this.templateBuilder.Clear();
-                int add = 0 - ((TextLabel)valueLabels.FirstOrDefault()).ParameterPositions.ElementAt(0).ParameterStartIndex;
-                foreach (TextLabel label in this.valueLabels)
+                int add = 0;
+                var parameters = new List<SqlTagParameterPosition>(this.valueLabels.Count);
+                for (int i = 0; i < this.valueLabels.Count; i++)
                 {
+                    TextLabel label = (TextLabel)this.valueLabels[i];
                     this.templateBuilder.Append(label.SqlText);
-                    var parameter = label.ParameterPositions.ElementAt(0);
-                    add += parameter.ParameterStartIndex;
-                    parameter.ParameterStartIndex = add;
-                    parameter.ParameterStopIndex = add;
-                    parameter.PrefixStartIndex = add;
-                    arrayLabel.Line.Add(parameter);
+                    var parameter = label.ParameterPositions.ElementAt(0).Clone();
+                    parameter.ParameterStartIndex += add;
+                    parameter.ParameterStopIndex += add;
+                    parameter.PrefixStartIndex += add;
+                    parameters.Add(parameter);
+                    add += label.SqlText.Length;
                 }
 
                 arrayLabel.Line = new TextLabel()
@@ -201,7 +198,7 @@ namespace Never.EasySql.Linq
                     TagId = NewId.GenerateNumber(),
                     SqlText = this.templateBuilder.ToString(),
                 };
-
+                arrayLabel.Line.AddRange(parameters);
                 this.labels.Add(arrayLabel);
             }
             else
@@ -241,6 +238,7 @@ namespace Never.EasySql.Linq
                 TagId = NewId.GenerateNumber(),
             };
 
+            //参数模式
             if (textParameter == false)
             {
                 if (insertTimes == 0)
@@ -252,8 +250,8 @@ namespace Never.EasySql.Linq
                     {
                         ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                         SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                        Name = columnName,
-                        OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + columnName.Length,
+                        Name = parameterName,
+                        OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length,
                         PrefixStartIndex = 0,
                         ParameterStartIndex = this.dao.SqlExecuter.GetParameterPrefix().Length,
                         ParameterStopIndex = this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
@@ -269,55 +267,57 @@ namespace Never.EasySql.Linq
                     {
                         ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
                         SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                        Name = columnName,
-                        OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + columnName.Length,
-                        PrefixStartIndex = 1,
-                        ParameterStartIndex = 1 + this.dao.SqlExecuter.GetParameterPrefix().Length,
-                        ParameterStopIndex = 1 + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
-                        TextParameter = textParameter,
-                    });
-                }
-            }
-            else
-            {
-                if (insertTimes == 0)
-                {
-                    var equalAndQuotation = function ? "" : "'";
-                    templateBuilder.Append(this.FormatTableAndColumn(columnName));
-                    insertTimes++;
-                    label.SqlText = string.Concat(equalAndQuotation, this.dao.SqlExecuter.GetParameterPrefix(), parameterName, equalAndQuotation);
-                    label.Add(new SqlTagParameterPosition()
-                    {
-                        ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                        SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                        Name = columnName,
-                        OccupanLength = columnName.Length + 2,
-                        PrefixStartIndex = equalAndQuotation.Length + 0,
-                        ParameterStartIndex = equalAndQuotation.Length + 0 + this.dao.SqlExecuter.GetParameterPrefix().Length,
-                        ParameterStopIndex = equalAndQuotation.Length + 0 + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
-                        TextParameter = textParameter,
-                    });
-                }
-                else
-                {
-                    var equalAndQuotation = function ? "," : ",'";
-                    var equalAndQuotationEnd = function ? "" : "'";
-                    templateBuilder.Append(",");
-                    templateBuilder.Append(this.FormatTableAndColumn(columnName));
-                    label.SqlText = string.Concat(equalAndQuotation, this.dao.SqlExecuter.GetParameterPrefix(), parameterName, equalAndQuotationEnd);
-                    label.Add(new SqlTagParameterPosition()
-                    {
-                        ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                        SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
-                        Name = columnName,
-                        OccupanLength = columnName.Length + 2,
-                        PrefixStartIndex = equalAndQuotation.Length,
-                        ParameterStartIndex = equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
-                        ParameterStopIndex = equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
+                        Name = parameterName,
+                        OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length,
+                        PrefixStartIndex = ",".Length,
+                        ParameterStartIndex = ",".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                        ParameterStopIndex = ",".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
                         TextParameter = textParameter,
                     });
                 }
 
+                this.textLength += label.SqlText.Length;
+                this.valueLabels.Add(label);
+                return this;
+            }
+
+            //文本内容模式
+            if (insertTimes == 0)
+            {
+                var equalAndQuotation = function ? "" : "'";
+                templateBuilder.Append(this.FormatTableAndColumn(columnName));
+                insertTimes++;
+                label.SqlText = string.Concat(equalAndQuotation, this.dao.SqlExecuter.GetParameterPrefix(), parameterName, equalAndQuotation);
+                label.Add(new SqlTagParameterPosition()
+                {
+                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    Name = parameterName,
+                    OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length,
+                    PrefixStartIndex = equalAndQuotation.Length,
+                    ParameterStartIndex = equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                    ParameterStopIndex = equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
+                    TextParameter = textParameter,
+                });
+            }
+            else
+            {
+                var equalAndQuotation = function ? "," : ",'";
+                var equalAndQuotationEnd = function ? "" : "'";
+                templateBuilder.Append(",");
+                templateBuilder.Append(this.FormatTableAndColumn(columnName));
+                label.SqlText = string.Concat(equalAndQuotation, this.dao.SqlExecuter.GetParameterPrefix(), parameterName, equalAndQuotationEnd);
+                label.Add(new SqlTagParameterPosition()
+                {
+                    ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                    Name = parameterName,
+                    OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length,
+                    PrefixStartIndex = equalAndQuotation.Length,
+                    ParameterStartIndex = equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                    ParameterStopIndex = equalAndQuotation.Length + this.dao.SqlExecuter.GetParameterPrefix().Length + parameterName.Length - 1,
+                    TextParameter = textParameter,
+                });
             }
 
             this.textLength += label.SqlText.Length;

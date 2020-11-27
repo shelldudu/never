@@ -11,7 +11,6 @@ namespace Never.Test
     public class User
     {
         public Guid AggregateId { get; set; }
-        public string UserName { get; set; }
 
         [Never.SqlClient.Column(Optional = Never.SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | Never.SqlClient.ColumnAttribute.ColumnOptional.Primary)]
         public int Id { get; set; }

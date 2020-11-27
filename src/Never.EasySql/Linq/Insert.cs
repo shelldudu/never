@@ -43,7 +43,10 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public BulkInsertGrammar<Parameter, Table> UseBulk()
         {
-            return new BulkInsertGrammar<Parameter, Table>() { Context = this.Context }.StartInsertRecord();
+            if (this.Context.sqlParameter.IsIEnumerable)
+                return new BulkInsertGrammar<Parameter, Table>() { Context = this.Context }.StartInsertRecord();
+
+            throw new Exception("sql parameter is not enumerabled");
         }
     }
 }

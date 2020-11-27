@@ -9,6 +9,7 @@ namespace Never.EasySql
     /// <summary>
     /// 参数位置
     /// </summary>
+    [Serializable]
     public class SqlTagParameterPosition : IEquatable<SqlTagParameterPosition>
     {
         /// <summary>
@@ -47,7 +48,7 @@ namespace Never.EasySql
         public int ParameterStopIndex { get; set; }
 
         /// <summary>
-        /// 占地长度（如果是文本参数，则包含了$$，如果是常规参数，则包含了@）
+        /// 占地长度（如果是文本参数，则包含了$，如果是常规参数，则包含了@）
         /// </summary>
         public int OccupanLength { get; set; }
 
@@ -61,6 +62,15 @@ namespace Never.EasySql
         public bool Equals(SqlTagParameterPosition other)
         {
             return this.Name == other.Name;
+        }
+
+        /// <summary>
+        /// 克隆一个出来
+        /// </summary>
+        /// <returns></returns>
+        public SqlTagParameterPosition Clone()
+        {
+            return ObjectExtension.Clone(this);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Never.EasySql;
+using Never.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,11 +42,40 @@ namespace Never.Test.SqlClient
         }
 
         [Xunit.Fact]
+        public void testInsert1()
+        {
+            var user = new User() { Name = "sqlserver", UserId = 22334, AggregateId = NewId.GenerateGuid() };
+            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            var more = dao.ToEasyLinqDao(user)
+                 .Insert()
+                 .UseSingle()
+                 .InsertAll()
+                 .LastInsertId<int>()
+                 .GetResult();
+
+            string sql = more.ToString();
+            System.Console.WriteLine(sql);
+        }
+
+        [Xunit.Fact]
+        public void testInsert2()
+        {
+            var user1 = new User() { Name = "sqlserver", UserId = 22339, AggregateId = NewId.GenerateGuid(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
+            var user2 = new User() { Name = "sqlserver", UserId = 223310, AggregateId = NewId.GenerateGuid(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
+            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            dao.ToEasyLinqDao(new[] { user1, user2 })
+                 .Insert<User>()
+                 .UseBulk()
+                 .InsertAll()
+                 .GetResult();
+        }
+
+        [Xunit.Fact]
         public void testReges()
         {
             var regex = new Regex(@"\{(?<name>.*?)\}", RegexOptions.Compiled | RegexOptions.Singleline);
             var sql = " and {user}.{id} != @Id ";
-            var text = regex.Replace(sql, m => string.Concat("[",m.Groups["name"].Value,"]"));
+            var text = regex.Replace(sql, m => string.Concat("[", m.Groups["name"].Value, "]"));
         }
     }
 }

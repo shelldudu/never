@@ -57,7 +57,7 @@ namespace Never.Test
         public void TestSession()
         {
             var builder = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build;
-            Task.Run(() => 
+            Task.Run(() =>
             {
                 Console.WriteLine(builder.GetHashCode());
                 var dao = builder();

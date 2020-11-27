@@ -20,7 +20,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 入口
         /// </summary>
-        public SingleInsertGrammar<Parameter, Table> StartInsertRecord()
+        internal SingleInsertGrammar<Parameter, Table> StartInsertRecord()
         {
             this.Context.SetSingle().StartEntrance();
             return this;
@@ -29,10 +29,10 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的所有字段名
         /// </summary>
-        public SingleInsertGrammar<Parameter, Table> InsertAll()
+        public InsertAllGrammar InsertAll()
         {
             this.Context.InsertAll();
-            return this;
+            return new InsertAllGrammar() { Context = this.Context };
         }
 
         /// <summary>
@@ -74,10 +74,10 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 返回最后插入语句
         /// </summary>
-        public SingleInsertGrammar<Parameter, Table> LastInsertId<ReturnType>()
+        public InsertLastInsertIdGrammar<ReturnType> LastInsertId<ReturnType>()
         {
             this.Context.InsertLastInsertId<ReturnType>();
-            return this;
+            return new InsertLastInsertIdGrammar<ReturnType>() { Context = this.Context };
         }
 
         /// <summary>
@@ -90,11 +90,51 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 获取结果
+        /// 插入全部
         /// </summary>
-        public Result GetResult<Result>()
+        public struct InsertAllGrammar
         {
-            return this.Context.GetResult<Result>();
+            /// <summary>
+            /// 上下文
+            /// </summary>
+            internal InsertContext<Parameter, Table> Context { get; set; }
+
+            /// <summary>
+            /// 返回最后插入语句
+            /// </summary>
+            public InsertLastInsertIdGrammar<ReturnType> LastInsertId<ReturnType>()
+            {
+                this.Context.InsertLastInsertId<ReturnType>();
+                return new InsertLastInsertIdGrammar<ReturnType>() { Context = this.Context };
+            }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public void GetResult()
+            {
+                this.Context.GetResult();
+                return;
+            }
+        }
+
+        /// <summary>
+        /// 自增Id
+        /// </summary>
+        public struct InsertLastInsertIdGrammar<ReturnType>
+        {
+            /// <summary>
+            /// 上下文
+            /// </summary>
+            internal InsertContext<Parameter, Table> Context { get; set; }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public ReturnType GetResult()
+            {
+                return this.Context.GetResult<ReturnType>();
+            }
         }
     }
 
@@ -120,10 +160,10 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 插入的所有字段名
         /// </summary>
-        public BulkInsertGrammar<Parameter, Table> InsertAll()
+        public InsertAllGrammar InsertAll()
         {
             this.Context.InsertAll();
-            return this;
+            return new InsertAllGrammar() { Context = this.Context };
         }
 
         /// <summary>
@@ -171,6 +211,26 @@ namespace Never.EasySql.Linq
         {
             this.Context.GetResult();
             return;
+        }
+
+        /// <summary>
+        /// 插入全部
+        /// </summary>
+        public struct InsertAllGrammar
+        {
+            /// <summary>
+            /// 上下文
+            /// </summary>
+            internal InsertContext<Parameter, Table> Context { get; set; }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public void GetResult()
+            {
+                this.Context.GetResult();
+                return;
+            }
         }
     }
 }

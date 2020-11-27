@@ -20,6 +20,20 @@ namespace Never.EasySql
         /// <summary>
         /// sql参数，只接受key-value这种形式的对象，如果是value文本参数，请传入<see cref="KeyValueSqlParameter{T}"/>对象
         /// </summary>
+        protected EasySqlParameter(IEnumerable<T> array)
+        {
+            this.Object = array.IsNotNullOrEmpty() ? array.FirstOrDefault() : default(T);
+            this.IsICollection = this.IsIDictionary = this.IsIList = this.IsIEnumerable = true;
+            this.IsIDictionary = array is IDictionary;
+            this.IsIList = array is IList;
+            this.IsICollection = array is ICollection;
+            this.Count = this.IsICollection ? ((ICollection)array).Count : 0;
+            this.Members = new List<KeyValueTuple<string, object>>(this.Count);
+        }
+
+        /// <summary>
+        /// sql参数，只接受key-value这种形式的对象，如果是value文本参数，请传入<see cref="KeyValueSqlParameter{T}"/>对象
+        /// </summary>
         /// <param name="object"></param>
         protected EasySqlParameter(T @object)
         {
@@ -44,7 +58,7 @@ namespace Never.EasySql
                 }
             }
 
-            this.Members = new List<KeyValueTuple<string, object>>();
+            this.Members = new List<KeyValueTuple<string, object>>(this.Count);
         }
 
         #endregion ctor

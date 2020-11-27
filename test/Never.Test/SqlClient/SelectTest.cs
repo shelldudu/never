@@ -95,7 +95,7 @@ namespace Never.Test
                 //.Colum(m => m.UserId)
                 //.Colum(m => m.Name)
                 .LastInsertId<int>()
-                .GetResult<int>();
+                .GetResult();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Never.EasySql
     {
         public IEnumerable<T> Array { get; set; }
 
-        public ArraySqlParameter(IEnumerable<T> array) : base(default(T))
+        public ArraySqlParameter(IEnumerable<T> array) : base(array)
         {
             this.Array = array;
         }

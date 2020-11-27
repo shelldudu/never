@@ -1286,7 +1286,8 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public static TableInfo FindTableInfo<Table>()
         {
-            if (TableInfoCachedProvider.TryUpdateTableInfo(typeof(Table), out var tableInfo))
+            var type = typeof(Table);
+            if (type.IsArray == false && TableInfoCachedProvider.TryUpdateTableInfo(type, out var tableInfo))
                 return tableInfo;
 
             throw new KeyNotExistedException("table", "table info not found");

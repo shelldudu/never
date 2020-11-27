@@ -39,7 +39,7 @@ namespace Never.EasySql.Linq.Odbc
                 Line = new TextLabel()
                 {
                     TagId = NewId.GenerateNumber(),
-                    SqlText = this.UseBulk ? ";select @@Ideneity;" : "select @@Ideneity;",
+                    SqlText = this.UseBulk ? ";select @@Identity;" : "select @@Identity;",
                 },
                 Type = typeof(ReturnType).Name.ToLower(),
             });

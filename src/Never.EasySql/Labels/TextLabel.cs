@@ -71,6 +71,23 @@ namespace Never.EasySql.Labels
         }
 
         /// <summary>
+        /// 新加参数
+        /// </summary>
+        /// <param name="parameters"></param>
+        public void AddRange(IEnumerable<SqlTagParameterPosition> parameters)
+        {
+            if (this.parameterPositions == null)
+            {
+                this.parameterPositions = new List<SqlTagParameterPosition>();
+                this.parameterPositions.AddRange(parameters);
+                this.parameterPositionCount += parameters.Count();
+                return;
+            }
+
+            this.parameterPositions.AddRange(parameters);
+            this.parameterPositionCount += parameters.Count();
+        }
+        /// <summary>
         /// 复制参数
         /// </summary>
         /// <returns></returns>
@@ -274,9 +291,7 @@ namespace Never.EasySql.Labels
                 }
 
                 writeParameter(this.SqlText, para, i);
-                i += para.OccupanLength + 1;
-                if (i < this.SqlText.Length)
-                    format.WriteOnTextMode(this.SqlText[i]);
+                i += para.OccupanLength - 1;
             }
 
             //写参数

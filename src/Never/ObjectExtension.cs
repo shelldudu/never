@@ -303,7 +303,7 @@ namespace Never
         /// <typeparam name="T">目标对象</typeparam>
         /// <param name="object">源对象</param>
         /// <returns></returns>
-        public static T Clone<T>(this object @object)
+        public static T Clone<T>(this T @object)
         {
             if (@object == null)
                 throw new ArgumentNullException("当前对象为空，不可序列化");
