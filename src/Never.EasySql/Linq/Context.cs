@@ -2287,7 +2287,7 @@ namespace Never.EasySql.Linq
         {
             var builder = new StringBuilder((1 + 1 + whereExists.Joins.Count) * 20);
             var pp = joins == null ?
-                new[] { dao.SqlExecuter.GetParameterPrefix(), string.Concat(asTableName.IsNullOrEmpty() ? fromTable : asTableName, ".") }.Concat(whereExists.Joins.Select(ta => string.Concat(ta.AsName, "."))).ToArray()
+                new[] { dao.SqlExecuter.GetParameterPrefix(), string.Concat(asTableName.IsNullOrEmpty() ? fromTable : asTableName, ".") }.Concat(new[] { string.Concat(whereExists.AsName, ".") }).ToArray()
                 :
                 new[] { dao.SqlExecuter.GetParameterPrefix(), string.Concat(asTableName.IsNullOrEmpty() ? fromTable : asTableName, ".") }.Concat(joins.Select(ta => string.Concat(ta.AsName, "."))).Concat(new[] { string.Concat(whereExists.AsName, ".") }).ToArray();
 

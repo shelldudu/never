@@ -193,7 +193,7 @@ namespace Never.EasySql.Linq.SqlServer
             this.rowNumberTextLabel.SqlText = string.Concat(", row_number() over (", this.LoadOrderByContent(this.orderBies, this.dao).ToString(), ") as _\r");
             this.textLength += this.rowNumberTextLabel.SqlText.Length;
 
-            if (clear)
+            if (clear && this.orderBies != null)
                 this.orderBies.Clear();
         }
 

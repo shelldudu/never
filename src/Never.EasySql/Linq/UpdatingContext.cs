@@ -137,6 +137,9 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override UpdateContext<Parameter, Table> StartEntrance()
         {
+            if (this.equalAndPrefix.IsNotNullOrEmpty())
+                return this;
+
             if (this.FromTable.IsNullOrEmpty())
             {
                 this.From(this.FindTableName(this.tableInfo, typeof(Table)));
@@ -325,10 +328,10 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
-        /// 
+        /// set的时候选择什么表名（用别名还是真表名）
         /// </summary>
         /// <returns></returns>
-        protected string SelectTableNamePointOnSetColunm()
+        protected virtual string SelectTableNamePointOnSetColunm()
         {
             return this.asTableNamePoint.IsNullOrEmpty() ? this.tableNamePoint : this.asTableNamePoint;
         }

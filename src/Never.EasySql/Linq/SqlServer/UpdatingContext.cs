@@ -87,6 +87,15 @@ namespace Never.EasySql.Linq.SqlServer
         }
 
         /// <summary>
+        /// set的时候选择什么表名（用别名还是真表名）
+        /// </summary>
+        /// <returns></returns>
+        protected override string SelectTableNamePointOnSetColunm()
+        {
+            return this.tableNamePoint;
+        }
+
+        /// <summary>
         /// 对表格或字段格式化
         /// </summary>
         /// <param name="text"></param>

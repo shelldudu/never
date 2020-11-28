@@ -134,6 +134,9 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override DeleteContext<Parameter, Table> StartEntrance()
         {
+            if (this.equalAndPrefix.IsNotNullOrEmpty())
+                return this;
+
             if (this.FromTable.IsNullOrEmpty())
             {
                 this.From(this.FindTableName(this.tableInfo, typeof(Table)));

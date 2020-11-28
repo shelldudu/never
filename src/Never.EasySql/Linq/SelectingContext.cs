@@ -159,7 +159,7 @@ namespace Never.EasySql.Linq
                 this.textLength += label.SqlText.Length;
             }
 
-            if (clear)
+            if (clear && this.orderBies != null)
                 this.orderBies.Clear();
         }
 
@@ -227,6 +227,9 @@ namespace Never.EasySql.Linq
         /// </summary>
         public override SelectContext<Parameter, Table> StartEntrance()
         {
+            if (this.equalAndPrefix.IsNotNullOrEmpty())
+                return this;
+
             if (this.FromTable.IsNullOrEmpty())
             {
                 this.From(this.FindTableName(this.tableInfo, typeof(Table)));

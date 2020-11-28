@@ -135,7 +135,7 @@ namespace Never.EasySql.Linq
         public virtual UpdateContext<Parameter, Table> Set<TMember>(Expression<Func<Table, TMember>> key, Expression<Func<Parameter, TMember>> value)
         {
             string columnName = this.FindColumnName(key, this.tableInfo, out _);
-            string parameterName = this.FindColumnName(value, this.tableInfo, out _);
+            string parameterName = this.FindColumnName(value, FindTableInfo<Parameter>(), out _);
             return this.SetColumn(columnName, parameterName, false, false);
         }
 

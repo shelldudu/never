@@ -21,6 +21,8 @@ namespace Never.Test
 
         public DateTime CreateDate { get; set; }
         public DateTime EditDate { get; set; }
+
+        public int Version { get; set; }
     }
 
     public struct MyUserParameter

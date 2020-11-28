@@ -56,7 +56,6 @@ namespace Never.EasySql.Linq
         /// 插入字段值的参数
         /// </summary>
         protected List<ILabel> valueLabels;
-
         #endregion
 
         /// <summary>
@@ -88,6 +87,9 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override Linq.InsertContext<Parameter, Table> StartEntrance()
         {
+            if (this.equalAndPrefix.IsNotNullOrEmpty())
+                return this;
+
             if (this.InsertTable.IsNullOrEmpty())
             {
                 this.Into(this.FindTableName(this.tableInfo, typeof(Table)));

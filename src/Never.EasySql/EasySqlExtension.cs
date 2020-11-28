@@ -2,6 +2,7 @@
 using Never.EasySql.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,7 +36,7 @@ namespace Never.EasySql
         /// <param name="dao"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, T[] parameter)
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, IEnumerable<T> parameter)
         {
             if (parameter is INullableParameter)
                 throw new ArgumentException("parameter类型不能是INullableParameter");
@@ -50,12 +51,147 @@ namespace Never.EasySql
         /// <param name="dao"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, IEnumerable<T> parameter)
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, T[] parameter)
         {
-            if (parameter is INullableParameter)
-                throw new ArgumentException("parameter类型不能是INullableParameter");
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
 
-            return new EasyDecoratedXmlDao<T>(dao, new ArraySqlParameter<T>(parameter));
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, IQueryable<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, IList<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, IReadOnlyList<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, ICollection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, IReadOnlyCollection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, List<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, Collection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, ReadOnlyCollection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedXmlDao<T> ToEasyXmlDao<T>(this IDao dao, ParallelQuery<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyXmlDao<T>(dao, parameter.AsEnumerable());
         }
 
         /// <summary>
@@ -80,7 +216,7 @@ namespace Never.EasySql
         /// <param name="dao"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, T[] parameter)
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, IEnumerable<T> parameter)
         {
             if (parameter is INullableParameter)
                 throw new ArgumentException("parameter类型不能是INullableParameter");
@@ -95,12 +231,147 @@ namespace Never.EasySql
         /// <param name="dao"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, IEnumerable<T> parameter)
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, T[] parameter)
         {
-            if (parameter is INullableParameter)
-                throw new ArgumentException("parameter类型不能是INullableParameter");
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
 
-            return new EasyDecoratedTextDao<T>(dao, new ArraySqlParameter<T>(parameter));
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, IQueryable<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, IList<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, IReadOnlyList<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, ICollection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, IReadOnlyCollection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, List<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, Collection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, ReadOnlyCollection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedTextDao<T> ToEasyTextDao<T>(this IDao dao, ParallelQuery<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyTextDao<T>(dao, parameter.AsEnumerable());
         }
 
         /// <summary>
@@ -121,7 +392,7 @@ namespace Never.EasySql
         /// <param name="dao"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, T[] parameter)
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, IEnumerable<T> parameter)
         {
             if (parameter is INullableParameter)
                 throw new ArgumentException("parameter类型不能是INullableParameter");
@@ -136,12 +407,147 @@ namespace Never.EasySql
         /// <param name="dao"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, IEnumerable<T> parameter)
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, T[] parameter)
         {
-            if (parameter is INullableParameter)
-                throw new ArgumentException("parameter类型不能是INullableParameter");
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
 
-            return new EasyDecoratedLinqDao<T>(dao, new ArraySqlParameter<T>(parameter));
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, IQueryable<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, IList<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, IReadOnlyList<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, ICollection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, IReadOnlyCollection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, List<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, Collection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, ReadOnlyCollection<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
+        }
+
+        /// <summary>
+        /// 对idao进一步装饰
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dao"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static EasyDecoratedLinqDao<T> ToEasyLinqDao<T>(this IDao dao, ParallelQuery<T> parameter)
+        {
+            if (parameter == null)
+                throw new ArgumentNullException("parameter is null");
+
+            return ToEasyLinqDao<T>(dao, parameter.AsEnumerable());
         }
 
         /// <summary>

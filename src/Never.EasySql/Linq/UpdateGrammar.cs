@@ -130,7 +130,7 @@ namespace Never.EasySql.Linq
                 On = expression,
                 AsName = this.@as,
                 JoinOption = this.option,
-                Types = new[] { typeof(Parameter), typeof(Table1) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1) },
             });
 
             return this;
@@ -272,7 +272,7 @@ namespace Never.EasySql.Linq
                 On = expression,
                 AsName = this.@as.Last(),
                 JoinOption = this.option,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1), typeof(Table2) },
             });
             return this;
         }
@@ -420,7 +420,7 @@ namespace Never.EasySql.Linq
                 On = expression,
                 AsName = this.@as.Last(),
                 JoinOption = this.option,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1), typeof(Table2), typeof(Table3) },
             });
             return this;
         }
@@ -568,7 +568,7 @@ namespace Never.EasySql.Linq
                 On = expression,
                 AsName = this.@as.Last(),
                 JoinOption = this.option,
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) },
             });
             return this;
         }
@@ -629,7 +629,7 @@ namespace Never.EasySql.Linq
                 AsName = @as,
                 AndOrOption = option,
                 NotExists = flag == 'n',
-                Types = new[] { typeof(Parameter), typeof(Table1) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1) },
                 Joins = new List<Context.JoinInfo>(4),
             };
         }
@@ -768,7 +768,7 @@ namespace Never.EasySql.Linq
             {
                 JoinOption = joinOption,
                 AsName = @as.Last(),
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1), typeof(Table2) },
             });
         }
 
@@ -927,7 +927,7 @@ namespace Never.EasySql.Linq
             {
                 JoinOption = joinOption,
                 AsName = @as.Last(),
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1), typeof(Table2), typeof(Table3) },
             });
         }
 
@@ -1087,7 +1087,7 @@ namespace Never.EasySql.Linq
             {
                 JoinOption = joinOption,
                 AsName = @as.Last(),
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) },
             });
         }
 
@@ -1158,7 +1158,7 @@ namespace Never.EasySql.Linq
                 AsName = @as,
                 AndOrOption = option,
                 NotIn = flag == 'n',
-                Types = new[] { typeof(Parameter), typeof(Table1) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1) },
                 Joins = new List<Context.JoinInfo>(4),
             };
         }
@@ -1284,7 +1284,7 @@ namespace Never.EasySql.Linq
             this.@in.Joins.Add(new Context.JoinInfo()
             {
                 AsName = this.@as.Last(),
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1), typeof(Table2) },
                 JoinOption = joinOption
             });
         }
@@ -1428,7 +1428,7 @@ namespace Never.EasySql.Linq
             this.@in.Joins.Add(new Context.JoinInfo()
             {
                 AsName = this.@as.Last(),
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1), typeof(Table2), typeof(Table3) },
                 JoinOption = joinOption
             });
         }
@@ -1573,7 +1573,7 @@ namespace Never.EasySql.Linq
             this.@in.Joins.Add(new Context.JoinInfo()
             {
                 AsName = this.@as.Last(),
-                Types = new[] { typeof(Parameter), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) },
+                Types = new[] { typeof(Parameter), typeof(Table), typeof(Table1), typeof(Table2), typeof(Table3), typeof(Table4) },
                 JoinOption = joinOption
             });
         }
