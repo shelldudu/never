@@ -79,7 +79,7 @@ namespace Never.Test
         {
             get
             {
-                return "server=192.168.137.110;uid=sa;pwd=gg123456;database=test;port=3306;";
+                return "server=192.168.137.110;uid=sa;pwd=gg123456;database=login_user;port=3306;";
             }
         }
 

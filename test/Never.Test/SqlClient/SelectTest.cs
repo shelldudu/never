@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Never.Test
@@ -96,6 +97,14 @@ namespace Never.Test
                 //.Colum(m => m.Name)
                 .LastInsertId<int>()
                 .GetResult();
+        }
+
+        [Xunit.Fact]
+        public void testRegex()
+        {
+            var regex = new Regex(@"\{(?<name>.*?)\}", RegexOptions.Compiled | RegexOptions.Singleline);
+            var sql = " and {user}.{id} != @Id ";
+            var text = regex.Replace(sql, m => string.Concat("[", m.Groups["name"].Value, "]"));
         }
     }
 }

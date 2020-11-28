@@ -45,7 +45,7 @@ namespace Never.Test.SqlClient
         [Xunit.Fact]
         public void testInsert1()
         {
-            var user = new User() { Name = "sqlserver", UserId = 22334, AggregateId = NewId.GenerateGuid() };
+            var user = new User() { Name = "sqlserver", UserId = 22334, AggregateId = NewId.GenerateGuid(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
             var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
             var more = dao.ToEasyLinqDao(user)
                  .Insert()
@@ -104,6 +104,7 @@ namespace Never.Test.SqlClient
             var sql = dao.ToEasyLinqDao(user)
                 .Cached("UUUUUUUU")
                 .Update().As("t")
+                .InnerJoin<User>("t1").On((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Name != "10123456789").ToUpdate()
                 .SetColumn(t => t.Name, p => p.Name)
                 .SetColumnWithValue(t => t.Version, user.Version + 1)
                 .Where((p, t) => t.Id == p.Id && t.Name == "eee")
@@ -112,13 +113,32 @@ namespace Never.Test.SqlClient
             int row = sql.GetResult();
         }
 
+        [Xunit.Fact]
+        public void testDelete1()
+        {
+            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<User>().ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
+            user.Id = user.Id + 10;
+            var sql = dao.ToEasyLinqDao(user).Cached("DDDDDD")
+                .Delete().As("t")
+                .Where((p, t) => p.Id == t.Id);
+
+            var row = sql.GetResult();
+        }
 
         [Xunit.Fact]
-        public void testReges()
+        public void testDelete2()
         {
-            var regex = new Regex(@"\{(?<name>.*?)\}", RegexOptions.Compiled | RegexOptions.Singleline);
-            var sql = " and {user}.{id} != @Id ";
-            var text = regex.Replace(sql, m => string.Concat("[", m.Groups["name"].Value, "]"));
+            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<User>().ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
+            user.Id = user.Id + 10;
+            var sql = dao.ToEasyLinqDao(user).Cached("DDDDDD")
+                .Delete().As("t")
+                .InnerJoin<User>("t1").On((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Name != "10123456789").ToDelete()
+                .Where((p, t) => p.Id == t.Id)
+                .AndExists<User>("t2").Where((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Id == 23).ToWhere(); ;
+
+            var row = sql.GetResult();
         }
     }
 }

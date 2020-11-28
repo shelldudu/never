@@ -166,12 +166,12 @@ namespace Never.EasySql.Linq
             if (this.templateBuilder.Length == 0)
                 return;
 
-            this.templateBuilder.Append(")values");
-            this.templateBuilder.Insert(0, this.labels[0].SqlText);
-            ((BaseLabel)this.labels[0]).SqlText = this.templateBuilder.ToString();
-            this.textLength += this.labels[0].SqlText.Length;
             if (this.UseBulk)
             {
+                this.templateBuilder.Append(")values");
+                this.templateBuilder.Insert(0, this.labels[0].SqlText);
+                ((BaseLabel)this.labels[0]).SqlText = this.templateBuilder.ToString();
+                this.textLength += this.labels[0].SqlText.Length;
                 var arrayLabel = new ArrayLabel()
                 {
                     TagId = NewId.GenerateNumber(),
@@ -205,6 +205,10 @@ namespace Never.EasySql.Linq
             }
             else
             {
+                this.templateBuilder.Append(")values(");
+                this.templateBuilder.Insert(0, this.labels[0].SqlText);
+                ((BaseLabel)this.labels[0]).SqlText = this.templateBuilder.ToString();
+                this.textLength += this.labels[0].SqlText.Length;
                 this.labels.AddRange(this.valueLabels);
                 this.labels.Add(new TextLabel()
                 {
