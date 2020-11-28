@@ -87,13 +87,14 @@ namespace Never.EasySql.Labels
             this.parameterPositions.AddRange(parameters);
             this.parameterPositionCount += parameters.Count();
         }
+
         /// <summary>
         /// 复制参数
         /// </summary>
         /// <returns></returns>
-        protected List<SqlTagParameterPosition> Copy()
+        protected IEnumerable<SqlTagParameterPosition> OrderBy()
         {
-            return this.parameterPositions.ToList();
+            return this.parameterPositions.OrderBy(t => t.PrefixStartIndex);
         }
 
         /// <summary>
@@ -128,7 +129,7 @@ namespace Never.EasySql.Labels
             }
 
             int start = 0;
-            foreach (var para in this.parameterPositions)
+            foreach (var para in this.OrderBy())
             {
                 var item = convert.FirstOrDefault(o => o.Key.Equals(para.Name));
                 if (item == null)
@@ -197,7 +198,7 @@ namespace Never.EasySql.Labels
 
             var ator = ((IEnumerable)convert.Value).GetEnumerator();
             int start = 0;
-            foreach (var para in this.parameterPositions)
+            foreach (var para in this.OrderBy())
             {
                 format.WriteOnTextMode(this.SqlText, start, para.PrefixStartIndex - start);
                 var appendValue = false;
@@ -242,7 +243,6 @@ namespace Never.EasySql.Labels
                 }
 
                 start = para.ParameterStopIndex + 1;
-                continue;
             }
 
             if (this.SqlText.Length >= start)
@@ -280,18 +280,18 @@ namespace Never.EasySql.Labels
                 return;
             }
 
-            var copy = this.Copy();
-            for (var i = 0; i < this.SqlText.Length; i++)
+            int start = 0;
+            foreach (var para in this.OrderBy()) 
             {
-                var para = this.MathPosition(copy, i);
-                if (para == null)
-                {
-                    format.Write(this.SqlText[i]);
-                    continue;
-                }
+                format.WriteOnTextMode(this.SqlText, start, para.PrefixStartIndex - start);
+                writeParameter(this.SqlText, para, para.PrefixStartIndex);
+                start = para.ParameterStopIndex + 1;
+            }
 
-                writeParameter(this.SqlText, para, i);
-                i += para.OccupanLength - 1;
+            if (this.SqlText.Length >= start)
+            {
+                format.WriteOnTextMode(this.SqlText, start, this.SqlText.Length - start);
+                return;
             }
 
             //写参数

@@ -12,15 +12,15 @@ namespace Never.Test.SqlClient
     /// <summary>
     /// sql server test
     /// </summary>
-    public class SqlServerSelect
+    public class AccessSelect
     {
         [Xunit.Fact]
         public void testSelect1()
         {
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
             //返回条数
             var one = dao.ToEasyLinqDao(new { Id = 1, IdArray = new[] { 22, 23, 24, 25 }.ToNullableParameter(), Name = "ee" })
-               .Select<SqlServerUser>()
+               .Select<AccessUser>()
                .ToSingle()//单条
                .Where((p, t) => t.Id >= p.Id)
                .GetResult();
@@ -32,16 +32,16 @@ namespace Never.Test.SqlClient
         [Xunit.Fact]
         public void testSelect2()
         {
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
             //返回条数
             var more = dao.ToEasyLinqDao(new { Id = 1, IdArray = new[] { 22, 23, 24, 25 }.ToNullableParameter(), Name = "ee" })
-               .Select<SqlServerUser>()
+               .Select<AccessUser>()
                //.InnerJoin<User>("t1").On((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Name != "10123456789")
                //.InnerJoin<User>("t2").On((p, t, t1, t2) => t.Id == t1.Id).And((p, t, t1, t2) => t2.Name != "10123456789")
                //.ToSingle()//单条
                .ToEnumerable()
                .Where((p, t) => t.Id >= p.Id)
-               .AndExists<SqlServerUser>("t1").Where((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Id == 23).ToWhere()
+               .AndExists<AccessUser>("t1").Where((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Id == 23).ToWhere()
                //.AndExists<User>("t3").Where((p, t, t1, t2, t3) => t.Id == t3.Id).And((p, t, t1, t2, t3) => t3.Id == 23).ToWhere()
                .And((p, t) => t.Id.In(p.IdArray) && t.Id >= 2 && t.Name.Like("e") && t.Name.LeftLike("e") && t.Name.RightLike("e"))
                .Or((p, t) => t.Id.In(p.IdArray) && t.Id >= 2 || t.Name.Like("e") && t.Name.LeftLike("e") && t.Name.RightLike("e"))
@@ -60,8 +60,8 @@ namespace Never.Test.SqlClient
         [Xunit.Fact]
         public void testInsert1()
         {
-            var user = new SqlServerUser() { Name = "sqlserver", UserId = 22334, AggregateId = NewId.GenerateGuid(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            var user = new AccessUser() { Name = "sqlserver", UserId = 22334, AggregateId = NewId.GenerateGuid().ToString(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
+            var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
             var more = dao.ToEasyLinqDao(user)
                  .Insert()
                  .UseSingle()
@@ -76,11 +76,11 @@ namespace Never.Test.SqlClient
         [Xunit.Fact]
         public void testInsert2()
         {
-            var user1 = new SqlServerUser() { Name = "sqlserver", UserId = 22339, AggregateId = NewId.GenerateGuid(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
-            var user2 = new SqlServerUser() { Name = "sqlserver", UserId = 223310, AggregateId = NewId.GenerateGuid(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
+            var user1 = new AccessUser() { Name = "sqlserver", UserId = 22339, AggregateId = NewId.GenerateGuid().ToString(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
+            var user2 = new AccessUser() { Name = "sqlserver", UserId = 223310, AggregateId = NewId.GenerateGuid().ToString(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
+            var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
             dao.ToEasyLinqDao(new[] { user1, user2 })
-                 .Insert<SqlServerUser>()
+                 .Insert<AccessUser>()
                  .UseBulk()
                  .InsertAll()
                  .GetResult();
@@ -89,8 +89,8 @@ namespace Never.Test.SqlClient
         [Xunit.Fact]
         public void testUpdate1()
         {
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
-            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<SqlServerUser>().As("t").ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
+            var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
+            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<AccessUser>().As("t").ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
             user.Name = string.Concat(user.Name.Trim(), "1");
             var sql = dao.ToEasyLinqDao(user)
                 .Cached("UUUUUUUU")
@@ -113,17 +113,17 @@ namespace Never.Test.SqlClient
         [Xunit.Fact]
         public void testUpdate2()
         {
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
-            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<SqlServerUser>().As("t").ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
+            var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
+            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<AccessUser>().As("t").ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
             user.Name = string.Concat(user.Name.Trim(), "1");
             var sql = dao.ToEasyLinqDao(user)
                 .Cached("UUUUUUUU")
                 .Update().As("t")
-                .InnerJoin<SqlServerUser>("t1").On((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Name != "10123456789").ToUpdate()
+                .InnerJoin<AccessUser>("t1").On((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Name != "10123456789").ToUpdate()
                 .SetColumn(t => t.Name, p => p.Name)
                 .SetColumnWithValue(t => t.Version, user.Version + 1)
                 .Where((p, t) => t.Id == p.Id && t.Name == "eee")
-                .AndExists<SqlServerUser>("t1").Where((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Id == 23).ToWhere();
+                .AndExists<AccessUser>("t1").Where((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Id == 23).ToWhere();
 
             int row = sql.GetResult();
         }
@@ -131,8 +131,8 @@ namespace Never.Test.SqlClient
         [Xunit.Fact]
         public void testDelete1()
         {
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
-            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<SqlServerUser>().ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
+            var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
+            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<AccessUser>().ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
             user.Id = user.Id + 10;
             var sql = dao.ToEasyLinqDao(user).Cached("DDDDDD")
                 .Delete().As("t")
@@ -144,14 +144,14 @@ namespace Never.Test.SqlClient
         [Xunit.Fact]
         public void testDelete2()
         {
-            var dao = ConstructibleDaoBuilder<SqlServerBuilder>.Value.Build();
-            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<SqlServerUser>().ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
+            var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
+            var user = dao.ToEasyLinqDao(new { Id = 260 }).Select<AccessUser>().ToSingle().Where((p, t) => t.Id == p.Id).GetResult();
             user.Id = user.Id + 10;
             var sql = dao.ToEasyLinqDao(user).Cached("DDDDDD")
                 .Delete().As("t")
-                .InnerJoin<SqlServerUser>("t1").On((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Name != "10123456789").ToDelete()
+                .InnerJoin<AccessUser>("t1").On((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Name != "10123456789").ToDelete()
                 .Where((p, t) => p.Id == t.Id)
-                .AndExists<SqlServerUser>("t2").Where((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Id == 23).ToWhere(); ;
+                .AndExists<AccessUser>("t2").Where((p, t, t1) => t.Id == t1.Id).And((p, t, t1) => t1.Id == 23).ToWhere(); ;
 
             var row = sql.GetResult();
         }

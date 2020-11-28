@@ -11,6 +11,7 @@ namespace Never.EasySql.Client
     /// <summary>
     /// sqlite数据库
     /// </summary>
+    [Never.Attributes.Summary(Descn = "PROVIDER=Microsoft.Jet.OLEDB.4.0;Data Source=c:\\test.mdb;")]
     public sealed class SqliteExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild
@@ -30,7 +31,7 @@ namespace Never.EasySql.Client
         /// <param name="connectionString">连接字符串.</param>
         [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlClient.SqliteExecuter.DbProviderFactory")]
         public SqliteExecuter(string connectionString)
-            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.SqliteExecuter.InitInstance()), connectionString)
+            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.EasySql.SqlExecuterFactory.SqliteExecuter.InitInstance()), connectionString)
         {
         }
 

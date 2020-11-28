@@ -150,7 +150,7 @@ namespace Never.EasySql.Labels
 
                         format.Write(Open);
                         var para = new KeyValueSqlParameter<T>((T)ator.Current);
-                        this.Line.FormatArray(format, this, para, para.Convert(), arrayLevel);
+                        this.Line.FormatArray(format, this, para, para.Convert(), arrayLevel++);
                         format.Write(Close);
                         appendValue = true;
                     }

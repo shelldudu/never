@@ -11,6 +11,7 @@ namespace Never.EasySql.Client
     /// <summary>
     /// oracle 数据库
     /// </summary>
+    [Never.Attributes.Summary(Descn = "data source=(description=(address_list=(address=(protocol=tcp)(host=127.0.0.11)(port=1521)))(connect_data=(service_name=test)));user id=xx;password=xxx;")]
     public sealed class OracleServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild
@@ -30,7 +31,7 @@ namespace Never.EasySql.Client
         /// <param name="connectionString">连接字符串.</param>
         [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlClient.OracleServerExecuter.DbProviderFactory")]
         public OracleServerExecuter(string connectionString)
-            : base(":", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.OracleServerExecuter.InitInstance()), connectionString)
+            : base(":", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.EasySql.SqlExecuterFactory.OracleServerExecuter.InitInstance()), connectionString)
         {
         }
 

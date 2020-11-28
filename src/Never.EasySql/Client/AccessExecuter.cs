@@ -9,9 +9,10 @@ using System.Text;
 namespace Never.EasySql.Client
 {
     /// <summary>
-    /// oracle数据库
+    /// access数据库
     /// </summary>
-    public sealed class OleDbServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
+    [Never.Attributes.Summary(Descn = "PROVIDER=Microsoft.Jet.OLEDB.4.0;Data Source=C:\\test.mdb;uid=xx;pwd=xxx;")]
+    public sealed class AccessExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild
 
@@ -28,18 +29,18 @@ namespace Never.EasySql.Client
         /// Initializes a new instance of the <see cref="SqlServerExecuter"/> class.
         /// </summary>
         /// <param name="connectionString">连接字符串.</param>
-        [Never.Attributes.Summary(Descn = "请先引用初始化Never.SqlClient.SqlExecuterFactory.OleDbServerExecuter.DbProviderFactory")]
-        public OleDbServerExecuter(string connectionString)
-            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.OleDbServerExecuter.InitInstance()), connectionString)
+        [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlExecuterFactory.OleDbServerExecuter.DbProviderFactory")]
+        public AccessExecuter(string connectionString)
+            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.EasySql.SqlExecuterFactory.OleDbServerExecuter.InitInstance()), connectionString)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OleDbServerExecuter"/> class.
+        /// Initializes a new instance of the <see cref="AccessExecuter"/> class.
         /// </summary>
         /// <param name="provider">驱动</param>
         /// <param name="connectionString">连接字符串.</param>
-        public OleDbServerExecuter(DbProviderFactory provider, string connectionString)
+        public AccessExecuter(DbProviderFactory provider, string connectionString)
             : base("@", provider, connectionString)
         {
             //cache the provider

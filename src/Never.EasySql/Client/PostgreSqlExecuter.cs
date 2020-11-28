@@ -6,6 +6,7 @@ namespace Never.EasySql.Client
     /// <summary>
     /// PostgreSql 数据库
     /// </summary> 
+    [Never.Attributes.Summary(Descn = "server=127.0.0.1;uid=xx;pwd=xx;database=test;")]
     public sealed class PostgreSqlExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild
@@ -25,7 +26,7 @@ namespace Never.EasySql.Client
         /// <param name="connectionString">连接字符串.</param>
         [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlClient.PostgreSqlExecuter.DbProviderFactory")]
         public PostgreSqlExecuter(string connectionString)
-            : base(":", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.PostgreSqlExecuter.InitInstance()), connectionString)
+            : base(":", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.EasySql.SqlExecuterFactory.PostgreSqlExecuter.InitInstance()), connectionString)
         {
         }
 

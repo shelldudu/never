@@ -8,7 +8,43 @@ using System.Threading.Tasks;
 namespace Never.Test
 {
     [Never.SqlClient.TableName(Name = "user")]
-    public class User
+    public class AccessUser
+    {
+        public string AggregateId { get; set; }
+
+        [Never.SqlClient.Column(Optional = Never.SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | Never.SqlClient.ColumnAttribute.ColumnOptional.Primary)]
+        public int Id { get; set; }
+
+        public long UserId { get; set; }
+        [Never.SqlClient.Column(Alias = "UserName")]
+        public string Name { get; set; }
+
+        public DateTime CreateDate { get; set; }
+        public DateTime EditDate { get; set; }
+
+        public int Version { get; set; }
+    }
+
+    [Never.SqlClient.TableName(Name = "user")]
+    public class SqlServerUser
+    {
+        public Guid AggregateId { get; set; }
+
+        [Never.SqlClient.Column(Optional = Never.SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | Never.SqlClient.ColumnAttribute.ColumnOptional.Primary)]
+        public int Id { get; set; }
+
+        public long UserId { get; set; }
+        [Never.SqlClient.Column(Alias = "UserName")]
+        public string Name { get; set; }
+
+        public DateTime CreateDate { get; set; }
+        public DateTime EditDate { get; set; }
+
+        public int Version { get; set; }
+    }
+
+    [Never.SqlClient.TableName(Name = "user")]
+    public class MySqlUser
     {
         public Guid AggregateId { get; set; }
 
@@ -52,13 +88,40 @@ namespace Never.Test
         {
             get
             {
-                return @"server=192.168.137.110;uid=sa;pwd=gg123456;database=p2p_login;";
+                return @"server=192.168.137.110,1433;uid=sa;pwd=gg123456;database=p2p_login;";
             }
         }
 
         protected override IEasySqlExecuter CreateSqlExecuter()
         {
             return new EasySql.Client.SqlServerExecuter(this.ConnectionString);
+        }
+    }
+
+    public class AccessBuilder : XmlContentDaoBuilder.XmlEmbeddedDaoBuilder
+    {
+        public override string[] EmbeddedSqlMaps
+        {
+            get
+            {
+                return new string[]
+                {
+                   "Never.EasySql.Xml.easysqldemo.xml,Never.EasySql",
+                };
+            }
+        }
+
+        public override string ConnectionString
+        {
+            get
+            {
+                return @"PROVIDER=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\shelldudu\Documents\p2p_login.mdb;";
+            }
+        }
+
+        protected override IEasySqlExecuter CreateSqlExecuter()
+        {
+            return new EasySql.Client.AccessExecuter(this.ConnectionString);
         }
     }
 
@@ -115,6 +178,7 @@ namespace Never.Test
             return new EasySql.Client.PostgreSqlExecuter(this.ConnectionString);
         }
     }
+
 
     #endregion builder
 }

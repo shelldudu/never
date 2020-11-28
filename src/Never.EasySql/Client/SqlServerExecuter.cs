@@ -11,6 +11,7 @@ namespace Never.EasySql.Client
     /// <summary>
     /// sqlserver数据库
     /// </summary>
+    [Never.Attributes.Summary(Descn = "server=127.0.0.1,1433;uid=xx;pwd=xx;database=test;")]
     public sealed class SqlServerExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
     {
         #region feild
@@ -30,7 +31,7 @@ namespace Never.EasySql.Client
         /// <param name="connectionString">连接字符串.</param>
         [Never.Attributes.Summary(Descn = "请先引用初始化Never.EasySql.SqlClient.SqlServerExecuter.DbProviderFactory")]
         public SqlServerExecuter(string connectionString)
-            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.SqlClient.SqlExecuterFactory.SqlServerExecuter.InitInstance()), connectionString)
+            : base("@", DbProviderFactoryInstance ?? (DbProviderFactoryInstance = Never.EasySql.SqlExecuterFactory.SqlServerExecuter.InitInstance()), connectionString)
         {
         }
 

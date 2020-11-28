@@ -164,19 +164,19 @@ namespace Never.EasySql
                 };
             }
 
-            if (this.SqlExecuter is OdbcServerExecuter)
-            {
-                return new Update<Parameter, Table>()
-                {
-                    Context = new Linq.Odbc.UpdatingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
-                };
-            }
+            //if (this.SqlExecuter is OdbcServerExecuter)
+            //{
+            //    return new Update<Parameter, Table>()
+            //    {
+            //        Context = new Linq.Odbc.UpdatingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
+            //    };
+            //}
 
-            if (this.SqlExecuter is OleDbServerExecuter)
+            if (this.SqlExecuter is AccessExecuter)
             {
                 return new Update<Parameter, Table>()
                 {
-                    Context = new Linq.OleDb.UpdatingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
+                    Context = new Linq.Access.UpdatingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
                 };
             }
 
@@ -269,19 +269,19 @@ namespace Never.EasySql
                 };
             }
 
-            if (this.SqlExecuter is OdbcServerExecuter)
-            {
-                return new Delete<Parameter, Table>()
-                {
-                    Context = new Linq.Odbc.DeletingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
-                };
-            }
+            //if (this.SqlExecuter is OdbcServerExecuter)
+            //{
+            //    return new Delete<Parameter, Table>()
+            //    {
+            //        Context = new Linq.Odbc.DeletingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
+            //    };
+            //}
 
-            if (this.SqlExecuter is OleDbServerExecuter)
+            if (this.SqlExecuter is AccessExecuter)
             {
                 return new Delete<Parameter, Table>()
                 {
-                    Context = new Linq.OleDb.DeletingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
+                    Context = new Linq.Access.DeletingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
                 };
             }
 
@@ -374,19 +374,19 @@ namespace Never.EasySql
                 };
             }
 
-            if (this.SqlExecuter is OdbcServerExecuter)
-            {
-                return new Insert<Parameter, Table>()
-                {
-                    Context = new Linq.Odbc.InsertingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
-                };
-            }
+            //if (this.SqlExecuter is OdbcServerExecuter)
+            //{
+            //    return new Insert<Parameter, Table>()
+            //    {
+            //        Context = new Linq.Odbc.InsertingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
+            //    };
+            //}
 
-            if (this.SqlExecuter is OleDbServerExecuter)
+            if (this.SqlExecuter is AccessExecuter)
             {
                 return new Insert<Parameter, Table>()
                 {
-                    Context = new Linq.OleDb.InsertingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
+                    Context = new Linq.Access.InsertingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
                 };
             }
 
@@ -478,19 +478,19 @@ namespace Never.EasySql
                 };
             }
 
-            if (this.SqlExecuter is OdbcServerExecuter)
-            {
-                return new Select<Parameter, Table>()
-                {
-                    Context = new Linq.Odbc.SelectingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
-                };
-            }
+            //if (this.SqlExecuter is OdbcServerExecuter)
+            //{
+            //    return new Select<Parameter, Table>()
+            //    {
+            //        Context = new Linq.Odbc.SelectingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
+            //    };
+            //}
 
-            if (this.SqlExecuter is OleDbServerExecuter)
+            if (this.SqlExecuter is AccessExecuter)
             {
                 return new Select<Parameter, Table>()
                 {
-                    Context = new Linq.OleDb.SelectingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
+                    Context = new Linq.Access.SelectingContext<Parameter, Table>(this.cacheId, this, tableInfo, this.parameter)
                 };
             }
 

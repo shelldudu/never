@@ -2,12 +2,11 @@
 using System;
 using System.Data.Common;
 
-namespace Never.SqlClient
+namespace Never.EasySql
 {
     /// <summary>
     /// sql工厂
     /// </summary>
-    [Obsolete("please use never.easy.sqlExecuterFactory")]
     public static class SqlExecuterFactory
     {
         #region netsted

@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Never.EasySql.Linq.OleDb
+namespace Never.EasySql.Linq.Access
 {
     /// <summary>
     /// 插入操作
