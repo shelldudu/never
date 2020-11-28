@@ -157,7 +157,7 @@ namespace Never.SqlClient
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        protected IEnumerable<IDbDataParameter> ReadyParameters(KeyValuePair<string, object>[] @parameters)
+        protected virtual IEnumerable<IDbDataParameter> ReadyParameters(KeyValuePair<string, object>[] @parameters)
         {
             var list = new List<IDbDataParameter>(@parameters.Length);
             foreach (var para in @parameters)

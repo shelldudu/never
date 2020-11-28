@@ -1,4 +1,6 @@
 ﻿using Never.EasySql;
+using Never.SqlClient;
+using Never.SqlClient.TypeHandlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +16,13 @@ namespace Never.Test
 
         [Never.SqlClient.Column(Optional = Never.SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | Never.SqlClient.ColumnAttribute.ColumnOptional.Primary)]
         public int Id { get; set; }
-
+        [TypeHandler(typeof(LongIntegerTypeHandler))]
         public long UserId { get; set; }
         [Never.SqlClient.Column(Alias = "UserName")]
         public string Name { get; set; }
 
         public DateTime CreateDate { get; set; }
+
         public DateTime EditDate { get; set; }
 
         public int Version { get; set; }

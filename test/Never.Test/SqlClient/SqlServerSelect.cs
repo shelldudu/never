@@ -48,7 +48,7 @@ namespace Never.Test.SqlClient
                .OrderBy(t => t.Id)
                //.OrderByDescendingTable1(t => t.Id)
                //.OrderByDescendingTable2(t => t.Id)
-               .AddSql(" and {user}.{id} != @Id ", true)
+               .AddSql(" and {user}.{id} != \'$Id$\' ", true)
                //.GetResult()
                .GetResult(0, 1);
             //.GetSqlTagFormat(true);

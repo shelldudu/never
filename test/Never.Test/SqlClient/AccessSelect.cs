@@ -17,9 +17,10 @@ namespace Never.Test.SqlClient
         [Xunit.Fact]
         public void testSelect1()
         {
+            var txt = new string(new char[] { '1', '2' });
             var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
             //返回条数
-            var one = dao.ToEasyLinqDao(new { Id = 1, IdArray = new[] { 22, 23, 24, 25 }.ToNullableParameter(), Name = "ee" })
+            var one = dao.ToEasyLinqDao(new { Id = 21, IdArray = new[] { 22, 23, 24, 25 }.ToNullableParameter(), Name = "ee" })
                .Select<AccessUser>()
                .ToSingle()//单条
                .Where((p, t) => t.Id >= p.Id)
@@ -62,15 +63,19 @@ namespace Never.Test.SqlClient
         {
             var user = new AccessUser() { Name = "sqlserver", UserId = 22334, AggregateId = NewId.GenerateGuid().ToString(), CreateDate = DateTime.Now, EditDate = DateTime.Now };
             var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
-            var more = dao.ToEasyLinqDao(user)
-                 .Insert()
+            dao.ToEasyLinqDao(new { Name = user.Name, UserId = user.UserId, AggregateId = user.AggregateId, Version = user.Version, UserName = user.Name, CreateDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") })
+                 .Insert<AccessUser>()
                  .UseSingle()
-                 .InsertAll()
-                 .LastInsertId<int>()
+                 .Colum(t => t.UserId)
+                 .Colum(t => t.AggregateId)
+                 .Colum(t => t.Version)
+                 .Colum(t => t.Name, p => p.Name)
+                 .Colum(t => t.CreateDate)
+                 //.LastInsertId<int>()
                  .GetResult();
 
-            string sql = more.ToString();
-            System.Console.WriteLine(sql);
+            //string sql = more.ToString();
+            //System.Console.WriteLine(sql);
         }
 
         [Xunit.Fact]

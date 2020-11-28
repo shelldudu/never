@@ -16,7 +16,7 @@ namespace Never.Test
         public void TestGetInt()
         {
             var type = typeof(int?);
-            using (var sql = Never.SqlClient.SqlExecuterFactory.MySql("server=127.0.0.1;port=3306; initial catalog = b2c_message;uid = sa;pwd=gg123456;SslMode=none;"))
+            using (var sql = Never.EasySql.SqlExecuterFactory.MySql("server=127.0.0.1;port=3306; initial catalog = b2c_message;uid = sa;pwd=gg123456;SslMode=none;"))
             {
                 var ints = sql.QueryForObject<TestDB>("select 1 as Id, 1 as UserId,'[1,2,3]' as UserName from asset where UserName = @UserName limit 1;", new TestDB { UserName = new[] { '1', '2', '3' } });
                 //var str = sql.QueryForList<string>("select VideoDescn from article", null);

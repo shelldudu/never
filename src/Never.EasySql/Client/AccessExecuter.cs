@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.Common;
 using System.Text;
 
@@ -49,5 +50,42 @@ namespace Never.EasySql.Client
         }
 
         #endregion ctor
+
+        #region para
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        protected override IEnumerable<IDbDataParameter> ReadyParameters(KeyValuePair<string, object>[] parameters)
+        {
+            return base.ReadyParameters(parameters);
+            var list = new List<IDbDataParameter>(@parameters.Length);
+            foreach (var para in @parameters)
+            {
+                if (para.Value == null || para.Value == DBNull.Value)
+                {
+                    list.Add(this.CreateParameter(para.Key, DBNull.Value));
+                }
+
+                else if (para.Value is DateTime)
+                {
+                    var pa = this.CreateParameter(para.Key, DbType.DateTime, para.Value);
+#if NET461
+                    ((System.Data.OleDb.OleDbParameter)pa).DbType = DbType.DateTime;
+#endif
+                    list.Add(pa);
+                }
+
+                else
+                {
+                    list.Add(this.CreateParameter(para.Key, para.Value));
+                }
+
+            }
+
+            return list;
+        }
+        #endregion
     }
 }
