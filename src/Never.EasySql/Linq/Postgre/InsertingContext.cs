@@ -33,13 +33,17 @@ namespace Never.EasySql.Linq.Postgre
         public override InsertContext<Parameter, Table> InsertLastInsertId<ReturnType>()
         {
             this.LoadSqlOnGetResulting();
+            if (this.UseBulk)
+                return this;
+
+            var name = this.AutoIncrementColumnName;
             this.labels.Add(new ReturnLabel()
             {
                 TagId = NewId.GenerateNumber(),
                 Line = new TextLabel()
                 {
                     TagId = NewId.GenerateNumber(),
-                    SqlText = this.UseBulk ? ";select @@Identity;" : "select @@Identity;",
+                    SqlText = string.Concat("RETURNING ", name.IsNullOrEmpty() ? "0" : name, ";"),
                 },
                 Type = typeof(ReturnType).Name.ToLower(),
             });

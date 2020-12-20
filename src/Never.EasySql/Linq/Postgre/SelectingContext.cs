@@ -26,6 +26,104 @@ namespace Never.EasySql.Linq.Postgre
         }
 
         /// <summary>
+        /// 入口
+        /// </summary>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> StartEntrance()
+        {
+            return base.StartEntrance();
+        }
+
+        /// <summary>
+        /// where
+        /// </summary>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> Where()
+        {
+            return base.Where();
+        }
+
+        /// <summary>
+        /// wehre
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="andOr"></param>
+        /// <returns></returns>
+        public override SelectContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null)
+        {
+            return base.Where(expression, andOr);
+        }
+
+        /// <summary>
+        /// 查询结果
+        /// </summary>
+        public override Table GetResult()
+        {
+            return base.GetResult();
+        }
+
+        /// <summary>
+        /// 查询结果
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <returns></returns>
+        public override IEnumerable<Table> GetResults(int startIndex, int endIndex)
+        {
+            this.LoadOrderBy(true);
+            var change = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = "\r",
+            };
+
+            this.labels.Add(change);
+            this.textLength += change.SqlText.Length;
+
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = string.Concat("limit ", this.dao.SqlExecuter.GetParameterPrefix(), "StartIndex", ", OFFSET ", this.dao.SqlExecuter.GetParameterPrefix(), "EndIndex"),
+            };
+
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = "StartIndex",
+                OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length,
+                PrefixStartIndex = "limit ".Length,
+                ParameterStartIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                ParameterStopIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length - 1,
+                TextParameter = false,
+            });
+            label.Add(new SqlTagParameterPosition()
+            {
+                ActualPrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                SourcePrefix = this.dao.SqlExecuter.GetParameterPrefix(),
+                Name = "EndIndex",
+                OccupanLength = this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length,
+                PrefixStartIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length + ", OFFSET ".Length,
+                ParameterStartIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length + ", OFFSET ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length,
+                ParameterStopIndex = "limit ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "StartIndex".Length + ", OFFSET ".Length + this.dao.SqlExecuter.GetParameterPrefix().Length + "EndIndex".Length - 1,
+                TextParameter = false,
+            });
+
+            this.labels.Add(label);
+            this.textLength += label.SqlText.Length;
+
+            return base.GetResults(startIndex, endIndex);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected override void OnWhereInit()
+        {
+            base.OnWhereInit();
+        }
+
+        /// <summary>
         /// 对表格或字段格式化
         /// </summary>
         /// <param name="text"></param>

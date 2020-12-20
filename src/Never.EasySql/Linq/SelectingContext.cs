@@ -61,7 +61,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// where的条数
         /// </summary>
-        private int whereCount = 0;
+        protected int whereCount = 0;
         #endregion
 
         /// <summary>
@@ -82,6 +82,11 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override Table GetResult()
         {
+            if (this.whereCount == 0)
+            {
+                this.AddFromTable();
+            }
+
             this.LoadOrderBy(true);
             var sqlTag = new LinqSqlTag(this.cacheId, "select")
             {
@@ -101,6 +106,11 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override IEnumerable<Table> GetResults(int startIndex, int endIndex)
         {
+            if (this.whereCount == 0)
+            {
+                this.AddFromTable();
+            }
+
             this.LoadOrderBy(true);
             var sqlTag = new LinqSqlTag(this.cacheId, "select")
             {
@@ -121,6 +131,11 @@ namespace Never.EasySql.Linq
         /// <returns></returns>
         public override SqlTagFormat GetSqlTagFormat(bool formatText = false)
         {
+            if (this.whereCount == 0)
+            {
+                this.AddFromTable();
+            }
+
             this.LoadOrderBy(true);
             var sqlTag = new LinqSqlTag(this.cacheId, "select")
             {
@@ -141,28 +156,75 @@ namespace Never.EasySql.Linq
         /// 加载orderby
         /// </summary>
         /// <param name="clear"></param>
-        protected void LoadOrderBy(bool clear = true)
+        protected void LoadOrderBy(bool clear)
         {
-            if (this.orderBies.IsNotNullOrEmpty())
-            {
-                var label = new TextLabel()
-                {
-                    SqlText = "\r",
-                    TagId = NewId.GenerateNumber(),
-                };
-
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
-
-                label = this.LoadOrderByLabel(this.orderBies, this.dao);
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
-            }
-
-            if (clear && this.orderBies != null)
+            this.LoadOrderBy(this.labels, this.orderBies, out var length);
+            this.textLength += length;
+            if (clear && length > 0)
                 this.orderBies.Clear();
         }
 
+        /// <summary>
+        /// 加载orderby
+        /// </summary>
+        /// <param name="labels"></param>
+        /// <param name="orderBies"></param>
+        /// <param name="appendLength"></param>
+        public void LoadOrderBy(IList<ILabel> labels, List<OrderByInfo> orderBies, out int appendLength)
+        {
+            appendLength = 0;
+            if (orderBies.IsNullOrEmpty())
+                return;
+
+            var label = new TextLabel()
+            {
+                SqlText = "\r",
+                TagId = NewId.GenerateNumber(),
+            };
+
+            labels.Add(label);
+            textLength += label.SqlText.Length;
+
+            label = this.LoadOrderByLabel(orderBies, this.dao);
+            labels.Add(label);
+            appendLength = label.SqlText.Length;
+        }
+
+
+        /// <summary>
+        /// 添加查询表
+        /// </summary>
+        protected void AddFromTable()
+        {
+            this.AddFromTable(this.labels, out var length);
+            this.textLength += length;
+        }
+
+        /// <summary>
+        /// add table
+        /// </summary>
+        /// <param name="labels"></param>
+        /// <param name="appendLength"></param>
+        public void AddFromTable(IList<ILabel> labels, out int appendLength)
+        {
+            var label = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+            };
+
+            if (this.AsTable.IsNotNullOrEmpty())
+            {
+                label.SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r");
+            }
+            else
+            {
+                label.SqlText = string.Concat("from ", this.FromTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r");
+            }
+
+            labels.Add(label);
+            appendLength = label.SqlText.Length;
+            return;
+        }
         /// <summary>
         /// 检查名字
         /// </summary>
@@ -187,7 +249,7 @@ namespace Never.EasySql.Linq
         /// <param name="originalColunmName"></param>
         /// <param name="as"></param>
         /// <returns></returns>
-        protected override SelectContext<Parameter, Table> SelectColumn(string memberName, string originalColunmName, string @as)
+        public override SelectContext<Parameter, Table> SelectColumn(string memberName, string originalColunmName, string @as)
         {
             var label = new TextLabel()
             {
@@ -270,31 +332,7 @@ namespace Never.EasySql.Linq
             if (whereCount == 0)
             {
                 whereCount++;
-                if (this.AsTable.IsNotNullOrEmpty())
-                {
-                    var label = new TextLabel()
-                    {
-                        SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
-                        TagId = NewId.GenerateNumber(),
-                    };
-
-                    this.labels.Add(label);
-                    this.textLength += label.SqlText.Length;
-                }
-
-                else
-                {
-                    var label = new TextLabel()
-                    {
-                        SqlText = string.Concat("from ", this.FromTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
-                        TagId = NewId.GenerateNumber(),
-                    };
-
-                    this.labels.Add(label);
-                    this.textLength += label.SqlText.Length;
-                }
-
-
+                this.AddFromTable();
                 if (this.selectJoin.IsNotNullOrEmpty())
                 {
                     var label = this.LoadJoinLabel(this.FromTable, this.AsTable, selectJoin, this.dao);
@@ -328,44 +366,20 @@ namespace Never.EasySql.Linq
                 this.OnWhereInit();
             }
 
-            var label = new TextLabel()
-            {
-                TagId = NewId.GenerateNumber(),
-            };
-
             if (whereCount == 0)
             {
                 whereCount++;
-                label.SqlText = string.Concat("where ");
-
-                if (this.AsTable.IsNotNullOrEmpty())
+                var label = new TextLabel()
                 {
-                    var label2 = new TextLabel()
-                    {
-                        SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
-                        TagId = NewId.GenerateNumber(),
-                    };
-
-                    this.labels.Add(label2);
-                    this.textLength += label.SqlText.Length;
-                }
-                else
-                {
-                    var label2 = new TextLabel()
-                    {
-                        SqlText = string.Concat("from ", this.FromTable, this.selectJoin.IsNotNullOrEmpty() ? " " : "\r"),
-                        TagId = NewId.GenerateNumber(),
-                    };
-
-                    this.labels.Add(label2);
-                    this.textLength += label.SqlText.Length;
-                }
-
+                    TagId = NewId.GenerateNumber(),
+                    SqlText = string.Concat("where "),
+                };
+                this.AddFromTable();
                 if (this.selectJoin.IsNotNullOrEmpty())
                 {
-                    var label2 = this.LoadJoinLabel(this.FromTable, this.AsTable, selectJoin, this.dao);
-                    this.labels.Add(label2);
-                    this.textLength += label.SqlText.Length;
+                    var labelt = this.LoadJoinLabel(this.FromTable, this.AsTable, selectJoin, this.dao);
+                    this.labels.Add(labelt);
+                    this.textLength += labelt.SqlText.Length;
                 }
 
                 this.labels.Add(label);
@@ -387,29 +401,34 @@ namespace Never.EasySql.Linq
                     this.labels.Add(label);
                     this.textLength += label.SqlText.Length;
                 }
+
+                return this;
             }
-            else
-            {
-                label.SqlText = andOr == null ? "and " : string.Concat(andOr, " ");
-                this.labels.Add(label);
-                this.textLength += label.SqlText.Length;
-                int s = this.labels.Count;
-                if (base.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix()))
-                {
-                    int e = this.labels.Count;
-                    for (var i = s; i < e; i++)
-                    {
-                        this.textLength += this.labels[i].SqlText.Length;
-                    }
 
-                    label = new TextLabel()
-                    {
-                        TagId = NewId.GenerateNumber(),
-                        SqlText = "\r",
-                    };
-                    this.labels.Add(label);
-                    this.textLength += label.SqlText.Length;
+            var label2 = new TextLabel()
+            {
+                TagId = NewId.GenerateNumber(),
+                SqlText = andOr == null ? "and " : string.Concat(andOr, " "),
+            };
+
+            this.labels.Add(label2);
+            this.textLength += label2.SqlText.Length;
+            int ss = this.labels.Count;
+            if (base.AnalyzeWhereExpress(expression, this.labels, this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable, this.dao.SqlExecuter.GetParameterPrefix()))
+            {
+                int e = this.labels.Count;
+                for (var i = ss; i < e; i++)
+                {
+                    this.textLength += this.labels[i].SqlText.Length;
                 }
+
+                var labelr = new TextLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                    SqlText = "\r",
+                };
+                this.labels.Add(labelr);
+                this.textLength += labelr.SqlText.Length;
             }
 
             return this;

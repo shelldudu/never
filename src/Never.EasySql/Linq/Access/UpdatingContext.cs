@@ -26,6 +26,76 @@ namespace Never.EasySql.Linq.Access
         }
 
         /// <summary>
+        /// 入口
+        /// </summary>
+        public override UpdateContext<Parameter, Table> StartEntrance()
+        {
+            this.formatColumnAppendCount = this.FormatTableAndColumn("a").Length - 1;
+            this.tableNamePoint = string.Concat(this.FromTable, ".");
+            this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");
+
+            var label = new TextLabel() { TagId = NewId.GenerateNumber(), SqlText = string.Concat("update ", this.FromTable, "\r") };
+            this.textLength += label.SqlText.Length;
+            this.labels.Add(label);
+            this.equalAndPrefix = string.Concat(" = ", this.dao.SqlExecuter.GetParameterPrefix());
+            return this;
+        }
+
+
+        /// <summary>
+        /// where 条件
+        /// </summary>
+        public override UpdateContext<Parameter, Table> Where()
+        {
+            if (this.updateJoin.IsNotNullOrEmpty())
+            {
+                var label = this.LoadJoinLabel(this.FromTable, this.AsTable, updateJoin, this.dao);
+
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
+            return base.Where();
+        }
+
+        /// <summary>
+        /// where 条件
+        /// </summary>
+        public override UpdateContext<Parameter, Table> Where(Expression<Func<Parameter, Table, bool>> expression, string andOr = null)
+        {
+            if (this.AsTable.IsNotNullOrEmpty())
+            {
+                var label = new TextLabel()
+                {
+                    SqlText = string.Concat("from ", this.FromTable, " as ", this.AsTable, this.updateJoin.IsNotNullOrEmpty() ? " " : "\r"),
+                    TagId = NewId.GenerateNumber(),
+                };
+
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
+            if (this.updateJoin.IsNotNullOrEmpty())
+            {
+                var label = this.LoadJoinLabel(this.FromTable, this.AsTable, updateJoin, this.dao);
+
+                this.labels.Add(label);
+                this.textLength += label.SqlText.Length;
+            }
+
+            return base.Where(expression);
+        }
+
+        /// <summary>
+        /// set的时候选择什么表名（用别名还是真表名）
+        /// </summary>
+        /// <returns></returns>
+        protected override string SelectTableNamePointOnSetColunm()
+        {
+            return this.tableNamePoint;
+        }
+
+        /// <summary>
         /// 对表格或字段格式化
         /// </summary>
         /// <param name="text"></param>

@@ -2,6 +2,7 @@
 using Never.EasySql.Labels;
 using Never.Exceptions;
 using Never.Serialization.Json;
+using Never.SqlClient;
 using Never.Utils;
 using System;
 using System.Collections.Generic;
@@ -1018,11 +1019,78 @@ namespace Never.EasySql.Linq
         }
         #endregion
 
-        #region field
+        #region field and ctor
+
         /// <summary>
         /// 格式化表格或字段
         /// </summary>
         protected static Regex formatTableOrColumnRegex = new Regex(@"\{(?<name>.*?)\}", RegexOptions.Compiled | RegexOptions.Singleline);
+        /// <summary>
+        /// 自动增长的属性信息
+        /// </summary>
+        protected TableInfo.ColumnInfo? autoIncrementColumnInfo;
+        /// <summary>
+        /// 主键的属性信息
+        /// </summary>
+        protected TableInfo.ColumnInfo? primaryKeyColumnInfo;
+
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="tableInfo"></param>
+        protected Context(TableInfo tableInfo)
+        {
+            if (tableInfo.Columns != null)
+            {
+                if (tableInfo.Columns.Any(t => t.Column != null && ((t.Column.Optional & ColumnAttribute.ColumnOptional.Primary)  == ColumnAttribute.ColumnOptional.Primary)))
+                {
+                    var column = tableInfo.Columns.FirstOrDefault(t => t.Column != null && ((t.Column.Optional & ColumnAttribute.ColumnOptional.Primary) == ColumnAttribute.ColumnOptional.Primary));
+                    primaryKeyColumnInfo = column;
+                }
+
+                if (tableInfo.Columns.Any(t => t.Column != null && ((t.Column.Optional & ColumnAttribute.ColumnOptional.AutoIncrement) == ColumnAttribute.ColumnOptional.AutoIncrement)))
+                {
+                    var column = tableInfo.Columns.FirstOrDefault(t => t.Column != null && ((t.Column.Optional & ColumnAttribute.ColumnOptional.AutoIncrement) == ColumnAttribute.ColumnOptional.AutoIncrement));
+                    autoIncrementColumnInfo = column;
+                }
+            }
+        }
+        #endregion
+
+        #region prop
+
+        /// <summary>
+        /// 自动增长的属性名字
+        /// </summary>
+        protected string AutoIncrementColumnName
+        {
+            get
+            {
+                if (this.autoIncrementColumnInfo.HasValue)
+                {
+                   return this.autoIncrementColumnInfo.Value.Column.Name.IsNullOrEmpty() ? this.autoIncrementColumnInfo.Value.Member.Name : this.autoIncrementColumnInfo.Value.Column.Name;
+                }
+
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// 主键的属性名字
+        /// </summary>
+        protected string PrimaryKeyColumnName
+        {
+            get
+            {
+                if (this.primaryKeyColumnInfo.HasValue)
+                {
+                    return this.primaryKeyColumnInfo.Value.Column.Name.IsNullOrEmpty() ? this.primaryKeyColumnInfo.Value.Member.Name : this.primaryKeyColumnInfo.Value.Column.Name;
+                }
+
+                return string.Empty;
+            }
+        }
+
         #endregion
 
         #region execute
@@ -1337,9 +1405,9 @@ namespace Never.EasySql.Linq
                 if (column.Any())
                 {
                     columnInfo = column.FirstOrDefault();
-                    if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
+                    if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Name.IsNotNullOrEmpty())
                     {
-                        return column.FirstOrDefault().Column.Alias;
+                        return column.FirstOrDefault().Column.Name;
                     }
 
                     return column.FirstOrDefault().Member.Name;
@@ -1357,9 +1425,9 @@ namespace Never.EasySql.Linq
                 if (column.Any())
                 {
                     columnInfo = column.FirstOrDefault();
-                    if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
+                    if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Name.IsNotNullOrEmpty())
                     {
-                        return column.FirstOrDefault().Column.Alias;
+                        return column.FirstOrDefault().Column.Name;
                     }
 
                     return column.FirstOrDefault().Member.Name;
@@ -1380,9 +1448,9 @@ namespace Never.EasySql.Linq
                     if (column.Any())
                     {
                         columnInfo = column.FirstOrDefault();
-                        if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
+                        if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Name.IsNotNullOrEmpty())
                         {
-                            return column.FirstOrDefault().Column.Alias;
+                            return column.FirstOrDefault().Column.Name;
                         }
 
                         return column.FirstOrDefault().Member.Name;
@@ -1408,9 +1476,9 @@ namespace Never.EasySql.Linq
             IEnumerable<TableInfo.ColumnInfo> column = tableInfo.Columns.Where(ta => ta.Member == memberInfo);
             if (column.Any())
             {
-                if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
+                if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Name.IsNotNullOrEmpty())
                 {
-                    return column.FirstOrDefault().Column.Alias;
+                    return column.FirstOrDefault().Column.Name;
                 }
 
                 return column.FirstOrDefault().Member.Name;
@@ -1432,9 +1500,9 @@ namespace Never.EasySql.Linq
             if (column.Any())
             {
                 columnInfo = column.FirstOrDefault();
-                if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Alias.IsNotNullOrEmpty())
+                if (column.FirstOrDefault().Column != null && column.FirstOrDefault().Column.Name.IsNotNullOrEmpty())
                 {
-                    return column.FirstOrDefault().Column.Alias;
+                    return column.FirstOrDefault().Column.Name;
                 }
 
                 return column.FirstOrDefault().Member.Name;

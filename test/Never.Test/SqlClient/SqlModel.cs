@@ -14,11 +14,11 @@ namespace Never.Test
     {
         public string AggregateId { get; set; }
 
-        [Never.SqlClient.Column(Optional = Never.SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement | Never.SqlClient.ColumnAttribute.ColumnOptional.Primary)]
+        [Never.SqlClient.Column(Optional = ColumnAttribute.ColumnOptional.AutoIncrement | ColumnAttribute.ColumnOptional.Primary, Name = "ID")]
         public int Id { get; set; }
         [TypeHandler(typeof(LongIntegerTypeHandler))]
         public long UserId { get; set; }
-        [Never.SqlClient.Column(Alias = "UserName")]
+        [Never.SqlClient.Column(Name = "UserName")]
         public string Name { get; set; }
 
         public DateTime CreateDate { get; set; }
@@ -37,7 +37,7 @@ namespace Never.Test
         public int Id { get; set; }
 
         public long UserId { get; set; }
-        [Never.SqlClient.Column(Alias = "UserName")]
+        [Never.SqlClient.Column(Name = "UserName")]
         public string Name { get; set; }
 
         public DateTime CreateDate { get; set; }
@@ -55,7 +55,7 @@ namespace Never.Test
         public int Id { get; set; }
 
         public long UserId { get; set; }
-        [Never.SqlClient.Column(Alias = "UserName")]
+        [Never.SqlClient.Column(Name = "UserName")]
         public string Name { get; set; }
 
         public DateTime CreateDate { get; set; }
@@ -74,9 +74,9 @@ namespace Never.Test
 
     #region builder
 
-    public class SqlServerBuilder : XmlContentDaoBuilder.XmlEmbeddedDaoBuilder
+    public class SqlServerBuilder : BaseDaoBuilder
     {
-        public override string[] EmbeddedSqlMaps
+        public string[] EmbeddedSqlMaps
         {
             get
             {
@@ -101,9 +101,9 @@ namespace Never.Test
         }
     }
 
-    public class AccessBuilder : XmlContentDaoBuilder.XmlEmbeddedDaoBuilder
+    public class AccessBuilder : BaseDaoBuilder
     {
-        public override string[] EmbeddedSqlMaps
+        public string[] EmbeddedSqlMaps
         {
             get
             {
@@ -128,9 +128,9 @@ namespace Never.Test
         }
     }
 
-    public class MySqlBuilder : XmlContentDaoBuilder.XmlEmbeddedDaoBuilder
+    public class MySqlBuilder : BaseDaoBuilder
     {
-        public override string[] EmbeddedSqlMaps
+        public string[] EmbeddedSqlMaps
         {
             get
             {
@@ -155,9 +155,9 @@ namespace Never.Test
         }
     }
 
-    public class PostgreSqlBuilder : XmlContentDaoBuilder.XmlEmbeddedDaoBuilder
+    public class PostgreSqlBuilder : BaseDaoBuilder
     {
-        public override string[] EmbeddedSqlMaps
+        public string[] EmbeddedSqlMaps
         {
             get
             {
@@ -181,7 +181,32 @@ namespace Never.Test
             return new EasySql.Client.PostgreSqlExecuter(this.ConnectionString);
         }
     }
+    public class SqliteSqlBuilder : BaseDaoBuilder
+    {
+        public string[] EmbeddedSqlMaps
+        {
+            get
+            {
+                return new string[]
+                {
+                    "Never.EasySql.Xml.easysqldemo.xml,Never.EasySql",
+                };
+            }
+        }
 
+        public override string ConnectionString
+        {
+            get
+            {
+                return "server=192.168.137.110;uid=sa;pwd=gg123456;database=p2p_login;port=3306;";
+            }
+        }
+
+        protected override IEasySqlExecuter CreateSqlExecuter()
+        {
+            return new EasySql.Client.SqliteExecuter(this.ConnectionString);
+        }
+    }
 
     #endregion builder
 }

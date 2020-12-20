@@ -107,7 +107,6 @@ namespace Never.EasySql.Linq
                 this.Context.InsertLastInsertId<ReturnType>();
                 return new InsertLastInsertIdGrammar<ReturnType>() { Context = this.Context };
             }
-
             /// <summary>
             /// 获取结果
             /// </summary>

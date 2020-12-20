@@ -61,7 +61,7 @@ namespace Never.EasySql.Linq
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        protected DeleteContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter)
+        protected DeleteContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(tableInfo)
         {
             this.dao = dao; this.tableInfo = tableInfo; this.sqlParameter = sqlParameter;
             this.labels = new List<ILabel>(10);

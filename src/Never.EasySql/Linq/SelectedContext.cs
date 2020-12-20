@@ -10,10 +10,11 @@ namespace Never.EasySql.Linq
     internal sealed class SelectedContext<Parameter, Table> : SelectContext<Parameter, Table>
     {
         private readonly LinqSqlTag sqlTag;
-
+        private readonly IPageParameterHandler parameterHandler;
         public SelectedContext(LinqSqlTag sqlTag, IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(dao, tableInfo, sqlParameter)
         {
             this.sqlTag = sqlTag;
+            this.parameterHandler = dao.SqlExecuter as IPageParameterHandler;
         }
 
         public override SelectContext<Parameter, Table> AddSql(string sql, bool formatTableOrColumn)
@@ -28,8 +29,17 @@ namespace Never.EasySql.Linq
 
         public override IEnumerable<Table> GetResults(int startIndex, int endIndex)
         {
-            this.templateParameter["StartIndex"] = startIndex;
-            this.templateParameter["EndIndex"] = endIndex;
+            if (this.parameterHandler != null)
+            {
+                this.templateParameter["StartIndex"] = this.parameterHandler.HandleStartIndex(startIndex);
+                this.templateParameter["EndIndex"] = this.parameterHandler.HandleEndIndex(endIndex);
+            }
+            else
+            {
+                this.templateParameter["StartIndex"] = startIndex;
+                this.templateParameter["EndIndex"] = endIndex;
+            }
+
             return this.SelectMany<Parameter, Table>(this.sqlTag.Clone(this.templateParameter), this.dao, this.sqlParameter);
         }
 
@@ -44,7 +54,7 @@ namespace Never.EasySql.Linq
             return this;
         }
 
-        protected override SelectContext<Parameter, Table> SelectColumn(string column, string originalColunmName, string @as)
+        public override SelectContext<Parameter, Table> SelectColumn(string column, string originalColunmName, string @as)
         {
             return this;
         }

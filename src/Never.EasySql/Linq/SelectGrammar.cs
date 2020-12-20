@@ -7645,6 +7645,14 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 获取结果
+        /// </summary>
+        public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+        {
+            return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+        }
+
+        /// <summary>
         /// 获取sql语句
         /// </summary>
         /// <returns></returns>
@@ -7824,6 +7832,15 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+            {
+                return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+            }
+
             /// <summary>
             /// 获取sql语句
             /// </summary>
@@ -8971,6 +8988,14 @@ namespace Never.EasySql.Linq
         {
             return this.Context.GetResults(startIndex, endIndex);
         }
+
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+        {
+            return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+        }
         /// <summary>
         /// 获取sql语句
         /// </summary>
@@ -9172,6 +9197,15 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+            {
+                return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+            }
+
             /// <summary>
             /// 获取sql语句
             /// </summary>
@@ -10344,6 +10378,14 @@ namespace Never.EasySql.Linq
         }
 
         /// <summary>
+        /// 获取结果
+        /// </summary>
+        public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+        {
+            return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+        }
+
+        /// <summary>
         /// 获取sql语句
         /// </summary>
         /// <returns></returns>
@@ -10567,6 +10609,15 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+            {
+                return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+            }
+
             /// <summary>
             /// 获取sql语句
             /// </summary>
@@ -11759,6 +11810,15 @@ namespace Never.EasySql.Linq
         {
             return this.Context.GetResults(startIndex, endIndex);
         }
+
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+        {
+            return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+        }
+
         /// <summary>
         /// 获取sql语句
         /// </summary>
@@ -12004,6 +12064,15 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+            {
+                return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+            }
+
             /// <summary>
             /// 获取sql语句
             /// </summary>
@@ -13197,6 +13266,15 @@ namespace Never.EasySql.Linq
         {
             return this.Context.GetResults(startIndex, endIndex);
         }
+
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+        {
+            return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+        }
+
         /// <summary>
         /// 获取sql语句
         /// </summary>
@@ -13466,6 +13544,15 @@ namespace Never.EasySql.Linq
             {
                 return this.Context.GetResults(startIndex, endIndex);
             }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            public IEnumerable<Table> GetResult(PagedSearch pagedSearch)
+            {
+                return this.Context.GetResults(pagedSearch.StartIndex, pagedSearch.EndIndex);
+            }
+
             /// <summary>
             /// 获取sql语句
             /// </summary>

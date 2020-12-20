@@ -12,9 +12,9 @@ namespace Never.SqlClient
     public class ColumnAttribute : Attribute
     {
         /// <summary>
-        /// 字段别名
+        /// 字段名
         /// </summary>
-        public string Alias { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// 字段的特性

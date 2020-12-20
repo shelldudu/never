@@ -41,8 +41,8 @@ namespace Never.SqlClient
             /// <returns></returns>
             public string GetMemberName()
             {
-                if (this.Column != null && this.Column.Alias.IsNotNullOrWhiteSpace())
-                    return this.Column.Alias;
+                if (this.Column != null && this.Column.Name.IsNotNullOrWhiteSpace())
+                    return this.Column.Name;
 
                 return this.Member.Name;
             }

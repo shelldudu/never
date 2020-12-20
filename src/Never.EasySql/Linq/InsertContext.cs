@@ -65,7 +65,7 @@ namespace Never.EasySql.Linq
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        protected InsertContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter)
+        protected InsertContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(tableInfo)
         {
             this.dao = dao; this.tableInfo = tableInfo; this.sqlParameter = sqlParameter;
             this.labels = new List<ILabel>(10);
@@ -168,7 +168,7 @@ namespace Never.EasySql.Linq
                     if ((i.Column.Optional & SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement) == SqlClient.ColumnAttribute.ColumnOptional.AutoIncrement)
                         continue;
 
-                    var name = i.Column.Alias.IsNullOrEmpty() ? i.Member.Name : i.Column.Alias;
+                    var name = i.Column.Name.IsNullOrEmpty() ? i.Member.Name : i.Column.Name;
                     this.InsertColumn(name, name, false, false);
                 }
             }

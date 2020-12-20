@@ -25,6 +25,7 @@
     <PackageReference Include="Castle.Core" Version="4.4.0" />
     <PackageReference Include="EmitMapper" Version="1.0.0" />
     <PackageReference Include="Jil" Version="2.17.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.1" />
     <PackageReference Include="MySql.Data" Version="8.0.16" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Npgsql" Version="4.0.6" />

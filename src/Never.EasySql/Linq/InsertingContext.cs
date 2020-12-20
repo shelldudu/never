@@ -202,6 +202,11 @@ namespace Never.EasySql.Linq
                 };
                 arrayLabel.Line.AddRange(parameters);
                 this.labels.Add(arrayLabel);
+                this.labels.Add(new TextLabel()
+                {
+                    TagId = NewId.GenerateNumber(),
+                    SqlText = ";",
+                });
             }
             else
             {

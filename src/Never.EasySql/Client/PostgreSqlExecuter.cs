@@ -38,9 +38,6 @@ namespace Never.EasySql.Client
         public PostgreSqlExecuter(DbProviderFactory provider, string connectionString)
             : base(":", provider, connectionString)
         {
-            //cache the provider
-            if (DbProviderFactoryInstance == null)
-                DbProviderFactoryInstance = provider;
         }
 
         #endregion ctor

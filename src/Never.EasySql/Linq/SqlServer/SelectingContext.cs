@@ -183,7 +183,7 @@ namespace Never.EasySql.Linq.SqlServer
                 {
                     this.orderBies.Add(new OrderByInfo
                     {
-                        Flag = string.Concat("order by ", primary.FirstOrDefault().Column.Alias.IsNullOrEmpty() ? primary.FirstOrDefault().Member.Name : primary.FirstOrDefault().Column.Alias, " desc"),
+                        Flag = string.Concat("order by ", primary.FirstOrDefault().Column.Name.IsNullOrEmpty() ? primary.FirstOrDefault().Member.Name : primary.FirstOrDefault().Column.Name, " desc"),
                         Placeholder = this.AsTable.IsNullOrEmpty() ? this.FromTable : this.AsTable,
                         Type = typeof(Table)
                     });

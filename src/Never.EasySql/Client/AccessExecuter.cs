@@ -13,7 +13,7 @@ namespace Never.EasySql.Client
     /// access数据库
     /// </summary>
     [Never.Attributes.Summary(Descn = "PROVIDER=Microsoft.Jet.OLEDB.4.0;Data Source=C:\\test.mdb;uid=xx;pwd=xxx;")]
-    public sealed class AccessExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter
+    public sealed class AccessExecuter : EasySqlExecuter, ISqlExecuter, ITransactionExecuter, IPageParameterHandler
     {
         #region feild
 
@@ -44,48 +44,27 @@ namespace Never.EasySql.Client
         public AccessExecuter(DbProviderFactory provider, string connectionString)
             : base("@", provider, connectionString)
         {
-            //cache the provider
-            if (DbProviderFactoryInstance == null)
-                DbProviderFactoryInstance = provider;
+        }
+
+        /// <summary>
+        /// 返回新的startIndex
+        /// </summary>
+        /// <param name="startIndex"></param>
+        public int HandleStartIndex(int startIndex)
+        {
+            return startIndex <= 0 ? 1 : startIndex;
+        }
+
+        /// <summary>
+        /// 返回新的endIndex
+        /// </summary>
+        /// <param name="endIndex"></param>
+        /// <returns></returns>
+        public int HandleEndIndex(int endIndex)
+        {
+            return endIndex <= 0 ? 1 : endIndex;
         }
 
         #endregion ctor
-
-        #region para
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        protected override IEnumerable<IDbDataParameter> ReadyParameters(KeyValuePair<string, object>[] parameters)
-        {
-            return base.ReadyParameters(parameters);
-            var list = new List<IDbDataParameter>(@parameters.Length);
-            foreach (var para in @parameters)
-            {
-                if (para.Value == null || para.Value == DBNull.Value)
-                {
-                    list.Add(this.CreateParameter(para.Key, DBNull.Value));
-                }
-
-                else if (para.Value is DateTime)
-                {
-                    var pa = this.CreateParameter(para.Key, DbType.DateTime, para.Value);
-#if NET461
-                    ((System.Data.OleDb.OleDbParameter)pa).DbType = DbType.DateTime;
-#endif
-                    list.Add(pa);
-                }
-
-                else
-                {
-                    list.Add(this.CreateParameter(para.Key, para.Value));
-                }
-
-            }
-
-            return list;
-        }
-        #endregion
     }
 }

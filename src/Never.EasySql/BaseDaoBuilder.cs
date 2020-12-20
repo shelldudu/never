@@ -36,7 +36,10 @@ namespace Never.EasySql
         /// 初始化sqlTag提供者
         /// </summary>
         /// <returns></returns>
-        public abstract ISqlTagProvider InitSqlTagProviderOnStart();
+        public virtual ISqlTagProvider InitSqlTagProviderOnStart()
+        {
+            return new SqlTagProvider();
+        }
 
         #endregion init
 

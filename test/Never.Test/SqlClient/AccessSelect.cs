@@ -20,11 +20,11 @@ namespace Never.Test.SqlClient
             var txt = new string(new char[] { '1', '2' });
             var dao = ConstructibleDaoBuilder<AccessBuilder>.Value.Build();
             //返回条数
-            var one = dao.ToEasyLinqDao(new { Id = 21, IdArray = new[] { 22, 23, 24, 25 }.ToNullableParameter(), Name = "ee" })
+            var one = dao.ToEasyLinqDao(new { Id = 0, IdArray = new[] { 22, 23, 24, 25 }.ToNullableParameter(), Name = "ee" })
                .Select<AccessUser>()
-               .ToSingle()//单条
-               .Where((p, t) => t.Id >= p.Id)
-               .GetResult();
+               .ToEnumerable()//单条
+               //.Where((p, t) => t.Id >= p.Id)
+               .GetResult(0, 3);
 
             string sql = one.ToString();
             System.Console.WriteLine(sql);

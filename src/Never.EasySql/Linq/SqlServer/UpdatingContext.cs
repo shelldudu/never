@@ -30,6 +30,14 @@ namespace Never.EasySql.Linq.SqlServer
         /// </summary>
         public override UpdateContext<Parameter, Table> StartEntrance()
         {
+            if (this.equalAndPrefix.IsNotNullOrEmpty())
+                return this;
+
+            if (this.FromTable.IsNullOrEmpty())
+            {
+                this.From(this.FindTableName(this.tableInfo, typeof(Table)));
+            }
+
             this.formatColumnAppendCount = this.FormatTableAndColumn("a").Length - 1;
             this.tableNamePoint = string.Concat(this.FromTable, ".");
             this.asTableNamePoint = this.AsTable.IsNullOrEmpty() ? string.Empty : string.Concat(this.AsTable, ".");

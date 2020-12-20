@@ -32,13 +32,16 @@ namespace Never.EasySql.Linq.SqlServer
         public override InsertContext<Parameter, Table> InsertLastInsertId<ReturnType>()
         {
             this.LoadSqlOnGetResulting();
+            if (this.UseBulk)
+                return this;
+
             this.labels.Add(new ReturnLabel()
             {
                 TagId = NewId.GenerateNumber(),
                 Line = new TextLabel()
                 {
                     TagId = NewId.GenerateNumber(),
-                    SqlText = this.UseBulk ? ";select @@Identity;" : "select @@Identity;",
+                    SqlText = this.UseBulk ? "select @@Identity;" : "select @@Identity;",
                 },
                 Type = typeof(ReturnType).Name.ToLower(),
             });

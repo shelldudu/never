@@ -62,7 +62,7 @@ namespace Never.EasySql.Linq
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        protected UpdateContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter)
+        protected UpdateContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(tableInfo)
         {
             this.dao = dao;
             this.tableInfo = tableInfo;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Never.SqlClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -91,7 +92,7 @@ namespace Never.EasySql.Linq
         /// <param name="dao"></param>
         /// <param name="tableInfo"></param>
         /// <param name="sqlParameter"></param>
-        protected SelectContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter)
+        protected SelectContext(IDao dao, TableInfo tableInfo, EasySqlParameter<Parameter> sqlParameter) : base(tableInfo)
         {
             this.dao = dao; this.tableInfo = tableInfo; this.sqlParameter = sqlParameter;
             this.labels = new List<ILabel>(10);
@@ -167,7 +168,7 @@ namespace Never.EasySql.Linq
         /// <summary>
         /// 更新字段名
         /// </summary>
-        protected abstract SelectContext<Parameter, Table> SelectColumn(string columnName, string originalColunmName, string @as);
+        public abstract SelectContext<Parameter, Table> SelectColumn(string columnName, string originalColunmName, string @as);
 
         /// <summary>
         /// 查询所有
